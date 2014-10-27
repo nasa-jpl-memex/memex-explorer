@@ -9,7 +9,7 @@
 
         gridster.$el
           .on('mouseenter', '> li', function() {
-              gridster.resize_widget($(this), 2, 2);
+              gridster.resize_widget($(this), 3, 3);
           })
           .on('mouseleave', '> li', function() {
               gridster.resize_widget($(this), 1, 1);
