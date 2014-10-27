@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+<h2>Register Crawl</h2>
+<form method=post action="/register_crawl">
+
+<h3>Crawl:</h3>
+    {{ render_field(form.name) }}
+    {{ render_field(form.description) }}
+    {{ render_field(form.data_location) }}
+
+<p><input type=submit value=Register>
+</form>
+{% endblock %}

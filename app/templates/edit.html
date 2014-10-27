@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Edit Data Source: {{datasource.name}}</h2>
+
+  <form class="form-horizontal col-sm-9" action="" method="post" name="register">
+    {{form.hidden_tag()}}
+
+      <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+         <input type="text" class="form-control" id="name" name="name">
+         {{datasource.name}}
+        </div>
+        {% for error in form.errors.name %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label for="endpoint" class="col-sm-2 control-label">Endpoint</label>
+        <div class="col-sm-10">
+           <input type="text" class="form-control"  id="endpoint" name="endpoint">
+           {{datasource.endpoint}}
+        </div>
+        {% for error in form.errors.endpoint %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+     </div>
+
+     <div class="form-group">
+        <label for="uri" class="col-sm-2 control-label">URI</label>
+        <div class="col-sm-10">
+           <input type="text" class="form-control" id="uri" name="uri">
+           {{datasource.uri}}
+        </div>
+        {% for error in form.errors.uri %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+     </div>
+
+     <div class="form-group">
+        <label for="description "class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+           <input type="text" class="form-control" id="description" name="description">
+           {{datasource.description}}
+        </div>
+        {% for error in form.errors.description %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+      </div>
+     
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-9" align="center">
+           <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+     </div>
+
+  </form>
+
+  <div class="col-sm-3">
+  </div>
+
+
+{% endblock %}
