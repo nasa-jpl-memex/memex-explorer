@@ -1,4 +1,17 @@
-from app import db
+from . import db
+
+plots = db.Table('plots',
+    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id')),
+    db.Column('monitor_data_id', db.Integer, db.ForeignKey('monitor_data.id')),
+    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id')),
+    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id'))
+)
+
+
+dashboards = db.Table('dashboards',
+    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
+    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id'))
+)
 
 class Crawl(db.Model):
     __tablename__ = "crawl"
@@ -15,14 +28,6 @@ class Crawl(db.Model):
 
     def __repr__(self):
         return '<Crawl %r>' % (self.name)
-
-
-plots = db.Table('plots',
-    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id')),
-    db.Column('monitor_data_id', db.Integer, db.ForeignKey('monitor_data.id')),
-    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id')),
-    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id'))
-)
 
 
 class MonitorData(db.Model):
@@ -45,12 +50,6 @@ class Plot(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.Text)
     plot = db.Column(db.String(64), index=True, unique=True)
-
-
-dashboards = db.Table('dashboards',
-    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
-    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id'))
-)
 
 
 class Dashboard(db.Model):

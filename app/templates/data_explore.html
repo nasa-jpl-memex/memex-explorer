@@ -3,13 +3,13 @@
 
 {% block content %}
 
-<h2 span class="datasource-name">{{datasource.name}}</h2>
+<h2 span class="datasource-name">{{data.name}}</h2>
 
 {% include 'data_header.html' %}
 
 
 <button type="button" class="btn btn-default">
-  <a href="/data/{{datasource.endpoint}}/explore">Explore</a>
+  <a href="/crawl/{{crawl.endpoint}}/data/{{data.endpoint}}/explore">Explore</a>
 </button>
 
 <h3>Data shape:</h3>
@@ -29,12 +29,12 @@
 
 <h3>Plots:</h3>
 <ul>
-{% for d in dash_list %}
-<p><a href="/{{datasource.endpoint}}/dashboard/{{d.endpoint}}">{{d.name}}</a></p>
+{% for p in plot_list %}
+<p><a href="/plot/{{plot.endpoint}}">{{p.endpoint}}</a></p>
 {% endfor %}
 </ul>
 <button type="button" class="btn btn-default">
-  <a href="/data/{{datasource.endpoint}}/dashboard">Add Dashboard</a>
+  <a href="/create_plot">Add Plot</a>
 </button>
 
 {% endblock content %}

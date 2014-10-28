@@ -7,23 +7,23 @@ from wtforms.validators import DataRequired, Email
 class CrawlForm(Form):
     name = TextField('Name', validators = [DataRequired()])
     data_location = TextField('Data location', validators = [DataRequired()])
-    description = TextField('Description')
+    description = TextAreaField('Description')
 
 
 class MonitorDataForm(Form):
     name = TextField('Name', validators = [DataRequired()])
     data_uri = TextField('Data URI', validators = [DataRequired()])
-    description = TextField('Description')
+    description = TextAreaField('Description')
 
 
 class DashboardForm(Form):
     name = TextField('Name', validators = [DataRequired()])
-    description = TextField('Description')
+    description = TextAreaField('Description')
 
 
 class PlotForm(Form):
     name = TextField('Name', validators = [DataRequired()])
-    description = TextField('Description')
+    description = TextAreaField('Description')
     plot = SelectField('Plot', choices=[('domain', 'Domain'), ('harvest', 'Harvest'), \
         ('harvest rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
 

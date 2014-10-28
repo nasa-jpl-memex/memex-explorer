@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import os
 
 from webhelpers import text
@@ -5,22 +7,20 @@ from webhelpers import text
 from flask import redirect, flash, render_template, request, url_for, send_from_directory, jsonify, session
 
 from werkzeug import secure_filename
-from models import Crawl, MonitorData, Dashboard, Plot
-from forms import SourceForm, DashboardForm, ContactForm
-from nbconverter import html_export
+from .models import Crawl, MonitorData, Dashboard, Plot
+from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, PlotForm, ContactForm
 
 
-from app import app, db
+from . import app, db
 from blaze import resource, discover, Data, into, compute
 import json
 from pandas import DataFrame
 import datetime as dt
-from mail import send_email
-from config import ADMINS, DEFAULT_MAIL_SENDER
-from auth import requires_auth
+from .mail import send_email
+from .config import ADMINS, DEFAULT_MAIL_SENDER
+from .auth import requires_auth
 
-from bokeh.plotting import ColumnSource
-from plotting import map_builder, timeseries_builder
+from bokeh.plotting import ColumnDataSource
 
 
 @app.context_processor
@@ -47,9 +47,9 @@ def register():
             description = form.description.data)
         registered_crawl = crawl.query.filter_by(name=form.name.data).first()
 
-        if registered_source:
+        if registered_crawl:
             flash('Crawl name already registered, please choose another name', 'error')
-            return render_template('register_source.html', form=form)
+            return render_template('register_crawl.html', form=form)
 
         db.session.add(crawl)
         db.session.commit()
@@ -62,8 +62,8 @@ def register():
 def crawl(crawl_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     data = crawl.monitor_data.all()
-    plots = crawl.plots.all()
-    dashbs = crawl.dashboards.all()
+    plots = crawl.plots
+    dashbs = crawl.dashboards
     data_list = []
     plot_list = []
     dash_list = []
@@ -90,9 +90,9 @@ def register_data(crawl_endpoint):
             description = form.description.data, crawl=crawl)
         registered_data= crawl.query.filter_by(name=form.name.data).first()
 
-        if registered_source:
+        if registered_data:
             flash('MonitorData name already registered, please choose another name', 'error')
-            return render_template('register_source.html', form=form)
+            return render_template('register_data.html', form=form)
 
         db.session.add(data)
         db.session.commit()
@@ -104,15 +104,15 @@ def register_data(crawl_endpoint):
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>')
 def data(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    data = crawl.query.filter_by(endpoint=data_endpoint).first()
+    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
 
-    plots = monitor_data.plots.all()
+    plots = monitor_data.plots
     plot_list = []
     for p in plots:
         plot_list.append({"name": p.name,"endpoint": p.endpoint})
 
-    uri = data.uri
-    t = Data(data.uri)
+    uri = monitor_data.data_uri
+    t = Data(uri)
     dshape = t.dshape
     columns = t.fields
     fields = ', '.join(columns)
@@ -120,16 +120,21 @@ def data(crawl_endpoint, data_endpoint):
     df = into(DataFrame, expr)
     sample = df.to_html()
 
-    return render_template('data.html', data=data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
+    return render_template('data.html', crawl=crawl, data=monitor_data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
 
 
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>/explore')
 def data_explore(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    data = crawl.query.filter_by(endpoint=data_endpoint).first()
+    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
 
-    uri = data.uri
-    t = Data(daat.uri)
+    plots = monitor_data.plots
+    plot_list = []
+    for p in plots:
+        plot_list.append({"name": p.name,"endpoint": p.endpoint})
+
+    uri = monitor_data.data_uri
+    t = Data(uri)
     dshape = t.dshape
     columns = t.fields
     fields = ', '.join(columns)
@@ -137,7 +142,7 @@ def data_explore(crawl_endpoint, data_endpoint):
     df = into(DataFrame, expr)
     sample = df.to_html()
 
-    return render_template('data_explore.html', dshape=dshape, data=data, fields=fields, sample=sample) 
+    return render_template('data_explore.html', crawl=crawl, data=monitor_data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
 
 
 @app.route('/plot/<plot_endpoint>')
@@ -147,8 +152,15 @@ def plot(plot_endpoint):
 
     return render_template('plot.html', data=data, plot=plot) 
 
+@app.route('/plot/create_plot')
+def create_plot():
+    plot = Plot.query.filter_by(endpoint=plot_endpoint).first()
+    data = plot.data.query.all()
 
-@app.route('/dashboard/dashboard_endpoint>')
+    return render_template('create_plot.html', data=data, plot=plot) 
+
+
+@app.route('/dashboard/<dashboard_endpoint>')
 def dash(dashboard_endpoint):
     dash = Dashboard.query.filter_by(endpoint=dashboard_endpoint).first()
     plots = dash.plots

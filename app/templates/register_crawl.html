@@ -3,9 +3,10 @@
 
 {% block content %}
 <h2>Register Crawl</h2>
-<form method=post action="/register_crawl">
+<form method=post action="/register_data">
 
-<h3>Crawl:</h3>
+<h3>Crawl: {{crawl.name}}</h3>
+<h3>Monitor Data:</h3>
     {{ render_field(form.name) }}
     {{ render_field(form.description) }}
     {{ render_field(form.data_location) }}
@@ -13,3 +14,4 @@
 <p><input type=submit value=Register>
 </form>
 {% endblock %}
+

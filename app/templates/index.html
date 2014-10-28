@@ -3,17 +3,15 @@
 
 {% block content %}
 
-<h1>Data Space</h1>
+<h1>MEMEX Viewer</h1>
 
-<p>Data Space is a simple app that allows you to explore and visualize your data sources.</p>
-
-<p>You can register a datasource by its URI, explore the shape of your data, select the relevant fields that you want to plot, and create interactive dashboards.</p>
+<p>Viewers for statistics and dashboarding of Domain Search Engine data</p>
 
 <br>
 <div>
 <p>Start now:</p>
 <button type="button" class="btn btn-default">
-  <a href="/register_source">Register Source</a>
+  <a href="/register_crawl">Register Crawl</a>
 </button>
 </div>
 <br>
@@ -22,14 +20,6 @@
 <a href="http://continuum.io" target="_blank"><img src="{{ url_for('static', filename="images/continuum_analytics_logo.png") }}" width="200px" style="margin:20px"></a>
 <a href="http://www.jpl.nasa.gov/" target="_blank"><img src="{{ url_for('static', filename="images/nasa_jpl_logo.png") }}"  width="200px" style="margin:20px"></a>
 <a href="http://www.kitware.com" target="_blank"><img src="{{ url_for('static', filename="images/kitware.png") }}"  width="200px" style="margin:20px"></a>
-
-<br>
-
-<div>
-<p>If you have trouble uploading your data sources or would like to request a custom visualization for one of your data sets, please contact us!</p>
-<button type="button" class="btn btn-default">
-  <a href="/contact">Contact Ebola Space Team</a>
-</button>
-</div>
+<a href="" target="_blank"><img src="{{ url_for('static', filename="images/nyu-logo.png") }}"  width="200px" style="margin:20px"></a>
 
 {% endblock content %}
