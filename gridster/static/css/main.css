@@ -4,4 +4,6 @@
 img.graph{
 	with:200;
 	max-width: 100%;
+	background-color:#CC0099;
+	padding:5px;
 }
