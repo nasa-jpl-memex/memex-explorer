@@ -29,30 +29,6 @@
         {% endfor %}
      </div>
 
-     <!-- Issue -->
-     <div class="form-group">
-          <label class="col-sm-2 control-label">Issue</label>
-          <div class="col-sm-10">
-             {{form.issue(class_="form-control")}}
-          </div>
-            {% for error in form.errors.issue %}
-            <span style="color: red;">[{{error}}]</span>
-            {% endfor %}
-     </div>
-
-     <!-- Data -->
-     {% if data %}
-     <div class="form-group">
-        <label for="data" class="col-sm-2 control-label">Data URI</label>
-        <div class="col-sm-10">
-           <input type="text" class="form-control" id="data" readonly name="data" value="{{ data }}">
-        </div>
-        {% for error in form.errors.data %}
-        <span style="color: red;">[{{error}}]</span>
-        {% endfor %}
-     </div>
-     {% endif %}
-
      <!-- Description -->
      <div class="form-group">
         <label for="description "class="col-sm-2 control-label">Description</label>

@@ -39,7 +39,7 @@ def plot_builder(crawl, plot):
 
     if plot.plot == 'harvest_rate':
         data = MonitorData.query.filter_by(crawl_id=crawl.id)
-        harvest = data.filter_by(name='harvest_rate').first().data_uri
+        harvest = data.filter_by(name='harvest').first().data_uri
         d = Harvest(harvest)
         script, div = d.create_plot_harvest_rate()
 
@@ -49,5 +49,4 @@ def plot_builder(crawl, plot):
         t =  Termite(termite)
         script, div = t.create_plot()
 
-    #if plot.name == 'harvest':
     return script, div
