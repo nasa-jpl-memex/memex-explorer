@@ -13,13 +13,19 @@ from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, Plo
 
 from . import app, db
 from blaze import resource, discover, Data, into, compute
+
+import logging
+
+logging.shutdown()
+reload(logging)
+
 import json
 from pandas import DataFrame
 import datetime as dt
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
-
+from .plotting import plot_builder
 from bokeh.plotting import ColumnDataSource
 
 
@@ -43,8 +49,7 @@ def register():
 
     if request.method == 'POST' and form.validate():
         endpoint = text.urlify(form.name.data)
-        crawl = Crawl(name = form.name.data, endpoint = endpoint, data_location = form.data_location.data, \
-            description = form.description.data)
+        crawl = Crawl(name = form.name.data, endpoint = endpoint, description = form.description.data)
         registered_crawl = crawl.query.filter_by(name=form.name.data).first()
 
         if registered_crawl:
@@ -145,19 +150,33 @@ def data_explore(crawl_endpoint, data_endpoint):
     return render_template('data_explore.html', crawl=crawl, data=monitor_data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
 
 
-@app.route('/plot/<plot_endpoint>')
-def plot(plot_endpoint):
+
+@app.route('/<crawl_endpoint>/plot/<plot_endpoint>')
+def plot(crawl_endpoint, plot_endpoint):
+    crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     plot = Plot.query.filter_by(endpoint=plot_endpoint).first()
-    data = plot.data.query.all()
+    print plot
+    print plot.name
+    print plot.plot
+    script, div = plot_builder(crawl, plot)
 
-    return render_template('plot.html', data=data, plot=plot) 
+    return render_template('plot.html', plot=plot, crawl=crawl, div=div, script=script) 
 
-@app.route('/plot/create_plot')
-def create_plot():
-    plot = Plot.query.filter_by(endpoint=plot_endpoint).first()
-    data = plot.data.query.all()
 
-    return render_template('create_plot.html', data=data, plot=plot) 
+@app.route('/crawl/<crawl_endpoint>/create_plot', methods=['GET', 'POST'])
+def create_plot(crawl_endpoint):
+    form = PlotForm(request.form)
+    crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
+    if request.method == 'POST' and form.validate():
+        endpoint = text.urlify(form.name.data)
+        plot = Plot(name = form.name.data, endpoint = endpoint, plot=form.plot.data, description = form.description.data)
+        crawl.plots.append(plot)
+        db.session.add(plot)
+        db.session.commit()
+        flash('Your plot was successfully registered', 'success')
+        return redirect(url_for('plot', crawl_endpoint=crawl.endpoint, plot_endpoint=endpoint))
+
+    return render_template('create_plot.html', crawl=crawl, form=form) 
 
 
 @app.route('/dashboard/<dashboard_endpoint>')

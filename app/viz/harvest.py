@@ -8,35 +8,27 @@ from bokeh.objects import HoverTool
 from collections import OrderedDict
 import numpy as np
 import datetime as dt
-
-def generate_harvest():
-    """
-    Generates a fake_harvest_data
-    """
-    harvest_data = 'data_monitor/harvestinfo.csv'
-    return harvest_data
-
+from bokeh.embed import components
+from bokeh.resources import CDN
 
 class Harvest(object):
 
-    def __init__(self, input_data='data_monitor/harvestinfo.csv'):
+    def __init__(self, input_data='harvestinfo.csv'):
         self.harvest_data = input_data
         self.source = self.update_source()
         self.plot, self.rate_plot = self.create_plot()
 
     def update_source(self):
-        t = Table(CSV(self.harvest_data, columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
+        t = Data(CSV(self.harvest_data, columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
         t = transform(t, timestamp=t.timestamp.map(dt.datetime.fromtimestamp, schema='{timestamp: datetime}'))
-        t = transform(t, date=t.timestamp.map(lambda x: x.date(), schema='{date: date}'))
+        t = transform(t, date=t.timestamp.date())
         t = transform(t, harvest_rate=t.relevant_pages/t.downloaded_pages)
 
         source = into(ColumnDataSource, t)
 
         return source
 
-    def create_plot(self, output_html='harvest.html'):
-
-        output_file(output_html)
+    def create_plot_harvest(self):
 
         figure(plot_width=500, plot_height=250, title="Harvest Plot", tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover', x_axis_type='datetime')
         hold()
@@ -55,6 +47,12 @@ class Harvest(object):
 
         harvest_plot = curplot()
 
+        domain_by_relevance = components(harvest_plot, CDN)
+        
+        return harvest_plot
+
+    def create_plot_harvest_rate(self):
+
         figure(plot_width=500, plot_height=250, title="Harvest Rate", x_axis_type='datetime', tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
         line(x="timestamp", y="harvest_rate", fill_alpha=0.6, color="blue", width=0.2, legend="harvest_rate", source=self.source)
         scatter(x="timestamp", y="harvest_rate", alpha=0, color="blue", legend="harvest_rate", source=self.source)
@@ -66,4 +64,6 @@ class Harvest(object):
 
         harvest_rate_plot = curplot()
 
-        return harvest_plot, harvest_rate_plot
+        domain_by_relevance = components(harvest_rate_plot, CDN)
+
+        return harvest_rate_plot

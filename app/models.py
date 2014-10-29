@@ -18,7 +18,6 @@ class Crawl(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     endpoint = db.Column(db.String(64), index=True, unique=True)
-    data_location = db.Column(db.String(120), index=True, unique=True)
     description = db.Column(db.Text)
     monitor_data = db.relationship('MonitorData', backref='crawl', lazy='dynamic')
     plots = db.relationship('Plot', secondary=plots, \
@@ -47,14 +46,16 @@ class MonitorData(db.Model):
 
 class Plot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
+    name = db.Column(db.String(64), index=True)
     description = db.Column(db.Text)
-    plot = db.Column(db.String(64), index=True, unique=True)
+    endpoint = db.Column(db.String(64), index=True, unique=True)
+    plot = db.Column(db.String(64), index=True)
 
 
 class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
+    endpoint = db.Column(db.String(64), index=True, unique=True)
     description = db.Column(db.Text)
     plots = db.relationship('Plot', secondary=plots, \
         backref=db.backref('dashboard', lazy='dynamic'))

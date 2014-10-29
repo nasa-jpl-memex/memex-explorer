@@ -1,26 +1,27 @@
 {% extends "base.html" %}
 {% set active_page = "overview" %}
 
-{% block content %}
+{% if script != None %}
+{% block extrahead %}
+{{ script|safe }}
+{% endblock extrahead %}
+{% endif %}
 
+{% block content %}
 <h2 class="dashboard-name">{{plot.name}}</h2>
 
 {% include 'plot_header.html' %}
 
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/plot/{{plot.endpoint}}/delete">Delete</a>
-</button>
-
-<button type="button" class="btn btn-default">
-  <a href="/plot/{{plot.endpoint}}/edit">Edit</a>
-</button>
-
-<h3 class="available-dashboards">Monitor data in the plot:</h3>
-<ul>
-
+<!--
 {% for d in data %}
 <li><a href="/crawl/{{d.crawl.endpoint}}/data/{{d.endpoint}}">{{d.name}}</a></l>
 {% endfor %}
-</ul>
+</ul-->
+
+<h3>Your plot:</h3>
+<div class="data-sample">
+{{ div|safe }}
+</div>
 
 {% endblock content %}
+

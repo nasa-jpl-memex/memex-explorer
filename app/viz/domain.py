@@ -20,22 +20,29 @@ def group_by_minutes(d, minutes):
 
 class Domain(object):
 
-    def __init__(self):
+    def __init__(self, crawled='crawledpages.csv', relevant='relevantpages.csv', frontier='frontierpages.csv', output_dir='data_preprocessed'):
+        self.relevant = relevant
+        self.crawled = crawled
+        self.frontier = frontier
+        self.output_dir = output_dir
         self.sort_relevant_source, self.sort_crawled_source, self.sort_frontier_source = self.update_source()
-        self.sort_relevant_plot, self.sort_crawled_plot, self.sort_frontier_plot  = self.create_plot()
+        #self.sort_relevant_plot = self.create_plot_relevant()
+        #self.sort_crawled_plot =  self.create_plot_crawled()
+        #self.sort_frontier_plot = self.create_plot_frontier()
 
     def generate_data(self, minutes=5):
         """
         Generates the domain data (Preprocessing)
         """
-        relevant_data ='data_monitor/relevantpages.csv'
-        crawled_data = 'data_monitor/crawledpages.csv'
-        frontier_data = 'data_monitor/frontierpages.csv'
+        relevant_data = self.relevant
+        crawled_data = self.crawled
+        frontier_data = self.frontier
         # Transform the summary.txt file into a csv file with the purpose of inputing the file into Blaze-Bokeh for visualization.
         fmt ='%Y-%m-%d-%H-%M-%S-%f' 
         current_time = dt.datetime.now().strftime(fmt)
-        #relevant_file = '%s_relevantpages.csv' % current_time
-        relevant_file = 'data_preprocessed/relevantpages.csv'
+        relevant_file = self.output_dir+'/'+'relevantpages.csv'
+        #relevant_file = self.output_dir+'/'+'relevantpages_%s.csv' % current_time
+
         with open(relevant_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
             with open(relevant_data, 'rb') as f:
@@ -56,8 +63,8 @@ class Domain(object):
                         print 'file %s, line %d: %s' % (input_summary, reader.line_num, e)
                         pass
 
-        #crawled_file = '%s_crawledpages.csv' % current_time
-        crawled_file = 'data_preprocessed/crawledpages.csv'
+        crawled_file = self.output_dir+'/'+'crawledpages.csv'
+        #crawled_file = self.output_dir+'/'+'crawledpages._%s.csv' % current_time
         with open(crawled_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
             with open(crawled_data, 'rb') as f:
@@ -78,8 +85,8 @@ class Domain(object):
                         print 'file %s, line %d: %s' % (input_summary, reader.line_num, e)
                         pass
 
-        #frontier_file = '%s_frontierpages.csv' % current_time
-        frontier_file = 'data_preprocessed/frontierpages.csv'
+        frontier_file = self.output_dir + '/' + 'frontierpages.csv'
+        #frontier_file = self.output_dir + '/' + 'frontierpages_%s.csv' % current_time
         with open(frontier_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
             with open(frontier_data, 'rb') as f:
@@ -115,6 +122,7 @@ class Domain(object):
         #t_crawled = Table(CSV(crawled_file, columns=["url", "domain", "timestamp", "minute"], encoding='utf-8'), schema = "{url: string, domain:string, timestamp:datetime, minute:datetime}")
         #t_relevant = Table(CSV(relevant_file, columns=["url", "domain", "timestamp", "minute"], encoding='utf-8'), schema ="{url: string, domain:string, timestamp:datetime, minute:datetime}")
         df_frontier = pd.read_csv(frontier_file, names = ["domain"], delimiter='\t', encoding='utf-8', engine='c', error_bad_lines=False, squeeze=True)
+        print df_frontier
         df_crawled = pd.read_csv(crawled_file, names = ["domain", "timestamp", "minute"], delimiter='\t', encoding='utf-8')
         df_relevant = pd.read_csv(relevant_file, names = ["domain", "timestamp", "minute"], delimiter='\t', encoding='utf-8')
 
@@ -141,13 +149,18 @@ class Domain(object):
         sort_relevant = joined.sort('relevant_count', ascending=False).head(25)
         sort_crawled = joined.sort('crawled_count', ascending=False).head(25)
         sort_frontier = joined.sort('frontier_count', ascending=False).head(25)
+        print sort_relevant
+        print sort_crawled
+        print sort_frontier
 
         return sort_relevant, sort_crawled, sort_frontier
+
 
     def update_source(self):
 
         sort_relevant, sort_crawled, sort_frontier = self.generate_data()
-
+        print "What's wrong?"
+        print sort_relevant
         # Sorted by Relevance
         # Generate the column that calculates the center of the rectangle for the rect glyph.
         sort_relevant['relevant_rect'] = sort_relevant['relevant_count'].map(lambda x: x/2)
@@ -172,11 +185,12 @@ class Domain(object):
 
         return sort_relevant_source, sort_crawled_source, sort_frontier_source
 
-    def create_plot(self, output_html='domain.html'):
 
-        output_file('domain.html')
+    def create_plot_relevant(self):
+
         # Sorted by Relevance
         y_range= self.sort_relevant_source.data['index']
+        print y_range
 
         figure(plot_width=400, plot_height=400, title="Domains Sorted by Relevance", y_range = y_range, tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
@@ -190,6 +204,13 @@ class Domain(object):
 
         sort_relevant_plot = curplot()
 
+        domain_by_relevance = components(sort_relevant_plot, CDN)
+
+        return domain_by_relevance
+
+
+    def create_plot_frontier(self):
+
         # Sorted by Frontier
         y_range= self.sort_frontier_source.data['index']
 
@@ -202,8 +223,13 @@ class Domain(object):
         #rect(y=y_range, x='relevant_rect', height=1, width='relevant_count', color="blue", fill_color="blue", source = self.sort_frontier_source, legend="relevant")
 
         axis().major_label_text_font_size = "8pt"
-
         sort_frontier_plot = curplot()
+        domain_by_frontier= components(sort_frontier_plot, CDN)
+
+        return domain_by_frontier
+
+
+    def create_plot_crawled(self):
 
         # Sorted by Crawled
         y_range= self.sort_crawled_source.data['index']
@@ -217,28 +243,10 @@ class Domain(object):
         rect(y=y_range, x='relevant_rect', height=1, width='relevant_count', color="red", fill_color="red", source = self.sort_crawled_source, legend="relevant")
 
         axis().major_label_text_font_size = "8pt"
-
         sort_crawled_plot = curplot()
-        
-        return sort_relevant_plot, sort_crawled_plot, sort_frontier_plot
+        domain_by_crawled= components(sort_crawled_plot, CDN)
 
-    def domain_by_relevance(self):
-        sort_relevant_plot, sort_crawled_plot, sort_frontier_plot = self.create_plot()
-
-        domain_by_relevance = components(sort_relevant_plot, CDN)
-        return domain_by_relevance
-
-    def domain_by_crawled(self):
-        sort_relevant_plot, sort_crawled_plot, sort_frontier_plot = self.create_plot()
-
-        domain_by_crawled = components(sort_crawled_plot, CDN)
         return domain_by_crawled
-
-     def domain_by_frontier(self):
-        sort_relevant_plot, sort_crawled_plot, sort_frontier_plot = self.create_plot()
-
-        domain_by_frontier = components(sort_frontier_plot, CDN)
-        return domain_by_frontier
 
 
 

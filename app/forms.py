@@ -6,7 +6,6 @@ from wtforms.validators import DataRequired, Email
 
 class CrawlForm(Form):
     name = TextField('Name', validators = [DataRequired()])
-    data_location = TextField('Data location', validators = [DataRequired()])
     description = TextAreaField('Description')
 
 
@@ -24,7 +23,8 @@ class DashboardForm(Form):
 class PlotForm(Form):
     name = TextField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
-    plot = SelectField('Plot', choices=[('domain', 'Domain'), ('harvest', 'Harvest'), \
+    plot = SelectField('Plot', choices=[('domain_by_relevance', 'Domain Relevance'), ('domain_by_crawled', 'Domain Crawled'), \
+        ('domain_by_frontier', 'Domain Frontier'), ('harvest', 'Harvest'), \
         ('harvest rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
 
 

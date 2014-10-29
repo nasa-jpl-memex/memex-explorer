@@ -5,6 +5,9 @@ import pandas as pd
 from bokeh.plotting import *
 import numpy as np
 import datetime as dt
+from bokeh.embed import components
+from bokeh.resources import CDN
+
 
 
 class Termite(object):
@@ -13,7 +16,7 @@ class Termite(object):
     def __init__(self, input_data='data_monitor/summary.txt'):
         self.input_data = input_data
         self.data, self.source = self.update_source()
-        self.plot = self.create_plot()
+        #self.plot = self.create_plot()
 
     def generate_data(self):
         """
@@ -108,4 +111,7 @@ class Termite(object):
         xaxis().major_label_orientation = np.pi/3
         #show()
 
-        return curplot()
+        plot = curplot()
+        termite = components(plot, CDN)
+
+        return termite
