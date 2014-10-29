@@ -5,7 +5,9 @@
 
 <h2 class="dashboard-name">{{crawl.name}}</h2>
 
-{% include 'crawl_header.html' %}
+<!-- {% include 'crawl_header.html' %} -->
+<p>{{crawl.description}}</p>
+
 
 <button type="button" class="btn btn-default btn-duo">
   <a href="/crawl/{{crawl.endpoint}}/register_data">Add Monitor Data</a>
@@ -23,26 +25,34 @@
   <a href="/crawl/{{crawl.endpoint}}/edit">Edit</a>
 </button>
 
+{% if data_list %}
 <h3 class="available-dashboards">Monitor Data:</h3>
 <ul>
 {% for d in data_list %}
 <li><a href="/crawl/{{crawl.endpoint}}/data/{{d.endpoint}}">{{d.name}}</a></l>
 {% endfor %}
 </ul>
+{% endif %}
 
+{% if plot_list %}
 <h3 class="available-dashboards">Plots:</h3>
 <ul>
 {% for p in plot_list %}
 <li><a href="/{{crawl.endpoint}}/plot/{{p.endpoint}}">{{p.name}}</a></l>
 {% endfor %}
 </ul>
+{% endif %}
 
+{% if dash_list %}
 <h3 class="available-dashboards">Dashboards:</h3>
 <ul>
 {% for d in dash_list %}
 <li><a href="/{{crawl.endpoint}}/dashboard/{{d.endpoint}}">{{d.name}}</a></l>
 {% endfor %}
 </ul>
+{% else %}
+<h3>No dashboards available.</h3>
+{% endif %}
 
 
 {% endblock content %}
