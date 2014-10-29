@@ -1,12 +1,7 @@
 .widget{
 	list-style: none;
 }
-img.graph{
-	with:150;
-	background-color:red;
-	padding:5px;
-}
 .gridster li{
-	background-color:red;
+	background-color:#F7F7F7;
 	list-style: none;
 }

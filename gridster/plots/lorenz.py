@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.integrate import odeint
 from bokeh.plotting import *
+from bokeh.embed import components
+import bokeh.resources
 
 sigma = 10
 rho = 28
@@ -28,10 +30,11 @@ colors = ["#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08
 
 output_file("lorenz.html", title="lorenz.py example")
 
+figure(plot_width=300, plot_height=300)
+
 multi_line(np.array_split(xprime, 7), np.array_split(z, 7),
-           line_color=colors, line_alpha=0.8, line_width=1.5,
-           tools="pan,wheel_zoom,box_zoom,reset,previewsave", title="lorenz example", name="lorenz_example")
+           line_color=colors, line_alpha=0.8, line_width=1.5, 
+           tools="pan,wheel_zoom,box_zoom,reset,previewsave", title="lorenz example", 
+           name="lorenz_example")
 
-
-
-show()  # open a browser
+a, b = components(curplot(), bokeh.resources.CDN)
