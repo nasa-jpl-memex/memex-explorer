@@ -45,6 +45,7 @@ class MonitorData(db.Model):
 
 
 class Plot(db.Model):
+    __tablename__ = "plot"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True)
     description = db.Column(db.Text)
@@ -53,6 +54,7 @@ class Plot(db.Model):
 
 
 class Dashboard(db.Model):
+    __tablename__ = "dashboard"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     endpoint = db.Column(db.String(64), index=True, unique=True)

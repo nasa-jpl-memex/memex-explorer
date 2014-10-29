@@ -73,11 +73,11 @@
             {% set href, id, caption = ['/crawl/' + crawl.endpoint , crawl.endpoint, crawl.name] %}
               <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
             {% endfor %}
-          <h4>Plots:</h4>
+          <!--h4>Plots:</h4>
             {% for plot in plots %}
             {% set href, id, caption = ['/plot/' + plot.endpoint , plot.endpoint, plot.name] %}
               <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
-            {% endfor %}
+            {% endfor %}-->
           <h4>Dashboards:</h4>
             {% for dash in dashboards %}
             {% set href, id, caption = ['/dash/' + dash.endpoint , dash.endpoint, dash.name] %}

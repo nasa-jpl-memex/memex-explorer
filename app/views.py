@@ -16,9 +16,6 @@ from blaze import resource, discover, Data, into, compute
 
 import logging
 
-logging.shutdown()
-reload(logging)
-
 import json
 from pandas import DataFrame
 import datetime as dt
