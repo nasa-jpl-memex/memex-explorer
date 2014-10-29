@@ -2,8 +2,11 @@
 	list-style: none;
 }
 img.graph{
-	with:200;
-	max-width: 100%;
-	background-color:#CC0099;
+	with:150;
+	background-color:red;
 	padding:5px;
+}
+.gridster li{
+	background-color:red;
+	list-style: none;
 }
