@@ -33,6 +33,19 @@ def inject_crawls():
     dashboards = Dashboard.query.all()
     return dict(crawls=crawls, plots=plots, dashboards=dashboards)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def application_error(e):
+    # TODO
+    # http://flask.pocoo.org/docs/0.10/errorhandling/#application-errors
+
+    # sender = DEFAULT_MAIL_SENDER
+    # send_email(subject=subject, sender=sender, recipients=ADMINS, text_body=text_body, html_body=text_body)
+    return render_template('500.html'), 500
+
 
 @app.route('/')
 @app.route('/index')
