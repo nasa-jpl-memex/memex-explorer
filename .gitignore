@@ -52,3 +52,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# App-generated files and folders
+app.db
+db_repository/
+data_monitor/
+data_preprocessed/
