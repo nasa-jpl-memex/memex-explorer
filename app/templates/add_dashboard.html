@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set active_page = "overview" %}
+
+{% block content %}
+
+<h2 class="datasource-name">{{datasource.name}}</h2>
+
+{% include 'data_header.html' %}
+
+<button type="button" class="btn btn-default">
+  <a href="/data/{{datasource.endpoint}}/explore">Explore</a>
+</button>
+
+<h3>Data shape:</h3>
+<div>
+    <pre>{{dshape}}</pre>
+</div>
+
+<h3>Fields:</h3>
+<div>
+    <pre>{{fields}}</pre>
+</div>
+
+<h3>Sample:</h3>
+<div class="data-sample">
+{{ sample|safe }}
+</div>
+
+<button type="button" class="btn btn-default">
+  <a href="/data/{{datasource.endpoint}}/dashboard">Add Dashboard</a>
+</button>
+
+{% endblock content %}

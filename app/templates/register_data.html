@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+  
+  <h3>Crawl: {{crawl.name}}</h3>
+  
+  <h2>Register Monitor Data</h2>
+
+  <form class="form-horizontal col-sm-9" action="" method="post" name="register" enctype="multipart/form-data">
+      {{form.hidden_tag()}}
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">{{form.name.label}}</label>
+        <div class="col-sm-10">
+           {{ form.name|safe }}
+        </div>
+        {% for error in form.errors.name %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+     </div>
+
+     <div class="form-group">
+        <label class="col-sm-2 control-label">{{form.data_uri.label}}</label>
+        <div class="col-sm-10">
+           {{ form.data_uri|safe }}
+        </div>
+        {% for error in form.errors.data_uri %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+     </div>
+
+     <div class="form-group">
+        <label class="col-sm-2 control-label">{{form.description.label}}</label>
+        <div class="col-sm-10">
+           {{ form.description|safe }}
+        </div>
+        {% for error in form.errors.description %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-9" align="center">
+           <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+     </div>
+
+  </form>
+
+  <div class="col-sm-3">
+  </div>
+
+{% endblock %}
