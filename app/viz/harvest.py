@@ -16,12 +16,12 @@ class Harvest(object):
     def __init__(self, input_data='harvestinfo.csv'):
         self.harvest_data = input_data
         self.source = self.update_source()
-        self.plot, self.rate_plot = self.create_plot()
+        #self.plot, self.rate_plot = self.create_plot()
 
     def update_source(self):
         t = Data(CSV(self.harvest_data, columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
-        t = transform(t, timestamp=t.timestamp.map(dt.datetime.fromtimestamp, schema='{timestamp: datetime}'))
-        t = transform(t, date=t.timestamp.date())
+        t = transform(t, timestamp=t.timestamp.map(dt.datetime.fromtimestamp, schema='datetime'))
+        t = transform(t, date=t.timestamp.map(lambda x: x.date(), schema='date'))
         t = transform(t, harvest_rate=t.relevant_pages/t.downloaded_pages)
 
         source = into(ColumnDataSource, t)
@@ -47,9 +47,9 @@ class Harvest(object):
 
         harvest_plot = curplot()
 
-        domain_by_relevance = components(harvest_plot, CDN)
+        harvest = components(harvest_plot, CDN)
         
-        return harvest_plot
+        return harvest
 
     def create_plot_harvest_rate(self):
 
@@ -64,6 +64,6 @@ class Harvest(object):
 
         harvest_rate_plot = curplot()
 
-        domain_by_relevance = components(harvest_rate_plot, CDN)
+        harvest_rate = components(harvest_rate_plot, CDN)
 
-        return harvest_rate_plot
+        return harvest_rate

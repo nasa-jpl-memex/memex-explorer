@@ -113,7 +113,13 @@ def data(crawl_endpoint, data_endpoint):
     for p in plots:
         plot_list.append({"name": p.name,"endpoint": p.endpoint})
 
-    uri = monitor_data.data_uri
+    try:
+        uri = monitor_data.data_uri
+        r = resource(uri)
+    except Exception as e:
+        flash("Could not parse the data source with Blaze. Sorry, it's not possible to explore the dataset at this time.", 'error')
+        return redirect(url_for('crawl', crawl_endpoint=crawl.endpoint))
+
     t = Data(uri)
     dshape = t.dshape
     columns = t.fields
