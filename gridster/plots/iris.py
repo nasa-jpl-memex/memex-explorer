@@ -3,7 +3,7 @@ from bokeh.embed import components
 import bokeh.resources
 from bokeh.plotting import *
 
-output_file("iris.html", title="iris.py example", mode='cdn')
+output_server("iris")
 
 colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
 
@@ -15,6 +15,7 @@ flowers['color'] = flowers['species'].map(lambda x: colormap[x])
 
 scatter(flowers["petal_length"], flowers["petal_width"],
         color=flowers["color"], fill_alpha=0.2, size=10, name="iris",
+        tools="pan,wheel_zoom,box_zoom,reset,previewsave",
         plot_width=300, plot_height=300)
         
 xax, yax = axis()
@@ -23,4 +24,5 @@ yax.axis_label = 'Petal Width'
 
 curplot().title = "Iris Morphology"
 
-a, b = components(curplot(), bokeh.resources.CDN)
+# a, b = components(curplot(), bokeh.resources.CDN)
+show()

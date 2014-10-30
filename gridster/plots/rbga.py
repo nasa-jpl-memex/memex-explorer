@@ -18,7 +18,7 @@ for i in range(N):
         view[i, j, 2] = int(j/N*255)
         view[i, j, 3] = 255
 
-output_file("image_rgba.html", title="image_rgba.py example")
+output_server("rbga")
 
 image_rgba(
     image=[img], x=[0], y=[0], dw=[10], dh=[10],
@@ -26,4 +26,5 @@ image_rgba(
     tools="pan,wheel_zoom,box_zoom,reset,previewsave", name="image_example",
     plot_width=300, plot_height=300)
 
-a, b = components(curplot(), bokeh.resources.CDN)
+# a, b = components(curplot(), bokeh.resources.CDN)
+show()
