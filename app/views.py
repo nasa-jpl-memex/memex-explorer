@@ -1,29 +1,39 @@
-from __future__ import absolute_import
+"""Main views for memex-viewer application"""
+from __future__ import absolute_import, division, print_function
+
+#  IMPORTS 
+# =========
+
+# Standard Library
+# ----------------
 
 import os
+import logging
+import json
+import datetime as dt
 
+# Third-party Libraries 
+# ---------------------
+
+from flask import (redirect, flash, render_template, request, url_for,
+                   send_from_directory, jsonify, session, abort)
+from werkzeug import secure_filename
 from webhelpers import text
 
-from flask import redirect, flash, render_template, request, url_for, send_from_directory, jsonify, session
+from blaze import resource, discover, Data, into, compute
+from pandas import DataFrame
+from bokeh.plotting import ColumnDataSource
 
-from werkzeug import secure_filename
-from .models import Crawl, MonitorData, Dashboard, Plot
-from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, PlotForm, ContactForm
-
+# Local Imports
+# -------------
 
 from . import app, db
-from blaze import resource, discover, Data, into, compute
-
-import logging
-
-import json
-from pandas import DataFrame
-import datetime as dt
+from .models import Crawl, MonitorData, Dashboard, Plot
+from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
 from .plotting import plot_builder
-from bokeh.plotting import ColumnDataSource
 
 
 @app.context_processor
@@ -33,9 +43,11 @@ def inject_crawls():
     dashboards = Dashboard.query.all()
     return dict(crawls=crawls, plots=plots, dashboards=dashboards)
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
 
 @app.errorhandler(500)
 def application_error(e):
@@ -48,84 +60,89 @@ def application_error(e):
 
 
 @app.route('/')
-@app.route('/index')
 def index():
     return render_template('index.html')
 
+# Crawl
+# -----------------------------------------------------------------------------
 
 @app.route('/register_crawl', methods=['GET', 'POST'])
 def register():
     form = CrawlForm(request.form)
-
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         endpoint = text.urlify(form.name.data)
-        crawl = Crawl(name = form.name.data, endpoint = endpoint, description = form.description.data)
-        registered_crawl = crawl.query.filter_by(name=form.name.data).first()
+        crawl = Crawl(name=form.name.data,
+                      endpoint=endpoint,
+                      description=form.description.data)
 
-        if registered_crawl:
-            flash('Crawl name already registered, please choose another name', 'error')
+        crawl_exists = crawl.query.filter_by(name=form.name.data).first()
+        if crawl_exists:
+            flash("A crawl named '%s' has already been registered-"
+                  "please provide another name." % form.name.data, 'error')
             return render_template('register_crawl.html', form=form)
+        else:
+            db.session.add(crawl)
+            db.session.commit()
+            flash('%s has successfully been registered!' % form.name.data, 'success')
+            return redirect(url_for('crawl', crawl_endpoint=endpoint))
 
-        db.session.add(crawl)
-        db.session.commit()
-        flash('Your data source was successfully registered', 'success')
-        return redirect('/index')
     return render_template('register_crawl.html', form=form)
 
 
 @app.route('/crawl/<crawl_endpoint>')
 def crawl(crawl_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
+    if crawl is None:
+        flash("Crawl '%s' was not found." % crawl_endpoint, 'error')
+        abort(404)
+
     data = crawl.monitor_data.all()
     plots = crawl.plots
     dashbs = crawl.dashboards
-    data_list = []
-    plot_list = []
-    dash_list = []
-    for d in data:
-        data_list.append({"name": d.name,"endpoint": d.endpoint})
-    for p in plots:
-        plot_list.append({"name": p.name,"endpoint": p.endpoint})
-    for d in dashbs:
-        dash_list.append({"name": d.name,"endpoint": d.endpoint})
-    if crawl == None:
-        flash('Crawl %s not found.' % crawl.name)
-        return redirect(url_for('index'))
-    return render_template('crawl.html', crawl=crawl, data_list=data_list, plot_list=plot_list, dash_list=dash_list)
 
+    data_list = [dict(name=x.name, endpoint=x.endpoint) for x in data]
+    plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
+    dash_list = [dict(name=x.name, endpoint=x.endpoint) for x in dashbs]
+
+    return render_template('crawl.html',
+                            crawl=crawl, data_list=data_list,
+                            plot_list=plot_list, dash_list=dash_list)
+
+# Data
+# -----------------------------------------------------------------------------
 
 @app.route('/crawl/<crawl_endpoint>/register_data', methods=['GET', 'POST'])
 def register_data(crawl_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     form = MonitorDataForm(request.form)
 
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         endpoint = text.urlify(form.name.data)
-        data = MonitorData(name = form.name.data, endpoint = endpoint, data_uri = form.data_uri.data, \
-            description = form.description.data, crawl=crawl)
-        registered_data= crawl.query.filter_by(name=form.name.data).first()
+        data = MonitorData(name=form.name.data, endpoint=endpoint,
+           data_uri=form.data_uri.data, description=form.description.data, crawl=crawl)
+        registered_data = crawl.query.filter_by(name=form.name.data).first()
 
         if registered_data:
-            flash('MonitorData name already registered, please choose another name', 'error')
+            flash('Monitor data name already registered, please choose another name', 'error')
             return render_template('register_data.html', form=form)
 
         db.session.add(data)
         db.session.commit()
-        flash('Your monitor data was successfully registered', 'success')
-        return redirect('/index')
+        flash("Monitor data source '%s' was successfully registered" % form.name.data, 'success')
+        return redirect(url_for('data', crawl_endpoint=crawl_endpoint, data_endpoint=endpoint))
+
     return render_template('register_data.html', crawl=crawl, form=form)
 
 
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>')
 def data(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
+    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id, endpoint=data_endpoint).first()
 
     plots = monitor_data.plots
-    plot_list = []
-    for p in plots:
-        plot_list.append({"name": p.name,"endpoint": p.endpoint})
+    plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
 
+    # TODO wrap Blaze err handling
     uri = monitor_data.data_uri
     t = Data(uri)
     dshape = t.dshape
@@ -135,7 +152,9 @@ def data(crawl_endpoint, data_endpoint):
     df = into(DataFrame, expr)
     sample = df.to_html()
 
-    return render_template('data.html', crawl=crawl, data=monitor_data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
+    return render_template('data.html',
+                           crawl=crawl, data=monitor_data, plots=plots,
+                           fields=fields, sample=sample, dshape=dshape) 
 
 
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>/explore')
@@ -144,10 +163,9 @@ def data_explore(crawl_endpoint, data_endpoint):
     monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
 
     plots = monitor_data.plots
-    plot_list = []
-    for p in plots:
-        plot_list.append({"name": p.name,"endpoint": p.endpoint})
+    plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
 
+    # TODO wrap Blaze err handling
     uri = monitor_data.data_uri
     t = Data(uri)
     dshape = t.dshape
@@ -157,45 +175,39 @@ def data_explore(crawl_endpoint, data_endpoint):
     df = into(DataFrame, expr)
     sample = df.to_html()
 
-    return render_template('data_explore.html', crawl=crawl, data=monitor_data, plots=plots, fields=fields, sample=sample, dshape=dshape) 
+    return render_template('data_explore.html',
+                           crawl=crawl, data=monitor_data, plots=plots,
+                           fields=fields, sample=sample, dshape=dshape) 
 
-
+# Plot
+# -----------------------------------------------------------------------------
 
 @app.route('/<crawl_endpoint>/plot/<plot_endpoint>')
 def plot(crawl_endpoint, plot_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     plot = Plot.query.filter_by(endpoint=plot_endpoint).first()
-    print plot
-    print plot.name
-    print plot.plot
     script, div = plot_builder(crawl, plot)
 
-    return render_template('plot.html', plot=plot, crawl=crawl, div=div, script=script) 
+    return render_template('plot.html',
+                           plot=plot, crawl=crawl, div=div, script=script) 
 
 
 @app.route('/crawl/<crawl_endpoint>/create_plot', methods=['GET', 'POST'])
 def create_plot(crawl_endpoint):
     form = PlotForm(request.form)
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         endpoint = text.urlify(form.name.data)
-        plot = Plot(name = form.name.data, endpoint = endpoint, plot=form.plot.data, description = form.description.data)
+        plot = Plot(name=form.name.data, endpoint=endpoint,
+                    plot=form.plot.data, description=form.description.data)
         crawl.plots.append(plot)
         db.session.add(plot)
         db.session.commit()
-        flash('Your plot was successfully registered', 'success')
-        return redirect(url_for('plot', crawl_endpoint=crawl.endpoint, plot_endpoint=endpoint))
+        flash('Your plot was successfully registered!', 'success')
+        return redirect(url_for('plot',
+            crawl_endpoint=crawl.endpoint, plot_endpoint=endpoint))
 
-    return render_template('create_plot.html', crawl=crawl, form=form) 
-
-
-@app.route('/dashboard/<dashboard_endpoint>')
-def dash(dashboard_endpoint):
-    dash = Dashboard.query.filter_by(endpoint=dashboard_endpoint).first()
-    plots = dash.plots
-    crawls = dash.crawls.query.all()
-
-    return render_template('dash.html', dash=dash, plot=plot, crawls=crawls) 
+    return render_template('create_plot.html', crawl=crawl, form=form)
 
 
 @app.route('/data/<data_endpoint>/edit', methods=['GET', 'POST'])
@@ -206,7 +218,7 @@ def data_edit(data_endpoint):
     datasource = Crawl.query.filter_by(endpoint=data_endpoint).first()
 
     description = Crawl.description
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         db.session.add(crawl)
         crawl.name = form.name.data
         crawl.endpoint = text.urlify(form.name.data)
@@ -216,8 +228,9 @@ def data_edit(data_endpoint):
         db.session.flush()
         db.session.commit()
         crawls = Crawl.query.all()
-        flash('Your data source was successfully updated', 'success')
-        return redirect('/data/'+ crawl.endpoint)
+        flash('Your data source was successfully updated!', 'success')
+        return redirect(url_for('data', crawl_endpoint=crawl.endpoint,
+                                        data_endpoint=data_endpoint))
     return render_template('edit.html', form=form, crawl=crawl)
 
 
@@ -232,11 +245,21 @@ def data_edit(data_endpoint):
 #        for d in dashbs:
 #            db.session.delete(d)
 #        db.session.delete(crawl)
-#        print "Crawl Deleted"
 #       db.session.commit()
 #        flash('Your data source %s was successfully deleted' % crawl.name, 'success')
 #        return redirect(url_for('index'))
 #    return render_template('delete.html', crawl=crawl)
+
+# Dashboard
+# -----------------------------------------------------------------------------
+
+@app.route('/dashboard/<dashboard_endpoint>')
+def dash(dashboard_endpoint):
+    dash = Dashboard.query.filter_by(endpoint=dashboard_endpoint).first()
+    plots = dash.plots
+    crawls = dash.crawls.query.all()
+
+    return render_template('dash.html', dash=dash, plot=plot, crawls=crawls) 
 
 
 #@app.route('/<data_endpoint>/dashboard/<dash_endpoint>/delete', methods=['GET', 'POST'])
@@ -247,7 +270,6 @@ def data_edit(data_endpoint):
 #    dashb = crawl.dashboards.filter_by(endpoint=dash_endpoint).first()
 #    if request.method == 'POST':
 #        db.session.delete(dashb)
-#        print "Dashboard Deleted"
 #        db.session.commit()
 #       flash('Your Dashboard %s was successfully deleted' % dashb.name, 'success')
 #        return redirect(url_for('index'))
@@ -319,7 +341,6 @@ def data_edit(data_endpoint):
 #        column_name_x = dashb.column_name_x
 #        column_name_y = dashb.column_name_y
 #        selected_columns = [column_name_x, column_name_y]
-#        print column_name_x
 #        table_select = t[selected_columns]
 #        table = table_select.relabel({column_name_x: 'longitude', column_name_y: 'latitude'})
 #        filter_nulls = table[table.longitude != None]
@@ -349,17 +370,13 @@ def contact():
     form = ContactForm(request.form)
     crawls = Crawl.query.all()
 
-    if request.method == 'POST' and form.validate():
-        # import pdb
-        # pdb.set_trace()
-        subject = ' '.join([form.issue.data, form.name.data])
+    if form.validate_on_submit():
+        subject = ' -- '.join([form.issue.data, form.name.data])
         sender = DEFAULT_MAIL_SENDER
         text_body = form.description.data
-        send_email(subject=subject, sender=sender, recipients=ADMINS, text_body=text_body, html_body=text_body)
-        print 'email sent'
-        flash('Thank you for contacting Continuum! We will be in touch shortly.', 'success')
-        return redirect('/index')
+        send_email(subject=subject, sender=sender, recipients=ADMINS,
+                   text_body=text_body, html_body=text_body)
+        flash('Thank you for contacting us! We will be in touch shortly.', 'success')
+        return redirect(url_for('index'))
 
-    data = session.get('data_uri', '')
-
-    return render_template('contact.html', form=form, data=data)
+    return render_template('contact.html', form=form)
