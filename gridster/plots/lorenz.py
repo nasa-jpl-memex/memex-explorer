@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import odeint
 from bokeh.plotting import *
-from bokeh.embed import components
+from bokeh import embed
 import bokeh.resources
 
 sigma = 10
@@ -37,5 +37,4 @@ multi_line(np.array_split(xprime, 7), np.array_split(z, 7),
            tools="pan,wheel_zoom,box_zoom,reset,previewsave", title="lorenz example", 
            name="lorenz_example")
 
-# a, b = components(curplot(), bokeh.resources.CDN)
-show()
+tag = embed.autoload_server(curplot(), cursession())

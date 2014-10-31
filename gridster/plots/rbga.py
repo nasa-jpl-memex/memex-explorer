@@ -2,7 +2,7 @@ from __future__ import division
 
 import numpy as np
 from bokeh.sampledata.iris import flowers
-from bokeh.embed import components
+from bokeh import embed
 import bokeh.resources
 from bokeh.plotting import *
 
@@ -26,5 +26,4 @@ image_rgba(
     tools="pan,wheel_zoom,box_zoom,reset,previewsave", name="image_example",
     plot_width=300, plot_height=300)
 
-# a, b = components(curplot(), bokeh.resources.CDN)
-show()
+tag = embed.autoload_server(curplot(), cursession())

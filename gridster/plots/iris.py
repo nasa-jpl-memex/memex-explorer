@@ -1,5 +1,5 @@
 from bokeh.sampledata.iris import flowers
-from bokeh.embed import components
+from bokeh import embed
 import bokeh.resources
 from bokeh.plotting import *
 
@@ -13,7 +13,7 @@ flowers['color'] = flowers['species'].map(lambda x: colormap[x])
 #friendly id, and the corresponding embed.js will have a nice name
 #too
 
-scatter(flowers["petal_length"], flowers["petal_width"],
+graph = scatter(flowers["petal_length"], flowers["petal_width"],
         color=flowers["color"], fill_alpha=0.2, size=10, name="iris",
         tools="pan,wheel_zoom,box_zoom,reset,previewsave",
         plot_width=300, plot_height=300)
@@ -24,5 +24,4 @@ yax.axis_label = 'Petal Width'
 
 curplot().title = "Iris Morphology"
 
-# a, b = components(curplot(), bokeh.resources.CDN)
-show()
+tag = embed.autoload_server(graph, cursession())
