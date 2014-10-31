@@ -20,10 +20,10 @@ for i in range(N):
 
 output_server("rbga")
 
-image_rgba(
+graph = image_rgba(
     image=[img], x=[0], y=[0], dw=[10], dh=[10],
     x_range=[0,10], y_range=[0,10],
     tools="pan,wheel_zoom,box_zoom,reset,previewsave", name="image_example",
     plot_width=300, plot_height=300)
 
-tag = embed.autoload_server(curplot(), cursession())
+tag = embed.autoload_server(graph, cursession())
