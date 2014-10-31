@@ -3,7 +3,7 @@ from bokeh.embed import components
 import bokeh.resources
 from bokeh.plotting import *
 
-output_file("iris.html", title="iris.py example", mode='cdn')
+#output_file("iris.html", title="iris.py example", mode='cdn')
 
 colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
 

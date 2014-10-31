@@ -28,7 +28,7 @@ xprime = np.cos(theta) * x - np.sin(theta) * y
 
 colors = ["#C6DBEF", "#9ECAE1", "#6BAED6", "#4292C6", "#2171B5", "#08519C", "#08306B",]
 
-output_file("lorenz.html", title="lorenz.py example")
+#output_file("lorenz.html", title="lorenz.py example")
 
 figure(plot_width=300, plot_height=300)
 
