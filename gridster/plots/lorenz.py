@@ -38,3 +38,4 @@ multi_line(np.array_split(xprime, 7), np.array_split(z, 7),
            name="lorenz_example")
 
 tag = embed.autoload_server(curplot(), cursession())
+
