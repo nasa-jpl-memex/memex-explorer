@@ -2,7 +2,7 @@ from bokeh.sampledata.iris import flowers
 from bokeh.plotting import *
 from bokeh import embed
 
-output_file("iris.html", title="iris.py example")
+output_server("iris")
 
 colormap = {'setosa': 'red', 'versicolor': 'green', 'virginica': 'blue'}
 
@@ -20,5 +20,7 @@ xax.axis_label = 'Petal Length'
 yax.axis_label = 'Petal Width'
 
 curplot().title = "Iris Morphology"
+
+show()
 
 tag = embed.autoload_server(curplot(), cursession())

@@ -4,6 +4,8 @@ import pandas as pd
 from bokeh.plotting import *
 from bokeh import embed
 
+output_server("brewer")
+
 N = 20
 categories = ['y' + str(x) for x in range(10)]
 data = {}
@@ -23,9 +25,9 @@ def stacked(df, categories):
         last = next
     return areas
 
-figure(plot_width=300, plot_height=300)
-
 output_server("brewer")
+
+figure(plot_width=300, plot_height=300)
 
 areas = stacked(df, categories)
 

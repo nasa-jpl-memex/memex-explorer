@@ -16,12 +16,11 @@ inc = df.close > df.open
 dec = df.open > df.close
 w = 12*60*60*1000 # half day in ms
 
-output_server("candlestick")
 
 figure(x_axis_type = "datetime", tools="pan,wheel_zoom,box_zoom,reset,previewsave",
        plot_width=300, plot_height=300, name="candlestick")
 
-hold()
+output_server("candlestick")
 
 segment(df.date, df.high, df.date, df.low, color='black')
 rect(df.date[inc], mids[inc], w, spans[inc], fill_color="#D5E1DD", line_color="black")
