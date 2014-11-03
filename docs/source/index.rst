@@ -9,14 +9,7 @@ Welcome to memex-viewer's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   user_guide
+   dev_guide
+   api
 
