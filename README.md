@@ -8,8 +8,6 @@ Viewers for statistics and dashboarding of Domain Search Engine data
  ```
 usage: run.py [-h] [-s]
 
-EBOLA DATA SPACE
-
 optional arguments:
   -h, --help  show this help message and exit
   -s, --show  Auto-raise app in a browser window
@@ -38,3 +36,5 @@ optional arguments:
 - Flask-WTF
 - flask-mail
 - webhelpers
+- tld
+- unicodecsv
