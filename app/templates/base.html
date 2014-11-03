@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="{{ url_for('static', filename="images/favicon.ico") }}" rel="icon">
+
+    <title>{% block title %}{{ config.TITLE }}{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename="css/bootstrap.min.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/dataTables.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/bokeh.min.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/sweet-alert.css")}}" rel="stylesheet" type="text/css" >
+    <link href="{{ url_for('static', filename="css/custom.css")}}" rel="stylesheet" type="text/css" >
+    <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,100italic,300italic,400italic,700italic|Open+Sans:400,700,600;' rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename="css/dashboard.css") }}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]>
+      <script src="{{ url_for('static', filename="js/ie8-responsive-file-warning.js") }}"></script>
+      <script src="{{ url_for('static', filename="js/ie-emulation-modes-warning.js") }}"></script>
+    <![endif]-->
+
+    {%- block extrahead %}{% endblock %}
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">{{ config.TITLE }}</a>
+        </div>
+        <div class="navbar-collapse collapse">
+<!--           <ul class="nav navbar-nav navbar-right nav-pills">
+            <li class="reset"><a href="/reset">Reset Demo</a></li>
+          </ul>
+ -->          <form class="navbar-form navbar-right">
+            <!--<input type="text" class="form-control" placeholder="Search...">-->
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+          <h4>Crawls</h4>
+            {% for crawl in crawls %}
+            {% set href, id, caption = ['/crawl/' + crawl.endpoint , crawl.endpoint, crawl.name] %}
+              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
+            {% endfor %}
+          <!--h4>Plots</h4>
+            {% for plot in plots %}
+            {% set href, id, caption = ['/plot/' + plot.endpoint , plot.endpoint, plot.name] %}
+              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
+            {% endfor %}-->
+          <h4>Dashboards</h4>
+            {% for dash in dashboards %}
+            {% set href, id, caption = ['/dash/' + dash.endpoint , dash.endpoint, dash.name] %}
+              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
+            {% endfor %}
+          </ul>
+          <button type="button" class="btn btn-default">
+              <a href="/register_crawl"><span class="glyphicon glyphicon-plus"></span></a>
+          </button>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="container">
+                {% with errors = get_flashed_messages(category_filter=["error"]) %}
+                {% if errors %}
+                <div class="alert alert-dismissible alert-danger" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  {% for error in errors %}
+                  {{ error }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                {% with warnings = get_flashed_messages(category_filter=["info"]) %}
+                {% if warnings %}
+                <div class="alert alert-dismissible alert-warning" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  {% for warning in warnings %}
+                  {{ warning }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                {% with messages = get_flashed_messages(category_filter=["success"]) %}
+                {% if messages %}
+                <div class="alert alert-dismissible alert-success" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  {% for message in messages %}
+                  {{ message }}
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+          </div>
+
+        {% block content %}
+        {% endblock content %}
+        </div>
+      </div>
+    </div>
+    <footer>
+      <ul class="list-inline text-center">
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="http://continuum.io/careers">Careers</a></li>
+          <li><a href="http://continuum.io/blog/">Blog</a></li>
+      </ul>
+      <a href="http://continuum.io" class="continuum">Powered By</a>
+
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename="js/jquery.dataTables.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/doc.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/bokeh.min.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/sweet-alert.min.js") }}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{ url_for('static', filename="js/ie10-viewport-bug-workaround.js") }}"></script>
+    <script src="{{ url_for('static', filename="js/dataTables.bootstrap.js") }}"></script>
+    {%- block extrafooter %}{% endblock %}
+
+  </body>
+</html>

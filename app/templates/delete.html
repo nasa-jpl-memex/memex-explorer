@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set active_page = "overview" %}
+
+{% block content %}
+
+<h2>Delete DataSource</h2>
+
+{% include 'data_header.html' %}
+
+<h3>Available Dashboards:</h3>
+<ul>
+{% for d in dash_list %}
+<li><a href="/{{datasource.url}}/dashboard/{{d.url}}">{{d.name}}</a></l>
+{% endfor %}
+</ul>
+
+
+<div class="delete">
+<button type="button" class="btn btn-danger btn-padded">Delete Data Source and Dashboards</button>
+</div>
+
+<script type="text/javascript">
+    document.querySelector('div.delete button').onclick = function(){
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this data source!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    },
+    function(isConfirm){
+    if (isConfirm){
+      $.post("{{url_for('data_delete', data_endpoint = datasource.endpoint)}}");
+      swal("Deleted!", "Your data source has been removed from the database!", "success");
+      $.post("{{url_for('index')}}");
+    } else {
+      swal("Cancelled", "Your data source is safe :)", "error");
+    }
+    });
+};
+</script>
+
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% set active_page = "overview" %}
+
+{% block content %}
+
+<h1>MEMEX Viewer</h1>
+
+<p>Viewers for statistics and dashboarding of Domain Search Engine data</p>
+
+<br>
+<div>
+<p>Start now:</p>
+<button type="button" class="btn btn-default">
+  <a href="/register_crawl">Register Crawl</a>
+</button>
+</div>
+<br>
+
+<p>Brought to you by:</p>
+<a href="http://continuum.io" target="_blank"><img src="{{ url_for('static', filename="images/continuum_analytics_logo.png") }}" width="200px" style="margin:20px"></a>
+<a href="http://www.jpl.nasa.gov/" target="_blank"><img src="{{ url_for('static', filename="images/nasa_jpl_logo.png") }}"  width="200px" style="margin:20px"></a>
+<a href="http://www.kitware.com" target="_blank"><img src="{{ url_for('static', filename="images/kitware.png") }}"  width="200px" style="margin:20px"></a>
+<a href="" target="_blank"><img src="{{ url_for('static', filename="images/nyu-logo.png") }}"  width="200px" style="margin:20px"></a>
+
+{% endblock content %}
