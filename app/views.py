@@ -142,8 +142,13 @@ def data(crawl_endpoint, data_endpoint):
     plots = monitor_data.plots
     plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
 
-    # TODO wrap Blaze err handling
-    uri = monitor_data.data_uri
+    try:
+        uri = monitor_data.data_uri
+        r = resource(uri)
+    except Exception as e:
+        flash("Could not parse the data source with Blaze. Sorry, it's not possible to explore the dataset at this time.", 'error')
+        return redirect(url_for('crawl', crawl_endpoint=crawl.endpoint))
+
     t = Data(uri)
     dshape = t.dshape
     columns = t.fields
@@ -234,25 +239,6 @@ def data_edit(data_endpoint):
     return render_template('edit.html', form=form, crawl=crawl)
 
 
-#@app.route('/data/<data_endpoint>/delete', methods=['GET', 'POST'])
-#@requires_auth
-#def data_delete(data_endpoint):
-#    crawls = Crawl.query.all()
-#    crawl = Crawl.query.filter_by(endpoint=data_endpoint).first()
-#    dashbs = crawl.dashboards.all()
-#    description = crawl.description
-#    if request.method == 'POST':
-#        for d in dashbs:
-#            db.session.delete(d)
-#        db.session.delete(crawl)
-#       db.session.commit()
-#        flash('Your data source %s was successfully deleted' % crawl.name, 'success')
-#        return redirect(url_for('index'))
-#    return render_template('delete.html', crawl=crawl)
-
-# Dashboard
-# -----------------------------------------------------------------------------
-
 @app.route('/dashboard/<dashboard_endpoint>')
 def dash(dashboard_endpoint):
     dash = Dashboard.query.filter_by(endpoint=dashboard_endpoint).first()
@@ -260,109 +246,6 @@ def dash(dashboard_endpoint):
     crawls = dash.crawls.query.all()
 
     return render_template('dash.html', dash=dash, plot=plot, crawls=crawls) 
-
-
-#@app.route('/<data_endpoint>/dashboard/<dash_endpoint>/delete', methods=['GET', 'POST'])
-#def dashboard_delete(data_endpoint, dash_endpoint):
-#    crawls = Crawl.query.all()
-#    crawl = Crawl.query.filter_by(endpoint=data_endpoint).first()
-#    dashbs = crawl.dashboards.all()
-#    dashb = crawl.dashboards.filter_by(endpoint=dash_endpoint).first()
-#    if request.method == 'POST':
-#        db.session.delete(dashb)
-#        db.session.commit()
-#       flash('Your Dashboard %s was successfully deleted' % dashb.name, 'success')
-#        return redirect(url_for('index'))
-#    return render_template('delete_dashboard.html', crawl=crawl, dashb = dashb)
-
-
-#@app.route('/data/<data_endpoint>/dashboard', methods=['GET', 'POST'])
-#def create_dashboard(data_endpoint):
-#    form = DashboardForm()
-#    crawls = Crawl.query.all()
-#    crawl = Crawl.query.filter_by(endpoint=data_endpoint).first()
-#    if crawl == None:
-#        flash('crawl %s not found.' % crawl.name)
-#        return redirect(url_for('index'))
-#
-#    if request.method == 'POST' and form.validate():
-#        fmt ='%Y-%m-%d-%H-%M-%S-%f' 
-#        current_time = dt.datetime.now().strftime(fmt)
-#        dashboard_uri = form.name.data + "_" + crawl.name + "_" + current_time
-#
-#        file = request.files.get('upload_file')
-#
-#       if file and form.plot.data == 'notebook':
-#            filename = secure_filename(file.filename)
-#            file.save(os.path.join(app.config['UPLOADED_NOTEBOOKS'], filename))
-#            dashboard_uri = os.path.join(os.path.basename(app.config['UPLOADED_NOTEBOOKS']), filename)
-#
-#        dashboard_endpoint = text.urlify(form.name.data)
-#        
-#        dashboard = Dashboard(name = form.name.data, endpoint = dashboard_endpoint, uri = dashboard_uri, description = form.description.data, \
-#            plot=form.plot.data, column_name_x=form.column_name_x.data, column_name_y=form.column_name_y.data, crawl=crawl)
-#        registered_dashboard = Dashboard.query.filter_by(name=form.name.data).first()
-#        # if registered_dashboard:
-#        #     flash('Datashboard name already registered, please choose another name', 'error')
-#        #     return redirect(url_for('create_dashboard', data_endpoint=crawl.url))
-#        db.session.add(dashboard)
-#        db.session.commit()
-#
-#        return redirect(url_for('dashboard', data_endpoint=data_endpoint, dash_endpoint=dashboard_endpoint))
-
-#    uri = crawl.uri
-#    t = Data(crawl.uri)
-#    dshape = t.dshape
-#    columns = t.fields
-#    fields = ', '.join(columns)
-#    expr = t.head(2)
-#    df = into(DataFrame, expr)
-#    sample = df.to_html()
-#    return render_template('create_dashboard.html', dshape=dshape, crawl=crawl, fields=fields, sample=sample, form=form) 
-
-
-#@app.route('/<data_endpoint>/dashboard/<dash_endpoint>')
-#def dashboard(data_endpoint,dash_endpoint):
-#    crawls = Crawl.query.all()
-#    crawl = Crawl.query.filter_by(endpoint=data_endpoint).first()
-#    dashbs = crawl.dashboards.all()
-#    dashb = crawl.dashboards.filter_by(endpoint=dash_endpoint).first()
-#    uri = crawl.uri
-#    t = Data(crawl.uri)
-#    dshape = t.dshape
-#    columns = t.fields
-#    fields = ', '.join(columns)
-#    expr = t.head(10)
-#    df = into(DataFrame, expr)
-#    sample = df.to_html()
-
-#    if dashb.plot == 'map':
-        # Get columns
-#        column_name_x = dashb.column_name_x
-#        column_name_y = dashb.column_name_y
-#        selected_columns = [column_name_x, column_name_y]
-#        table_select = t[selected_columns]
-#        table = table_select.relabel({column_name_x: 'longitude', column_name_y: 'latitude'})
-#        filter_nulls = table[table.longitude != None]
-#        cds = into(Columncrawl, filter_nulls)
-#        script, div = map_builder(cds)
-
-#    if dashb.plot == 'timeseries':
-        # Get columns
-#        column_name_x = dashb.column_name_x
-#        column_name_y = dashb.column_name_y
-#        selected_columns = [column_name_x, column_name_y]
-#        table_select = t[selected_columns]
-#        table = table_select.relabel({column_name_x: 'x', column_name_y: 'y'})
-#        cds = into(Columncrawl, table)
-#        script, div = timeseries_builder(cds)
-
-#    if dashb.plot == 'notebook':
-#        filename = dashb.uri
-#        head, div = html_export(filename)
-#        return render_template('dashboard.html', script=None, div=div, crawl=crawl, dashb=dashb)
-
-#    return render_template('dashboard.html', script=script, div=div, crawl=crawl, dashb=dashb)
 
 
 @app.route('/contact', methods=['GET', 'POST'])
