@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Internal Server Error (500)</h1>
+<p style="font-style: italic">An administrator has been notified.</p>
+<p>Perhaps visit the <a href="{{ url_for('index') }}">index</a> and seek again!</p>
+
+{% endblock content %}
