@@ -13,6 +13,7 @@ Here are the steps for getting gridster set up on your web development project.
 	CSS file into your HTML document. 
 4.  Create a new file JavaScript file with the following code. The name can be 
 	anything you want:
+
 	```
 	$(function(){ //DOM Ready
     	$(".gridster ul").gridster({
@@ -21,9 +22,11 @@ Here are the steps for getting gridster set up on your web development project.
     	});
 	});
 	```
+
 	This is where you will place your gridster options, which are available through
 	the official documentation.
 5.  Include the gridster HTML markup in your document:
+
 	```
 	<div class="gridster">
     	<ul>
@@ -36,10 +39,12 @@ Here are the steps for getting gridster set up on your web development project.
     	</ul>
 	</div>
 	```
+
 	Inside the li tags, place any HTML markup or JavaScript objects. 
 
 	`data-row` and `data-col` correspond to the rows and columns of the grid layout.
 
 	`data-sizex` and `data-sizey` alter the size of the grid in relation to the
-	dimensions defined in the gridster config file.
+	dimensions defined in the gridster JavaScript config file. 
+
 
