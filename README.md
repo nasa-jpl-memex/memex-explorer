@@ -8,10 +8,18 @@ Viewers for statistics and dashboarding of Domain Search Engine data
  ```
 usage: run.py [-h] [-s]
 
+EBOLA DATA SPACE
+
 optional arguments:
   -h, --help  show this help message and exit
   -s, --show  Auto-raise app in a browser window
 ```
+
+## Install
+
+wget http://bit.ly/miniconda
+bash Miniconda-latest-Linux-x86_64.sh
+bash install.sh
 
 ## Dependencies
 
@@ -26,6 +34,7 @@ optional arguments:
 - toolz
 - pytables
 - pygments
+- unicodecsv
 
 ### Conda Channels
 - conda install -c https://conda.binstar.org/bokeh/channel/dev  bokeh
@@ -37,4 +46,3 @@ optional arguments:
 - flask-mail
 - webhelpers
 - tld
-- unicodecsv
