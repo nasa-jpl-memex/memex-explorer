@@ -197,8 +197,8 @@ class Domain(object):
         hold()
 
         #rect(y=y_range, x='frontier_rect', height=0.4, width='frontier_count', color="grey", fill_color="grey", source = self.sort_relevant_source, legend="frontier")
-        rect(y=y_range, x='crawled_rect', height=0.95, width='crawled_count', color="red", fill_color="red", source = self.sort_relevant_source, legend="crawled")
-        rect(y=y_range, x='relevant_rect', height=0.95, width='relevant_count', color="blue", fill_color="blue", source = self.sort_relevant_source, legend="relevant")
+        rect(y=y_range, x='crawled_rect', height=0.75, width='crawled_count', color="red", fill_color="red", source = self.sort_relevant_source, legend="crawled")
+        rect(y=y_range, x='relevant_rect', height=0.75, width='relevant_count', color="blue", fill_color="blue", source = self.sort_relevant_source, legend="relevant")
 
         axis().major_label_text_font_size = "8pt"
 
@@ -218,8 +218,8 @@ class Domain(object):
 
         hold()
 
-        rect(y=y_range, x='frontier_rect', height=0.95, width='frontier_count', color="grey", fill_color="grey", source = self.sort_frontier_source, legend="frontier")
-        rect(y=y_range, x='crawled_rect', height=0.95, width='crawled_count', color="red", fill_color="red", source = self.sort_frontier_source, legend="crawled")
+        rect(y=y_range, x='frontier_rect', height=0.75, width='frontier_count', color="grey", fill_color="grey", source = self.sort_frontier_source, legend="frontier")
+        rect(y=y_range, x='crawled_rect', height=0.75, width='crawled_count', color="red", fill_color="red", source = self.sort_frontier_source, legend="crawled")
         #rect(y=y_range, x='relevant_rect', height=1, width='relevant_count', color="blue", fill_color="blue", source = self.sort_frontier_source, legend="relevant")
 
         axis().major_label_text_font_size = "8pt"

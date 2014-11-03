@@ -25,7 +25,7 @@ class PlotForm(Form):
     description = TextAreaField('Description')
     plot = SelectField('Plot', choices=[('domain_by_relevance', 'Domain Relevance'), ('domain_by_crawled', 'Domain Crawled'), \
         ('domain_by_frontier', 'Domain Frontier'), ('harvest', 'Harvest'), \
-        ('harvest rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
+        ('harvest_rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
 
 
 class ContactForm(Form):
