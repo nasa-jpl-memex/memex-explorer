@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'memex-viewer'
-copyright = u'2014, Andy Terrel, Christine Doig, Ben Zaitlen, Karan Dodia, Brittain Hard'
+copyright = u'2014, Continuum Analytics'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
