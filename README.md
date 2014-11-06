@@ -17,9 +17,11 @@ optional arguments:
 
 ## Install
 
+```
 wget http://bit.ly/miniconda
 bash Miniconda-latest-Linux-x86_64.sh
 bash install.sh
+```
 
 ## Dependencies
 
