@@ -1,4 +1,10 @@
 #!flask/bin/python
+
+# todo: fix with proper manage.py script
+# need for some version of python?
+import sys
+sys.path.insert(0,".")
+
 import imp
 from migrate.versioning import api
 from app import db
