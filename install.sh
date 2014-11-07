@@ -1,5 +1,16 @@
  #!/usr/bin/env bash
 
+conda_file=`which conda`
+if [ ! -d $conda ]; then
+    wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O /opt/miniconda.sh
+    bash /opt/miniconda.sh -b -p /opt/anaconda/
+    echo "export PATH=/opt/anaconda/bin/:$PATH" | sudo tee -a /etc/bashrc
+    echo "export PATH=/opt/anaconda/bin/:$PATH" | sudo tee -a /etc/environment
+    /opt/anaconda/bin/conda config --set always_yes yes
+    /opt/anaconda/bin/conda config --add create_default_packages pip --add create_default_packages ipython
+    /opt/anaconda/bin/conda update conda --yes
+fi
+
 conda create -n memex-viewer python=2.7 pip ipython --yes
 source activate memex-viewer
 conda install flask pip pymongo pytables pygments ipython-notebook bokeh requests sqlalchemy numpy pandas psutil unicodecsv blaze dynd-python libdynd h5py pytables multipledispatch datashape toolz cytoolz --yes
