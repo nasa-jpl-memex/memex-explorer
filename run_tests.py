@@ -1,12 +1,14 @@
 import unittest
 
 from tests.test_front_page import ServerUpTest
+from tests.test_register_crawl import RegisterCrawlTest
 
 
 def suite():
     suite = unittest.TestSuite()
 
     suite.addTest(unittest.makeSuite(ServerUpTest))
+    suite.addTest(unittest.makeSuite(RegisterCrawlTest))
 
     return suite
 
