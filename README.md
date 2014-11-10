@@ -15,6 +15,10 @@ optional arguments:
   -s, --show  Auto-raise app in a browser window
 ```
 
+## Testing
+
+`python run_tests.py`
+
 ## Install
 
 ```
@@ -48,3 +52,5 @@ bash install.sh
 - flask-mail
 - webhelpers
 - tld
+
+
