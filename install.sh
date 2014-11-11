@@ -7,3 +7,6 @@ conda install -c https://conda.binstar.org/bokeh/channel/dev bokeh --yes
 pip install git+https://github.com/ContinuumIO/blaze.git --upgrade
 pip install git+https://github.com/ContinuumIO/datashape.git --upgrade --no-deps
 pip install flask-sqlalchemy tld sqlalchemy-migrate Flask-WTF flask-mail webhelpers
+
+echo `which python`
+python utilities/db_create.py
