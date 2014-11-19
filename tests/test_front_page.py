@@ -1,7 +1,10 @@
+"""
+Testing prper rendering of front page
+"""
 
 import os
 import sys
-sys.path.insert(0,".")
+sys.path.insert(0, ".")
 import unittest
 
 from app import app, db
@@ -9,7 +12,8 @@ from app.config import basedir
 
 TESTDB = 'test_app.db'
 TESTDB_SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, TESTDB)
-print(TESTDB_SQLALCHEMY_DATABASE_URI)
+
+
 class ServerUpTest(unittest.TestCase):
 
     def setUp(self):
@@ -26,8 +30,6 @@ class ServerUpTest(unittest.TestCase):
         assert response.status_code == 200
 
     def test_title(self):
+        """test title of root page"""
         rv = self.app.get('/')
         self.assertIn('MEMEX VIEWER', rv.data)
-
-
-
