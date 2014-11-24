@@ -2,24 +2,39 @@
 {% set active_page = "overview" %}
 
 {% block content %}
-
-<h1>MEMEX Viewer</h1>
-
-<p>Viewers for statistics and dashboarding of Domain Search Engine data</p>
-
-<br>
-<div>
-<p>Start now:</p>
-<button type="button" class="btn btn-default">
-  <a href="/register_crawl">Register Crawl</a>
-</button>
+<div class='inner'>
+    <h1 style='text-align: center;'>Memex-Viewer</h1>
+    <p style='text-align: center;font-size:14px;'>The next generation of information retrieval, data mining, and visualization.</p>
+    <div style='text-align: center;'>
+        <button id='center' type="button" class="btn btn-default btn-duo center">
+            <a href="#">Learn More</a>
+        </button>
+        <button id='center' type="button" class="btn btn-default btn-duo center">
+            <a href="#">Source</a>
+        </button>
+        <button id='center' type="button" class="btn btn-default btn-duo center">
+            <a href="#">Docs</a>
+        </button>
+    </div>
+    <br><br>
+    <h1>Projects</h1>
+    <ul class='inline-icons'>
+        <a href="#"><li><i class="fa fa-globe"></i><br>Ebola</li></a>
+        <a href="#"><li><i class="fa fa-users"></i><br>Human Trafficking</li></a>
+        <a href="#"><li><i class="fa fa-flag"></i><br>ISIL</li></a>
+        <a href="#"><li><i class="fa fa-file-o"></i><br>New Project</li></a>
+    </ul>
+    <br><br>
+    <h1>Apps</h1>
+    <ul class='inline-icons'>
+        <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
+        <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
+        <a href="#"><li><i class="fa fa-database"></i><br>Data Sources</li></a>
+    </ul>
+    <ul class='inline-icons'>
+        <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
+        <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
+        <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
+    </ul>
 </div>
-<br>
-
-<p>Brought to you by:</p>
-<a href="http://continuum.io" target="_blank"><img src="{{ url_for('static', filename="images/continuum_analytics_logo.png") }}" width="200px" style="margin:20px"></a>
-<a href="http://www.jpl.nasa.gov/" target="_blank"><img src="{{ url_for('static', filename="images/nasa_jpl_logo.png") }}"  width="200px" style="margin:20px"></a>
-<a href="http://www.kitware.com" target="_blank"><img src="{{ url_for('static', filename="images/kitware.png") }}"  width="200px" style="margin:20px"></a>
-<a href="" target="_blank"><img src="{{ url_for('static', filename="images/nyu-logo.png") }}"  width="200px" style="margin:20px"></a>
-
-{% endblock content %}
+{% endblock %}
