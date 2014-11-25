@@ -52,7 +52,7 @@ plot_dashboard = db.Table('plot_dashboard',
 class Crawl(db.Model):
     __tablename__ = "crawl"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
+    name = db.Column(db.String(64))
     description = db.Column(db.Text)
     crawler = db.Column(db.Text)
     config = db.Column(db.Text)
@@ -69,11 +69,9 @@ class Crawl(db.Model):
 class DataSource(db.Model):
     __tablename__ = "data_source"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
+    name = db.Column(db.String(64))
     data_uri = db.Column(db.String(120))
     description = db.Column(db.Text)
-    crawls = db.relationship('Crawl', secondary=crawl_data, \
-                             backref=db.backref('data', lazy='dynamic'))
     plots = db.relationship('Plot', secondary=data_plot, \
         backref=db.backref('data', lazy='dynamic'))
 
@@ -86,8 +84,6 @@ class ImageSpace(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     images_location = db.Column(db.Text)
     description = db.Column(db.Text)
-    crawls = db.relationship('Crawl', secondary=crawl_images, \
-                             backref=db.backref('images', lazy='dynamic'))
 
     def __repr__(self):
         return '<ImageSpace %r>' % (self.id)
@@ -96,15 +92,15 @@ class ImageSpace(db.Model):
 class Plot(db.Model):
     __tablename__ = "plot"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True)
+    name = db.Column(db.String(64))
     description = db.Column(db.Text)
-    plot = db.Column(db.String(64), index=True)
+    plot = db.Column(db.String(64))
 
 
 class Dashboard(db.Model):
     __tablename__ = "dashboard"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), index=True, unique=True)
+    name = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
     plots = db.relationship('Plot', secondary=plot_dashboard, \
         backref=db.backref('dashboard', lazy='dynamic'))

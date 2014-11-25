@@ -15,8 +15,8 @@ args = parse_args()
 app.config.from_pyfile('config.py')
 
 if args.show:
+    url = "http://%s:%s/" % (app.config['HOST'], app.config['PORT'])
     if app.config['DEBUG']:
-        url = "http://%s:%s/" % (app.config['HOST'], app.config['PORT'])
         print url
     else:
         import webbrowser
