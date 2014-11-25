@@ -18,6 +18,7 @@
     <link href="{{ url_for('static', filename="css/sweet-alert.css")}}" rel="stylesheet" type="text/css" >
     <link href="{{ url_for('static', filename="css/custom.css")}}" rel="stylesheet" type="text/css" >
     <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,100italic,300italic,400italic,700italic|Open+Sans:400,700,600;' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/font-awesome.min.css") }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
     <!-- Custom styles for this template -->
@@ -54,6 +55,9 @@
           <a class="navbar-brand" href="/">{{ config.TITLE }}</a>
         </div>
         <div class="navbar-collapse collapse">
+          <a class='navbar-brand right' href="#">Projects</a>
+          <a class='navbar-brand right' href="#">Apps</a>
+          <a class='navbar-brand right' href="#">Plots</a>
 <!--           <ul class="nav navbar-nav navbar-right nav-pills">
             <li class="reset"><a href="/reset">Reset Demo</a></li>
           </ul>
@@ -66,29 +70,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-          <h4>Crawls</h4>
-            {% for crawl in crawls %}
-            {% set href, id, caption = ['/crawl/' + crawl.endpoint , crawl.endpoint, crawl.name] %}
-              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
-            {% endfor %}
-          <!--h4>Plots</h4>
-            {% for plot in plots %}
-            {% set href, id, caption = ['/plot/' + plot.endpoint , plot.endpoint, plot.name] %}
-              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
-            {% endfor %}-->
-          <h4>Dashboards</h4>
-            {% for dash in dashboards %}
-            {% set href, id, caption = ['/dash/' + dash.endpoint , dash.endpoint, dash.name] %}
-              <li{% if id == active_page %} class="active"{% endif %}><a href="{{ href|e }}">{{ caption|e }}</a></li>
-            {% endfor %}
-          </ul>
-          <button type="button" class="btn btn-default">
-              <a href="/register_crawl"><span class="glyphicon glyphicon-plus"></span></a>
-          </button>
-        </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-12 main">
           <div class="container">
                 {% with errors = get_flashed_messages(category_filter=["error"]) %}
                 {% if errors %}

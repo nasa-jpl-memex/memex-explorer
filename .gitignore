@@ -61,3 +61,7 @@ app.db
 db_repository/
 data_monitor/
 data_preprocessed/
+
+# Third-party ui/ux
+*.sass-cache
+node-modules/
