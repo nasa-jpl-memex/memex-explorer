@@ -4,10 +4,10 @@ import sys
 sys.path.insert(0,".")
 
 from app import db
-from app.models import DataSource
+from app.models import Crawl
 
-datasources = DataSource.query.all()
-for d in datasources:
+crawls = Crawl.query.all()
+for d in crawls:
     db.session.delete(d)
 
 db.session.commit()
