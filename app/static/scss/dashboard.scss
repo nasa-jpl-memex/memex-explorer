@@ -345,13 +345,29 @@ form {
 
 ul.inline-icons{
   list-style: none;
-  text-align: center;
+  text-align:left;
   li{
     float:none;
     display:inline-block;
     margin:0 auto;
     font-size:30px;
     margin: 0px 25px 0px 25px;
+  }
+}
+
+ul.sidebar-links{
+  list-style: none;
+  float:none;
+  display:block;
+  margin:0 auto;
+  padding-left:0;
+  margin-right:20px;
+  li{
+    padding:10px;
+    background-color:#fff;
+    text-align:left;
+    margin-bottom:5px;
+    @include boxShadow(3px 3px 3px 1px rgba(0, 0, 0, .30));
   }
 }
 
