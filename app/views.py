@@ -28,8 +28,8 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, MonitorData, Dashboard, Plot
-from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, PlotForm, ContactForm
+from .models import Crawl, DataSource, Dashboard, Plot
+from .forms import CrawlForm, DashboardForm, MonitorDataForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
@@ -118,7 +118,7 @@ def register_data(crawl_endpoint):
 
     if form.validate_on_submit():
         endpoint = text.urlify(form.name.data)
-        data = MonitorData(name=form.name.data, endpoint=endpoint,
+        data = DataSource(name=form.name.data, endpoint=endpoint,
            data_uri=form.data_uri.data, description=form.description.data, crawl=crawl)
         registered_data = crawl.query.filter_by(name=form.name.data).first()
 
@@ -137,7 +137,7 @@ def register_data(crawl_endpoint):
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>')
 def data(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id, endpoint=data_endpoint).first()
+    monitor_data = DataSource.query.filter_by(crawl_id=crawl.id, endpoint=data_endpoint).first()
 
     plots = monitor_data.plots
     plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
@@ -165,7 +165,7 @@ def data(crawl_endpoint, data_endpoint):
 @app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>/explore')
 def data_explore(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    monitor_data = MonitorData.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
+    monitor_data = DataSource.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
 
     plots = monitor_data.plots
     plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
