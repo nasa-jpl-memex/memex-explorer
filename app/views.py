@@ -29,7 +29,7 @@ from bokeh.plotting import ColumnDataSource
 
 from . import app, db
 from .models import Crawl, MonitorData, Dashboard, Plot
-from .forms import CrawlForm, DashboardForm, MonitorDataForm, DashboardForm, PlotForm, ContactForm
+from .forms import CrawlForm, DashboardForm, MonitorDataForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
