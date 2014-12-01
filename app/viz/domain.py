@@ -13,61 +13,82 @@ from bokeh.objects import ColumnDataSource
 from bokeh.embed import components
 from bokeh.resources import CDN
 
+from functools import partial
+
 def group_by_minutes(d, minutes):
     k = d + dt.timedelta(minutes=-(d.minute % minutes)) 
     return dt.datetime(k.year, k.month, k.day, k.hour, k.minute, 0)
 
+def halves(iterable):
+    return [x/2 for x in iterable]
+
 
 class Domain(object):
 
-    def __init__(self, crawled='crawledpages.csv', relevant='relevantpages.csv', frontier='frontierpages.csv', output_dir='data_preprocessed'):
+    def __init__(self, crawled='crawledpages.csv', relevant='relevantpages.csv',
+                       frontier='frontierpages.csv', output_dir='data_preprocessed'):
         self.relevant = relevant
         self.crawled = crawled
         self.frontier = frontier
         self.output_dir = output_dir
+
         self.sort_relevant_source, self.sort_crawled_source, self.sort_frontier_source = self.update_source()
-        #self.sort_relevant_plot = self.create_plot_relevant()
-        #self.sort_crawled_plot =  self.create_plot_crawled()
-        #self.sort_frontier_plot = self.create_plot_frontier()
+
+
+    def update_source(self):
+
+        sort_relevant, sort_crawled, sort_frontier = self.generate_data()
+        # Sorted by Relevance
+        # Generate the column that calculates the center of the rectangle for the rect glyph.
+        sort_relevant['relevant_rect'] = halves(sort_relevant['relevant_count'])
+        sort_relevant['crawled_rect'] = halves(sort_relevant['crawled_count'])
+        sort_relevant_source = ColumnDataSource(sort_relevant)
+
+        # Sorted by Frontier
+        sort_frontier['relevant_rect'] = halves(sort_frontier['relevant_count'])
+        sort_frontier['frontier_rect'] = halves(sort_frontier['frontier_count'])
+        sort_frontier['crawled_rect'] = halves(sort_frontier['crawled_count'])
+        sort_frontier_source = ColumnDataSource(sort_frontier)
+
+        # Sorted by Crawled
+        sort_crawled['relevant_rect'] = halves(sort_crawled['relevant_count'])
+        sort_crawled['frontier_rect'] = halves(sort_crawled['frontier_count'])
+        sort_crawled['crawled_rect'] = halves(sort_crawled['crawled_count'])
+        sort_crawled_source = ColumnDataSource(sort_crawled)
+
+        return sort_relevant_source, sort_crawled_source, sort_frontier_source
+
+    def generate_relevant_data(self, minutes=5):
+        """
+        Generates the relevant domain data (Preprocessing)
+        """
 
     def generate_data(self, minutes=5):
         """
         Generates the domain data (Preprocessing)
         """
-        relevant_data = self.relevant
-        crawled_data = self.crawled
-        frontier_data = self.frontier
-        # Transform the summary.txt file into a csv file with the purpose of inputing the file into Blaze-Bokeh for visualization.
-        fmt ='%Y-%m-%d-%H-%M-%S-%f' 
-        current_time = dt.datetime.now().strftime(fmt)
-        relevant_file = self.output_dir+'/'+'relevantpages.csv'
-        #relevant_file = self.output_dir+'/'+'relevantpages_%s.csv' % current_time
 
+        # Transform the summary.txt file into a csv file with the purpose of inputting the file into Blaze-Bokeh for visualization.
+        relevant_file = self.output_dir+'/'+'relevantpages.csv'
+
+        rel_df = pd.read_csv(self.relevant, delimiter='\t', header=None, names=['URL', 'Timestamp'])
+        rel_df['Domain'] = rel_df['URL'].apply(partial(get_tld, fail_silently=True))
+        import ipdb; ipdb.set_trace()
+
+        # TODO preprocess files at specified intervals
         with open(relevant_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
-            with open(relevant_data, 'rb') as f:
-                reader = unicodecsv.reader(f, encoding='utf-8', delimiter='\t')
-                for row in reader:
-                    try:
-                        url = row[0]
-                        domain = get_tld(url, fail_silently=True)
-                        #domain = url.split('/')[2]
-                        timestamp = row[1]
-                        timestamp_dt = dt.datetime.fromtimestamp(int(timestamp))
-                        minute_gby = group_by_minutes(timestamp_dt, minutes)
-                        minute = minute_gby.strftime('%Y-%m-%d %H:%M:%S')
-                        line = [url, domain, timestamp, minute]
-                        #line = [domain, timestamp, minute]
-                        writer.writerow(line)
-                    except csv.Error as e:
-                        print 'file %s, line %d: %s' % (input_summary, reader.line_num, e)
-                        pass
+
+            url = row[0]
+            timestamp_dt = dt.datetime.fromtimestamp(int(timestamp))
+            minute_gby = group_by_minutes(timestamp_dt, minutes)
+            minute = minute_gby.strftime('%Y-%m-%d %H:%M:%S')
+            line = [url, domain, timestamp, minute]
 
         crawled_file = self.output_dir+'/'+'crawledpages.csv'
-        #crawled_file = self.output_dir+'/'+'crawledpages._%s.csv' % current_time
         with open(crawled_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
-            with open(crawled_data, 'rb') as f:
+            with open(self.crawled, 'rb') as f:
                 reader = unicodecsv.reader(f, encoding='utf-8', delimiter='\t')
                 for row in reader:
                     try:
@@ -86,10 +107,9 @@ class Domain(object):
                         pass
 
         frontier_file = self.output_dir + '/' + 'frontierpages.csv'
-        #frontier_file = self.output_dir + '/' + 'frontierpages_%s.csv' % current_time
         with open(frontier_file, 'wb') as outfile:
             writer = unicodecsv.writer(outfile, encoding='utf-8', delimiter='\t')
-            with open(frontier_data, 'rb') as f:
+            with open(self.frontier, 'rb') as f:
                 reader = unicodecsv.reader(f, encoding='utf-8', delimiter='\t')
                 for row in reader:
                     try:
@@ -146,44 +166,13 @@ class Domain(object):
         # Join
         a = df_frontier_counts.join(df_crawled_counts, how='outer')
         joined = a.join(df_relevant_counts, how='outer').fillna(0)
+
         sort_relevant = joined.sort('relevant_count', ascending=False).head(25)
         sort_crawled = joined.sort('crawled_count', ascending=False).head(25)
         sort_frontier = joined.sort('frontier_count', ascending=False).head(25)
-        print sort_relevant
-        print sort_crawled
-        print sort_frontier
 
         return sort_relevant, sort_crawled, sort_frontier
 
-
-    def update_source(self):
-
-        sort_relevant, sort_crawled, sort_frontier = self.generate_data()
-        print "What's wrong?"
-        print sort_relevant
-        # Sorted by Relevance
-        # Generate the column that calculates the center of the rectangle for the rect glyph.
-        sort_relevant['relevant_rect'] = sort_relevant['relevant_count'].map(lambda x: x/2)
-        #sort_relevant['frontier_rect'] = sort_relevant['frontier_count'].map(lambda x: x/2)
-        sort_relevant['crawled_rect'] = sort_relevant['crawled_count'].map(lambda x: x/2)
-
-        sort_relevant_source = ColumnDataSource(sort_relevant)
-
-        # Sorted by Frontier
-        # Generate the column that calculates the center of the rectangle for the rect glyph.
-        sort_frontier['relevant_rect'] = sort_frontier['relevant_count'].map(lambda x: x/2)
-        sort_frontier['frontier_rect'] = sort_frontier['frontier_count'].map(lambda x: x/2)
-        sort_frontier['crawled_rect'] = sort_frontier['crawled_count'].map(lambda x: x/2)
-        sort_frontier_source = ColumnDataSource(sort_frontier)
-
-        # Sorted by Crawled
-        # Generate the column that calculates the center of the rectangle for the rect glyph.
-        sort_crawled['relevant_rect'] = sort_crawled['relevant_count'].map(lambda x: x/2)
-        sort_crawled['frontier_rect'] = sort_crawled['frontier_count'].map(lambda x: x/2)
-        sort_crawled['crawled_rect'] = sort_crawled['crawled_count'].map(lambda x: x/2)
-        sort_crawled_source = ColumnDataSource(sort_crawled)
-
-        return sort_relevant_source, sort_crawled_source, sort_frontier_source
 
 
     def create_plot_relevant(self):

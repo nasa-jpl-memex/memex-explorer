@@ -1,34 +1,34 @@
 from flask.ext.wtf import Form
-from wtforms import TextField, TextAreaField, ValidationError, SelectField
+from wtforms import StringField, TextAreaField, ValidationError, SelectField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Email
 
+from plotting import PLOT_TYPES
+
 
 class CrawlForm(Form):
-    name = TextField('Name', validators = [DataRequired()])
+    name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
 
 
 class MonitorDataForm(Form):
-    name = TextField('Name', validators = [DataRequired()])
-    data_uri = TextField('Data URI', validators = [DataRequired()])
+    name = StringField('Name', validators = [DataRequired()])
+    data_uri = StringField('Data URI', validators = [DataRequired()])
     description = TextAreaField('Description')
 
 
 class DashboardForm(Form):
-    name = TextField('Name', validators = [DataRequired()])
+    name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
 
 
 class PlotForm(Form):
-    name = TextField('Name', validators = [DataRequired()])
+    name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
-    plot = SelectField('Plot', choices=[('domain_by_relevance', 'Domain Relevance'), ('domain_by_crawled', 'Domain Crawled'), \
-        ('domain_by_frontier', 'Domain Frontier'), ('harvest', 'Harvest'), \
-        ('harvest_rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
+    plot = SelectField('Plot', choices=PLOT_TYPES, validators = [DataRequired()])
 
 
 class ContactForm(Form):
-    name = TextField('Name', validators = [DataRequired()])
-    email = TextField('Email', validators = [DataRequired(), Email()])
+    name = StringField('Name', validators = [DataRequired()])
+    email = StringField('Email', validators = [DataRequired(), Email()])
     description = TextAreaField('Name', validators = [DataRequired()])
