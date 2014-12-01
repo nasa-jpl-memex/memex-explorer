@@ -345,7 +345,8 @@ form {
 
 ul.inline-icons{
   list-style: none;
-  text-align:left;
+  text-align: center;
+  padding:0px;
   li{
     float:none;
     display:inline-block;
@@ -355,31 +356,24 @@ ul.inline-icons{
   }
 }
 
-ul.sidebar-links{
-  list-style: none;
+.sidebar-buttons{
+  padding:10px;
+  background-color:#fff;
+  text-align:left;
+  margin-bottom:5px;
+  width:100%;
+  @include boxShadow(3px 3px 3px 1px rgba(0, 0, 0, .30));
+}
+
+.index-columns{
+  display:inline-block;
   float:none;
-  display:block;
   margin:0 auto;
-  padding-left:0;
-  margin-right:20px;
-  li{
-    padding:10px;
-    background-color:#fff;
-    text-align:left;
-    margin-bottom:5px;
-    @include boxShadow(3px 3px 3px 1px rgba(0, 0, 0, .30));
-  }
 }
 
 .inner{
-  width: 50%;
+  width: 75%;
   margin: 0 auto;
-}
-
-@media (max-width: 1001px) {
-  .inner{
-    width: 75%;
-  }
 }
 @media (max-width: 769px) {
   .inner{

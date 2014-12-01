@@ -3,17 +3,8 @@
 
 {% block content %}
 
-<div class="col-sm-3 col-md-2 sidebar">
-  <ul class="nav nav-sidebar">
-    <h4>My Project</h4>
-    <ul class='sidebar-links'>
-      <a href="#"><li>Crawls</li></a>
-      <a href="#"><li>Dashboards</li></a>
-      <a href="#"><li>Data Sources</li></a>
-      <a href="#"><li>Data Flows</li></a>
-    </ul>
-  </ul>
-</div>
+{% include "sidebar.html" %}
+
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
   <h1>My Project<a href="#"><i style='margin-left:50px;' class='fa fa-close'></i></a><a href="#"><i style='margin-left:30px;' class='fa fa-edit'></i></a></i></h1>
 </div>
