@@ -1,31 +1,44 @@
 {% extends "base.html" %}
-{% set active_page = "overview" %}
 
 {% block content %}
 <div class='inner'>
-    <h1 style='text-align: center;'>Memex-Viewer</h1>
+    <h1 style='text-align: center;'>Memex Viewer</h1>
     <p style='text-align: center;font-size:14px;'>The next generation of information retrieval, data mining, and visualization.</p>
     <div style='text-align: center;'>
-        <button id='center' type="button" class="btn btn-default btn-duo center">
+        <button type="button" class="btn btn-default btn-duo center">
             <a href="#">Learn More</a>
         </button>
-        <button id='center' type="button" class="btn btn-default btn-duo center">
+        <button type="button" class="btn btn-default btn-duo center">
             <a href="#">Source</a>
         </button>
-        <button id='center' type="button" class="btn btn-default btn-duo center">
+        <button type="button" class="btn btn-default btn-duo center">
             <a href="#">Docs</a>
         </button>
     </div>
     <br><br>
-    <h1>Projects</h1>
-    <ul class='inline-icons'>
-        <a href="#"><li><i class="fa fa-globe"></i><br>Ebola</li></a>
-        <a href="#"><li><i class="fa fa-users"></i><br>Human Trafficking</li></a>
-        <a href="#"><li><i class="fa fa-flag"></i><br>ISIL</li></a>
-        <a href="#"><li><i class="fa fa-file-o"></i><br>New Project</li></a>
-    </ul>
+    <h3>Projects</h3>
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-xs-6 col-sm-3">
+        <div class="well"><a href="#">
+         <i class="fa {{project.icon}}"></i>
+        <h4>{{ project.name }}</h4></a>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <h3>Projects</h3>
+    <div class="row">
+    {% for project in projects %}
+    <div class="col-xs-6 col-sm-3">
+    <a href="#" class="btn btn-custom" role="button"><span class="fa {{project.icon}}"></span> <br/>{{ project.name }}</a>
+    </div>
+    {% endfor %}
+    </div>
+
     <br><br>
-    <h1>Apps</h1>
+    <h3>Apps</h3>
     <ul class='inline-icons'>
         <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
         <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
