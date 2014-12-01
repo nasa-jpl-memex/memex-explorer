@@ -3,6 +3,8 @@ from wtforms import StringField, TextAreaField, ValidationError, SelectField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Email
 
+from plotting import PLOT_TYPES
+
 
 class CrawlForm(Form):
     name = StringField('Name', validators = [DataRequired()])
@@ -23,9 +25,7 @@ class DashboardForm(Form):
 class PlotForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
-    plot = SelectField('Plot', choices=[('domain_by_relevance', 'Domain Relevance'), ('domain_by_crawled', 'Domain Crawled'), \
-        ('domain_by_frontier', 'Domain Frontier'), ('harvest', 'Harvest'), \
-        ('harvest_rate', 'Harvest rate'), ('termite', 'Termite')], validators = [DataRequired()])
+    plot = SelectField('Plot', choices=PLOT_TYPES, validators = [DataRequired()])
 
 
 class ContactForm(Form):

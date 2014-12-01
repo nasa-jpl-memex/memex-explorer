@@ -1,15 +1,29 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+# Project
+# -------
 
 TITLE = 'MEMEX VIEWER'
+ADMINS = []
+
+# Server
+# ------
+
 HOST = '0.0.0.0'
 PORT = 5000
 DEBUG = True
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+# Database
+# --------
 
-# email server
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, 'app.db')
+SQLALCHEMY_MIGRATE_REPO = os.path.join(BASEDIR, 'db_repository')
+
+# Email
+# -----
+
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465
 MAIL_USE_TLS = False
@@ -19,4 +33,3 @@ MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
-ADMINS = []
