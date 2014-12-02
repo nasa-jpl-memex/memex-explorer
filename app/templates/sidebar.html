@@ -1,9 +1,5 @@
 <div class="col-sm-3 col-md-2 sidebar">
-    {% if project %}
-    <h1>{{ project.name }}</h1>
-    {% else %}
-    <h1>My Project</h1>
-    {% endif %}
+    <h1><i class='fa {{ project.icon }}'></i><br>{{ project.name }}</h1>
     <div class="accordion" id="accordion2">
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
