@@ -3,54 +3,49 @@
 
 {% block content %}
 
-<h2 class="dashboard-name">{{ crawl.name }}</h2>
-
-<p>{{ crawl.description }}</p>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/register_data">Add Monitor Data</a>
-</button>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/create_plot">Add Plot</a>
-</button>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/delete">Delete</a>
-</button>
-
-<button type="button" class="btn btn-default">
-  <a href="/crawl/{{ crawl.endpoint }}/edit">Edit</a>
-</button>
-
-{% if data_list %}
-<h3 class="available-dashboards">Monitor Data:</h3>
-<ul>
-{% for d in data_list %}
-<li><a href="/crawl/{{ crawl.endpoint }}/data/{{ d.endpoint }}">{{d.name}}</a></l>
-{% endfor %}
-</ul>
-{% endif %}
-
-{% if plot_list %}
-<h3 class="available-dashboards">Plots:</h3>
-<ul>
-{% for p in plot_list %}
-<li><a href="/{{ crawl.endpoint }}/plot/{{ p.endpoint }}">{{ p.name}}</a></l>
-{% endfor %}
-</ul>
-{% endif %}
-
-{% if dash_list %}
-<h3 class="available-dashboards">Dashboards:</h3>
-<ul>
-{% for d in dash_list %}
-<li><a href="/{{ crawl.endpoint }}/dashboard/{{ d.endpoint }}">{{ d.name }}</a></l>
-{% endfor %}
-</ul>
-{% else %}
-<h3>No dashboards available.</h3>
-{% endif %}
-
-
+{% include 'sidebar.html' %}
+<div class='row'>
+  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <h1>{{ crawl.name }}</h1>
+    <p>Status: unknown</p>
+  </div>
+</div>
+<div class='row'>
+  <div class='col-sm-3 col-sm-offset-2'>
+    <ul class='inline-icons' style='text-align:left;'>
+      <li><h1><a href="#"><i class='fa fa-play'></i></a></h1></li>
+      <li><h1><a href="#"><i class='fa fa-pause'></i></a></h1></li>
+      <li><h1><a href="#"><i class='fa fa-stop'></i></a></h1></li>
+    </ul>
+  </div>
+  <div class='col-sm-3'>
+    <ul class='inline-icons' style='text-align:left;'>
+      <li><h1><a href="#"><i class='fa fa-file-o'></i></a></h1></li>
+      <li><h1><a href="#"><i class='fa fa-edit'></i></a></h1></li>
+      <li><h1><a href="#"><i class='fa fa-close'></i></a></h1></li>
+    </ul>
+  </div>
+</div>
+<div class='row'>
+  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div role="tabpanel">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a></li>
+        <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">Summary Statistics</a></li>
+        <li role="presentation"><a href="#explorer" aria-controls="explorer" role="tab" data-toggle="tab">Data Explorer</a></li>
+        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Crawl Index</a></li>
+        <li role="presentation"><a href="#index" aria-controls="index" role="tab" data-toggle="tab">Crawl Index</a></li>
+      </ul>
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="description">
+            <p>The muchtreasured and intricately embroidered ancient Irish facecloth attributed to Solomon of Droma and Manus Tomaltach og MacDonogh, authors of the Book of Ballymote, was then carefully produced and called forth prolonged admiration. No need to dwell on the legendary beauty of the cornerpieces, the acme of art, wherein one can distinctly discern each of the four evangelists in turn presenting to each of the four masters his evangelical symbol, a bogoak sceptre, a North American puma (a far nobler king of beasts than the British article, be it said in passing), a Kerry calf and a golden eagle from Carrantuohill.</p>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="statistics">...</div>
+        <div role="tabpanel" class="tab-pane" id="explorer">...</div>
+        <div role="tabpanel" class="tab-pane" id="settings">...</div>
+        <div role="tabpanel" class="tab-pane" id="index">...</div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}

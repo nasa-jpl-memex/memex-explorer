@@ -66,6 +66,15 @@ def index():
 # -----------------------------------------------------------------------------
 
 
+@app.route('/<project_name>')
+def project(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    if project is None:
+        flash("Project '%s' was not found." % project_name, 'error')
+        abort(404)
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    return render_template('project.html', project=project, crawls=crawls)
+
 
 # Crawl
 # -----------------------------------------------------------------------------
@@ -93,24 +102,23 @@ def register():
     return render_template('register_crawl.html', form=form)
 
 
-@app.route('/crawl/<crawl_endpoint>')
-def crawl(crawl_endpoint):
-    crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
-    if crawl is None:
-        flash("Crawl '%s' was not found." % crawl_endpoint, 'error')
+@app.route('/<project_name>/crawls/<crawl_name>')
+def crawl(project_name, crawl_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawl = Crawl.query.filter_by(name=crawl_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    if not crawl:
+        flash("Crawl '%s' was not found." % crawl_name, 'error')
         abort(404)
+    elif not project:
+        flash("Project '%s' was not found." % project_name, 'error')
+        abort(404)
+    elif crawl.project_id != project.id:
+        flash("This crawl is not part of project '%s'" % project_name, 'error')
+        abort(404)
+    return render_template('crawl.html', project=project, crawl=crawl,\
+                            crawls=crawls)
 
-    data = crawl.monitor_data.all()
-    plots = crawl.plots
-    dashbs = crawl.dashboards
-
-    data_list = [dict(name=x.name, endpoint=x.endpoint) for x in data]
-    plot_list = [dict(name=x.name, endpoint=x.endpoint) for x in plots]
-    dash_list = [dict(name=x.name, endpoint=x.endpoint) for x in dashbs]
-
-    return render_template('crawl.html',
-                            crawl=crawl, data_list=data_list,
-                            plot_list=plot_list, dash_list=dash_list)
 
 # Data
 # -----------------------------------------------------------------------------
@@ -267,13 +275,3 @@ def contact():
         return redirect(url_for('index'))
 
     return render_template('contact.html', form=form)
-
-
-@app.route('/<project_name>')
-def project(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    if project is None:
-        flash("Project '%s' was not found." % project_name, 'error')
-        abort(404)
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    return render_template('project.html', project=project, crawls=crawls)

@@ -157,7 +157,7 @@ body {
   *font-size: normal;
   color: #333333; }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h3, h4, h5, h6 {
   font-family: "Lato", sans-serif;
   letter-spacing: 0em;
   text-transform: uppercase; }
@@ -191,6 +191,9 @@ div:not(.bk-plot-wrapper) > table {
   div:not(.bk-plot-wrapper) > table th, div:not(.bk-plot-wrapper) > table td {
     padding: 3px 10px;
     border: 1px solid #333333; }
+
+.row p {
+  font-size: 16px; }
 
 /* Buttons */
 .btn-default, .btn-primary, .btn-danger {
@@ -375,6 +378,9 @@ ul.inline-icons {
     font-size: 30px;
     margin: 0px 25px 0px 25px; }
 
+.tab-pane p {
+  margin: 10px; }
+
 .sidebar-buttons {
   padding: 10px;
   border: 1px solid #E8E8E8;
@@ -392,9 +398,12 @@ ul.inline-icons {
   background-color: #fff;
   text-align: left;
   margin-top: -5px;
-  margin-bottom: 10px;
-  width: 85%;
+  margin-bottom: 5px;
+  width: 100%;
   list-style: none; }
+  .accordion-links a {
+    border-bottom: 1px solid #D3D3D3;
+    margin-top: 10px; }
 
 .index-columns {
   display: inline-block;
