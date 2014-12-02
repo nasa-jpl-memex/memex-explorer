@@ -190,7 +190,7 @@ body {
   color: #333333;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h3, h4, h5, h6 {
   font-family: "Lato", sans-serif;
   letter-spacing: 0em;
   text-transform: uppercase;
@@ -245,7 +245,11 @@ div:not(.bk-plot-wrapper) > {
   }
 }
 
-
+.row{
+  p{
+    font-size:16px;
+  }
+}
 /* Buttons */
 
 .btn-default, .btn-primary, .btn-danger {
@@ -374,9 +378,13 @@ ul.inline-icons{
   background-color:#fff;
   text-align:left;
   margin-top:-5px;
-  margin-bottom:10px;
+  margin-bottom:5px;
   width:100%;
   list-style:none;
+  a{
+    border-bottom:1px solid #D3D3D3;
+    margin-top:10px;
+  }
 }
 
 .index-columns{
