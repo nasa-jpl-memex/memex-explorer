@@ -1,12 +1,17 @@
 <div class="col-sm-3 col-md-2 sidebar">
+    {% if project %}
+    <h1>{{ project.name }}</h1>
+    {% else %}
+    <h1>My Project</h1>
+    {% endif %}
     <div class="accordion" id="accordion2">
       <div class="accordion-group">
-        <div class="accordion-heading">
+        <div class="accordion-heading sidebar-buttons">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
             Crawls
           </a>
         </div>
-        <div id="collapseOne" class="accordion-body collapse in">
+        <div id="collapseOne" class="accordion-body collapse accordion-links">
         {% if crawls %}
         {% for w in crawls %}
           <div class="accordion-inner">
@@ -14,18 +19,18 @@
           </div>
         {% endfor %}
         {% endif %}
-        <div class="accordion-inner">
+          <div class="accordion-inner">
             <a href="#">+ Add Crawl</a>
           </div>
         </div>
       </div>
       <div class="accordion-group">
-        <div class="accordion-heading">
+        <div class="accordion-heading sidebar-buttons">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
             Dashboards
           </a>
         </div>
-        <div id="collapseTwo" class="accordion-body collapse">
+        <div id="collapseTwo" class="accordion-body collapse accordion-links">
         {% if dashboard %}
         {% for x in dashboard %}
           <div class="accordion-inner">
@@ -39,12 +44,12 @@
         </div>
       </div>
       <div class="accordion-group">
-        <div class="accordion-heading">
+        <div class="accordion-heading sidebar-buttons">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
             Data Sources
           </a>
         </div>
-        <div id="collapseThree" class="accordion-body collapse">
+        <div id="collapseThree" class="accordion-body collapse accordion-links">
         {% if data_sources %}
         {% for y in data_sources %}
           <div class="accordion-inner">
@@ -58,12 +63,12 @@
         </div>
       </div>
       <div class="accordion-group">
-        <div class="accordion-heading">
+        <div class="accordion-heading sidebar-buttons">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
             Data Flows
           </a>
         </div>
-        <div id="collapseFour" class="accordion-body collapse">
+        <div id="collapseFour" class="accordion-body collapse accordion-links">
         {% if data_flows %}
         {% for z in data_flows %}
           <div class="accordion-inner">

@@ -358,12 +358,25 @@ ul.inline-icons{
 
 .sidebar-buttons{
   padding:10px;
-  background-color:#fff;
+  border:1px solid #E8E8E8;
+  border-radius:5px;
+  background-color:#FCFCFC;
   text-align:left;
   margin-bottom:5px;
   width:100%;
   list-style:none;
-  @include boxShadow(3px 3px 3px 1px rgba(0, 0, 0, .30));
+}
+
+.accordion-links{
+  padding:10px;
+  border:1px solid #E8E8E8;
+  border-radius:5px;
+  background-color:#fff;
+  text-align:left;
+  margin-top:-5px;
+  margin-bottom:10px;
+  width:85%;
+  list-style:none;
 }
 
 .index-columns{
