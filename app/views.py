@@ -28,7 +28,7 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot
+from .models import Crawl, DataSource, Dashboard, Plot, Project, App
 from .forms import CrawlForm, DashboardForm, MonitorDataForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
@@ -37,11 +37,10 @@ from .plotting import plot_builder
 
 
 @app.context_processor
-def inject_crawls():
-    crawls = Crawl.query.all()
-    plots = Plot.query.all()
-    dashboards = Dashboard.query.all()
-    return dict(crawls=crawls, plots=plots, dashboards=dashboards)
+def context():
+    projects = Project.query.all()
+    apps = App.query.all()
+    return dict(projects=projects, apps=apps)
 
 
 @app.errorhandler(404)
@@ -62,6 +61,11 @@ def application_error(e):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# Project
+# -----------------------------------------------------------------------------
+
+
 
 # Crawl
 # -----------------------------------------------------------------------------
