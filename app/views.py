@@ -28,7 +28,7 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, App, Project, ImageSpace
+from .models import Crawl, DataSource, Dashboard, Plot
 from .forms import CrawlForm, DashboardForm, MonitorDataForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
@@ -61,8 +61,7 @@ def application_error(e):
 
 @app.route('/')
 def index():
-    projects = Project.query.all()
-    return render_template('index.html', projects=projects)
+    return render_template('index.html')
 
 # Crawl
 # -----------------------------------------------------------------------------
@@ -264,16 +263,3 @@ def contact():
         return redirect(url_for('index'))
 
     return render_template('contact.html', form=form)
-
-# Plot
-# -----------------------------------------------------------------------------
-
-
-@app.route('/projects')
-def projects():
-    return 'Hello world!'
-
-
-@app.route('/project')
-def project():
-    return render_template('project.html')

@@ -362,6 +362,7 @@ ul.inline-icons{
   text-align:left;
   margin-bottom:5px;
   width:100%;
+  list-style:none;
   @include boxShadow(3px 3px 3px 1px rgba(0, 0, 0, .30));
 }
 

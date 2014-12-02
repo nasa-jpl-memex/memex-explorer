@@ -3,64 +3,38 @@
 
 {% block content %}
 <div class='inner'>
-<div class='col-sm-12'>
     <h1 style='text-align: center;'>Memex-Viewer</h1>
-    <p style='text-align: center;font-size:18px;'>The next generation of information retrieval, data mining, and visualization.</p>
+    <p style='text-align: center;font-size:14px;'>The next generation of information retrieval, data mining, and visualization.</p>
     <div style='text-align: center;'>
-        <button type="button" class="btn btn-default btn-duo center">
+        <button id='center' type="button" class="btn btn-default btn-duo center">
             <a href="#">Learn More</a>
         </button>
-        <button type="button" class="btn btn-default btn-duo center">
+        <button id='center' type="button" class="btn btn-default btn-duo center">
             <a href="#">Source</a>
         </button>
-        <button type="button" class="btn btn-default btn-duo center">
+        <button id='center' type="button" class="btn btn-default btn-duo center">
             <a href="#">Docs</a>
         </button>
     </div>
-</div>
-<div class='col-sm-12'>
-    <h1 style='text-align:center;padding-top:20px;'>Projects</h1>
-</div>
+    <br><br>
+    <h1>Projects</h1>
     <ul class='inline-icons'>
-    {% if projects %}
-    <div class='row'>
-    {% for x in projects %}
-    <div class='col-sm-2 index-columns'>
-        <a href="#"><li><i class="fa fa-globe"></i><br>{{ x.name }}</li></a>
-    </div>
-    {% endfor %}
-    </div>
-    {% else %}
-    <div class='row'>
-    <div class='col-sm-2 index-columns'>
-        <a href="#"><li><i class="fa fa-file-o"></i><br>Add Project</li></a>
-    </div>
-    </div>
-    {% endif %}
+        <a href="#"><li><i class="fa fa-globe"></i><br>Ebola</li></a>
+        <a href="#"><li><i class="fa fa-users"></i><br>Human Trafficking</li></a>
+        <a href="#"><li><i class="fa fa-flag"></i><br>ISIL</li></a>
+        <a href="#"><li><i class="fa fa-file-o"></i><br>New Project</li></a>
     </ul>
     <br><br>
-    <h1 style='text-align:center;'>Apps</h1>
-    <div class='row'>
+    <h1>Apps</h1>
     <ul class='inline-icons'>
-        <div class='col-sm-3 index-columns'>
         <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
-        </div>
-        <div class='col-sm-3 index-columns'>
         <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
-        </div>
-        <div class='col-sm-3 index-columns'>
         <a href="#"><li><i class="fa fa-database"></i><br>Data Sources</li></a>
-        </div>
-        <div class='col-sm-3 index-columns'>
-        <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
-        </div>
-        <div class='col-sm-3 index-columns'>
-        <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
-        </div>
-        <div class='col-sm-3 index-columns'>
-        <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
-        </div>
     </ul>
-    </div>
+    <ul class='inline-icons'>
+        <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
+        <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
+        <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
+    </ul>
 </div>
 {% endblock %}
