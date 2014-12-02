@@ -16,38 +16,50 @@
         </button>
     </div>
     <br><br>
-    <h3>Projects</h3>
+    <h3 style='text-align: center;'>Projects</h3>
     <div class="row">
-        {% for project in projects %}
-        <div class="col-xs-6 col-sm-3">
-        <div class="well"><a href="#">
-         <i class="fa {{project.icon}}"></i>
-        <h4>{{ project.name }}</h4></a>
-        </div>
-        </div>
-        {% endfor %}
-    </div>
-    
-    <h3>Projects</h3>
-    <div class="row">
-    {% for project in projects %}
-    <div class="col-xs-6 col-sm-3">
-    <a href="#" class="btn btn-custom" role="button"><span class="fa {{project.icon}}"></span> <br/>{{ project.name }}</a>
+    <ul class='inline-icons'>
+    {% if projects %}
+    <div class='row'>
+    {% for x in projects %}
+    <div class='col-sm-2 index-columns'>
+        <a href="#"><li><i class="fa {{ x.icon }}"></i><br>{{ x.name }}</li></a>
     </div>
     {% endfor %}
     </div>
+    {% else %}
+    <div class='row'>
+    <div class='col-sm-2 index-columns'>
+        <a href="#"><li><i class="fa fa-file-o"></i><br>Add Project</li></a>
+    </div>
+    </div>
+    {% endif %}
+    </ul>
+    </div>
 
     <br><br>
-    <h3>Apps</h3>
-    <ul class='inline-icons'>
-        <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
-        <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
-        <a href="#"><li><i class="fa fa-database"></i><br>Data Sources</li></a>
-    </ul>
-    <ul class='inline-icons'>
-        <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
-        <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
-        <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
-    </ul>
+    <h3 style='text-align: center;'>Apps</h3>
+    <div class='row'>
+     <ul class='inline-icons'>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
+        </div>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
+        </div>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-database"></i><br>Data Sources</li></a>
+        </div>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
+        </div>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
+        </div>
+        <div class='col-sm-3 index-columns'>
+         <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
+        </div>
+     </ul>
+    </div>
 </div>
 {% endblock %}
