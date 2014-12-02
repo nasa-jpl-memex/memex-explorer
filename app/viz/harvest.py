@@ -5,6 +5,7 @@ from blaze import *
 import pandas as pd
 from bokeh.plotting import *
 from bokeh.objects import HoverTool
+from bokeh.models import ColumnDataSource
 from collections import OrderedDict
 import numpy as np
 import datetime as dt
@@ -16,8 +17,6 @@ from plot import PlotManager
 class Harvest(PlotManager):
 
     def __init__(self, datasource, plot):
-        # plot attributes: name description plot
-        # data attributes: name data_uri description plots 
         self.harvest_data = datasource.data_uri
         super(Harvest, self).__init__(plot)
 
@@ -29,7 +28,6 @@ class Harvest(PlotManager):
         t = transform(t, harvest_rate=t.relevant_pages/t.downloaded_pages)
 
         source = into(ColumnDataSource, t)
-
         return source
 
     def create_and_store(self):
@@ -43,10 +41,15 @@ class Harvest(PlotManager):
                    title="Harvest Plot", x_axis_type='datetime',
                    tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
-        p.scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6, color="red", source=self.source)
-        p.line(x="timestamp", y="relevant_pages", color="red", width=0.2, legend="relevant", source=self.source)
-        p.scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6, color="blue", source=self.source)
-        p.line(x="timestamp", y="downloaded_pages", color="blue", width=0.2, legend="downloaded", source=self.source)
+        p.line(x="timestamp", y="relevant_pages", color="red", width=0.2,
+               legend="relevant", source=self.source)
+        p.scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6,
+                  color="red", source=self.source)
+
+        p.line(x="timestamp", y="downloaded_pages", color="blue", width=0.2,
+               legend="downloaded", source=self.source)
+        p.scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6,
+                 color="blue", source=self.source)
 
         hover = p.select(dict(type=HoverTool))
         hover.tooltips = OrderedDict([
@@ -55,19 +58,10 @@ class Harvest(PlotManager):
 
         p.legend.orientation = "top_left"
 
-        cursession().store_document(curdoc())
-
         # Save ColumnDataSource model id to database model 
         self.plot.source_id = self.source._id
         db.session.flush()
         db.session.commit()
 
+        cursession().store_document(curdoc())
         return autoload_server(p, cursession())
-
-    def push_to_server(self):
-        self.source = self.update_source()
-        s = Session()
-        d = Document()
-        json_source = s.pull(typename="ColumnDataSource", objid=self.plot.source_id)
-        d.load(json_source)
-

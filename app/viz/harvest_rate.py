@@ -15,18 +15,15 @@ from harvest import Harvest
 
 class HarvestRate(Harvest):
 
-    def __init__(self, datasource, plot):
-        # plot attributes: name description plot
-        # data attributes: name data_uri description plots 
-        self.harvest_data = data.data_uri
-        super(HarvestRate, self).__init__(plot)
+    # def __init__(self, datasource, plot):
+    #     # self.harvest_data = datasource.data_uri
+    #     super(HarvestRate, self).__init__(datasource, plot)
 
-    def update_source(self):
-        super(HarvestRate, self).update_source(plot)
+    # def update_source(self):
+    #     super(HarvestRate, self).update_source()
 
 
     def create_and_store(self):
-
         self.source = self.update_source()
 
         output_server(self.doc_name)
@@ -36,8 +33,9 @@ class HarvestRate(Harvest):
                title="Harvest Rate", x_axis_type='datetime',
                tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
-        p.line(x="timestamp", y="harvest_rate", fill_alpha=0.6, color="blue", width=0.2, legend="harvest_rate", source=self.source)
-        p.scatter(x="timestamp", y="harvest_rate", alpha=0, color="blue", legend="harvest_rate", source=self.source)
+        p.line(x="timestamp", y="harvest_rate", fill_alpha=0.6, color="blue",
+               width=0.2, legend="harvest_rate", source=self.source)
+        p.scatter(x="timestamp", y="harvest_rate", alpha=0, color="blue", source=self.source)
 
         hover = curplot().select(dict(type=HoverTool))
         hover.tooltips = OrderedDict([
@@ -45,6 +43,11 @@ class HarvestRate(Harvest):
         ])
 
         p.legend.orientation = "top_left"
+
+        # Save ColumnDataSource model id to database model 
+        self.plot.source_id = self.source._id
+        db.session.flush()
+        db.session.commit()
         
         cursession().store_document(curdoc())
         return autoload_server(p, cursession())
