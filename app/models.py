@@ -51,6 +51,7 @@ class Plot(db.Model):
     description = db.Column(db.Text)
     endpoint = db.Column(db.String(64), index=True, unique=True)
     plot = db.Column(db.String(64), index=True)
+    source_id = db.Column(db.String(64))
 
 
 class Dashboard(db.Model):
