@@ -20,7 +20,6 @@ In particular, Alembic is currently unable to detect indexes. Once finalized, th
 Then you can apply the migration to the database:
 
     $ python manage.py db upgrade
--
 
 ## More info
 
