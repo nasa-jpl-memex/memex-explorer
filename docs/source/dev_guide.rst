@@ -1,2 +1,54 @@
 Developer's Guide to memex-viewer
 ---------------------------------
+
+The Database Model
+==================
+
+The current application database entity relation diagram is:
+
+.. image:: _static/img/db_model.png
+
+
+The Database
+=============
+
+We are currently using an SQLite database with the following tables:
+
+.. image:: _static/img/db_tables.png
+
+
+Database migrations
+===================
+
+We are using Flask-migrate to manage our application database migrations.
+
+Basic usage
+
+You can create the database or enable migrations if the database already exists with the following command:
+
+.. code:: bash
+
+    $ python manage.py db init
+
+This will add a `migrations` folder to your application. The contents of this folder need to be added to version control along with your other source files.
+
+You can then generate an initial migration:
+
+.. code:: bash
+
+    $ python manage.py db migrate
+
+The migration script needs to be reviewed and edited, as Alembic currently does not detect every change you make to your models.
+In particular, Alembic is currently unable to detect indexes. Once finalized, the migration script also needs to be added to version control.
+
+Then you can apply the migration to the database:
+
+.. code:: bash
+
+    $ python manage.py db upgrade
+
+To learn more about Flask-migrations:
+
+- `Tutorial <http://blog.miguelgrinberg.com/post/flask-migrate-alembic-database-migration-wrapper-for-flask>`_.
+- `Docs <http://flask-migrate.readthedocs.org/en/latest/>`_.
+- `Source code <https://github.com/miguelgrinberg/Flask-Migrate>`_.
