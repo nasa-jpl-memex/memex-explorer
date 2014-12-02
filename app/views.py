@@ -267,3 +267,13 @@ def contact():
         return redirect(url_for('index'))
 
     return render_template('contact.html', form=form)
+
+
+@app.route('/<project_name>')
+def project(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    if project is None:
+        flash("Project '%s' was not found." % project_name, 'error')
+        abort(404)
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    return render_template('project.html', project=project, crawls=crawls)

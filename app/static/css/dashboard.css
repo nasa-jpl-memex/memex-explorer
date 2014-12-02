@@ -366,7 +366,8 @@ form .btn-primary, form .btn-default {
 
 ul.inline-icons {
   list-style: none;
-  text-align: left; }
+  text-align: center;
+  padding: 0px; }
   ul.inline-icons li {
     float: none;
     display: inline-block;
@@ -374,29 +375,36 @@ ul.inline-icons {
     font-size: 30px;
     margin: 0px 25px 0px 25px; }
 
-ul.sidebar-links {
-  list-style: none;
-  float: none;
-  display: block;
-  margin: 0 auto;
-  padding-left: 0;
-  margin-right: 20px; }
-  ul.sidebar-links li {
-    padding: 10px;
-    background-color: #fff;
-    text-align: left;
-    margin-bottom: 5px;
-    box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, 0.3);
-    -webkit-box-shadow: 3px 3px 3px 1px rgba(0, 0, 0, 0.3); }
+.sidebar-buttons {
+  padding: 10px;
+  border: 1px solid #E8E8E8;
+  border-radius: 5px;
+  background-color: #FCFCFC;
+  text-align: left;
+  margin-bottom: 5px;
+  width: 100%;
+  list-style: none; }
 
-.inner {
-  width: 50%;
+.accordion-links {
+  padding: 10px;
+  border: 1px solid #E8E8E8;
+  border-radius: 5px;
+  background-color: #fff;
+  text-align: left;
+  margin-top: -5px;
+  margin-bottom: 10px;
+  width: 85%;
+  list-style: none; }
+
+.index-columns {
+  display: inline-block;
+  float: none;
   margin: 0 auto; }
 
-@media (max-width: 1001px) {
-  .inner {
-    width: 75%; } }
+.inner {
+  width: 75%;
+  margin: 0 auto; }
+
 @media (max-width: 769px) {
   .inner {
     width: 100%; } }
