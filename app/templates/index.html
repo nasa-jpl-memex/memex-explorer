@@ -23,7 +23,7 @@
     <div class='row'>
     {% for x in projects %}
     <div class='col-sm-2 index-columns'>
-        <a href="#"><li><i class="fa {{ x.icon }}"></i><br>{{ x.name }}</li></a>
+        <a href="{{ url_for('project', project_name=x.name) }}"><li><i class="fa {{ x.icon }}"></i><br>{{ x.name }}</li></a>
     </div>
     {% endfor %}
     </div>

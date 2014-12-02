@@ -11,7 +11,7 @@
         {% if crawls %}
         {% for w in crawls %}
           <div class="accordion-inner">
-            <a href="#">{{ w.name }}</a>
+            <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}">{{ w.name }}</a>
           </div>
         {% endfor %}
         {% endif %}

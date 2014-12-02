@@ -3,54 +3,10 @@
 
 {% block content %}
 
-<h2 class="dashboard-name">{{ crawl.name }}</h2>
+{% include 'sidebar.html' %}
 
-<p>{{ crawl.description }}</p>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/register_data">Add Monitor Data</a>
-</button>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/create_plot">Add Plot</a>
-</button>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{ crawl.endpoint }}/delete">Delete</a>
-</button>
-
-<button type="button" class="btn btn-default">
-  <a href="/crawl/{{ crawl.endpoint }}/edit">Edit</a>
-</button>
-
-{% if data_list %}
-<h3 class="available-dashboards">Monitor Data:</h3>
-<ul>
-{% for d in data_list %}
-<li><a href="/crawl/{{ crawl.endpoint }}/data/{{ d.endpoint }}">{{d.name}}</a></l>
-{% endfor %}
-</ul>
-{% endif %}
-
-{% if plot_list %}
-<h3 class="available-dashboards">Plots:</h3>
-<ul>
-{% for p in plot_list %}
-<li><a href="/{{ crawl.endpoint }}/plot/{{ p.endpoint }}">{{ p.name}}</a></l>
-{% endfor %}
-</ul>
-{% endif %}
-
-{% if dash_list %}
-<h3 class="available-dashboards">Dashboards:</h3>
-<ul>
-{% for d in dash_list %}
-<li><a href="/{{ crawl.endpoint }}/dashboard/{{ d.endpoint }}">{{ d.name }}</a></l>
-{% endfor %}
-</ul>
-{% else %}
-<h3>No dashboards available.</h3>
-{% endif %}
-
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <h1>{{ crawl.name }}</h1>
+</div>
 
 {% endblock content %}
