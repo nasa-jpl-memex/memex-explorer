@@ -378,6 +378,9 @@ ul.inline-icons {
     font-size: 30px;
     margin: 0px 25px 0px 25px; }
 
+.tab-pane p {
+  margin: 10px; }
+
 .sidebar-buttons {
   padding: 10px;
   border: 1px solid #E8E8E8;
