@@ -9,11 +9,15 @@ background-color: #1D4971;
 border-color: #1D4971;
 }
 
+.panel-project>a>.panel-heading {
+color: #fff;
+background-color: #1D4971;
+border-color: #1D4971;
+}
+
 .panel-project>.panel-footer.p {
 color: black;
 }
-
-
 
 .app-icon, .app-icon:hover, .app-icon:active, .app-icon:focus {
   color: #1D4971;
