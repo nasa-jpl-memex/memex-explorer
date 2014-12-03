@@ -3,34 +3,12 @@
 
 {% block content %}
 
-<h2 class="dashboard-name">{{dash.name}}</h2>
+{% include 'sidebar.html' %}
 
-{% include 'dash_header.html' %}
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{crawl.endpoint}}/data/{{data.endpoint}}/create_plot">Add plot</a>
-</button>
-
-<button type="button" class="btn btn-default btn-duo">
-  <a href="/crawl/{{crawl.endpoint}}/data/{{data.endpoint}}/delete">Delete</a>
-</button>
-
-<button type="button" class="btn btn-default">
-  <a href="/crawl/{{crawl.endpoint}}/data/{{data.endpoint}}/edit">Edit</a>
-</button>
-
-<h3 class="available-dashboards">Plots:</h3>
-<ul>
-{% for p in plot_list %}
-<li><a href="/{{crawl.endpoint}}/plot/{{p.endpoint}}">{{p.name}}</a></l>
-{% endfor %}
-</ul>
-
-<h3 class="available-dashboards">Crawls:</h3>
-<ul>
-{% for c in crawls_list %}
-<li><a href="/crawl/{{c.endpoint}}">{{c.name}}</a></l>
-{% endfor %}
-</ul>
+<div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h1>Here's your dashboard!</h1>
+    </div>
+</div>
 
 {% endblock content %}

@@ -29,7 +29,7 @@ from bokeh.plotting import ColumnDataSource
 
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project
-from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm
+from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, DashboardForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
@@ -68,11 +68,13 @@ def index():
 @app.route('/<project_name>')
 def project(project_name):
     project = Project.query.filter_by(name=project_name).first()
-    if project is None:
+    if not project:
         flash("Project '%s' was not found." % project_name, 'error')
         abort(404)
     crawls = Crawl.query.filter_by(project_id=project.id)
-    return render_template('project.html', project=project, crawls=crawls)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    return render_template('project.html', project=project, crawls=crawls, \
+                            dashboards=dashboards)
 
 
 # Crawl
@@ -106,6 +108,7 @@ def crawl(project_name, crawl_name):
     project = Project.query.filter_by(name=project_name).first()
     crawl = Crawl.query.filter_by(name=crawl_name).first()
     crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
     if not crawl:
         flash("Crawl '%s' was not found." % crawl_name, 'error')
         abort(404)
@@ -116,18 +119,11 @@ def crawl(project_name, crawl_name):
         flash("This crawl is not part of project '%s'" % project_name, 'error')
         abort(404)
     return render_template('crawl.html', project=project, crawl=crawl,\
-                            crawls=crawls)
+                            crawls=crawls, dashboards=dashboards)
 
 
 # Data
 # -----------------------------------------------------------------------------
-
-
-@app.route('/<project_name>/add_dashboard')
-def add_dashboard(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    return render_template('add_dashboard.html', project=project, crawls=crawls)
 
 
 @app.route('/crawl/<crawl_endpoint>/register_data', methods=['GET', 'POST'])
@@ -203,8 +199,40 @@ def data_explore(crawl_endpoint, data_endpoint):
                            crawl=crawl, data=monitor_data, plots=plots,
                            fields=fields, sample=sample, dshape=dshape) 
 
-# Plot
+# Plot & Dashboard
 # -----------------------------------------------------------------------------
+
+
+@app.route('/<project_name>/add_dashboard', methods=['GET', 'POST'])
+def add_dashboard(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    form = DashboardForm(request.form)
+
+    if form.validate_on_submit():
+        data = Dashboard(name=form.name.data, description=form.description.data, \
+                        project_id=project.id)
+        db.session.add(data)
+        db.session.commit()
+        flash("Dashboard '%s' was successfully registered" % form.name.data, 'success')
+        return redirect(url_for('dash', project_name=project.name, \
+                        dashboard_name=dashboard.name))
+
+    return render_template('add_dashboard.html', project=project, crawls=crawls,
+                            form=form)
+
+
+@app.route('/<project_name>/dashboards/<dashboard_name>')
+def dash(project_name, dashboard_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    dashboard = Dashboard.query.filter_by(name=dashboard_name).first()
+
+    return render_template('dash.html', project=project, crawls=crawls, \
+                            dashboards=dashboards, dashboard=dashboard)
+
 
 @app.route('/<crawl_endpoint>/plot/<plot_endpoint>')
 def plot(crawl_endpoint, plot_endpoint):
@@ -256,15 +284,6 @@ def data_edit(data_endpoint):
         return redirect(url_for('data', crawl_endpoint=crawl.endpoint,
                                         data_endpoint=data_endpoint))
     return render_template('edit.html', form=form, crawl=crawl)
-
-
-@app.route('/dashboard/<dashboard_endpoint>')
-def dash(dashboard_endpoint):
-    dash = Dashboard.query.filter_by(endpoint=dashboard_endpoint).first()
-    plots = dash.plots
-    crawls = dash.crawls.query.all()
-
-    return render_template('dash.html', dash=dash, plot=plot, crawls=crawls) 
 
 
 @app.route('/contact', methods=['GET', 'POST'])
