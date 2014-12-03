@@ -6,18 +6,16 @@
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
           Crawls
           </a>
-          {% if crawls %}
+          {% if crawls[0] %}
           <a href="{{ url_for('crawls', project_name=project.name) }}" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseOne" class="accordion-body collapse accordion-links">
-        {% if crawls %}
-        {% for w in crawls %}
+        {% for w in crawls if crawls %}
           <div class="accordion-inner">
             <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}">{{ w.name }}</a>
           </div>
         {% endfor %}
-        {% endif %}
           <div class="accordion-inner">
             <a href="#">+ Add Crawl</a>
           </div>
@@ -28,16 +26,16 @@
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
             Dashboards
           </a>
-            <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          {% if dashboards[0] %}
+          <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          {% endif %}
         </div>
         <div id="collapseTwo" class="accordion-body collapse accordion-links">
-        {% if dashboards %}
         {% for x in dashboards %}
           <div class="accordion-inner">
             <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}">{{ x.name }}</a>
           </div>
         {% endfor %}
-        {% endif %}
           <div class="accordion-inner">
             <a href="{{ url_for('add_dashboard', project_name=project.name) }}">+ Add Dashboard</a>
           </div>
@@ -48,15 +46,16 @@
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
             Data Sources
           </a>
+          {% if data_sources %}
+            <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          {% endif %}
         </div>
         <div id="collapseThree" class="accordion-body collapse accordion-links">
-        {% if data_sources %}
         {% for y in data_sources %}
           <div class="accordion-inner">
             <a href="#">{{ y.name }}</a>
           </div>
         {% endfor %}
-        {% endif %}
           <div class="accordion-inner">
             <a href="#">+ Add Data Source</a>
           </div>
@@ -67,15 +66,16 @@
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
             Data Flows
           </a>
+          {% if data_flows %}
+            <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          {% endif %}
         </div>
         <div id="collapseFour" class="accordion-body collapse accordion-links">
-        {% if data_flows %}
         {% for z in data_flows %}
           <div class="accordion-inner">
             <a href="#">{{ z.name }}</a>
           </div>
         {% endfor %}
-        {% endif %}
           <div class="accordion-inner">
             <a href="#">+ Add Data Flow</a>
           </div>

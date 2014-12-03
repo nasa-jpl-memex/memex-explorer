@@ -7,8 +7,9 @@
 
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <h1>{{ project.name }} Crawls</h1>
+        <h1>Crawls</h1>
     </div>
+    {% if crawls[0] %}
     {% for crawl in crawls %}
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <a href="{{ url_for('crawl', project_name=project.name, crawl_name=crawl.name) }}">
@@ -16,19 +17,19 @@
         </a>
         <p>{{ crawl.description }}</p>
     <div class="col-sm-2">
-        {% if dashboards %}
+        {% if images %}
         <table class="table table-striped">
             <tr>
-                <th>Dashboard(s)</th>
+                <th>Image(s)</th>
             </tr>
-            {% for dashboard in dashboards %}
+            {% for image in images %}
             <tr>
-                <td><a href="{{ url_for('dash', project_name=project.name, dashboard_name=dashboard.name) }}">{{ dashboard.name }}</a></td>
+                <td><a href="#">{{ image.name }}</a></td>
             </tr>
             {% endfor %}
         </table>
         {% else %}
-        <p>+ Add plots</p>
+        <a href="#"><p>+ Add Images</p></a>
         {% endif %}
     </div>
     <div class="col-sm-2">
@@ -44,7 +45,7 @@
             {% endfor %}
         </table>
         {% else %}
-        <p>+ Add plots</p>
+        <a href="#"><p>+ Add plots</p></a>
         {% endif %}
     </div>
     <div class="col-sm-2">
@@ -60,11 +61,16 @@
             {% endfor %}
         </table>
         {% else %}
-        <p>+ Add Data Sources</p>
+        <a href="#"><p>+ Add Data Sources</p></a>
         {% endif %}
     </div>
     </div>
     {% endfor %}
+    {% else %}
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <p>There are no crawls associated with this project.</p>
+        </div>
+    {% endif %}
 </div>
 
 {% endblock %}

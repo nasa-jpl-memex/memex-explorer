@@ -125,6 +125,7 @@ def crawls(project_name):
     project = Project.query.filter_by(name=project_name).first()
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
+    print(crawls)
     return render_template('crawls.html', project=project, crawls=crawls, \
                             dashboards=dashboards)
 
