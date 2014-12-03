@@ -211,13 +211,14 @@ def add_dashboard(project_name):
     form = DashboardForm(request.form)
 
     if form.validate_on_submit():
+        name = form.name.data
         data = Dashboard(name=form.name.data, description=form.description.data, \
                         project_id=project.id)
         db.session.add(data)
         db.session.commit()
         flash("Dashboard '%s' was successfully registered" % form.name.data, 'success')
         return redirect(url_for('dash', project_name=project.name, \
-                        dashboard_name=dashboard.name))
+                        dashboard_name=name))
 
     return render_template('add_dashboard.html', project=project, crawls=crawls,
                             form=form)
