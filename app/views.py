@@ -28,7 +28,7 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, App
+from .models import Crawl, DataSource, Dashboard, Plot, Project
 from .forms import CrawlForm, DashboardForm, MonitorDataForm, PlotForm, ContactForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
@@ -39,8 +39,7 @@ from .plotting import plot_builder
 @app.context_processor
 def context():
     projects = Project.query.all()
-    apps = App.query.all()
-    return dict(projects=projects, apps=apps)
+    return dict(projects=projects)
 
 
 @app.errorhandler(404)
