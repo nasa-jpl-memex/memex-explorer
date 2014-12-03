@@ -122,6 +122,14 @@ def crawl(project_name, crawl_name):
 # Data
 # -----------------------------------------------------------------------------
 
+
+@app.route('/<project_name>/add_dashboard')
+def add_dashboard(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    return render_template('add_dashboard.html', project=project, crawls=crawls)
+
+
 @app.route('/crawl/<crawl_endpoint>/register_data', methods=['GET', 'POST'])
 def register_data(crawl_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
