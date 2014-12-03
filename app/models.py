@@ -1,26 +1,33 @@
 from . import db
 
 
-project_app = db.Table('project_app',
-    db.Column('project_id', db.Integer, db.ForeignKey('project.id')),
-    db.Column('app_id', db.Integer, db.ForeignKey('app.id') )
+team_user = db.Table('team_user',
+    db.Column('team_id', db.Integer, db.ForeignKey('team.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
 )
+
+
+class Team(db.Model):
+    __tablename__ = "team"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    leader_id = db.Column(db.Integer)
+    users = db.relationship('User', secondary=team_user, \
+        backref=db.backref('team', lazy='dynamic'))
+
+
+class User(db.Model):
+    __tablename__ = "user"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True)
+    password = db.Column(db.String(12))
+    email = db.Column(db.String(50))
 
 
 class Project(db.Model):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-    description = db.Column(db.Text)
-    icon = db.Column(db.String(64))
-    apps = db.relationship("App", secondary=project_app, backref="projects")
-    crawls = db.relationship("Crawl", backref="project")
-
-
-class App(db.Model):
-    __tablename__ = "app"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
     description = db.Column(db.Text)
     icon = db.Column(db.String(64))
 
@@ -57,6 +64,7 @@ class Crawl(db.Model):
     crawler = db.Column(db.Text)
     config = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
     data_sources = db.relationship('DataSource', secondary=crawl_data, \
         backref=db.backref('crawl', lazy='dynamic'))
     images = db.relationship('ImageSpace', secondary=crawl_images, \
@@ -66,12 +74,22 @@ class Crawl(db.Model):
         return '<Crawl %r>' % (self.name)
 
 
+class DataModel(db.Model):
+    __tablename__ = "data_model"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+
+    def __repr__(self):
+        return '<DataModel %r>' % (self.name)
+
+
 class DataSource(db.Model):
     __tablename__ = "data_source"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     data_uri = db.Column(db.String(120))
     description = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     plots = db.relationship('Plot', secondary=data_plot, \
         backref=db.backref('data', lazy='dynamic'))
 
@@ -84,9 +102,28 @@ class ImageSpace(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     images_location = db.Column(db.Text)
     description = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     def __repr__(self):
         return '<ImageSpace %r>' % (self.id)
+
+
+class Image(db.Model):
+    __tablename__ = "image"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    img_file = db.Column(db.String(140))
+    EXIF_LensSerialNumber = db.Column(db.String(140))
+    MakerNote_SerialNumberFormat = db.Column(db.String(140))
+    EXIF_BodySerialNumber = db.Column(db.String(140))
+    MakerNote_InternalSerialNumber = db.Column(db.String(140))
+    MakerNote_SerialNumber = db.Column(db.String(140))
+    Image_BodySerialNumber = db.Column(db.String(140))
+    Uploaded = db.Column(db.Integer)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    def __unicode__(self):
+        return self.img_file
 
 
 class Plot(db.Model):
@@ -95,6 +132,7 @@ class Plot(db.Model):
     name = db.Column(db.String(64))
     description = db.Column(db.Text)
     plot = db.Column(db.String(64))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
 
 class Dashboard(db.Model):
@@ -102,6 +140,7 @@ class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     plots = db.relationship('Plot', secondary=plot_dashboard, \
         backref=db.backref('dashboard', lazy='dynamic'))
 
