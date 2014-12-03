@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set active_page = "overview" %}
+
+{% block content %}
+
+{% include 'sidebar.html' %}
+
+<div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h1>{{ project.name }} Crawls</h1>
+    </div>
+    {% for crawl in crawls %}
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <a href="{{ url_for('crawl', project_name=project.name, crawl_name=crawl.name) }}">
+            <p>{{ crawl.name }}</p>
+        </a>
+        <p>{{ crawl.description }}</p>
+    <div class="col-sm-2">
+        {% if dashboards %}
+        <table class="table table-striped">
+            <tr>
+                <th>Dashboard(s)</th>
+            </tr>
+            {% for dashboard in dashboards %}
+            <tr>
+                <td><a href="{{ url_for('dash', project_name=project.name, dashboard_name=dashboard.name) }}">{{ dashboard.name }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>+ Add plots</p>
+        {% endif %}
+    </div>
+    <div class="col-sm-2">
+        {% if plots %}
+        <table class="table table-striped">
+            <tr>
+                <th>Plot(s)</th>
+            </tr>
+            {% for plot in plots %}
+            <tr>
+                <td>{{ plot.name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>+ Add plots</p>
+        {% endif %}
+    </div>
+    <div class="col-sm-2">
+        {% if data_sources %}
+        <table class="table table-striped">
+            <tr>
+                <th>Data Source(s)</th>
+            </tr>
+            {% for data_source in data_sources %}
+            <tr>
+                <td>{{ data_source.name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>+ Add Data Sources</p>
+        {% endif %}
+    </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
