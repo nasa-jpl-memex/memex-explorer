@@ -29,7 +29,8 @@ from bokeh.plotting import ColumnDataSource
 
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project
-from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, DashboardForm
+from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
+                    DashboardForm, ProjectForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER
 from .auth import requires_auth
@@ -77,6 +78,22 @@ def project(project_name):
                             dashboards=dashboards)
 
 
+@app.route('/add_project', methods=['GET', 'POST'])
+def add_project():
+    form = ProjectForm(request.form)
+
+    if form.validate_on_submit():
+        name = form.name.data
+        data = Project(name=form.name.data, description=form.description.data, \
+                        icon=form.icon.data)
+        db.session.add(data)
+        db.session.commit()
+        flash("Project '%s' was successfully registered" % form.name.data, 'success')
+        return redirect(url_for('project', project_name=name))
+
+    return render_template('add_project.html', form=form)
+
+
 # Crawl
 # -----------------------------------------------------------------------------
 
@@ -101,6 +118,15 @@ def register():
             return redirect(url_for('crawl', crawl_endpoint=endpoint))
 
     return render_template('register_crawl.html', form=form)
+
+
+@app.route('/<project_name>/crawls')
+def crawls(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    return render_template('crawls.html', project=project, crawls=crawls, \
+                            dashboards=dashboards)
 
 
 @app.route('/<project_name>/crawls/<crawl_name>')
@@ -230,6 +256,15 @@ def dash(project_name, dashboard_name):
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     dashboard = Dashboard.query.filter_by(name=dashboard_name).first()
+    if not dashboard:
+        flash("Dashboard '%s' was not found." % dashboard_name, 'error')
+        abort(404)
+    elif not project:
+        flash("Project '%s' was not found." % project_name, 'error')
+        abort(404)
+    elif dashboard.project_id != project.id:
+        flash("This crawl is not part of project '%s'" % project_name, 'error')
+        abort(404)
 
     return render_template('dash.html', project=project, crawls=crawls, \
                             dashboards=dashboards, dashboard=dashboard)

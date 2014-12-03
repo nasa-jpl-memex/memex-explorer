@@ -4,7 +4,7 @@
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-            Crawls
+            <a href="{{ url_for('crawls', project_name=project.name) }}">Crawls</a>
           </a>
         </div>
         <div id="collapseOne" class="accordion-body collapse accordion-links">

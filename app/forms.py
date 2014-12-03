@@ -32,3 +32,9 @@ class ContactForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     email = StringField('Email', validators = [DataRequired(), Email()])
     description = TextAreaField('Name', validators = [DataRequired()])
+
+
+class ProjectForm(Form):
+    name = StringField('Name', validators = [DataRequired()])
+    description = TextAreaField('Description')
+    icon = StringField('Icon')

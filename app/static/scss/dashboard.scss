@@ -366,6 +366,13 @@ ul.inline-icons{
   }
 }
 
+.new-project{
+  color:white;
+  &.hover{
+    color:#b3d0e9;
+  }
+}
+
 .sidebar-buttons{
   padding:10px;
   border:1px solid #E8E8E8;
