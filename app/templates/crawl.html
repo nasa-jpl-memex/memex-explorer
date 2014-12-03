@@ -11,21 +11,33 @@
   </div>
 </div>
 <div class='row'>
-  <div class='col-sm-3 col-sm-offset-2'>
-    <ul class='inline-icons' style='text-align:left;'>
-      <li><h1><a href="#"><i class='fa fa-play'></i></a></h1></li>
-      <li><h1><a href="#"><i class='fa fa-pause'></i></a></h1></li>
-      <li><h1><a href="#"><i class='fa fa-stop'></i></a></h1></li>
-    </ul>
+        <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
+            <div class='col-md-2'>
+              <button id="playButton" type="button" class="btn btn-control">
+                  <i class="fa fa-play"></i>
+              </button>
+              <button id="pauseButton" type="button" class="btn btn-control">
+                  <span class="fa fa-pause"></span>
+              </button>
+              <button id="stopButton" type="button" class="btn btn-control">
+                  <span class="fa fa-stop"></span>
+              </button>
+              </div>
+              <div class='col-md-2'>
+              <button id="seedButton" type="button" class="btn btn-control">
+                  <i class="fa fa-file-o"></i>
+              </button>
+              <button id="editButton" type="button" class="btn btn-control">
+                  <span class="fa fa-edit"></span>
+              </button>
+              <button id="removeButton" type="button" class="btn btn-control">
+                  <span class="fa fa-close"></span>
+              </button>
+            </div>
+      </div>
+
   </div>
-  <div class='col-sm-3'>
-    <ul class='inline-icons' style='text-align:left;'>
-      <li><h1><a href="#"><i class='fa fa-file-o'></i></a></h1></li>
-      <li><h1><a href="#"><i class='fa fa-edit'></i></a></h1></li>
-      <li><h1><a href="#"><i class='fa fa-close'></i></a></h1></li>
-    </ul>
-  </div>
-</div>
+
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div role="tabpanel">
@@ -33,7 +45,7 @@
         <li role="presentation" class="active"><a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a></li>
         <li role="presentation"><a href="#statistics" aria-controls="statistics" role="tab" data-toggle="tab">Summary Statistics</a></li>
         <li role="presentation"><a href="#explorer" aria-controls="explorer" role="tab" data-toggle="tab">Data Explorer</a></li>
-        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Crawl Index</a></li>
+        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Crawl Settings</a></li>
         <li role="presentation"><a href="#index" aria-controls="index" role="tab" data-toggle="tab">Crawl Index</a></li>
       </ul>
       <div class="tab-content">
