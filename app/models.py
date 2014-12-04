@@ -52,6 +52,7 @@ class Plot(db.Model):
     endpoint = db.Column(db.String(64), index=True, unique=True)
     plot = db.Column(db.String(64), index=True)
     source_id = db.Column(db.String(64))
+    autoload_tag = db.Column(db.Text)
 
 
 class Dashboard(db.Model):
