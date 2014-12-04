@@ -14,7 +14,9 @@ from bokeh.resources import CDN
 
 from plot import PlotManager
 
+
 class Harvest(PlotManager):
+    """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
     def __init__(self, datasource, plot):
         self.harvest_data = datasource.data_uri
