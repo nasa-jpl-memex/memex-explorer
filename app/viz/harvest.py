@@ -23,13 +23,12 @@ class Harvest(PlotManager):
         super(Harvest, self).__init__(plot)
 
     def update_source(self):
-        t = Data(CSV(self.harvest_data,
-                     columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
-        t = transform(t, timestamp=t.timestamp.map(dt.datetime.fromtimestamp, schema='datetime'))
-        t = transform(t, date=t.timestamp.map(lambda x: x.date(), schema='date'))
-        t = transform(t, harvest_rate=t.relevant_pages/t.downloaded_pages)
 
-        source = into(ColumnDataSource, t)
+        df = pd.read_csv(self.harvest_data, delimiter='\t',
+            names=['relevant_pages', 'downloaded_pages', 'timestamp'])
+        df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
+
+        source = into(ColumnDataSource, df)
         return source
 
     def create_and_store(self):

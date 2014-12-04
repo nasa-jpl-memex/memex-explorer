@@ -1,16 +1,10 @@
 from __future__ import division
-import csv
-import sys
-from blaze import *
 import pandas as pd
-from bokeh.plotting import *
-from bokeh.objects import HoverTool
-from bokeh.models import ColumnDataSource
-from collections import OrderedDict
 import numpy as np
-import datetime as dt
-from bokeh.embed import components
-from bokeh.resources import CDN
+
+from blaze import *
+from bokeh.plotting import *
+from bokeh.models import ColumnDataSource
 from functools import partial
 
 from plot import PlotManager
@@ -54,7 +48,6 @@ class Termite(PlotManager):
         df = pd.read_csv(self.termite_data, delimiter='\t', header=None,
                          names=["topic", "keyword", "value"])
         df.topic.fillna(method='ffill', inplace=True)
-        # df.set_index('topic', drop=True, inplace=True)
         df.dropna(subset=['keyword'], inplace=True)
         df.sort('value', ascending=False, inplace=True)
 

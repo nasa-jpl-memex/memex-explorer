@@ -15,14 +15,6 @@ from harvest import Harvest
 
 class HarvestRate(Harvest):
 
-    # def __init__(self, datasource, plot):
-    #     # self.harvest_data = datasource.data_uri
-    #     super(HarvestRate, self).__init__(datasource, plot)
-
-    # def update_source(self):
-    #     super(HarvestRate, self).update_source()
-
-
     def create_and_store(self):
         self.source = self.update_source()
 
