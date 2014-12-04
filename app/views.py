@@ -255,6 +255,7 @@ def dash(project_name, dashboard_name):
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     dashboard = Dashboard.query.filter_by(name=dashboard_name).first()
+    plots = Plot.query.filter_by(project_id=project.id)
     if not dashboard:
         flash("Dashboard '%s' was not found." % dashboard_name, 'error')
         abort(404)
@@ -266,7 +267,7 @@ def dash(project_name, dashboard_name):
         abort(404)
 
     return render_template('dash.html', project=project, crawls=crawls, \
-                            dashboards=dashboards, dashboard=dashboard)
+                           dashboards=dashboards, dashboard=dashboard, plots=plots)
 
 
 @app.route('/<crawl_endpoint>/plot/<plot_endpoint>')
