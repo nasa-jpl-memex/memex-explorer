@@ -131,8 +131,11 @@ class Plot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     description = db.Column(db.Text)
-    plot = db.Column(db.String(64))
+    endpoint = db.Column(db.String(64), index=True, unique=True)
+    plot = db.Column(db.String(64), index=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    source_id = db.Column(db.String(64))
+    autoload_tag = db.Column(db.Text)
 
 
 class Dashboard(db.Model):

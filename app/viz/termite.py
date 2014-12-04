@@ -1,117 +1,92 @@
+from __future__ import division
 import csv
 import sys
 from blaze import *
 import pandas as pd
 from bokeh.plotting import *
+from bokeh.objects import HoverTool
+from bokeh.models import ColumnDataSource
+from collections import OrderedDict
 import numpy as np
 import datetime as dt
 from bokeh.embed import components
 from bokeh.resources import CDN
+from functools import partial
+
+from plot import PlotManager
 
 
+class Termite(PlotManager):
+    """Create a termite plot to visualize topics and words from an LDA.
+       See <http://vis.stanford.edu/papers/termite>"""
 
-class Termite(object):
 
-    # Draw a termite plot to visualize topics and words from an LDA.
-    def __init__(self, input_data='data_monitor/summary.txt'):
-        self.input_data = input_data
-        self.data, self.source = self.update_source()
-        #self.plot = self.create_plot()
+    def __init__(self, datasource, plot):
+        self.termite_data = datasource.data_uri
+        super(Termite, self).__init__(plot)
 
-    def generate_data(self):
-        """
-        Generates the csv files from the summary.txt output of the LDA.
-        """
-        # Transform the summary.txt file into a csv file with the purpose of inputing the file into Blaze-Bokeh for visualization.
-        fmt ='%Y-%m-%d-%H-%M-%S-%f' 
-        current_time = dt.datetime.now().strftime(fmt)
-        #topics_file = '%s_topics_data.csv' % current_time
-        topics_file = 'topics_data.csv'
-        with open(topics_file, 'wb') as outfile:
-            writer = csv.writer(outfile, delimiter=',')
-            with open(self.input_data, 'rb') as f:
-                reader = csv.reader(f, delimiter='\t')
-                try:
-                    for row in reader:
-                        if any(row):
-                            if row[0].startswith("Topic"):
-                                topic = row[0]
-                                writer.writerow(row)
-                            else:
-                                pass
-                except csv.Error as e:
-                    sys.exit('file %s, line %d: %s' % (self.input_data, reader.line_num, e))
+    def preprocess_file(self):
+        """Transform the summary.txt file into two CSV files with
+        the specified formatting."""
 
-        # Transform the summary.txt file into a csv file with the purpose of inputing the file into Blaze-Bokeh for visualization.
-        #termite_file = '%s_termite_data.csv' % current_time
-        termite_file = 'termite_data.csv'
-        with open(termite_file, 'wb') as outfile:
-            writer = csv.writer(outfile, delimiter=',')
-            with open(self.input_data, 'rb') as f:
-                reader = csv.reader(f, delimiter='\t')
-                try:
-                    for row in reader:
-                        if any(row):
-                            if row[0].startswith("Topic"):
-                                topic = row[0]
-                                # Uncomment if you want the topic aggregation result as a row
-                                #writer.writerow(row)
-                            else:
-                                row[0] = topic
-                                writer.writerow(row)
-                except csv.Error as e:
-                    sys.exit('file %s, line %d: %s' % (self.input_data, reader.line_num, e))
+        return
+        # df = pd.read_csv(self.termite_data, delimiter='\t', header=None,
+        #                  names=["topic", "keyword", "value"],
+        #                  usecols=["topic", "value"])
+        # df.dropna(subset=['topic'], inplace=True)
+        # df.to_csv('topics_data.csv', index=False)
 
-        return topics_file, termite_file
+
+        # df = pd.read_csv(self.termite_data, delimiter='\t', header=None,
+        #                  names=["topic", "keyword", "value"])
+        # df.topic.fillna(method='ffill', inplace=True)
+        # df.set_index('topic', drop=True, inplace=True)
+        # df.dropna(inplace=True)
+        # df.to_csv('termite_data.csv')
+
+    @staticmethod
+    def size(x, MIN, MAX):
+        """Return a scaled pixel size suitable for display."""
+        return np.sqrt((x - MIN)/(MAX - MIN)) * 50
 
     def update_source(self):
-        topics_file, termite_file = self.generate_data()
+
+        df = pd.read_csv(self.termite_data, delimiter='\t', header=None,
+                         names=["topic", "keyword", "value"])
+        df.topic.fillna(method='ffill', inplace=True)
+        # df.set_index('topic', drop=True, inplace=True)
+        df.dropna(subset=['keyword'], inplace=True)
+        df.sort('value', ascending=False, inplace=True)
+
+        MAX = df.value.max()
+        MIN = df.value.min()
         
-        t = Table(CSV(termite_file, columns=['topic', 'word', 'result']))
-        df = into(DataFrame, t)
+        df['size'] = df.value.apply(partial(self.size, MIN, MAX))
 
-        top = Table(CSV(topics_file, columns=['topic', 'word', 'result']))
-        topics_df = into(DataFrame, top)
+        self.WORDS = list(df['keyword'].unique())
+        self.TOPICS = list(df['topic'].unique())
 
-        topics_df = topics_df[["topic", "result"]]
-        topics_df.sort('result', ascending=False)
+        source = into(ColumnDataSource, df)
+        return source
 
-        gby_df = df.groupby('topic')
+    def create_and_store(self):
 
-        gby_df.describe()
+        self.source = self.update_source()
 
-        t_by = by(t.topic, max=t.result.max(), min=t.result.min())
+        output_server(self.doc_name)
+        curdoc().autostore = False
 
-        # size proportional to result in Karan's example 0-10 range.
-        MAX = compute(t.result.max())
-        MIN = compute(t.result.min())
-
-        # Create a size variable to define the size of the the circle for the plot.
-        t = transform(t, size=sqrt((t.result - MIN)/(MAX - MIN))*50)
-
-        data = t
-
-        source = into(ColumnDataSource, data)
-
-        return data, source
-
-    def create_plot(self, output_html='termite.html'):
-
-        WORDS = self.data['word'].distinct()
-        WORDS = into(list, WORDS)
-
-        TOPICS = self.data['topic'].distinct()
-        TOPICS = into(list, TOPICS)
-
-        figure(x_range=TOPICS, y_range=WORDS, 
+        p = figure(x_range=self.TOPICS, y_range=self.WORDS, 
                plot_width=1000, plot_height=1700,
                title="Termite Plot", tools='resize, save')
 
-        circle(x="topic", y="word", size="size", fill_alpha=0.6, source=self.source)
-        xaxis().major_label_orientation = np.pi/3
-        #show()
+        p.circle(x="topic", y="keyword", size="size", fill_alpha=0.6, source=self.source)
+        p.xaxis.major_label_orientation = np.pi/3
 
-        plot = curplot()
-        termite = components(plot, CDN)
+        # Save ColumnDataSource model id to database model 
+        self.plot.source_id = self.source._id
+        db.session.flush()
+        db.session.commit()
 
-        return termite
+        cursession().store_document(curdoc())
+        return autoload_server(p, cursession())

@@ -5,65 +5,65 @@ from blaze import *
 import pandas as pd
 from bokeh.plotting import *
 from bokeh.objects import HoverTool
+from bokeh.models import ColumnDataSource
 from collections import OrderedDict
 import numpy as np
 import datetime as dt
 from bokeh.embed import components
 from bokeh.resources import CDN
 
-class Harvest(object):
+from plot import PlotManager
 
-    def __init__(self, input_data='harvestinfo.csv'):
-        self.harvest_data = input_data
-        self.source = self.update_source()
-        #self.plot, self.rate_plot = self.create_plot()
+
+class Harvest(PlotManager):
+    """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
+
+    def __init__(self, datasource, plot):
+        self.harvest_data = datasource.data_uri
+        super(Harvest, self).__init__(plot)
 
     def update_source(self):
-        t = Data(CSV(self.harvest_data, columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
+        t = Data(CSV(self.harvest_data,
+                     columns=['relevant_pages', 'downloaded_pages', 'timestamp']))
         t = transform(t, timestamp=t.timestamp.map(dt.datetime.fromtimestamp, schema='datetime'))
         t = transform(t, date=t.timestamp.map(lambda x: x.date(), schema='date'))
         t = transform(t, harvest_rate=t.relevant_pages/t.downloaded_pages)
 
         source = into(ColumnDataSource, t)
-
         return source
 
-    def create_plot_harvest(self):
+    def create_and_store(self):
 
-        figure(plot_width=500, plot_height=250, title="Harvest Plot", tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover', x_axis_type='datetime')
-        hold()
+        self.source = self.update_source()
 
-        scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6, color="red", source=self.source)
-        line(x="timestamp", y="relevant_pages", color="red", width=0.2, legend="relevant", source=self.source)
-        scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6, color="blue", source=self.source)
-        line(x="timestamp", y="downloaded_pages", color="blue", width=0.2, legend="downloaded", source=self.source)
+        output_server(self.doc_name)
+        curdoc().autostore = False
 
-        hover = curplot().select(dict(type=HoverTool))
+        p = figure(plot_width=500, plot_height=250,
+                   title="Harvest Plot", x_axis_type='datetime',
+                   tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
+
+        p.line(x="timestamp", y="relevant_pages", color="red", width=0.2,
+               legend="relevant", source=self.source)
+        p.scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6,
+                  color="red", source=self.source)
+
+        p.line(x="timestamp", y="downloaded_pages", color="blue", width=0.2,
+               legend="downloaded", source=self.source)
+        p.scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6,
+                 color="blue", source=self.source)
+
+        hover = p.select(dict(type=HoverTool))
         hover.tooltips = OrderedDict([
             ("harvest_rate", "@harvest_rate"),
         ])
 
-        legend().orientation = "top_left"
+        p.legend.orientation = "top_left"
 
-        harvest_plot = curplot()
+        # Save ColumnDataSource model id to database model 
+        self.plot.source_id = self.source._id
+        db.session.flush()
+        db.session.commit()
 
-        harvest = components(harvest_plot, CDN)
-        
-        return harvest
-
-    def create_plot_harvest_rate(self):
-
-        figure(plot_width=500, plot_height=250, title="Harvest Rate", x_axis_type='datetime', tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
-        line(x="timestamp", y="harvest_rate", fill_alpha=0.6, color="blue", width=0.2, legend="harvest_rate", source=self.source)
-        scatter(x="timestamp", y="harvest_rate", alpha=0, color="blue", legend="harvest_rate", source=self.source)
-
-        hover = curplot().select(dict(type=HoverTool))
-        hover.tooltips = OrderedDict([
-            ("harvest_rate", "@harvest_rate"),
-        ])
-
-        harvest_rate_plot = curplot()
-
-        harvest_rate = components(harvest_rate_plot, CDN)
-
-        return harvest_rate
+        cursession().store_document(curdoc())
+        return autoload_server(p, cursession())
