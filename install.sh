@@ -1,7 +1,6 @@
  #!/usr/bin/env bash
 
-conda_file=`which conda`
-if [ ! -d $conda ]; then
+if [ ! -d /opt/anaconda ]; then
     wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O /opt/miniconda.sh
     bash /opt/miniconda.sh -b -p /opt/anaconda/
     echo "export PATH=/opt/anaconda/bin/:$PATH" | sudo tee -a /etc/bashrc
