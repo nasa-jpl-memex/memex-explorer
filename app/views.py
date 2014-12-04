@@ -97,27 +97,27 @@ def add_project():
 # Crawl
 # -----------------------------------------------------------------------------
 
-@app.route('/register_crawl', methods=['GET', 'POST'])
-def register():
+@app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
+def add_crawl(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = CrawlForm(request.form)
     if form.validate_on_submit():
-        endpoint = text.urlify(form.name.data)
         crawl = Crawl(name=form.name.data,
-                      endpoint=endpoint,
-                      description=form.description.data)
+                      description=form.description.data,
+                      crawler=form.crawler.data,
+                      config=form.config.data,
+                      project_id=project.id,
+                      data_model_id=1)
+        db.session.add(crawl)
+        db.session.commit()
+        flash('%s has successfully been registered!' % form.name.data, 'success')
+        return redirect(url_for('crawl', project_name=project.name, \
+                                crawl_name=form.name.data))
 
-        crawl_exists = crawl.query.filter_by(name=form.name.data).first()
-        if crawl_exists:
-            flash("A crawl named '%s' has already been registered-"
-                  "please provide another name." % form.name.data, 'error')
-            return render_template('register_crawl.html', form=form)
-        else:
-            db.session.add(crawl)
-            db.session.commit()
-            flash('%s has successfully been registered!' % form.name.data, 'success')
-            return redirect(url_for('crawl', crawl_endpoint=endpoint))
-
-    return render_template('register_crawl.html', form=form)
+    return render_template('add_crawl.html', form=form, project=project, \
+                           crawls=crawls, dashboards=dashboards)
 
 
 @app.route('/<project_name>/crawls')
@@ -237,17 +237,16 @@ def add_dashboard(project_name):
     form = DashboardForm(request.form)
 
     if form.validate_on_submit():
-        name = form.name.data
         data = Dashboard(name=form.name.data, description=form.description.data, \
                         project_id=project.id)
         db.session.add(data)
         db.session.commit()
         flash("Dashboard '%s' was successfully registered" % form.name.data, 'success')
         return redirect(url_for('dash', project_name=project.name, \
-                        dashboard_name=name))
+                        dashboard_name=form.name.data))
 
     return render_template('add_dashboard.html', project=project, crawls=crawls,
-                            form=form)
+                            form=form, dashboards=dashboards)
 
 
 @app.route('/<project_name>/dashboards/<dashboard_name>')
@@ -263,7 +262,7 @@ def dash(project_name, dashboard_name):
         flash("Project '%s' was not found." % project_name, 'error')
         abort(404)
     elif dashboard.project_id != project.id:
-        flash("This crawl is not part of project '%s'" % project_name, 'error')
+        flash("Dashboard is not part of project '%s'." % project_name, 'error')
         abort(404)
 
     return render_template('dash.html', project=project, crawls=crawls, \
