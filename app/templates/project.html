@@ -4,9 +4,16 @@
 {% block content %}
 
 {% include "sidebar.html" %}
+
 <div class='row'>
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-  <h1>{{ project.name }}<a href="#"><i style='margin-left:50px;' class='fa fa-close'></i></a><a href="#"><i style='margin-left:30px;' class='fa fa-edit'></i></a></i></h1>
+  <h1>{{ project.name }}
+    <button id="playButton" type="button" class="btn btn-control">
+        <i class="fa fa-close"></i>
+    </button>
+    <button id="playButton" type="button" class="btn btn-control">
+        <i class="fa fa-edit"></i>
+    </button></h1>
   <p>{{ project.description }}</p>
 </div>
 </div>
@@ -16,26 +23,44 @@
     </div>
 </div>
 <div class='row'>
-     <ul class='inline-icons'>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-archive"></i><br>Crawls</li></a>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-archive"></i></h1>
+            <h3>Crawls</h3>
+         </a>
         </div>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-line-chart"></i><br>Dashboards</li></a>
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-line-chart"></i></h1>
+            <h3>Dashboards</h3>
+         </a>
         </div>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-database"></i><br>Data Sources</li></a>
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-database"></i></h1>
+            <h3>Data Sources</h3>
+         </a>
         </div>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-share-alt"></i><br>Data Flows</li></a>
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-share-alt"></i></h1>
+            <h3>Data Flows</h3>
+         </a>
         </div>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-search"></i><br>Data Models</li></a>
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-search"></i></h1>
+            <h3>Data Models</h3>
+         </a>
         </div>
-        <div class='col-sm-3 index-columns'>
-         <a href="#"><li><i class="fa fa-image"></i><br>Image Space</li></a>
+        <div class='col-sm-2 text-center'>
+         <a href="#" class='app-icon'>
+         <h1><i class="fa fa-image"></i></h1>
+            <h3>Image Space</h3>
+         </a>
         </div>
-     </ul>
+    </div>
 </div>
 
 {% endblock %}

@@ -9,6 +9,10 @@ from plotting import PLOT_TYPES
 class CrawlForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
+    crawler = SelectField('Crawler', choices=[('nutch','Nutch'), \
+                         ('achenyu','ACHENYU'), ('scrapy','Scrapy')],
+                          validators=[DataRequired()])
+    config = StringField('Configuration')
 
 
 class MonitorDataForm(Form):

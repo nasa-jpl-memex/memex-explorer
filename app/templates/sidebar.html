@@ -17,7 +17,7 @@
           </div>
         {% endfor %}
           <div class="accordion-inner">
-            <a href="#">+ Add Crawl</a>
+            <a href="{{ url_for('add_crawl', project_name=project.name) }}">+ Add Crawl</a>
           </div>
         </div>
       </div>
