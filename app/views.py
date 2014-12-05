@@ -97,6 +97,36 @@ def add_project():
 # Crawl
 # -----------------------------------------------------------------------------
 
+
+class CrawlInstance(object):
+
+    def __init__(self, seeds_list, model_name):
+        self.seeds_list = seeds_list
+        self.model_name = model_name
+        self.proc = None
+
+    def start(self):
+        self.proc = subprocess.Popen('./script/start_crawler.sh conf/ conf/seeds/%s conf/models/%s/'
+                                % (self.seeds_list, self.model_name), shell=True)
+
+    def stop(self):
+        if self.proc is not None:
+            self.proc.kill()
+
+    def status(self):
+        if self.proc is None:
+            return "No process exists"
+        elif self.proc.returncode is None:
+            return "Running"
+        elif self.proc.returncode < 0:
+            return "Stopped"
+        else:
+            return "An error occurred"
+
+
+CRAWLS_RUNNING = {}
+
+
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_name):
     project = Project.query.filter_by(name=project_name).first()
