@@ -11,6 +11,7 @@ import os
 import logging
 import json
 import datetime as dt
+import subprocess
 
 # Third-party Libraries 
 # ---------------------
@@ -32,9 +33,13 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER
+from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH
 from .auth import requires_auth
 from .plotting import plot_builder
+
+
+# Dictionary of crawls by key(project_name-crawl_name)
+CRAWLS_RUNNING = {}
 
 
 @app.context_processor
@@ -106,11 +111,14 @@ class CrawlInstance(object):
         self.proc = None
 
     def start(self):
-        self.proc = subprocess.Popen('./script/start_crawler.sh conf/ conf/seeds/%s conf/models/%s/'
-                                % (self.seeds_list, self.model_name), shell=True)
+        self.proc = subprocess.Popen('./run_crawler.sh {0} conf/ conf/seeds/{1} conf/models/{2}/'
+                                     .format(CRAWLER_PATH, self.seeds_list, self.model_name), shell=True)
+        #self.proc = subprocess.Popen('./count_things.sh', shell=True)
+        return self.proc.pid
 
     def stop(self):
         if self.proc is not None:
+            print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
 
     def status(self):
@@ -119,12 +127,9 @@ class CrawlInstance(object):
         elif self.proc.returncode is None:
             return "Running"
         elif self.proc.returncode < 0:
-            return "Stopped"
+            return "Stopped (Unused)"
         else:
             return "An error occurred"
-
-
-CRAWLS_RUNNING = {}
 
 
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
@@ -177,6 +182,42 @@ def crawl(project_name, crawl_name):
     return render_template('crawl.html', project=project, crawl=crawl,\
                             crawls=crawls, dashboards=dashboards)
 
+
+@app.route('/<project_name>/crawl/<crawl_name>/run', methods=['POST'])
+def run_crawl(project_name, crawl_name):
+    key = project_name + '-' + crawl_name
+    if CRAWLS_RUNNING.has_key(key):
+        abort(400)
+    else:
+        crawl = Crawl.query.filter_by(name=crawl_name).first()
+        seeds_list = crawl.seeds_list
+        model_name = crawl.data_model
+        crawl_instance = CrawlInstance(seeds_list, model_name)
+        pid = crawl_instance.start()
+        CRAWLS_RUNNING[key] = crawl_instance
+        return "Crawl running"
+
+
+@app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
+def stop_crawl(project_name, crawl_name):
+    key = project_name + '-' + crawl_name
+    crawl_instance = CRAWLS_RUNNING.get(key)
+    if crawl_instance is not None:
+        crawl_instance.stop()
+        del CRAWLS_RUNNING[key]
+        return "Crawl stopped"
+    else:
+        abort(400)
+
+
+@app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])
+def status_crawl(project_name, crawl_name):
+    key = project_name + '-' + crawl_name
+    crawl_instance = CRAWLS_RUNNING.get(key)
+    if crawl_instance is not None:
+        return crawl_instance.status()
+    else:
+        return "Stopped"
 
 # Data
 # -----------------------------------------------------------------------------

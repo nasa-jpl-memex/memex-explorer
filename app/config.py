@@ -33,3 +33,7 @@ MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
+# Crawler
+# -----
+
+CRAWLER_PATH = '/Users/cdoig/work/memexcrawler/focused_crawler'

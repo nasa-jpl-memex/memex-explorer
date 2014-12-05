@@ -63,8 +63,10 @@ class Crawl(db.Model):
     description = db.Column(db.Text)
     crawler = db.Column(db.Text)
     config = db.Column(db.Text)
+    seeds_list = db.Column(db.String(64))
+    data_model = db.Column(db.String(64))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
+    #data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
     data_sources = db.relationship('DataSource', secondary=crawl_data, \
         backref=db.backref('crawl', lazy='dynamic'))
     images = db.relationship('ImageSpace', secondary=crawl_images, \

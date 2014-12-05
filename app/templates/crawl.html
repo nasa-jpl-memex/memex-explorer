@@ -1,13 +1,74 @@
 {% extends "base.html" %}
 {% set active_page = "overview" %}
 
-{% block content %}
+{%- block extrahead %}
+<script>
+$( document ).ready(function() {
 
+    function playSuccess() {
+        console.log("Run OK")
+        // TODO disable button?
+        pollStatusNow();
+    }
+
+    function stopSuccess() {
+        console.log("Stop OK");
+        // TODO disable button?
+        pollStatusNow();
+    }
+
+    function pollStatusNow() {
+        $.ajax({
+            url: "/{{ project.name }}/crawl/{{ crawl.name }}/status",
+            type: "GET",
+            success: function(data) {
+                $( '#status' ).text( data );
+                console.log("polling now " + data);
+            },
+            timeout: 2000
+        });
+    }
+
+    $('#playButton').on('click', function(){
+        $.ajax({
+          type: "POST",
+          url: "/{{ project.name }}/crawl/{{ crawl.name }}/run",
+          success: playSuccess
+        });
+    });
+
+    $('#stopButton').on('click', function(){
+        $.ajax({
+          type: "POST",
+          url: "/{{ project.name }}/crawl/{{ crawl.name }}/stop",
+          success: stopSuccess
+        });
+    });
+
+    (function pollStatus() {
+        $.ajax({
+            url: "/{{ project.name }}/crawl/{{ crawl.name }}/status",
+            type: "GET",
+            success: function(data) {
+                $( '#status' ).text( data );
+                console.log("polling " + data);
+            },
+            complete: setTimeout(function() {pollStatus()}, 5000),
+            timeout: 2000
+    });
+    })();
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
 {% include 'sidebar.html' %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>{{ crawl.name }}</h1>
-    <p>Status: unknown</p>
+    <p>Status: <span id="status">Unknown</span></p>
   </div>
 </div>
 <div class='row'>
@@ -15,9 +76,6 @@
             <div class='col-md-2'>
               <button id="playButton" type="button" class="btn btn-control">
                   <i class="fa fa-play"></i>
-              </button>
-              <button id="pauseButton" type="button" class="btn btn-control">
-                  <span class="fa fa-pause"></span>
               </button>
               <button id="stopButton" type="button" class="btn btn-control">
                   <span class="fa fa-stop"></span>
