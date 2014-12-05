@@ -120,6 +120,7 @@ class CrawlInstance(object):
         if self.proc is not None:
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
+            proc2 = subprocess.Popen('./stop_crawler.sh', shell=True)
 
     def status(self):
         if self.proc is None:
