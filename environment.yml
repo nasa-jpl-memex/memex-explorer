@@ -1,11 +1,10 @@
 name: memex-viewer
 channels:
   - blaze
-  - bokeh/c/dev
 dependencies:
   - blaze=0.6.7
   - Flask=0.10.1
-  - bokeh=0.6.2.dev.20141204
+  - bokeh=0.7
   - pip
   - pip:
     - Flask-WTF==0.8.2
