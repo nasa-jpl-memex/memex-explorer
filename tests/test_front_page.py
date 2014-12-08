@@ -32,4 +32,4 @@ class ServerUpTest(unittest.TestCase):
     def test_title(self):
         """test title of root page"""
         rv = self.app.get('/')
-        self.assertIn('MEMEX VIEWER', rv.data)
+        self.assertIn('MEMEX EXPLORER', rv.data)

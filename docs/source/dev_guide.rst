@@ -1,4 +1,4 @@
-Developer's Guide to memex-viewer
+Developer's Guide to memex-explorer
 ---------------------------------
 
 The Database Model

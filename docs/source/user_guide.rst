@@ -1,12 +1,12 @@
-User's Guide to memex-viewer
+User's Guide to memex-explorer
 ----------------------------
 
-*NOTE: memex-viewer is still in development, and features are still being added. Do not expect the current product to reflect the final one.*
+*NOTE: memex-explorer is still in development, and features are still being added. Do not expect the current product to reflect the final one.*
 
 The Interface
 =============
 
-This is the memex-viewer interface. It is designed to be clean, straightforward, and easy-to-use. 
+This is the memex-explorer interface. It is designed to be clean, straightforward, and easy-to-use. 
 
 .. image:: _static/img/homepage-view.png
 
@@ -24,11 +24,11 @@ Assuming you have named your crawl 'crawl2', it will now show up on the sidebar,
 Registering Monitor Data
 ========================
 
-The next step in using memex-viewer is to register a data source for analysis. This data source must be a URI, or `Uniform Resource Identifier <http://en.wikipedia.org/wiki/Uniform_resource_identifier>`_. This tells memex-viewer where to look for your dataset, and it will register the location in a database for continued use. First, you should see the following menu when you have registered your crawl:
+The next step in using memex-explorer is to register a data source for analysis. This data source must be a URI, or `Uniform Resource Identifier <http://en.wikipedia.org/wiki/Uniform_resource_identifier>`_. This tells memex-explorer where to look for your dataset, and it will register the location in a database for continued use. First, you should see the following menu when you have registered your crawl:
 
 .. image:: _static/img/crawl-register-success.png
 
-Next, click the 'Add Monitor Data' button to add a data source to your crawl. The menu looks similar to the add crawl menu, but with the added 'Data URI' field. At the moment, the data URI must be a link to somewhere on your computer. You can provide an absolute path (if it is not in the memex-viewer folder) or a relative path (if it is in the memex-viewer folder).
+Next, click the 'Add Monitor Data' button to add a data source to your crawl. The menu looks similar to the add crawl menu, but with the added 'Data URI' field. At the moment, the data URI must be a link to somewhere on your computer. You can provide an absolute path (if it is not in the memex-explorer folder) or a relative path (if it is in the memex-explorer folder).
 
 .. image:: _static/img/register-monitor-data.png
 
@@ -46,7 +46,7 @@ To explore the data, simply click on the link to the data, and then click 'Explo
 Plotting Registered Data
 ========================
 
-In the future, you will be able to automatically generate plots for your data using ContinuumIO's plotting library, `Bokeh <http://bokeh.pydata.org/>`_. As of now, we have a sample of some datasets of web crawls that have been graphed and integrated into memex-viewer. This interface will look something like this:
+In the future, you will be able to automatically generate plots for your data using ContinuumIO's plotting library, `Bokeh <http://bokeh.pydata.org/>`_. As of now, we have a sample of some datasets of web crawls that have been graphed and integrated into memex-explorer. This interface will look something like this:
 
 .. image:: _static/img/plot-view.png
 

@@ -5,7 +5,7 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 # Project
 # -------
 
-TITLE = 'MEMEX VIEWER'
+TITLE = 'MEMEX EXPLORER'
 ADMINS = []
 
 # Server

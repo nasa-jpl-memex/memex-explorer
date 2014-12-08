@@ -1,4 +1,4 @@
-"""Main views for memex-viewer application"""
+"""Main views for memex-explorer application"""
 from __future__ import absolute_import, division, print_function
 
 #  IMPORTS 

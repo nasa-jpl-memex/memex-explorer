@@ -3,7 +3,7 @@ from app import app
 import argparse
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="MEMEX VIEWER")
+    parser = argparse.ArgumentParser(description="MEMEX EXPLORER")
 
     parser.add_argument("-s", "--show", action="store_true",
                         help="Auto-raise app in a browser window")

@@ -1,4 +1,4 @@
-name: memex-viewer
+name: memex-explorer
 channels:
   - blaze
 dependencies:
