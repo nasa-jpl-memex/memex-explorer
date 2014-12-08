@@ -12,7 +12,8 @@ class CrawlForm(Form):
     crawler = SelectField('Crawler', choices=[('nutch','Nutch'), \
                          ('achenyu','ACHENYU'), ('scrapy','Scrapy')],
                           validators=[DataRequired()])
-    config = StringField('Configuration')
+    seeds_list = FileField('Seeds List')
+    # config = StringField('Configuration')
 
 
 class MonitorDataForm(Form):
