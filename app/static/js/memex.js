@@ -2,22 +2,34 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 $(function() {
-  var CrawlFormView, crawl_form;
-  CrawlFormView = (function(_super) {
-    __extends(CrawlFormView, _super);
+  var CrawlForm, crawl_form;
+  CrawlForm = (function(_super) {
+    var crawler, data_model;
 
-    function CrawlFormView() {
-      return CrawlFormView.__super__.constructor.apply(this, arguments);
+    __extends(CrawlForm, _super);
+
+    function CrawlForm() {
+      return CrawlForm.__super__.constructor.apply(this, arguments);
     }
 
-    CrawlFormView.prototype.crawler = $('#crawler');
+    crawler = $('#crawler');
 
-    CrawlFormView.prototype.data_model = $("#data_model");
+    data_model = $('#data_model');
 
-    crawler.val().not('achenyu');
+    CrawlForm.prototype.initialize = function() {
+      return data_model.prop("disabled", true);
+    };
 
-    return CrawlFormView;
+    crawler.change(function() {
+      if (crawler.val() === 'achenyu') {
+        return data_model.prop("disabled", false);
+      } else {
+        return data_model.prop("disabled", true);
+      }
+    });
+
+    return CrawlForm;
 
   })(Backbone.View);
-  return crawl_form = new CrawlFormView;
+  return crawl_form = new CrawlForm;
 });
