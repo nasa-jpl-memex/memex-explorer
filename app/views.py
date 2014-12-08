@@ -33,7 +33,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH
+from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, SEED_FILES
 from .auth import requires_auth
 from .plotting import plot_builder
 
@@ -138,14 +138,16 @@ def add_crawl(project_name):
     project = Project.query.filter_by(name=project_name).first()
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
-    form = CrawlForm(request.form)
+    form = CrawlForm()
     if form.validate_on_submit():
+        filename = secure_filename(form.seeds_list.data.filename)
+        form.seeds_list.data.save(SEED_FILES + filename)
         crawl = Crawl(name=form.name.data,
                       description=form.description.data,
                       crawler=form.crawler.data,
-                      config=form.config.data,
                       project_id=project.id,
-                      data_model_id=1)
+                      data_model=form.data_model.data,
+                      seeds_list = SEED_FILES + filename)
         db.session.add(crawl)
         db.session.commit()
         flash('%s has successfully been registered!' % form.name.data, 'success')
