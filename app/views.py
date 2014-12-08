@@ -146,6 +146,7 @@ def add_crawl(project_name):
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
+                      data_model=form.data_model.data,
                       seeds_list = SEED_FILES + filename)
         db.session.add(crawl)
         db.session.commit()
