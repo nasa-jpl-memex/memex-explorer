@@ -1,5 +1,5 @@
 from . import db
-from .models import Project, Crawl, Dashboard
+from .models import Project, Crawl, Dashboard, Image
 
 def get_project(project_name):
     """Return the project identified by `project_name`.
@@ -31,8 +31,7 @@ def get_images(project_id):
     return Image.query.filter_by(project_id=project_id)
 
 
-
-def get_images(image_id):
+def get_image(image_id):
     """Return the image that matches `image_id`.
     """
     return Image.query.filter_by(id=image_id).first()

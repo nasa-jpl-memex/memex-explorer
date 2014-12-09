@@ -29,8 +29,9 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project
-from .db_api import get_project, get_crawl, get_crawls, get_dashboards
+from .models import Crawl, DataSource, Dashboard, Plot, Project, Image
+from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
+                     get_images, get_image)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
@@ -51,7 +52,7 @@ def context():
 
     context_vars = {}
 
-    if 'project_name' in request.view_args:
+    if request.view_args and 'project_name' in request.view_args:
         project_name = request.view_args['project_name']
         project = get_project(project_name)
         if not project:
@@ -450,7 +451,7 @@ def contact():
 
 
 @app.route('/<project_name>/image_space/<image>/compare/')
-def crawl(project_name, image):
+def compare(project_name, image):
 
     project = get_project(project_name)
     images = get_images(project.id)
@@ -461,11 +462,11 @@ def crawl(project_name, image):
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
 
-             (image_obj.EXIF_BodySerialNumber, image_obj.EXIF_LensSerialNumber,
-              image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
-              image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
+             (img.EXIF_BodySerialNumber, img.EXIF_LensSerialNumber,
+              img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
+              img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
 
-    # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
+    # serial_matches = get_info_serial(img.EXIF_BodySerialNumber)
     # full_match_paths = [app.config['STATIC_IMAGE_DIR'] + x.img_file for x in serial_matches
     #                                                                  if x.Uploaded != 1]
     # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
@@ -473,8 +474,8 @@ def crawl(project_name, image):
 
     internal_matches = []
 
-    # if image_obj.EXIF_BodySerialNumber:
-    #     external_matches = lost_camera_retreive(image_obj.EXIF_BodySerialNumber)
+    # if img.EXIF_BodySerialNumber:
+    #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)
     # else:
     #     external_matches = []
 
