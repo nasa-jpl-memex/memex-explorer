@@ -56,8 +56,9 @@ def context():
         project_name = request.view_args['project_name']
         project = get_project(project_name)
         if not project:
-            flash("Project '%s' was not found." % project_name, 'error')
-            abort(404)
+            return {}
+            # flash("Project '%s' was not found." % project_name, 'error')
+            # abort(404)
 
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
@@ -84,6 +85,11 @@ def application_error(e):
     # sender = DEFAULT_MAIL_SENDER
     # send_email(subject=subject, sender=sender, recipients=ADMINS, text_body=text_body, html_body=text_body)
     return render_template('500.html'), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(BASEDIR, 'static'),
+                               'favicon.ico', mimetype='image/x-icon')
 
 
 @app.route('/')
@@ -486,10 +492,13 @@ def compare(project_name, image_id):
 
 @app.route('/static/image/<image_id>')
 def image_source(image_id):
-    base_dir = os.path.join(BASEDIR,
-                                   '/images/')
+    img_dir = os.path.join(BASEDIR,
+                                   'image')
 
-    return send_from_directory(base_dir, image_id)
+    img_filename = "%s.jpg" % image_id
+    print(img_dir, img_filename)
+
+    return send_from_directory(img_dir, img_filename)
 
 @app.route('/<project_name>/image_space/<image_id>/inspect')
 def inspect(project_name, image_id):
