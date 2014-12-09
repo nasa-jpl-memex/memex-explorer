@@ -444,3 +444,42 @@ def contact():
         return redirect(url_for('index'))
 
     return render_template('contact.html', form=form)
+
+    # Compare (Image Space)
+    # ------------------------------------------------------------------------
+
+
+@app.route('/<project_name>/image_space/<image>/compare/')
+def crawl(project_name, image):
+
+    project = get_project(project_name)
+    images = get_images(project.id)
+
+    img = get_image(image)
+
+    exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
+              'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
+              'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
+
+             (image_obj.EXIF_BodySerialNumber, image_obj.EXIF_LensSerialNumber,
+              image_obj.Image_BodySerialNumber, image_obj.MakerNote_InternalSerialNumber,
+              image_obj.MakerNote_SerialNumber, image_obj.MakerNote_SerialNumberFormat)))
+
+    # serial_matches = get_info_serial(image_obj.EXIF_BodySerialNumber)
+    # full_match_paths = [app.config['STATIC_IMAGE_DIR'] + x.img_file for x in serial_matches
+    #                                                                  if x.Uploaded != 1]
+    # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
+    #                         for x in full_match_paths]
+
+    internal_matches = []
+
+    # if image_obj.EXIF_BodySerialNumber:
+    #     external_matches = lost_camera_retreive(image_obj.EXIF_BodySerialNumber)
+    # else:
+    #     external_matches = []
+
+    return render_template('compare.html', image=img, exif_info=exif_info, 
+                            internal_matches=internal_matches,
+                            # external_matches=external_matches
+                             )
+

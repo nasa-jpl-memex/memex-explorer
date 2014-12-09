@@ -26,7 +26,13 @@ def get_dashboards(project_id):
 
 
 def get_images(project_id):
-    """
-    Return all images under `project_id` that match `crawl_name`.
+    """Return all images under `project_id` that match `crawl_name`.
     """
     return Image.query.filter_by(project_id=project_id)
+
+
+
+def get_images(image_id):
+    """Return the image that matches `image_id`.
+    """
+    return Image.query.filter_by(id=image_id).first()
