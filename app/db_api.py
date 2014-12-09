@@ -35,3 +35,10 @@ def get_image(image_id):
     """Return the image that matches `image_id`.
     """
     return Image.query.filter_by(id=image_id).first()
+
+def get_matches(project_id, image_id):
+    """Return all images under `project_id` that match metadata on `image_id`.
+    """
+
+    img = get_image(image_id)
+    return Image.query.filter_by(project_id=project_id, EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()

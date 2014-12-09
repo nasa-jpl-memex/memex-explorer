@@ -31,7 +31,7 @@ from bokeh.plotting import ColumnDataSource
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project, Image
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
-                     get_images, get_image)
+                     get_images, get_image, get_matches)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
@@ -478,7 +478,7 @@ def compare(project_name, image_id):
     # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
     #                         for x in full_match_paths]
 
-    internal_matches = []
+    internal_matches = get_matches(project.id, img.id)
 
     # if img.EXIF_BodySerialNumber:
     #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)

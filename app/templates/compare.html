@@ -27,8 +27,8 @@
   <div class="row">
     {% for img in internal_matches %}
     <div class="col-xs-6 col-sm-3">
-     <img src="{{ url_for('static', filename = img[0]) }}" height="200" width="200" class="thumnail" alt="{{ img[1] }}">
-     <h4><a href="{{ url_for('compare', image=img[1]) }}">{{ img[1] }}</a></h4>
+     <img src="{{ url_for('image_source', image_id = img.id) }}" height="200" width="200" class="thumnail" alt="{{ img[1] }}">
+     <h4><a href="{{ url_for('compare', project_name=project.name, image_id=img.id) }}">{{ img[1] }}</a></h4>
    </div>
   {% endfor %}
 </div>
