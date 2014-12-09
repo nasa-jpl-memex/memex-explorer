@@ -35,7 +35,7 @@ from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH
+from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, BASEDIR
 from .auth import requires_auth
 from .plotting import plot_builder
 
@@ -484,8 +484,15 @@ def compare(project_name, image_id):
                             # external_matches=external_matches
                              )
 
-@app.route('/<project_name>/image_space/<image_id>')
-def image(project_name, image_id):
+@app.route('/static/image/<image_id>')
+def image_source(image_id):
+    base_dir = os.path.join(BASEDIR,
+                                   '/images/')
+
+    return send_from_directory(base_dir, image_id)
+
+@app.route('/<project_name>/image_space/<image_id>/inspect')
+def inspect(project_name, image_id):
     img = get_image(image_id)
 
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
