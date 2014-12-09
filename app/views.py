@@ -450,13 +450,13 @@ def contact():
     # ------------------------------------------------------------------------
 
 
-@app.route('/<project_name>/image_space/<image>/compare/')
-def compare(project_name, image):
+@app.route('/<project_name>/image_space/<image_id>/compare/')
+def compare(project_name, image_id):
 
     project = get_project(project_name)
     images = get_images(project.id)
 
-    img = get_image(image)
+    img = get_image(image_id)
 
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
@@ -483,4 +483,18 @@ def compare(project_name, image):
                             internal_matches=internal_matches,
                             # external_matches=external_matches
                              )
+
+@app.route('/<project_name>/image_space/<image_id>')
+def image(project_name, image_id):
+    img = get_image(image_id)
+
+    exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
+              'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
+              'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
+
+             (img.EXIF_BodySerialNumber, img.EXIF_LensSerialNumber,
+              img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
+              img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
+
+    return render_template('inspect.html', image=img, exif_info=exif_info)
 

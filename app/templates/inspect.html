@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% set active_page = "inspect" %}
+{% block content %}
+
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+  <h3>{{ image }}</h3>
+  <div class="row vertical-align clear-bottom">
+    <div class="col-xs-7">
+      <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
+      <img src="{{ url_for('retrieve_image', project_name=project.name, image_id=image.id) }}" class="img-responsive" alt="Generic placeholder thumbnail">
+    </div>
+    <div class="col-xs-5">
+      <div>
+        <dl>
+          {% for key, value in exif_info.iteritems() %}
+          <dt>{{ key }}</dt>
+          <dd>{{ value }}</dd>
+          {% endfor %}
+        </dl>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
