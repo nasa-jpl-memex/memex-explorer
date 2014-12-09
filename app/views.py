@@ -30,6 +30,7 @@ from bokeh.plotting import ColumnDataSource
 
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project
+from .db_api import get_project, get_crawl, get_crawls, get_dashboards
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
@@ -44,8 +45,29 @@ CRAWLS_RUNNING = {}
 
 @app.context_processor
 def context():
-    projects = Project.query.all()
-    return dict(projects=projects)
+    """Inject some context variables useful across templates.
+    See http://flask.pocoo.org/docs/0.10/templating/#context-processors
+    """
+
+    context_vars = {}
+
+    if 'project_name' in request.view_args:
+        project_name = request.view_args['project_name']
+        project = get_project(project_name)
+        if not project:
+            flash("Project '%s' was not found." % project_name, 'error')
+            abort(404)
+
+        crawls = get_crawls(project.id)
+        dashboards = get_dashboards(project.id)
+
+        context_vars.update(dict(
+            project=project, crawls=crawls, dashboards=dashboards))
+
+    # All pages should (potentially) be able to present all projects
+    context_vars.update(projects=Project.query.all())
+
+    return context_vars
 
 
 @app.errorhandler(404)
@@ -73,35 +95,31 @@ def index():
 
 @app.route('/<project_name>')
 def project(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    if not project:
-        flash("Project '%s' was not found." % project_name, 'error')
-        abort(404)
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    return render_template('project.html', project=project, crawls=crawls, \
-                            dashboards=dashboards)
 
+    # return render_template('project.html', project=project, crawls=crawls,
+    #                                        dashboards=dashboards)
+
+    # `project`, `crawls`, and `dashboards` handled by the context processor.
+    #   See `context() defined above.`
+    return render_template('project.html')
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
     form = ProjectForm(request.form)
 
     if form.validate_on_submit():
-        name = form.name.data
-        data = Project(name=form.name.data, description=form.description.data, \
+        project = Project(name=form.name.data, description=form.description.data, \
                         icon=form.icon.data)
-        db.session.add(data)
+        db.session.add(project)
         db.session.commit()
-        flash("Project '%s' was successfully registered" % form.name.data, 'success')
-        return redirect(url_for('project', project_name=name))
+        flash("Project '%s' was successfully registered" % project.name, 'success')
+        return redirect(url_for('project', project_name=project.name))
 
     return render_template('add_project.html', form=form)
 
 
 # Crawl
 # -----------------------------------------------------------------------------
-
 
 class CrawlInstance(object):
 
@@ -135,62 +153,56 @@ class CrawlInstance(object):
 
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = CrawlForm(request.form)
+
     if form.validate_on_submit():
+        project = get_project(project_name)
         crawl = Crawl(name=form.name.data,
                       description=form.description.data,
                       crawler=form.crawler.data,
                       config=form.config.data,
                       project_id=project.id,
                       data_model_id=1)
+
         db.session.add(crawl)
         db.session.commit()
-        flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=project.name, \
-                                crawl_name=form.name.data))
 
-    return render_template('add_crawl.html', form=form, project=project, \
-                           crawls=crawls, dashboards=dashboards)
+        flash('%s has successfully been registered!' % form.name.data, 'success')
+        return redirect(url_for('crawl', project_name=project.name,
+                                         crawl_name=form.name.data))
+
+    return render_template('add_crawl.html', form=form)
 
 
 @app.route('/<project_name>/crawls')
 def crawls(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    return render_template('crawls.html', project=project, crawls=crawls, \
-                            dashboards=dashboards)
+    return render_template('crawls.html')
 
 
 @app.route('/<project_name>/crawls/<crawl_name>')
 def crawl(project_name, crawl_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawl = Crawl.query.filter_by(name=crawl_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    if not crawl:
-        flash("Crawl '%s' was not found." % crawl_name, 'error')
-        abort(404)
-    elif not project:
+    project = get_project(project_name)
+    crawl = get_crawl(project.id, crawl_name)
+
+    if not project:
         flash("Project '%s' was not found." % project_name, 'error')
         abort(404)
-    elif crawl.project_id != project.id:
-        flash("This crawl is not part of project '%s'" % project_name, 'error')
+    elif not crawl:
+        flash("Crawl '%s' was not found." % crawl_name, 'error')
         abort(404)
-    return render_template('crawl.html', project=project, crawl=crawl,\
-                            crawls=crawls, dashboards=dashboards)
+
+    return render_template('crawl.html', crawl=crawl)
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/run', methods=['POST'])
 def run_crawl(project_name, crawl_name):
+    project = get_project(project_name)
+
     key = project_name + '-' + crawl_name
     if CRAWLS_RUNNING.has_key(key):
-        abort(400)
+        return "Crawl is already running."
     else:
-        crawl = Crawl.query.filter_by(name=crawl_name).first()
+        crawl = get_crawl(project_name, crawl_name)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
         crawl_instance = CrawlInstance(seeds_list, model_name)
@@ -219,6 +231,29 @@ def status_crawl(project_name, crawl_name):
         return crawl_instance.status()
     else:
         return "Stopped"
+
+
+# Image Space
+# -----------------------------------------------------------------------------
+
+@app.route('/<project_name>/crawls/<crawl_name>/image_space')
+def image_space(project_name, crawl_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawl = Crawl.query.filter_by(name=crawl_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    if not crawl:
+        flash("Crawl '%s' was not found." % crawl_name, 'error')
+        abort(404)
+    elif not project:
+        flash("Project '%s' was not found." % project_name, 'error')
+        abort(404)
+    elif crawl.project_id != project.id:
+        flash("This crawl is not part of project '%s'" % project_name, 'error')
+        abort(404)
+    return render_template('crawl.html', project=project, crawl=crawl,\
+                            crawls=crawls, dashboards=dashboards)
+
 
 # Data
 # -----------------------------------------------------------------------------
