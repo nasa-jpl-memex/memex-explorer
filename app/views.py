@@ -126,7 +126,7 @@ class CrawlInstance(object):
     def status(self):
         if self.proc is None:
             return "No process exists"
-        elif self.proc.returncode is None:
+        elif self.proc.returncode is None: 
             return "Running"
         elif self.proc.returncode < 0:
             return "Stopped (Unused)"
@@ -139,6 +139,8 @@ def add_crawl(project_name):
     project = Project.query.filter_by(name=project_name).first()
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
+    seed_files = db.session.query(Crawl.seeds_list.distinct())
+    config_files = db.session.query(Crawl.config.distinct()).filter_by(project_id=project.id)
     form = CrawlForm()
     if form.validate_on_submit():
         seed_filename = secure_filename(form.seeds_list.data.filename)
@@ -164,7 +166,8 @@ def add_crawl(project_name):
                                 crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form, project=project, \
-                           crawls=crawls, dashboards=dashboards)
+                           crawls=crawls, dashboards=dashboards, seed_files=seed_files,
+                           config_files=config_files)
 
 
 @app.route('/<project_name>/crawls')

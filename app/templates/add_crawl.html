@@ -42,14 +42,22 @@
 
     <div class="form-group">
         <label class="col-sm-2 control-label">{{form.config.label}}</label>
-        <div class="col-sm-10">
-          <input id="config" name="config" type="file">
+        <div class="col-sm-6">
+          <select name='config1' id='config1'>
+            <option selected disabled hidden value=''></option>
+            {% for x in config_files %}
+              <option value="{{ x }}">{{ x }}</option>
+            {% endfor %}
+              <option value="">New File</option>
+          </select>
+          <br><br>
+            <input type="file" id="config2" name="config2">
         </div>
         {% for error in form.errors.config %}
         <span style="color: red;">[{{error}}]</span>
         {% endfor %}
     </div>
-
+    <br>
     <div class="form-group">
       <label class="col-sm-2 control-label">{{form.data_model.label}}</label>
       <div class="col-sm-10">
@@ -75,7 +83,6 @@
            <button type="submit" class="btn btn-primary">Register</button>
         </div>
      </div>
-
   </form>
   </div>
 </div>

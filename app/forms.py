@@ -10,7 +10,7 @@ class CrawlForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
     crawler = SelectField('Crawler', choices=[('nutch','Nutch'), \
-                         ('achenyu','ACHENYU'), ('scrapy','Scrapy')],
+                         ('achenyu','ACHENYU')],
                           validators=[DataRequired()])
     seeds_list = FileField('Seeds List')
     data_model = FileField('Data Model')
