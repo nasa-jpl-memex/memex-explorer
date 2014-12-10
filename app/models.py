@@ -1,9 +1,40 @@
 from . import db
 
+# Table Relations
 
+# Teams can consist of several users,
+#   users can belong to many teams.
 team_user = db.Table('team_user',
     db.Column('team_id', db.Integer, db.ForeignKey('team.id')),
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+)
+
+# A plot can be sourced from multiple data sources,
+#   each data source can drive multiple plots.
+data_plot = db.Table('data_plot',
+    db.Column('data_source_id', db.Integer, db.ForeignKey('data_source.id')),
+    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id'))
+)
+
+# Each crawl will usually record several data sources,
+#   each data source can drive multiple plots.
+crawl_data = db.Table('crawl_data',
+    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
+    db.Column('data_source_id', db.Integer, db.ForeignKey('data_source.id'))
+)
+
+# Many images can be scraped from a crawl,
+#   many crawls can discover the same image. 
+crawl_images = db.Table('crawl_images',
+    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
+    db.Column('image_space_id', db.Integer, db.ForeignKey('image_space.id'))
+)
+
+# A dashboard (usually) contains many plots, 
+#   many dashboards can contain the same plot.
+plot_dashboard = db.Table('plot_dashboard',
+    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id')),
+    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id'))
 )
 
 
@@ -30,30 +61,6 @@ class Project(db.Model):
     name = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
     icon = db.Column(db.String(64))
-
-
-data_plot = db.Table('data_plot',
-    db.Column('data_source_id', db.Integer, db.ForeignKey('data_source.id')),
-    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id'))
-)
-
-
-crawl_data = db.Table('crawl_data',
-    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
-    db.Column('data_source_id', db.Integer, db.ForeignKey('data_source.id'))
-)
-
-
-crawl_images = db.Table('crawl_images',
-    db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
-    db.Column('image_space_id', db.Integer, db.ForeignKey('image_space.id'))
-)
-
-
-plot_dashboard = db.Table('plot_dashboard',
-    db.Column('plot_id', db.Integer, db.ForeignKey('plot.id')),
-    db.Column('dashboard_id', db.Integer, db.ForeignKey('dashboard.id'))
-)
 
 
 class Crawl(db.Model):
@@ -148,4 +155,3 @@ class Dashboard(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     plots = db.relationship('Plot', secondary=plot_dashboard, \
         backref=db.backref('dashboard', lazy='dynamic'))
-
