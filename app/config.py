@@ -33,12 +33,9 @@ MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
-# Seed Files
-#------------
 
-SEED_FILES = os.path.join(BASEDIR, 'seeds/')
-
-# Cralwer Path
+# Crawlers Path
 # ------------
 
-CRAWLER_PATH = '/Users/brittainchristopherhard/Documents/memexcrawler/focused_crawler'
+ACHE_PATH = os.environ.get('ACHE_HOME')
+NUTCH_PATH = os.environ.get('NUTCH_HOME')
