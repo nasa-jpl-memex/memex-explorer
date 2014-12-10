@@ -33,7 +33,8 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, SEED_FILES
+from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, SEED_FILES, \
+                    CONFIG_FILES, MODEL_FILES
 from .auth import requires_auth
 from .plotting import plot_builder
 
@@ -140,14 +141,22 @@ def add_crawl(project_name):
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = CrawlForm()
     if form.validate_on_submit():
-        filename = secure_filename(form.seeds_list.data.filename)
-        form.seeds_list.data.save(SEED_FILES + filename)
+        seed_filename = secure_filename(form.seeds_list.data.filename)
+        config_filename = secure_filename(form.config.data.filename)
+        form.seeds_list.data.save(SEED_FILES + seed_filename)
+        form.seeds_list.data.save(CONFIG_FILES + config_filename)
+        try:
+            model_filename = MODEL_FILES + secure_filename(form.data_model.data.filename)
+            form.seeds_list.data.save(MODEL_FILES + model_filename)
+        except AttributeError:
+            model_filename = ''
         crawl = Crawl(name=form.name.data,
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
-                      data_model=form.data_model.data,
-                      seeds_list = SEED_FILES + filename)
+                      data_model = model_filename,
+                      config = CONFIG_FILES + config_filename,
+                      seeds_list = SEED_FILES + seed_filename)
         db.session.add(crawl)
         db.session.commit()
         flash('%s has successfully been registered!' % form.name.data, 'success')

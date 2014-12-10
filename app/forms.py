@@ -13,8 +13,8 @@ class CrawlForm(Form):
                          ('achenyu','ACHENYU'), ('scrapy','Scrapy')],
                           validators=[DataRequired()])
     seeds_list = FileField('Seeds List')
-    data_model = StringField('Data Model')
-    # config = StringField('Configuration')
+    data_model = FileField('Data Model')
+    config = FileField('Configuration')
 
 
 class MonitorDataForm(Form):

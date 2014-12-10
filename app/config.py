@@ -33,10 +33,12 @@ MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
-# Seed Files
+# Crawler Files
 #------------
 
 SEED_FILES = os.path.join(BASEDIR, 'seeds/')
+MODEL_FILES = os.path.join(BASEDIR, 'models/')
+CONFIG_FILES = os.path.join(BASEDIR, 'configs/')
 
 # Cralwer Path
 # ------------

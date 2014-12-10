@@ -32,7 +32,7 @@
 
       <div class="form-group">
         <label class="col-sm-2 control-label">{{form.crawler.label}}</label>
-        <div class="col-sm-10">
+        <div class="col-sm-6">
           {{form.crawler(class_="form-control")}}
         </div>
         {% for error in form.errors.crawler %}
@@ -40,21 +40,20 @@
         {% endfor %}
      </div>
 
-    {# <div class="form-group">
+    <div class="form-group">
         <label class="col-sm-2 control-label">{{form.config.label}}</label>
         <div class="col-sm-10">
-           {{ form.config|safe }}
+          <input id="config" name="config" type="file">
         </div>
         {% for error in form.errors.config %}
         <span style="color: red;">[{{error}}]</span>
         {% endfor %}
-      </div>
-    #}
+    </div>
 
     <div class="form-group">
       <label class="col-sm-2 control-label">{{form.data_model.label}}</label>
       <div class="col-sm-10">
-        {{ form.data_model|safe }}
+        <input id="data_model" name="data_model" type="file">
       </div>
       {% for error in form.errors.data_model %}
       <span style="color: red;">[{{error}}]</span>
@@ -64,7 +63,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">{{form.seeds_list.label}}</label>
         <div class="col-sm-10">
-          {{ form.seeds_list|safe }}
+          <input id="seeds_list" name="seeds_list" type="file">
         </div>
         {% for error in form.errors.seeds_list %}
         <span style="color: red;">[{{error}}]</span>
