@@ -29,9 +29,9 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project
+from .models import Crawl, DataSource, Dashboard, Plot, Project, DataModel
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm
+                    DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
 from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, SEED_FILES, \
                     CONFIG_FILES, MODEL_FILES
@@ -139,24 +139,18 @@ def add_crawl(project_name):
     project = Project.query.filter_by(name=project_name).first()
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
-    seed_files = db.session.query(Crawl.seeds_list.distinct())
-    config_files = db.session.query(Crawl.config.distinct()).filter_by(project_id=project.id)
     form = CrawlForm()
+    data_models = DataModel.query.all()
     if form.validate_on_submit():
         seed_filename = secure_filename(form.seeds_list.data.filename)
         config_filename = secure_filename(form.config.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
         form.seeds_list.data.save(CONFIG_FILES + config_filename)
-        try:
-            model_filename = MODEL_FILES + secure_filename(form.data_model.data.filename)
-            form.seeds_list.data.save(MODEL_FILES + model_filename)
-        except AttributeError:
-            model_filename = ''
         crawl = Crawl(name=form.name.data,
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
-                      data_model = model_filename,
+                      data_model = fields.data_model.data,
                       config = CONFIG_FILES + config_filename,
                       seeds_list = SEED_FILES + seed_filename)
         db.session.add(crawl)
@@ -166,9 +160,26 @@ def add_crawl(project_name):
                                 crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form, project=project, \
-                           crawls=crawls, dashboards=dashboards, seed_files=seed_files,
-                           config_files=config_files)
+                           crawls=crawls, dashboards=dashboards, data_models=data_models)
 
+
+@app.route('/<project_name>/add_model', methods=['GET', 'POST'])
+def add_model(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    form = DataModelForm()
+    if form.validate_on_submit():
+        model_filename = secure_filename(form.name.data.filename)
+        form.name.data.save(MODEL_FILES + model_filename)
+        model = DataModel(name=MODEL_FILES + model_filename)
+        db.session.add(model)
+        db.session.commit()
+        flash('Model has successfully been registered!', 'success')
+        return redirect(url_for('project', project_name=project.name))
+
+    return render_template('add_data_model.html', form=form, project=project, \
+                           crawls=crawls, dashboards=dashboards)
 
 @app.route('/<project_name>/crawls')
 def crawls(project_name):

@@ -79,7 +79,7 @@ class Crawl(db.Model):
 class DataModel(db.Model):
     __tablename__ = "data_model"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
+    name = db.Column(db.Text)
 
     def __repr__(self):
         return '<DataModel %r>' % (self.name)
@@ -148,4 +148,3 @@ class Dashboard(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     plots = db.relationship('Plot', secondary=plot_dashboard, \
         backref=db.backref('dashboard', lazy='dynamic'))
-

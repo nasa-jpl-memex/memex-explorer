@@ -12,9 +12,9 @@ class CrawlForm(Form):
     crawler = SelectField('Crawler', choices=[('nutch','Nutch'), \
                          ('achenyu','ACHENYU')],
                           validators=[DataRequired()])
-    seeds_list = FileField('Seeds List')
-    data_model = FileField('Data Model')
-    config = FileField('Configuration')
+    config = FileField('Configuration', validators=[DataRequired()])
+    seeds_list = FileField('Seeds List', validators=[DataRequired()])
+    data_model = SelectField('Data Model')
 
 
 class MonitorDataForm(Form):
@@ -44,3 +44,6 @@ class ProjectForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
     icon = StringField('Icon')
+
+class DataModelForm(Form):
+    name = FileField('Name', validators=[DataRequired()])

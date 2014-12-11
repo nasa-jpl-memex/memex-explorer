@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% set active_page = "overview" %}
+
+{% block content %}
+
+{% include 'sidebar.html' %}
+
+<div class='row'>
+    <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
+  <h2>Register Data Model</h2>
+
+  <form class="form-horizontal col-sm-9" action="" method="post" name="register" enctype="multipart/form-data">
+      {{form.hidden_tag()}}
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">{{form.name.label}}</label>
+        <div class="col-sm-10">
+           {{ form.name|safe }}
+        </div>
+        {% for error in form.errors.name %}
+        <span style="color: red;">[{{error}}]</span>
+        {% endfor %}
+     </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-9" align="center">
+           <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+     </div>
+  </form>
+  </div>
+</div>
+
+{% endblock %}
