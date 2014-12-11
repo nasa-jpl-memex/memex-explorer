@@ -5,7 +5,6 @@ class CrawlForm extends Backbone.View
  
     initialize: ->            
         data_model.prop "disabled", true
-        config2.prop "disabled", true
 
     crawler.change ->
         if crawler.val() == 'achenyu'

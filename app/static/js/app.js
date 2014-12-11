@@ -16,8 +16,7 @@ CrawlForm = (function(_super) {
   data_model = $('#data_model');
 
   CrawlForm.prototype.initialize = function() {
-    data_model.prop("disabled", true);
-    return config2.prop("disabled", true);
+    return data_model.prop("disabled", true);
   };
 
   crawler.change(function() {

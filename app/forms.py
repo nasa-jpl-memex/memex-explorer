@@ -2,8 +2,16 @@ from flask.ext.wtf import Form
 from wtforms import StringField, TextAreaField, ValidationError, SelectField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Email
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from plotting import PLOT_TYPES
+from models import DataModel
+
+from . import app, db
+
+
+def data_models():
+    return DataModel.query.all()
 
 
 class CrawlForm(Form):
@@ -14,7 +22,8 @@ class CrawlForm(Form):
                           validators=[DataRequired()])
     config = FileField('Configuration', validators=[DataRequired()])
     seeds_list = FileField('Seeds List', validators=[DataRequired()])
-    data_model = SelectField('Data Model')
+    data_model = QuerySelectField('Data Model', query_factory=data_models, \
+                                  allow_blank=True, get_label='name')
 
 
 class MonitorDataForm(Form):
@@ -46,4 +55,5 @@ class ProjectForm(Form):
     icon = StringField('Icon')
 
 class DataModelForm(Form):
-    name = FileField('Name', validators=[DataRequired()])
+    name = StringField('Name', validators = [DataRequired()])
+    filename = FileField('File', validators = [DataRequired()])

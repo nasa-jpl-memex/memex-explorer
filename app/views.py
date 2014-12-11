@@ -140,8 +140,8 @@ def add_crawl(project_name):
     crawls = Crawl.query.filter_by(project_id=project.id)
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = CrawlForm()
-    data_models = DataModel.query.all()
     if form.validate_on_submit():
+        print(form.data_model.data)
         seed_filename = secure_filename(form.seeds_list.data.filename)
         config_filename = secure_filename(form.config.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
@@ -150,7 +150,7 @@ def add_crawl(project_name):
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
-                      data_model = fields.data_model.data,
+                      data_model_id=form.data_model.data,
                       config = CONFIG_FILES + config_filename,
                       seeds_list = SEED_FILES + seed_filename)
         db.session.add(crawl)
@@ -160,7 +160,7 @@ def add_crawl(project_name):
                                 crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form, project=project, \
-                           crawls=crawls, dashboards=dashboards, data_models=data_models)
+                           crawls=crawls, dashboards=dashboards)
 
 
 @app.route('/<project_name>/add_model', methods=['GET', 'POST'])
@@ -170,9 +170,10 @@ def add_model(project_name):
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = DataModelForm()
     if form.validate_on_submit():
-        model_filename = secure_filename(form.name.data.filename)
-        form.name.data.save(MODEL_FILES + model_filename)
-        model = DataModel(name=MODEL_FILES + model_filename)
+        model_filename = secure_filename(form.filename.data.filename)
+        form.filename.data.save(MODEL_FILES + model_filename)
+        model = DataModel(name=form.name.data,
+                          filename=MODEL_FILES + model_filename)
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
