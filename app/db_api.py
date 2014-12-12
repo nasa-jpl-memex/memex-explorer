@@ -1,5 +1,10 @@
-from . import db
+import pandas as pd
+
+from . import app, db 
 from .models import Project, Crawl, Dashboard, Image
+
+
+MATCHES = app.MATCHES
 
 def get_project(project_name):
     """Return the project identified by `project_name`.
@@ -42,3 +47,17 @@ def get_matches(project_id, image_id):
 
     img = get_image(image_id)
     return Image.query.filter_by(project_id=project_id, EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
+
+
+def set_match(source_id, match_id, match):
+    if match:
+        MATCHES.add((source_id, match_id))
+
+    elif not match:
+        MATCHES.remove((source_id, match_id))
+
+
+
+
+
+
