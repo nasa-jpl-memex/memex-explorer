@@ -32,6 +32,9 @@ from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project, Image
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches)
+
+from .rest_api import api
+
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
@@ -503,7 +506,7 @@ def image_source(image_id):
 
     return send_from_directory(img_dir, img_filename)
 
-@app.route('/<project_name>/image_space/<image_id>/inspect')
+@app.route('/<project_name>/image_space/<image_id>')
 def inspect(project_name, image_id):
     img = get_image(image_id)
 
