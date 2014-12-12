@@ -141,7 +141,8 @@ def add_crawl(project_name):
     dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = CrawlForm()
     if form.validate_on_submit():
-        print(form.data_model.data)
+        print(form.data_model.data.id)
+        print(type(form.name.data))
         seed_filename = secure_filename(form.seeds_list.data.filename)
         config_filename = secure_filename(form.config.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
@@ -150,7 +151,7 @@ def add_crawl(project_name):
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
-                      data_model_id=form.data_model.data,
+                      data_model_id=form.data_model.data.id,
                       config = CONFIG_FILES + config_filename,
                       seeds_list = SEED_FILES + seed_filename)
         db.session.add(crawl)

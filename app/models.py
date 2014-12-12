@@ -82,7 +82,7 @@ class DataModel(db.Model):
     filename = db.Column(db.Text)
 
     def __repr__(self):
-        return str(self.id)
+        return self.id
 
 
 class DataSource(db.Model):
