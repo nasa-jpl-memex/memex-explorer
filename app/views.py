@@ -35,9 +35,10 @@ from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, BASEDIR, SEED_FILES
+from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES
 from .auth import requires_auth
 from .plotting import plot_builder
+from .crawls import AcheCrawl, NutchCrawl
 
 
 # Dictionary of crawls by key(project_name-crawl_name)
@@ -128,36 +129,6 @@ def add_project():
 # Crawl
 # -----------------------------------------------------------------------------
 
-class CrawlInstance(object):
-
-    def __init__(self, seeds_list, model_name):
-        self.seeds_list = seeds_list
-        self.model_name = model_name
-        self.proc = None
-
-    def start(self):
-        self.proc = subprocess.Popen('./run_crawler.sh {0} conf/ conf/seeds/{1} conf/models/{2}/'
-                                     .format(CRAWLER_PATH, self.seeds_list, self.model_name), shell=True)
-        #self.proc = subprocess.Popen('./count_things.sh', shell=True)
-        return self.proc.pid
-
-    def stop(self):
-        if self.proc is not None:
-            print("Killing %s" % str(self.proc.pid))
-            self.proc.kill()
-            proc2 = subprocess.Popen('./stop_crawler.sh {0}'.format((CRAWLER_PATH)), shell=True)
-
-    def status(self):
-        if self.proc is None:
-            return "No process exists"
-        elif self.proc.returncode is None:
-            return "Running"
-        elif self.proc.returncode < 0:
-            return "Stopped (Unused)"
-        else:
-            return "An error occurred"
-
-
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_name):
     project = get_project(project_name)
@@ -215,10 +186,19 @@ def run_crawl(project_name, crawl_name):
         crawl = get_crawl(project_name, crawl_name)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
-        crawl_instance = CrawlInstance(seeds_list, model_name)
-        pid = crawl_instance.start()
-        CRAWLS_RUNNING[key] = crawl_instance
-        return "Crawl running"
+        if crawl.crawler=="ache-nyu":
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model_name)
+            pid = crawl_instance.start()
+            CRAWLS_RUNNING[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        elif crawl.crawler=="nutch":
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+            pid = crawl_instance.start()
+            CRAWLS_RUNNING[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        else:
+            abort(400)
+
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
