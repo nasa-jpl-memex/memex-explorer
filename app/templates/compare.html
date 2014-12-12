@@ -1,5 +1,41 @@
 {% extends "base.html" %}
 {% set active_page = "compare" %}
+
+
+{%- block extrahead %}
+<script>
+$( document ).ready(function() {
+
+  function set_match(source_id, match_id, match) {
+    $.ajax({
+      url: "/api/image_match/",
+      type: "POST",
+      data: {
+        source_id: source_id,
+        match_id: match_id,
+        match: match
+      },
+      success: function(response) {
+        console.log(response);
+      },
+      timeout: 2000
+    });
+  }
+
+  $('.thumbnail').on('click', function(){
+    var source_id = {{ image.id }};
+    var match_id = $(this)[0].dataset.id;
+    var match = true;
+    set_match(source_id, match_id, match);
+  });
+
+});
+
+</script>
+
+{% endblock %}
+
+
 {% block content %}
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -27,8 +63,14 @@
   <div class="row">
     {% for img in internal_matches %}
     <div class="col-xs-6 col-sm-3">
-     <img src="{{ url_for('image_source', image_id = img.id) }}" height="200" width="200" class="thumnail" alt="{{ img[1] }}">
-     <h4><a href="{{ url_for('compare', project_name=project.name, image_id=img.id) }}">{{ img[1] }}</a></h4>
+      <img src="{{ url_for('image_source', image_id = img.id) }}"
+        data-id="{{ img.id }}"
+        data-match="{{ img.match }}"
+        alt="{{ img }}"
+        height="200" width="200"
+        class="thumbnail">
+     <h4><a href="{{ url_for('compare', project_name=project.name, image_id=img.id) }}">{{ img }}</a></h4>
+
    </div>
   {% endfor %}
 </div>
