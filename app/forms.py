@@ -2,19 +2,28 @@ from flask.ext.wtf import Form
 from wtforms import StringField, TextAreaField, ValidationError, SelectField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Email
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from plotting import PLOT_TYPES
+from models import DataModel
+
+from . import app, db
+
+
+def data_models():
+    return DataModel.query.all()
 
 
 class CrawlForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
     crawler = SelectField('Crawler', choices=[('nutch','Nutch'), \
-                         ('achenyu','ACHENYU'), ('scrapy','Scrapy')],
+                         ('achenyu','ACHENYU')],
                           validators=[DataRequired()])
-    seeds_list = FileField('Seeds List')
-    data_model = StringField('Data Model')
-    # config = StringField('Configuration')
+    config = FileField('Configuration', validators=[DataRequired()])
+    seeds_list = FileField('Seeds List', validators=[DataRequired()])
+    data_model = QuerySelectField('Data Model', query_factory=data_models, \
+                                  allow_blank=True, get_label='name')
 
 
 class MonitorDataForm(Form):
@@ -44,3 +53,7 @@ class ProjectForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     description = TextAreaField('Description')
     icon = StringField('Icon')
+
+class DataModelForm(Form):
+    name = StringField('Name', validators = [DataRequired()])
+    filename = FileField('File', validators = [DataRequired()])

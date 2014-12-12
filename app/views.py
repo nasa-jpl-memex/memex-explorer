@@ -29,13 +29,15 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, Image
+from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
+                    DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm
+                    DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, BASEDIR, SEED_FILES
+from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, BASEDIR, SEED_FILES, \
+                    CONFIG_FILES, MODEL_FILES
 from .auth import requires_auth
 from .plotting import plot_builder
 
@@ -150,7 +152,7 @@ class CrawlInstance(object):
     def status(self):
         if self.proc is None:
             return "No process exists"
-        elif self.proc.returncode is None:
+        elif self.proc.returncode is None: 
             return "Running"
         elif self.proc.returncode < 0:
             return "Stopped (Unused)"
@@ -163,17 +165,19 @@ def add_crawl(project_name):
     project = get_project(project_name)
     crawls = get_crawls(project.id)
     dashboards = get_dashboards(project.id)
-    form = CrawlForm(request.form)
+    form = CrawlForm()
     if form.validate_on_submit():
-        filename = secure_filename(form.seeds_list.data.filename)
-        form.seeds_list.data.save(SEED_FILES + filename)
+        seed_filename = secure_filename(form.seeds_list.data.filename)
+        config_filename = secure_filename(form.config.data.filename)
+        form.seeds_list.data.save(SEED_FILES + seed_filename)
+        form.config.data.save(CONFIG_FILES + config_filename)
         crawl = Crawl(name=form.name.data,
                       description=form.description.data,
                       crawler=form.crawler.data,
                       project_id=project.id,
-
-                      data_model=form.data_model.data,
-                      seeds_list = SEED_FILES + filename)
+                      data_model_id=form.data_model.data.id,
+                      config = CONFIG_FILES + config_filename,
+                      seeds_list = SEED_FILES + seed_filename)
         db.session.add(crawl)
         db.session.commit()
 
@@ -183,6 +187,25 @@ def add_crawl(project_name):
 
     return render_template('add_crawl.html', form=form)
 
+
+@app.route('/<project_name>/add_model', methods=['GET', 'POST'])
+def add_model(project_name):
+    project = Project.query.filter_by(name=project_name).first()
+    crawls = Crawl.query.filter_by(project_id=project.id)
+    dashboards = Dashboard.query.filter_by(project_id=project.id)
+    form = DataModelForm()
+    if form.validate_on_submit():
+        model_filename = secure_filename(form.filename.data.filename)
+        form.filename.data.save(MODEL_FILES + model_filename)
+        model = DataModel(name=form.name.data,
+                          filename=MODEL_FILES + model_filename)
+        db.session.add(model)
+        db.session.commit()
+        flash('Model has successfully been registered!', 'success')
+        return redirect(url_for('project', project_name=project.name))
+
+    return render_template('add_data_model.html', form=form, project=project, \
+                           crawls=crawls, dashboards=dashboards)
 
 @app.route('/<project_name>/crawls')
 def crawls(project_name):
