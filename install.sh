@@ -15,5 +15,4 @@ conda env create --name=memex-explorer --file=environment.yml
 source activate memex-explorer
 
 echo `which python`
-export NUTCH_HOME='/opt/anaconda/envs/memex-explorer/lib/python2.7/site-packages/nutch/'
-export ACHE_HOME='/opt/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/'
+echo "export ACHE_HOME='/opt/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/" | sudo tee -a /etc/bashrc

@@ -38,4 +38,10 @@ DEFAULT_MAIL_SENDER = MAIL_USERNAME
 # ------------
 
 ACHE_PATH = os.environ.get('ACHE_HOME')
-NUTCH_PATH = os.environ.get('NUTCH_HOME')
+
+SEED_FILES = os.path.join(BASEDIR, 'seeds/')
+MODEL_FILES = os.path.join(BASEDIR, 'models/')
+CONFIG_FILES = os.path.join(BASEDIR, 'configs/')
+
+CRAWLS_PATH = os.path.join(BASEDIR, 'crawls/')
+
