@@ -563,6 +563,11 @@ def compare(project_name, image_id):
     #                         for x in full_match_paths]
 
     internal_matches = get_matches(project.id, img.id)
+    for x in internal_matches:
+        if (img.id, x.id) in app.MATCHES:
+            x.match = "true"
+        else:
+            x.match = "false"
 
     # if img.EXIF_BodySerialNumber:
     #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)

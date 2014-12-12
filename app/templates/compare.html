@@ -6,6 +6,13 @@
 <script>
 $( document ).ready(function() {
 
+  var source_id = {{ image.id }};
+
+  function bool(val) {
+    if (val == "true") return true;
+    return false;
+  }
+
   function set_match(source_id, match_id, match) {
     $.ajax({
       url: "/api/image_match/",
@@ -23,9 +30,13 @@ $( document ).ready(function() {
   }
 
   $('.thumbnail').on('click', function(){
-    var source_id = {{ image.id }};
-    var match_id = $(this)[0].dataset.id;
-    var match = true;
+    var el = $(this)[0];
+
+    var match_id = el.dataset.id;
+    var match = el.dataset.match = ! bool(el.dataset.match);
+
+    console.log(match);
+
     set_match(source_id, match_id, match);
   });
 

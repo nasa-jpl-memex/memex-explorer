@@ -1,8 +1,11 @@
-from . import db
+from . import app, db 
 import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
 from .models import Project, Crawl, Dashboard, Image, DataSource, Plot, DataModel
 
+from .models import Project, Crawl, Dashboard, Image
+
+MATCHES = app.MATCHES
 
 def get_project(project_name):
     """Return the project identified by `project_name`.
@@ -120,3 +123,11 @@ def db_init_ache(project, crawl):
     db.session.add(domain_plot)
     db.session.add(harvest_plot)
     db.session.commit()
+
+
+def set_match(source_id, match_id, match):
+    if match:
+        MATCHES.add((source_id, match_id))
+
+    elif not match:
+        MATCHES.remove((source_id, match_id))
