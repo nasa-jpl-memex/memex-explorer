@@ -9,7 +9,7 @@ class AcheCrawl(object):
         self.seeds_file = SEED_FILES + "/" + seeds_file
         self.model_dir = MODEL_FILES + "/" + model_name + "/"
         self.crawl_dir = CRAWLS_PATH + "/" + crawl_name
-        self.lang_detect_profile = CONFIG_FILES + "/profiles"
+        self.lang_detect_profile = CONFIG_FILES + "/profiles/"
         self.proc = None
 
     def start(self):
