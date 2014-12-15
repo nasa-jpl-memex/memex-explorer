@@ -1,15 +1,18 @@
 import subprocess
+import os
+
 from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH
+
 
 class AcheCrawl(object):
 
     def __init__(self, crawl_name, seeds_file, model_name, conf_name):
         self.crawl_name = crawl_name
-        self.config = CONFIG_FILES + "/" + conf_name
-        self.seeds_file = SEED_FILES + "/" + seeds_file
-        self.model_dir = MODEL_FILES + "/" + model_name + "/"
-        self.crawl_dir = CRAWLS_PATH + "/" + crawl_name
-        self.lang_detect_profile = CONFIG_FILES + "/profiles/"
+        self.config = os.path.join(CONFIG_FILES, conf_name)
+        self.seeds_file = os.path.join(SEED_FILES, seeds_file)
+        self.model_dir = os.path.join(MODEL_FILES, model_name)
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_name)
+        self.lang_detect_profile = os.path.join(CONFIG_FILES, "profiles/")
         self.proc = None
 
     def start(self):
