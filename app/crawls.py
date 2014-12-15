@@ -1,29 +1,26 @@
 import subprocess
-from .config import ACHE_PATH, SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH
+from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH
 
 class AcheCrawl(object):
 
-    def __init__(self, crawl_name, seeds_file, model_name):
+    def __init__(self, crawl_name, seeds_file, model_name, conf_name):
         self.crawl_name = crawl_name
-        self.config = "conf/conf_default"
-        #TODO Switch from default configuration to custom
-        #self.config = CONFIG_FILES + "/" + conf_name
+        self.config = CONFIG_FILES + "/" + conf_name
         self.seeds_file = SEED_FILES + "/" + seeds_file
-        self.model_name = MODEL_FILES + "/" + model_name + "/"
+        self.model_dir = MODEL_FILES + "/" + model_name + "/"
         self.crawl_dir = CRAWLS_PATH + "/" + crawl_name
+        self.lang_detect_profile = "libs/profile"
         self.proc = None
 
     def start(self):
-        self.proc = subprocess.Popen(['ache/run_ache_crawler.sh', ACHE_PATH, self.crawl_name, self.config,
-                                      self.seeds_file, self.model_name, self.crawl_dir])
-        #self.proc = subprocess.Popen('./count_things.sh', shell=True)
+        self.proc = subprocess.Popen('ache', 'startCrawl', self.crawl_dir, self.seeds_file, self.model_dir,
+                                     self.lang_detect_profile)
         return self.proc.pid
 
     def stop(self):
         if self.proc is not None:
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
-            proc2 = subprocess.Popen(['ache/stop_ache_crawler.sh', ACHE_PATH, self.crawl_name])
 
     def status(self):
         if self.proc is None:
