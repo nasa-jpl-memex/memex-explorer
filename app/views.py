@@ -192,10 +192,10 @@ def crawls(project_name):
     return render_template('crawls.html')
 
 
-@app.route('/<project_name>/crawls/<crawl_name>')
+@app.route('/<project_name>/crawl/<crawl_name>')
 def crawl(project_name, crawl_name):
     project = get_project(project_name)
-    crawl = get_crawl(project.id, crawl_name)
+    crawl = get_crawl(crawl_name)
 
     if not project:
         flash("Project '%s' was not found." % project_name, 'error')
@@ -215,7 +215,7 @@ def run_crawl(project_name, crawl_name):
     if CRAWLS_RUNNING.has_key(key):
         return "Crawl is already running."
     else:
-        crawl = get_crawl(project_name, crawl_name)
+        crawl = get_crawl(crawl_name)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
         if crawl.crawler=="ache":
@@ -269,7 +269,7 @@ def refresh(project_name, crawl_name):
     return "pushed"
 
 
-@app.route('/<project_name>/crawls/<crawl_name>/dashboard')
+@app.route('/<project_name>/crawl/<crawl_name>/dashboard')
 def view_plots(project_name, crawl_name):
 
     crawl = Crawl.query.filter_by(name=crawl_name).first()
@@ -325,7 +325,7 @@ def status_crawl(project_name, crawl_name):
 # Image Space
 # -----------------------------------------------------------------------------
 
-@app.route('/<project_name>/crawls/<crawl_name>/image_space')
+@app.route('/<project_name>/crawl/<crawl_name>/image_space')
 def image_space(project_name, crawl_name):
     project = Project.query.filter_by(name=project_name).first()
     crawl = Crawl.query.filter_by(name=crawl_name).first()
