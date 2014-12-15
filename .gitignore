@@ -65,6 +65,7 @@ seeds/
 models/
 configs/
 crawls/
+image_space
 
 # Third-party ui/ux
 *.sass-cache
