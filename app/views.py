@@ -87,6 +87,7 @@ def application_error(e):
     # send_email(subject=subject, sender=sender, recipients=ADMINS, text_body=text_body, html_body=text_body)
     return render_template('500.html'), 500
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(BASEDIR, 'static'),
@@ -97,9 +98,9 @@ def favicon():
 def index():
     return render_template('index.html')
 
+
 # Project
 # -----------------------------------------------------------------------------
-
 
 @app.route('/<project_name>')
 def project(project_name):
@@ -110,6 +111,7 @@ def project(project_name):
     # `project`, `crawls`, and `dashboards` handled by the context processor.
     #   See `context() defined above.`
     return render_template('project.html')
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
@@ -186,7 +188,7 @@ def run_crawl(project_name, crawl_name):
         crawl = get_crawl(project_name, crawl_name)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
-        if crawl.crawler=="ache-nyu":
+        if crawl.crawler=="ache":
             crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model_name)
             pid = crawl_instance.start()
             CRAWLS_RUNNING[key] = crawl_instance
@@ -482,6 +484,7 @@ def image_source(image_id):
     print(img_dir, img_filename)
 
     return send_from_directory(img_dir, img_filename)
+
 
 @app.route('/<project_name>/image_space/<image_id>/inspect')
 def inspect(project_name, image_id):
