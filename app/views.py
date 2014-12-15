@@ -33,7 +33,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches, db_add_crawl,
-                     db_init_ache)
+                     db_init_ache, get_crawl_model)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
@@ -192,7 +192,7 @@ def crawls(project_name):
     return render_template('crawls.html')
 
 
-@app.route('/<project_name>/crawl/<crawl_name>')
+@app.route('/<project_name>/crawls/<crawl_name>')
 def crawl(project_name, crawl_name):
     project = get_project(project_name)
     crawl = get_crawl(crawl_name)
@@ -207,19 +207,17 @@ def crawl(project_name, crawl_name):
     return render_template('crawl.html', crawl=crawl)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/run', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/run', methods=['POST'])
 def run_crawl(project_name, crawl_name):
-    project = get_project(project_name)
-
     key = project_name + '-' + crawl_name
     if CRAWLS_RUNNING.has_key(key):
         return "Crawl is already running."
     else:
         crawl = get_crawl(crawl_name)
         seeds_list = crawl.seeds_list
-        model_name = crawl.data_model
         if crawl.crawler=="ache":
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model_name)
+            model = get_crawl_model(crawl)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name)
             pid = crawl_instance.start()
             CRAWLS_RUNNING[key] = crawl_instance
             return "Crawl %s running" % crawl.name
@@ -232,7 +230,7 @@ def run_crawl(project_name, crawl_name):
             abort(400)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/stop', methods=['POST'])
 def stop_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
     crawl_instance = CRAWLS_RUNNING.get(key)
@@ -244,7 +242,7 @@ def stop_crawl(project_name, crawl_name):
         abort(400)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/refresh', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/refresh', methods=['POST'])
 def refresh(project_name, crawl_name):
 
     domain_plot = Plot.query.filter_by(name='domain').first()
@@ -269,7 +267,7 @@ def refresh(project_name, crawl_name):
     return "pushed"
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/dashboard')
+@app.route('/<project_name>/crawls/<crawl_name>/dashboard')
 def view_plots(project_name, crawl_name):
 
     crawl = Crawl.query.filter_by(name=crawl_name).first()
@@ -312,7 +310,7 @@ def view_plots(project_name, crawl_name):
     return render_template('dash.html', plots=[domain_tag, harvest_tag], crawl=crawl)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])
+@app.route('/<project_name>/crawls/<crawl_name>/status', methods=['GET'])
 def status_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
     crawl_instance = CRAWLS_RUNNING.get(key)
@@ -325,7 +323,7 @@ def status_crawl(project_name, crawl_name):
 # Image Space
 # -----------------------------------------------------------------------------
 
-@app.route('/<project_name>/crawl/<crawl_name>/image_space')
+@app.route('/<project_name>/crawls/<crawl_name>/image_space')
 def image_space(project_name, crawl_name):
     project = Project.query.filter_by(name=project_name).first()
     crawl = Crawl.query.filter_by(name=crawl_name).first()
@@ -348,7 +346,7 @@ def image_space(project_name, crawl_name):
 # -----------------------------------------------------------------------------
 
 
-@app.route('/crawl/<crawl_endpoint>/register_data', methods=['GET', 'POST'])
+@app.route('/crawsl/<crawl_endpoint>/register_data', methods=['GET', 'POST'])
 def register_data(crawl_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     form = MonitorDataForm(request.form)
@@ -371,7 +369,7 @@ def register_data(crawl_endpoint):
     return render_template('register_data.html', crawl=crawl, form=form)
 
 
-@app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>')
+@app.route('/crawls/<crawl_endpoint>/data/<data_endpoint>')
 def data(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     monitor_data = DataSource.query.filter_by(crawl_id=crawl.id, endpoint=data_endpoint).first()
@@ -399,7 +397,7 @@ def data(crawl_endpoint, data_endpoint):
                            fields=fields, sample=sample, dshape=dshape) 
 
 
-@app.route('/crawl/<crawl_endpoint>/data/<data_endpoint>/explore')
+@app.route('/crawls/<crawl_endpoint>/data/<data_endpoint>/explore')
 def data_explore(crawl_endpoint, data_endpoint):
     crawl = Crawl.query.filter_by(endpoint=crawl_endpoint).first()
     monitor_data = DataSource.query.filter_by(crawl_id=crawl.id,endpoint=data_endpoint).first()
