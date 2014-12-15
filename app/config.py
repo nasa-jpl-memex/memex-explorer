@@ -35,7 +35,7 @@ DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
 
 # Crawlers Path
-# ------------
+# -------------
 
 SEED_FILES = os.path.join(BASEDIR, 'seeds/')
 MODEL_FILES = os.path.join(BASEDIR, 'models/')
