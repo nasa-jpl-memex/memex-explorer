@@ -10,13 +10,9 @@ if [ ! -d /opt/anaconda ]; then
     /opt/anaconda/bin/conda update conda --yes
 fi
 
-conda create -n memex-explorer python=2.7 pip ipython --yes
+conda install -c conda conda-env
+conda env create --name=memex-explorer --file=environment.yml
 source activate memex-explorer
-conda install flask pip pymongo pytables pygments ipython-notebook bokeh requests sqlalchemy numpy pandas psutil unicodecsv blaze dynd-python libdynd h5py pytables multipledispatch datashape toolz cytoolz --yes
-conda install -c https://conda.binstar.org/bokeh/channel/dev bokeh --yes
-pip install git+https://github.com/ContinuumIO/blaze.git --upgrade
-pip install git+https://github.com/ContinuumIO/datashape.git --upgrade --no-deps
-pip install flask-sqlalchemy tld sqlalchemy-migrate Flask-WTF flask-mail webhelpers
 
 echo `which python`
-python utilities/db_create.py
+echo "export ACHE_HOME='/opt/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/" | sudo tee -a /etc/bashrc
