@@ -56,4 +56,4 @@ class ProjectForm(Form):
 
 class DataModelForm(Form):
     name = StringField('Name', validators = [DataRequired()])
-    filename = FileField('File', validators = [DataRequired()])
+    filename = FileField()

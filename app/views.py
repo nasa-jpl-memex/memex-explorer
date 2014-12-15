@@ -158,12 +158,12 @@ def add_crawl(project_name):
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
 
-        else:
+        else: 
             #TODO add db_init_nutch
             pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=project_name,
+        return redirect(url_for('crawl', project_name=get_project(project_name),
                                          crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form)
@@ -174,10 +174,12 @@ def add_model(project_name):
     form = DataModelForm()
     if form.validate_on_submit():
         # TODO model upload a folder instead of a file or a zip file and uncompress it
-        model_filename = secure_filename(form.filename.data.filename)
-        form.filename.data.save(MODEL_FILES + model_filename)
+        files = request.files.getlist("files")
+        os.mkdir(MODEL_FILES + form.name.data)
+        for x in files:
+            x.save(MODEL_FILES + form.name.data + '/' + x.filename)
         model = DataModel(name=form.name.data,
-                          filename=MODEL_FILES + model_filename)
+                          filename=MODEL_FILES + form.name.data)
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
@@ -206,7 +208,7 @@ def crawl(project_name, crawl_name):
     return render_template('crawl.html', crawl=crawl)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/run', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/run', methods=['POST'])
 def run_crawl(project_name, crawl_name):
     project = get_project(project_name)
 
@@ -231,7 +233,7 @@ def run_crawl(project_name, crawl_name):
             abort(400)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/stop', methods=['POST'])
 def stop_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
     crawl_instance = CRAWLS_RUNNING.get(key)
@@ -243,7 +245,7 @@ def stop_crawl(project_name, crawl_name):
         abort(400)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/refresh', methods=['POST'])
+@app.route('/<project_name>/crawls/<crawl_name>/refresh', methods=['POST'])
 def refresh(project_name, crawl_name):
 
     domain_plot = Plot.query.filter_by(name='domain').first()
@@ -312,7 +314,7 @@ def view_plots(project_name, crawl_name):
         crawls=crawls, dashboards=dashboards, crawl=crawl)
 
 
-@app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])
+@app.route('/<project_name>/crawls/<crawl_name>/status', methods=['GET'])
 def status_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
     crawl_instance = CRAWLS_RUNNING.get(key)
