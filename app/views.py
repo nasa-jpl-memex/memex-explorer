@@ -217,7 +217,8 @@ def run_crawl(project_name, crawl_name):
         seeds_list = crawl.seeds_list
         if crawl.crawler=="ache":
             model = get_crawl_model(crawl)
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name,
+                                       conf_name=crawl.config)
             pid = crawl_instance.start()
             CRAWLS_RUNNING[key] = crawl_instance
             return "Crawl %s running" % crawl.name
