@@ -162,12 +162,12 @@ def add_crawl(project_name):
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
 
-        else:
+        else: 
             #TODO add db_init_nutch
             pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=project_name,
+        return redirect(url_for('crawl', project_name=get_project(project_name),
                                          crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form)
@@ -178,10 +178,12 @@ def add_model(project_name):
     form = DataModelForm()
     if form.validate_on_submit():
         # TODO model upload a folder instead of a file or a zip file and uncompress it
-        model_filename = secure_filename(form.filename.data.filename)
-        form.filename.data.save(MODEL_FILES + model_filename)
+        files = request.files.getlist("files")
+        os.mkdir(MODEL_FILES + form.name.data)
+        for x in files:
+            x.save(MODEL_FILES + form.name.data + '/' + x.filename)
         model = DataModel(name=form.name.data,
-                          filename=MODEL_FILES + model_filename)
+                          filename=MODEL_FILES + form.name.data)
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
