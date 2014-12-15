@@ -215,7 +215,7 @@ def run_crawl(project_name, crawl_name):
     if CRAWLS_RUNNING.has_key(key):
         return "Crawl is already running."
     else:
-        crawl = get_crawl(project_name, crawl_name)
+        crawl = get_crawl(crawl_name)
         print(crawl)
         print(crawl.seeds_list)
         seeds_list = crawl.seeds_list

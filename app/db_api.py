@@ -10,10 +10,10 @@ def get_project(project_name):
     return Project.query.filter_by(name=project_name).first()
 
 
-def get_crawl(project_id, crawl_name):
+def get_crawl(crawl_name):
     """Return the first crawl under `project_id` that matches `crawl_name`.
     """
-    return Crawl.query.filter_by(project_id=project_id, name=crawl_name).first()
+    return Crawl.query.filter_by(name=crawl_name).first()
 
 
 def get_crawls(project_id):
