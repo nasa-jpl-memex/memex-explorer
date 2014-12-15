@@ -20,7 +20,7 @@ CrawlForm = (function(_super) {
   };
 
   crawler.change(function() {
-    if (crawler.val() === 'achenyu') {
+    if (crawler.val() === 'ache') {
       return data_model.prop("disabled", false);
     } else {
       return data_model.prop("disabled", true);
