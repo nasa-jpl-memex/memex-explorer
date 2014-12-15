@@ -13,6 +13,11 @@ sudo $scriptdir/supervisor.sh
 
 # TODO make necessary directories
 mkdir -p /var/lib/image_space/uploads
+mkdir seeds
+mkdir models
+mkdir configs
+mkdir crawls
+
 chmod a+rwX -R /var/lib/image_space
 
 ln -s /vagrant/data /data
