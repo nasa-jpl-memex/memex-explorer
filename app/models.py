@@ -77,9 +77,8 @@ class Crawl(db.Model):
     crawler = db.Column(db.Text)
     config = db.Column(db.Text)
     seeds_list = db.Column(db.String(64))
-    data_model = db.Column(db.String(64))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    #data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
+    data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
     data_sources = db.relationship('DataSource', secondary=crawl_data, \
         backref=db.backref('crawl', lazy='dynamic'))
     images = db.relationship('Image', secondary=crawl_image, \
@@ -93,6 +92,7 @@ class DataModel(db.Model):
     __tablename__ = "data_model"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+    filename = db.Column(db.Text)
 
     def __repr__(self):
         return '<DataModel %r>' % (self.name)

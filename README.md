@@ -30,3 +30,14 @@ optional arguments:
 
 `python run_tests.py`
 
+
+# Deploying on EC2
+
+Everything should **just work** by running:
+
+```./deploy.sh```
+
+## Deploy Setup
+ - conda bootrap: conda.sh .  Everything is pushed into `install.sh` and `environment.yml` file for conda and env setupd
+ - debian.sh: git, supervisor, make, JAVA
+ - supervisor_ec2.sh: moves conf files and calls supervisor -- conf file is hard-coded to use env setup in `environment.yml` 

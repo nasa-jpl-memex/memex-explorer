@@ -1,10 +1,14 @@
 name: memex-explorer
 channels:
   - blaze
+  - quasiben
+  - memex
 dependencies:
   - blaze=0.6.7
   - Flask=0.10.1
-  - bokeh=0.7
+  - bokeh=0.7.0
+  - nutch
+  - ache=0.1.0
   - pip
   - pip:
     - Flask-WTF==0.8.2

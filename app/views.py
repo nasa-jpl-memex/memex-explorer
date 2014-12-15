@@ -29,18 +29,29 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, Image
-from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
-                     get_images, get_image, get_matches)
-
+from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
+                    DataModel
 from .rest_api import api
 
+from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
+                     get_images, get_image, get_matches, db_add_crawl,
+                     db_init_ache)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm
+                    DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
-from .config import ADMINS, DEFAULT_MAIL_SENDER, CRAWLER_PATH, BASEDIR, SEED_FILES
+
+from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
+                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
+
 from .auth import requires_auth
 from .plotting import plot_builder
+from .crawls import AcheCrawl, NutchCrawl
+
+
+from .viz.domain import Domain
+from .viz.harvest import Harvest
+from .viz.harvest_rate import HarvestRate
+# from .viz.termite import Termite
 
 
 # Dictionary of crawls by key(project_name-crawl_name)
@@ -89,6 +100,7 @@ def application_error(e):
     # send_email(subject=subject, sender=sender, recipients=ADMINS, text_body=text_body, html_body=text_body)
     return render_template('500.html'), 500
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(BASEDIR, 'static'),
@@ -99,9 +111,9 @@ def favicon():
 def index():
     return render_template('index.html')
 
+
 # Project
 # -----------------------------------------------------------------------------
-
 
 @app.route('/<project_name>')
 def project(project_name):
@@ -112,6 +124,7 @@ def project(project_name):
     # `project`, `crawls`, and `dashboards` handled by the context processor.
     #   See `context() defined above.`
     return render_template('project.html')
+
 
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
@@ -131,60 +144,48 @@ def add_project():
 # Crawl
 # -----------------------------------------------------------------------------
 
-class CrawlInstance(object):
-
-    def __init__(self, seeds_list, model_name):
-        self.seeds_list = seeds_list
-        self.model_name = model_name
-        self.proc = None
-
-    def start(self):
-        self.proc = subprocess.Popen('./run_crawler.sh {0} conf/ conf/seeds/{1} conf/models/{2}/'
-                                     .format(CRAWLER_PATH, self.seeds_list, self.model_name), shell=True)
-        #self.proc = subprocess.Popen('./count_things.sh', shell=True)
-        return self.proc.pid
-
-    def stop(self):
-        if self.proc is not None:
-            print("Killing %s" % str(self.proc.pid))
-            self.proc.kill()
-            proc2 = subprocess.Popen('./stop_crawler.sh {0}'.format((CRAWLER_PATH)), shell=True)
-
-    def status(self):
-        if self.proc is None:
-            return "No process exists"
-        elif self.proc.returncode is None:
-            return "Running"
-        elif self.proc.returncode < 0:
-            return "Stopped (Unused)"
-        else:
-            return "An error occurred"
-
-
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_name):
-    project = get_project(project_name)
-    crawls = get_crawls(project.id)
-    dashboards = get_dashboards(project.id)
-    form = CrawlForm(request.form)
+    form = CrawlForm()
     if form.validate_on_submit():
-        filename = secure_filename(form.seeds_list.data.filename)
-        form.seeds_list.data.save(SEED_FILES + filename)
-        crawl = Crawl(name=form.name.data,
-                      description=form.description.data,
-                      crawler=form.crawler.data,
-                      project_id=project.id,
+        seed_filename = secure_filename(form.seeds_list.data.filename)
+        form.seeds_list.data.save(SEED_FILES + seed_filename)
+        # TODO allow upload configuration
+        #config_filename = secure_filename(form.config.data.filename)
+        #form.config.data.save(CONFIG_FILES + config_filename)
 
-                      data_model=form.data_model.data,
-                      seeds_list = SEED_FILES + filename)
-        db.session.add(crawl)
-        db.session.commit()
+        crawl = db_add_crawl(project, form, seed_filename)
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
+
+        if crawl.crawler == 'ache':
+            db_init_ache(project, crawl)
+
+        else:
+            #TODO add db_init_nutch
+            pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=project.name,
+        return redirect(url_for('crawl', project_name=project_name,
                                          crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form)
+
+
+@app.route('/<project_name>/add_model', methods=['GET', 'POST'])
+def add_model(project_name):
+    form = DataModelForm()
+    if form.validate_on_submit():
+        # TODO model upload a folder instead of a file or a zip file and uncompress it
+        model_filename = secure_filename(form.filename.data.filename)
+        form.filename.data.save(MODEL_FILES + model_filename)
+        model = DataModel(name=form.name.data,
+                          filename=MODEL_FILES + model_filename)
+        db.session.add(model)
+        db.session.commit()
+        flash('Model has successfully been registered!', 'success')
+        return redirect(url_for('project', project_name=project.name))
+
+    return render_template('add_data_model.html', form=form)
 
 
 @app.route('/<project_name>/crawls')
@@ -218,10 +219,18 @@ def run_crawl(project_name, crawl_name):
         crawl = get_crawl(project_name, crawl_name)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
-        crawl_instance = CrawlInstance(seeds_list, model_name)
-        pid = crawl_instance.start()
-        CRAWLS_RUNNING[key] = crawl_instance
-        return "Crawl running"
+        if crawl.crawler=="ache":
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model_name)
+            pid = crawl_instance.start()
+            CRAWLS_RUNNING[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        elif crawl.crawler=="nutch":
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+            pid = crawl_instance.start()
+            CRAWLS_RUNNING[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        else:
+            abort(400)
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
@@ -234,6 +243,75 @@ def stop_crawl(project_name, crawl_name):
         return "Crawl stopped"
     else:
         abort(400)
+
+
+@app.route('/<project_name>/crawl/<crawl_name>/refresh', methods=['POST'])
+def refresh(project_name, crawl_name):
+
+    domain_plot = Plot.query.filter_by(name='domain').first()
+
+    # TODO retrieve data from db. These are only valid if crawler==ache.
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
+
+    domain = Domain(domain_sources, domain_plot)
+    domain.push_to_server()
+
+    harvest_plot = Plot.query.filter_by(name='harvest').first()
+
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+    harvest_sources = dict(harvest=harvest_data_uri)
+    harvest = Harvest(harvest_sources, harvest_plot)
+
+    harvest.push_to_server()
+
+    return "pushed"
+
+
+@app.route('/<project_name>/crawls/<crawl_name>/dashboard')
+def view_plots(project_name, crawl_name):
+
+    crawl = Crawl.query.filter_by(name=crawl_name).first()
+
+    key = project_name + '-' + crawl_name
+
+    # Domain
+    plot = Plot.query.filter_by(name=key + '-' + 'domain').first()
+
+    #TODO use db_api
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
+
+    domain = Domain(domain_sources, plot)
+    domain_tag, source_id = domain.create_and_store()
+
+    plot.source_id = source_id
+    ###
+
+
+    # Harvest
+
+    plot = Plot.query.filter_by(name='harvest').first()
+
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+
+    harvest_sources = dict(harvest=harvest_data_uri)
+
+    harvest = Harvest(harvest_sources, plot)
+    harvest_tag, source_id = harvest.create_and_store()
+
+    plot.source_id = source_id
+    ###
+
+    db.session.flush()
+    db.session.commit()
+
+    return render_template('dash.html', plots=[domain_tag, harvest_tag], project=project,
+        crawls=crawls, dashboards=dashboards, crawl=crawl)
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])
@@ -345,9 +423,9 @@ def data_explore(crawl_endpoint, data_endpoint):
                            crawl=crawl, data=monitor_data, plots=plots,
                            fields=fields, sample=sample, dshape=dshape) 
 
+
 # Plot & Dashboard
 # -----------------------------------------------------------------------------
-
 
 @app.route('/<project_name>/add_dashboard', methods=['GET', 'POST'])
 def add_dashboard(project_name):
@@ -458,9 +536,9 @@ def contact():
 
     return render_template('contact.html', form=form)
 
-    # Compare (Image Space)
-    # ------------------------------------------------------------------------
 
+# Compare (Image Space)
+# ------------------------------------------------------------------------
 
 @app.route('/<project_name>/image_space/<image_id>/compare/')
 def compare(project_name, image_id):

@@ -14,6 +14,7 @@ from bokeh.resources import CDN
 
 from plot import PlotManager
 
+from app import db
 
 class Harvest(PlotManager):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""

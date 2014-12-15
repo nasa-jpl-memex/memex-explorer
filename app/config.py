@@ -33,12 +33,12 @@ MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 DEFAULT_MAIL_SENDER = MAIL_USERNAME
 
-# Seed Files
-#------------
+
+# Crawlers Path
+# -------------
 
 SEED_FILES = os.path.join(BASEDIR, 'seeds/')
+MODEL_FILES = os.path.join(BASEDIR, 'models/')
+CONFIG_FILES = os.path.join(BASEDIR, 'configs/')
 
-# Cralwer Path
-# ------------
-
-CRAWLER_PATH = '/Users/brittainchristopherhard/Documents/memexcrawler/focused_crawler'
+CRAWLS_PATH = os.path.join(BASEDIR, 'crawls/')

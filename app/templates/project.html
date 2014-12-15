@@ -25,7 +25,7 @@
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <div class='col-sm-2 text-center'>
-         <a href="#" class='app-icon'>
+         <a href="{{ url_for('add_crawl', project_name=project.name) }}" class='app-icon'>
          <h1><i class="fa fa-archive"></i></h1>
             <h3>Crawls</h3>
          </a>
@@ -49,7 +49,7 @@
          </a>
         </div>
         <div class='col-sm-2 text-center'>
-         <a href="#" class='app-icon'>
+         <a href="{{ url_for('add_model', project_name=project.name) }}" class='app-icon'>
          <h1><i class="fa fa-search"></i></h1>
             <h3>Data Models</h3>
          </a>
