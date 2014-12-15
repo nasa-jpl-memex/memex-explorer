@@ -7,7 +7,7 @@ class CrawlForm extends Backbone.View
         data_model.prop "disabled", true
 
     crawler.change ->
-        if crawler.val() == 'achenyu'
+        if crawler.val() == 'ache'
             data_model.prop "disabled", false
         else
             data_model.prop "disabled", true
