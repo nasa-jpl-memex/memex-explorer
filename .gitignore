@@ -61,6 +61,10 @@ app.db
 db_repository/
 data_monitor/
 data_preprocessed/
+seeds/
+models/
+configs/
+crawls/
 
 # Third-party ui/ux
 *.sass-cache
