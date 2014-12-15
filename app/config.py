@@ -40,5 +40,7 @@ DEFAULT_MAIL_SENDER = MAIL_USERNAME
 SEED_FILES = os.path.join(BASEDIR, 'seeds/')
 MODEL_FILES = os.path.join(BASEDIR, 'models/')
 CONFIG_FILES = os.path.join(BASEDIR, 'configs/')
+# Temporal location of libs/profiles
+LANG_DETECT_PATH = os.path.join(BASEDIR, 'profiles/')
 
 CRAWLS_PATH = os.path.join(BASEDIR, 'crawls/')
