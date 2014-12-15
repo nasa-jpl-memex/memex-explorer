@@ -10,8 +10,8 @@ if [ ! -d /opt/anaconda ]; then
     /opt/anaconda/bin/conda update conda --yes
 fi
 
-conda install -c conda conda-env
-conda env create --name=memex-explorer --file=environment.yml
+/opt/anaconda/bin/conda install -c conda conda-env
+/opt/anaconda/bin/conda env create --name=memex-explorer --file=environment.yml
 source activate memex-explorer
 
 echo `which python`
