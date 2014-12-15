@@ -10,6 +10,8 @@ from bokeh.models import ColumnDataSource, DataRange1d, FactorRange
 from tld import get_tld
 from functools import partial
 
+from app import db
+
 from plot import PlotManager
 
 

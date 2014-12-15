@@ -38,11 +38,17 @@ from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
 from .mail import send_email
 
 from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
-                    CONFIG_FILES, MODEL_FILES
+                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
 
 from .auth import requires_auth
 from .plotting import plot_builder
 from .crawls import AcheCrawl, NutchCrawl
+
+
+from .viz.domain import Domain
+from .viz.harvest import Harvest
+from .viz.harvest_rate import HarvestRate
+# from .viz.termite import Termite
 
 
 # Dictionary of crawls by key(project_name-crawl_name)
@@ -239,6 +245,83 @@ def stop_crawl(project_name, crawl_name):
         return "Crawl stopped"
     else:
         abort(400)
+
+
+@app.route('/<project_name>/crawl/<crawl_name>/refresh', methods=['POST'])
+def refresh(project_name, crawl_name):
+
+    plot = Plot.query.filter_by(name='domain').first()
+
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
+
+    domain = Domain(domain_sources, plot)
+    domain.push_to_server()
+
+    plot = Plot.query.filter_by(name='harvest').first()
+
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+    harvest_sources = dict(harvest=harvest_data_uri)
+    harvest = Harvest(harvest_sources, plot)
+
+    harvest.push_to_server()
+
+    return "pushed"
+
+
+@app.route('/<project_name>/crawls/<crawl_name>/dashboard')
+def view_plots(project_name, crawl_name):
+
+    project = Project.query.filter_by(name=project_name).first()
+    crawl = Crawl.query.filter_by(name=crawl_name).first()
+    crawls = Crawl.query.filter_by(name=crawl_name).all()
+    dashboards = Dashboard.query.filter_by(project_id=project.id).all()
+
+    key = project_name + '-' + crawl_name
+    crawl_instance = CRAWLS_RUNNING.get(key)
+
+    # Domain
+    plot = Plot(name='domain')
+    db.session.add(plot)
+    db.session.commit()
+    plot = Plot.query.filter_by(name='domain').first()
+
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
+
+    domain = Domain(domain_sources, plot)
+    domain_tag, source_id = domain.create_and_store()
+
+    plot.source_id = source_id
+    ###
+
+
+    # Harvest
+    plot = Plot(name='harvest')
+    db.session.add(plot)
+    db.session.commit()
+    plot = Plot.query.filter_by(name='harvest').first()
+
+
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+
+    harvest_sources = dict(harvest=harvest_data_uri)
+
+    harvest = Harvest(harvest_sources, plot)
+    harvest_tag, source_id = harvest.create_and_store()
+
+    plot.source_id = source_id
+    ###
+
+    db.session.flush()
+    db.session.commit()
+
+    return render_template('dash.html', plots=[domain_tag, harvest_tag], project=project,
+        crawls=crawls, dashboards=dashboards, crawl=crawl)
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])
