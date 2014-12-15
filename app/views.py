@@ -195,7 +195,7 @@ def crawls(project_name):
 @app.route('/<project_name>/crawl/<crawl_name>')
 def crawl(project_name, crawl_name):
     project = get_project(project_name)
-    crawl = get_crawl(project.id, crawl_name)
+    crawl = get_crawl(crawl_name)
 
     if not project:
         flash("Project '%s' was not found." % project_name, 'error')
@@ -216,8 +216,6 @@ def run_crawl(project_name, crawl_name):
         return "Crawl is already running."
     else:
         crawl = get_crawl(crawl_name)
-        print(crawl)
-        print(crawl.seeds_list)
         seeds_list = crawl.seeds_list
         model_name = crawl.data_model
         if crawl.crawler=="ache":
