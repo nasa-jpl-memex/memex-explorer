@@ -32,7 +32,8 @@ from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
-                     get_images, get_image, get_matches)
+                     get_images, get_image, get_matches, db_add_crawl,
+                     db_init_ache)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
@@ -141,30 +142,28 @@ def add_project():
 # Crawl
 # -----------------------------------------------------------------------------
 
-
 @app.route('/<project_name>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_name):
-    project = get_project(project_name)
-    crawls = get_crawls(project.id)
-    dashboards = get_dashboards(project.id)
     form = CrawlForm()
     if form.validate_on_submit():
         seed_filename = secure_filename(form.seeds_list.data.filename)
-        config_filename = secure_filename(form.config.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
-        form.config.data.save(CONFIG_FILES + config_filename)
-        crawl = Crawl(name=form.name.data,
-                      description=form.description.data,
-                      crawler=form.crawler.data,
-                      project_id=project.id,
-                      data_model_id=form.data_model.data.id,
-                      config = CONFIG_FILES + config_filename,
-                      seeds_list = SEED_FILES + seed_filename)
-        db.session.add(crawl)
-        db.session.commit()
+        # TODO allow upload configuration
+        #config_filename = secure_filename(form.config.data.filename)
+        #form.config.data.save(CONFIG_FILES + config_filename)
+
+        crawl = db_add_crawl(project, form, seed_filename)
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
+
+        if crawl.crawler == 'ache':
+            db_init_ache(project, crawl)
+
+        else:
+            #TODO add db_init_nutch
+            pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=project.name,
+        return redirect(url_for('crawl', project_name=project_name,
                                          crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form)
@@ -172,11 +171,9 @@ def add_crawl(project_name):
 
 @app.route('/<project_name>/add_model', methods=['GET', 'POST'])
 def add_model(project_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
     form = DataModelForm()
     if form.validate_on_submit():
+        # TODO model upload a folder instead of a file or a zip file and uncompress it
         model_filename = secure_filename(form.filename.data.filename)
         form.filename.data.save(MODEL_FILES + model_filename)
         model = DataModel(name=form.name.data,
@@ -186,8 +183,8 @@ def add_model(project_name):
         flash('Model has successfully been registered!', 'success')
         return redirect(url_for('project', project_name=project.name))
 
-    return render_template('add_data_model.html', form=form, project=project, \
-                           crawls=crawls, dashboards=dashboards)
+    return render_template('add_data_model.html', form=form)
+
 
 @app.route('/<project_name>/crawls')
 def crawls(project_name):
@@ -234,7 +231,6 @@ def run_crawl(project_name, crawl_name):
             abort(400)
 
 
-
 @app.route('/<project_name>/crawl/<crawl_name>/stop', methods=['POST'])
 def stop_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
@@ -250,21 +246,22 @@ def stop_crawl(project_name, crawl_name):
 @app.route('/<project_name>/crawl/<crawl_name>/refresh', methods=['POST'])
 def refresh(project_name, crawl_name):
 
-    plot = Plot.query.filter_by(name='domain').first()
+    domain_plot = Plot.query.filter_by(name='domain').first()
 
-    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data/data_monitor/crawledpages.csv')
+    # TODO retrieve data from db. These are only valid if crawler==ache.
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
     relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
     frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
     domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
 
-    domain = Domain(domain_sources, plot)
+    domain = Domain(domain_sources, domain_plot)
     domain.push_to_server()
 
-    plot = Plot.query.filter_by(name='harvest').first()
+    harvest_plot = Plot.query.filter_by(name='harvest').first()
 
     harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
     harvest_sources = dict(harvest=harvest_data_uri)
-    harvest = Harvest(harvest_sources, plot)
+    harvest = Harvest(harvest_sources, harvest_plot)
 
     harvest.push_to_server()
 
@@ -274,21 +271,15 @@ def refresh(project_name, crawl_name):
 @app.route('/<project_name>/crawls/<crawl_name>/dashboard')
 def view_plots(project_name, crawl_name):
 
-    project = Project.query.filter_by(name=project_name).first()
     crawl = Crawl.query.filter_by(name=crawl_name).first()
-    crawls = Crawl.query.filter_by(name=crawl_name).all()
-    dashboards = Dashboard.query.filter_by(project_id=project.id).all()
 
     key = project_name + '-' + crawl_name
-    crawl_instance = CRAWLS_RUNNING.get(key)
 
     # Domain
-    plot = Plot(name='domain')
-    db.session.add(plot)
-    db.session.commit()
-    plot = Plot.query.filter_by(name='domain').first()
+    plot = Plot.query.filter_by(name=key + '-' + 'domain').first()
 
-    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data/data_monitor/crawledpages.csv')
+    #TODO use db_api
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
     relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
     frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
     domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
@@ -301,11 +292,8 @@ def view_plots(project_name, crawl_name):
 
 
     # Harvest
-    plot = Plot(name='harvest')
-    db.session.add(plot)
-    db.session.commit()
-    plot = Plot.query.filter_by(name='harvest').first()
 
+    plot = Plot.query.filter_by(name='harvest').first()
 
     harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
 
@@ -433,9 +421,9 @@ def data_explore(crawl_endpoint, data_endpoint):
                            crawl=crawl, data=monitor_data, plots=plots,
                            fields=fields, sample=sample, dshape=dshape) 
 
+
 # Plot & Dashboard
 # -----------------------------------------------------------------------------
-
 
 @app.route('/<project_name>/add_dashboard', methods=['GET', 'POST'])
 def add_dashboard(project_name):
@@ -546,9 +534,9 @@ def contact():
 
     return render_template('contact.html', form=form)
 
-    # Compare (Image Space)
-    # ------------------------------------------------------------------------
 
+# Compare (Image Space)
+# ------------------------------------------------------------------------
 
 @app.route('/<project_name>/image_space/<image_id>/compare/')
 def compare(project_name, image_id):

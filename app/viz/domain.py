@@ -11,14 +11,13 @@ from tld import get_tld
 from functools import partial
 
 from app import db
-
 from plot import PlotManager
 
 
 class Domain(PlotManager):
 
     def __init__(self, datasources, plot, sort='relevant'):
-
+        # TODO Retrieve plot datasources from db
         self.crawled_data = datasources['crawled'].data_uri
         self.relevant_data = datasources['relevant'].data_uri
         self.frontier_data = datasources['frontier'].data_uri
