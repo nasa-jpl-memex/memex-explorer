@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH
+from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH
 
 
 class AcheCrawl(object):
@@ -12,12 +12,11 @@ class AcheCrawl(object):
         self.seeds_file = os.path.join(SEED_FILES, seeds_file)
         self.model_dir = os.path.join(MODEL_FILES, model_name)
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_name)
-        self.lang_detect_profile = os.path.join(CONFIG_FILES, "profiles/")
         self.proc = None
 
     def start(self):
         self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.seeds_file, self.model_dir,
-                                     self.lang_detect_profile])
+                                     LANG_DETECT_PATH])
         return self.proc.pid
 
     def stop(self):
