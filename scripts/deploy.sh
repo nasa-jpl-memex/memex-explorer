@@ -11,6 +11,7 @@ sudo $scriptdir/debian.sh
 sudo $scriptdir/conda.sh
 sudo $scriptdir/supervisor.sh
 
+# TODO make necessary directories
 mkdir -p /var/lib/image_space/uploads
 chmod a+rwX -R /var/lib/image_space
 
