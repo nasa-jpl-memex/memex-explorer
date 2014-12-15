@@ -75,6 +75,7 @@ def context():
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
 
+
         context_vars.update(dict(
             project=project, crawls=crawls, dashboards=dashboards))
 
@@ -308,8 +309,7 @@ def view_plots(project_name, crawl_name):
     db.session.flush()
     db.session.commit()
 
-    return render_template('dash.html', plots=[domain_tag, harvest_tag], project=project,
-        crawls=crawls, dashboards=dashboards, crawl=crawl)
+    return render_template('dash.html', plots=[domain_tag, harvest_tag], crawl=crawl)
 
 
 @app.route('/<project_name>/crawl/<crawl_name>/status', methods=['GET'])

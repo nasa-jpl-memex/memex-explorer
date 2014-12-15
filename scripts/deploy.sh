@@ -12,8 +12,17 @@ sudo $scriptdir/conda.sh
 sudo $scriptdir/supervisor.sh
 
 # TODO make necessary directories
-mkdir -p /var/lib/image_space/uploads
-chmod a+rwX -R /var/lib/image_space
+mkdir -p image_space/uploads
+mkdir seeds
+mkdir models
+mkdir configs
+mkdir crawls
+
+chmod a+rwX -R image_space
+chmod a+rwX -R seeds
+chmod a+rwX -R models
+chmod a+rwX -R configs
+chmod a+rwX -R crawls
 
 ln -s /vagrant/data /data
 ln -s /vagrant/UPLOADED_DATA /UPLOADED_DATA
