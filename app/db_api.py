@@ -1,7 +1,7 @@
 from . import db
 import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
-from .models import Project, Crawl, Dashboard, Image, DataSource, Plot
+from .models import Project, Crawl, Dashboard, Image, DataSource, Plot, DataModel
 
 
 def get_project(project_name):
@@ -39,6 +39,10 @@ def get_image(image_id):
     """
     return Image.query.filter_by(id=image_id).first()
 
+def get_crawl_model(crawl):
+    """Return the page classifier model used by that crawl.
+    """
+    return DataModel.query.filter_by(id=crawl.data_model_id).first()
 
 def get_matches(project_id, image_id):
     """Return all images under `project_id` that match metadata on `image_id`.
