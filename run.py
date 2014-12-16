@@ -10,16 +10,18 @@ def parse_args():
 
     return parser.parse_args()
 
-args = parse_args()
-
 app.config.from_pyfile('config.py')
 
-if args.show:
-    url = "http://%s:%s/" % (app.config['HOST'], app.config['PORT'])
-    if app.config['DEBUG']:
-        print url
-    else:
-        import webbrowser
-        webbrowser.open(url)
+if __name__ == "__main__":
+    args = parse_args()
 
-app.run(host=app.config['HOST'], port=app.config['PORT'], debug=app.config['DEBUG'])
+
+    if args.show:
+        url = "http://%s:%s/" % (app.config['HOST'], app.config['PORT'])
+        if app.config['DEBUG']:
+            print url
+        else:
+            import webbrowser
+            webbrowser.open(url)
+
+    app.run(host=app.config['HOST'], port=app.config['PORT'], debug=app.config['DEBUG'])
