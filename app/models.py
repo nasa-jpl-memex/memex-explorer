@@ -85,7 +85,7 @@ class Crawl(db.Model):
 class DataModel(db.Model):
     __tablename__ = "data_model"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, unique=True)
+    name = db.Column(db.String(64))
     filename = db.Column(db.Text)
 
     def __repr__(self):
