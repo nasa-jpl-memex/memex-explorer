@@ -529,7 +529,7 @@ def contact():
 # Compare (Image Space)
 # ------------------------------------------------------------------------
 
-@app.route('/<project_name>/image_space/<image_id>/compare/')
+@app.route('/<project_name>/image_space/<image_space_name>/<image_id>/compare/')
 def compare(project_name, image_id):
 
     project = get_project(project_name)
@@ -568,20 +568,19 @@ def compare(project_name, image_id):
                             # external_matches=external_matches
                              )
 
-@app.route('/static/image/<image_id>')
-def image_source(image_id):
-    img_dir = os.path.join(BASEDIR,
-                                   'image')
+@app.route('/static/image/<image_name>')
+def image_source(image_name):
+    img_dir = os.abspath.join(BASEDIR, 'image')
 
-    img_filename = "%s.jpg" % image_id
+    img_filename = "%s.jpg" % image_name
     print(img_dir, img_filename)
 
     return send_from_directory(img_dir, img_filename)
 
 
-@app.route('/<project_name>/image_space/<image_id>')
-def inspect(project_name, image_id):
-    img = get_image(image_id)
+@app.route('/<project_name>/image_space/<image_space_name>/<image_id>')
+def inspect(project_name, image_space_name, image_id):
+    img = get_image(image_space_name, image_id)
 
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',

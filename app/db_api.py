@@ -43,10 +43,11 @@ def get_images(project_id):
     return Image.query.filter_by(project_id=project_id)
 
 
-def get_image(image_id):
+def get_image(image_space_name, image_name):
     """Return the image that matches `image_id`.
     """
-    return Image.query.filter_by(id=image_id).first()
+    # TODO query just in that image_space
+    return Image.query.filter_by(name=image_name).first()
 
 def get_crawl_model(crawl):
     """Return the page classifier model used by that crawl.
