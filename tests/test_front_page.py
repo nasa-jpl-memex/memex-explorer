@@ -1,5 +1,5 @@
 """
-Testing prper rendering of front page
+Testing proper rendering of the front page.
 """
 
 import os
@@ -8,10 +8,10 @@ sys.path.insert(0, ".")
 import unittest
 
 from app import app, db
-from app.config import basedir
+from app.config import BASEDIR
 
 TESTDB = 'test_app.db'
-TESTDB_SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, TESTDB)
+TESTDB_SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASEDIR, TESTDB)
 
 
 class ServerUpTest(unittest.TestCase):
