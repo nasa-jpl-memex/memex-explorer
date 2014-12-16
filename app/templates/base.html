@@ -73,6 +73,7 @@
       <div class="row">
         <div class="col-sm-12 main">
           <div class="container">
+              <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 {% with errors = get_flashed_messages(category_filter=["error"]) %}
                 {% if errors %}
                 <div class="alert alert-dismissible alert-danger" role="alert">
@@ -105,7 +106,9 @@
                 </div>
                 {% endif %}
                 {% endwith %}
-          </div>
+               </div>
+              </div>
+              </div>
 
         {% block content %}
         {% endblock content %}
