@@ -180,13 +180,17 @@ def add_crawl(project_name):
 def add_model(project_name):
     form = DataModelForm()
     if form.validate_on_submit():
-        # TODO model upload a folder instead of a file or a zip file and uncompress it
+        registered_model = DataModel.query.filter_by(name=form.name.data).first()
+        if registered_model:
+            flash('Data model name already exists, please choose another name', 'error')
+            return render_template('add_data_model.html', form=form)
         files = request.files.getlist("files")
         os.mkdir(MODEL_FILES + form.name.data)
         for x in files:
             x.save(MODEL_FILES + form.name.data + '/' + x.filename)
         model = DataModel(name=form.name.data,
                           filename=MODEL_FILES + form.name.data)
+
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
