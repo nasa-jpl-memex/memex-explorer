@@ -334,27 +334,6 @@ def status_crawl(project_name, crawl_name):
         return "Stopped"
 
 
-# Image Space
-# -----------------------------------------------------------------------------
-
-@app.route('/<project_name>/crawls/<crawl_name>/image_space')
-def image_space(project_name, crawl_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawl = Crawl.query.filter_by(name=crawl_name).first()
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    if not crawl:
-        flash("Crawl '%s' was not found." % crawl_name, 'error')
-        abort(404)
-    elif not project:
-        flash("Project '%s' was not found." % project_name, 'error')
-        abort(404)
-    elif crawl.project_id != project.id:
-        flash("This crawl is not part of project '%s'" % project_name, 'error')
-        abort(404)
-    return render_template('crawl.html', project=project, crawl=crawl,\
-                            crawls=crawls, dashboards=dashboards)
-
 
 # Data
 # -----------------------------------------------------------------------------
