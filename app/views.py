@@ -262,9 +262,9 @@ def refresh(project_name, crawl_name):
     domain_plot = Plot.query.filter_by(name='domain').first()
 
     # TODO retrieve data from db. These are only valid if crawler==ache.
-    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
-    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
-    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/frontierpages.csv')
     domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
 
     domain = Domain(domain_sources, domain_plot)
@@ -272,7 +272,7 @@ def refresh(project_name, crawl_name):
 
     harvest_plot = Plot.query.filter_by(name='harvest').first()
 
-    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/harvestinfo.csv')
     harvest_sources = dict(harvest=harvest_data_uri)
     harvest = Harvest(harvest_sources, harvest_plot)
 
@@ -292,9 +292,9 @@ def view_plots(project_name, crawl_name):
     plot = Plot.query.filter_by(name=key + '-' + 'domain').first()
 
     #TODO use db_api
-    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/crawledpages.csv')
-    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/relevantpages.csv')
-    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/frontierpages.csv')
+    crawled_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/crawledpages.csv')
+    relevant_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/relevantpages.csv')
+    frontier_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/frontierpages.csv')
     domain_sources = dict(crawled=crawled_data_uri, relevant=relevant_data_uri, frontier=frontier_data_uri)
 
     domain = Domain(domain_sources, plot)
@@ -308,7 +308,7 @@ def view_plots(project_name, crawl_name):
 
     plot = Plot.query.filter_by(name='harvest').first()
 
-    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, 'data/data_monitor/harvestinfo.csv')
+    harvest_data_uri = os.path.join(CRAWLS_PATH, crawl_name, '/data_monitor/harvestinfo.csv')
 
     harvest_sources = dict(harvest=harvest_data_uri)
 
