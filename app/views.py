@@ -33,7 +33,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches, db_add_crawl,
-                     db_init_ache, get_models, get_image_space)
+                     db_init_ache, get_crawl_model, get_models, get_image_space)
 
 from .rest_api import api
 

@@ -3,7 +3,6 @@ import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
 from .models import (Project, Crawl, Dashboard, Image,
                      DataSource, Plot, DataModel, ImageSpace)
-
 from .models import Project, Crawl, Dashboard, Image
 
 MATCHES = app.MATCHES
