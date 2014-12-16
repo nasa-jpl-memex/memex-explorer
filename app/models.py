@@ -25,15 +25,9 @@ crawl_data = db.Table('crawl_data',
 
 # Many images can be scraped from a crawl,
 #   many crawls can discover the same image. 
-crawl_image = db.Table('crawl_image',
+crawl_images = db.Table('crawl_images',
     db.Column('crawl_id', db.Integer, db.ForeignKey('crawl.id')),
-    db.Column('image_id', db.Integer, db.ForeignKey('image.id'))
-)
-
-# Link image to user-selected matches
-image_image = db.Table('image_image',
-    db.Column('source_image_id', db.Integer, db.ForeignKey('image.id')),
-    db.Column('match_image_id', db.Integer, db.ForeignKey('image.id'))
+    db.Column('image_space_id', db.Integer, db.ForeignKey('image_space.id'))
 )
 
 # A dashboard (usually) contains many plots, 
@@ -81,7 +75,7 @@ class Crawl(db.Model):
     data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
     data_sources = db.relationship('DataSource', secondary=crawl_data, \
         backref=db.backref('crawl', lazy='dynamic'))
-    images = db.relationship('Image', secondary=crawl_image, \
+    images = db.relationship('ImageSpace', secondary=crawl_images, \
         backref=db.backref('crawl', lazy='dynamic'))
 
     def __repr__(self):
@@ -112,6 +106,17 @@ class DataSource(db.Model):
         return '<DataSource %r>' % (self.name)
 
 
+class ImageSpace(db.Model):
+    __tablename__ = "image_space"
+    id = db.Column(db.Integer, primary_key=True)
+    images_location = db.Column(db.Text)
+    description = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    def __repr__(self):
+        return '<ImageSpace %r>' % (self.id)
+
+
 class Image(db.Model):
     __tablename__ = "image"
     __table_args__ = {'extend_existing': True}
@@ -127,7 +132,7 @@ class Image(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     def __unicode__(self):
-        return self.img_file or '(Unnamed)'
+        return self.img_file
 
 
 class Plot(db.Model):

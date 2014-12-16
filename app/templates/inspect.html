@@ -8,7 +8,7 @@
   <div class="row vertical-align clear-bottom">
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
-      <img src="{{ url_for('image_source', project_name=project.name, image_id=image.id) }}" class="img-responsive" alt="Generic placeholder thumbnail">
+      <img src="{{ url_for('retrieve_image', project_name=project.name, image_id=image.id) }}" class="img-responsive" alt="Generic placeholder thumbnail">
     </div>
     <div class="col-xs-5">
       <div>
