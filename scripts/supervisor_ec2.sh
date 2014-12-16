@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-scriptdir=/mnt/ebola-tweets/memex-explorer/scripts
+scriptdir=/mnt/data/memex-explorer/scripts
 
 echo "Installing Supervisord dependencies"
+PATH=~/anaconda/bin:$PATH
+source activate memex-explorer
 
-service supervisor restart
-cp $scriptdir/supervisor_memex_explorer_ec2.conf /etc/supervisor/conf.d/memex_explorer.conf
-supervisorctl reread
-supervisorctl update
+pushd $scriptdir
+mkdir -p supervisord_child_logs
+supervisord -c /mnt/data/memex-explorer/scripts/supervisor_memex_explorer_ec2.conf
+popd

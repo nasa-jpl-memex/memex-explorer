@@ -9,6 +9,7 @@ dependencies:
   - bokeh=0.7.0
   - nutch
   - ache=0.1.0
+  - gunicorn
   - pip
   - pip:
     - Flask-WTF==0.8.2

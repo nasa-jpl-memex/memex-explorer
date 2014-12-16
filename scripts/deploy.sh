@@ -8,12 +8,6 @@ sudo apt-get update
 
 # Add your deployment scripts here:
 sudo $scriptdir/debian.sh
-sudo $scriptdir/conda.sh
-sudo $scriptdir/supervisor.sh
+$scriptdir/conda.sh
+$scriptdir/supervisor.sh
 
-# TODO make necessary directories
-mkdir -p /var/lib/image_space/uploads
-chmod a+rwX -R /var/lib/image_space
-
-ln -s /vagrant/data /data
-ln -s /vagrant/UPLOADED_DATA /UPLOADED_DATA
