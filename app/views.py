@@ -33,7 +33,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches, db_add_crawl,
-                     db_init_ache, get_crawl_model)
+                     db_init_ache, get_models, get_image_space)
 
 from .rest_api import api
 
@@ -77,10 +77,13 @@ def context():
 
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
+        models = get_models()
+        images = get_image_space(project.id)
 
 
         context_vars.update(dict(
-            project=project, crawls=crawls, dashboards=dashboards))
+            project=project, crawls=crawls, dashboards=dashboards, \
+            models=models, images=images))
 
     # All pages should (potentially) be able to present all projects
     context_vars.update(projects=Project.query.all())
@@ -155,7 +158,7 @@ def add_crawl(project_name):
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
-
+        project = get_project(project_name)
         crawl = db_add_crawl(project, form, seed_filename)
         subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
 
@@ -187,7 +190,8 @@ def add_model(project_name):
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
-        return redirect(url_for('project', project_name=project.name))
+        return redirect(url_for('project', 
+                                project_name=get_project(project_name).name))
 
     return render_template('add_data_model.html', form=form)
 
