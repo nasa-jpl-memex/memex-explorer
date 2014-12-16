@@ -116,6 +116,7 @@ class DataSource(db.Model):
 class ImageSpace(db.Model):
     __tablename__ = "image_space"
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
     images_location = db.Column(db.Text)
     description = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
@@ -136,7 +137,7 @@ class Image(db.Model):
     MakerNote_SerialNumber = db.Column(db.String(140))
     Image_BodySerialNumber = db.Column(db.String(140))
     Uploaded = db.Column(db.Integer)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
 
     def __unicode__(self):
         return self.img_file or '(Unnamed)'
