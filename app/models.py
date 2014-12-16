@@ -91,7 +91,8 @@ class Crawl(db.Model):
 class DataModel(db.Model):
     __tablename__ = "data_model"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
+    # TODO add unique constraint and correspondent alembic scripts to do it with sqlite
+    name = db.Column(db.Text)
     filename = db.Column(db.Text)
 
     def __repr__(self):
