@@ -1,8 +1,8 @@
 from . import db
 import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
-from .models import Project, Crawl, Dashboard, Image, DataSource, Plot, DataModel
-from .models import ImageSpace
+from .models import Project, Crawl, Dashboard, Image, DataSource, Plot, DataModel, \
+    ImageSpace
 
 
 def get_project(project_name):
@@ -11,10 +11,10 @@ def get_project(project_name):
     return Project.query.filter_by(name=project_name).first()
 
 
-def get_crawl(project_id, crawl_name):
+def get_crawl(crawl_name):
     """Return the first crawl under `project_id` that matches `crawl_name`.
     """
-    return Crawl.query.filter_by(project_id=project_id, name=crawl_name).first()
+    return Crawl.query.filter_by(name=crawl_name).first()
 
 
 def get_crawls(project_id):
@@ -47,6 +47,10 @@ def get_image(image_id):
     """
     return Image.query.filter_by(id=image_id).first()
 
+def get_crawl_model(crawl):
+    """Return the page classifier model used by that crawl.
+    """
+    return DataModel.query.filter_by(id=crawl.data_model_id).first()
 
 def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
