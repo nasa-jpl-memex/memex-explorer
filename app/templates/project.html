@@ -22,6 +22,32 @@
         <h2>Add a new application to your project:</h2>
     </div>
 </div> -->
+
+{% if crawls or dashboards or images %}
+<div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <h3>Apps in {{ project.name }}</h3>
+    <ul class="list-group">
+        {%  for w in crawls if crawls %}
+        <li class="list-group-item">
+            <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}">Crawl: {{ w.name }}</a>
+        </li>
+        {% endfor %}
+        {% for x in dashboards if dashboards %}
+        <li class="list-group-item">
+            <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}">Dashboard: {{ x.name }}</a>
+        </li>
+        {% endfor %}
+        {% for x in images if images %}
+        <li class="list-group-item">
+            <a href="#">Image Space: {{ x.name }}</a>
+        </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <div class='col-sm-2 text-center'>
