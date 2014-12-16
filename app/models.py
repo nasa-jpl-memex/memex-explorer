@@ -111,6 +111,17 @@ class DataSource(db.Model):
     def __repr__(self):
         return '<DataSource %r>' % (self.name)
 
+        
+class ImageSpace(db.Model):
+    __tablename__ = "image_space"
+    id = db.Column(db.Integer, primary_key=True)
+    images_location = db.Column(db.Text)
+    description = db.Column(db.Text)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    def __repr__(self):
+        return '<ImageSpace %r>' % (self.id)
+
 
 class Image(db.Model):
     __tablename__ = "image"
