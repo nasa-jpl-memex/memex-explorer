@@ -31,6 +31,8 @@ from bokeh.plotting import ColumnDataSource
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
+from .rest_api import api
+
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches, db_add_crawl,
                      db_init_ache, get_crawl_model, get_models, get_image_space)
@@ -566,6 +568,11 @@ def compare(project_name, image_id):
     #                         for x in full_match_paths]
 
     internal_matches = get_matches(project.id, img.id)
+    for x in internal_matches:
+        if (img.id, x.id) in app.MATCHES:
+            x.match = "true"
+        else:
+            x.match = "false"
 
     # if img.EXIF_BodySerialNumber:
     #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)
@@ -587,8 +594,7 @@ def image_source(image_id):
 
     return send_from_directory(img_dir, img_filename)
 
-
-@app.route('/<project_name>/image_space/<image_id>/inspect')
+@app.route('/<project_name>/image_space/<image_id>')
 def inspect(project_name, image_id):
     img = get_image(image_id)
 
