@@ -33,7 +33,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
                      get_images, get_image, get_matches, db_add_crawl,
-                     db_init_ache, get_crawl_model, get_models, get_image_space)
+                     db_init_ache, get_crawl_model)
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
                     DashboardForm, ProjectForm, DataModelForm
 from .mail import send_email
@@ -74,13 +74,10 @@ def context():
 
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
-        models = get_models()
-        images = get_image_space(project.id)
 
 
         context_vars.update(dict(
-            project=project, crawls=crawls, dashboards=dashboards, \
-            models=models, images=images))
+            project=project, crawls=crawls, dashboards=dashboards))
 
     # All pages should (potentially) be able to present all projects
     context_vars.update(projects=Project.query.all())
@@ -155,19 +152,19 @@ def add_crawl(project_name):
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
-        project = get_project(project_name)
+
         crawl = db_add_crawl(project, form, seed_filename)
         subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
 
-        else: 
+        else:
             #TODO add db_init_nutch
             pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_name=get_project(project_name),
+        return redirect(url_for('crawl', project_name=project_name,
                                          crawl_name=form.name.data))
 
     return render_template('add_crawl.html', form=form)
@@ -178,17 +175,14 @@ def add_model(project_name):
     form = DataModelForm()
     if form.validate_on_submit():
         # TODO model upload a folder instead of a file or a zip file and uncompress it
-        files = request.files.getlist("files")
-        os.mkdir(MODEL_FILES + form.name.data)
-        for x in files:
-            x.save(MODEL_FILES + form.name.data + '/' + x.filename)
+        model_filename = secure_filename(form.filename.data.filename)
+        form.filename.data.save(MODEL_FILES + model_filename)
         model = DataModel(name=form.name.data,
-                          filename=MODEL_FILES + form.name.data)
+                          filename=MODEL_FILES + model_filename)
         db.session.add(model)
         db.session.commit()
         flash('Model has successfully been registered!', 'success')
-        return redirect(url_for('project', 
-                                project_name=get_project(project_name).name))
+        return redirect(url_for('project', project_name=project.name))
 
     return render_template('add_data_model.html', form=form)
 
