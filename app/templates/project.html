@@ -23,9 +23,9 @@
     </div>
 </div> -->
 
-{% if crawls or dashboards or images %}
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+{% if crawls.count() or dashboards.count() or images.count() %}
     <h3>Apps in {{ project.name }}</h3>
     <ul class="list-group">
         {%  for w in crawls if crawls %}
@@ -44,12 +44,15 @@
         </li>
         {% endfor %}
         </ul>
+{% else %}
+    <h3> No apps install in {{ project.name }}</h3>
+{% endif %}
     </div>
 </div>
-{% endif %}
 
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h3> Add apps to {{ project.name }}</h3>
         <div class='col-sm-2 text-center'>
          <a href="{{ url_for('add_crawl', project_name=project.name) }}" class='app-icon'>
          <h1><i class="fa fa-archive"></i></h1>
