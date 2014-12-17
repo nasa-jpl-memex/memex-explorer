@@ -10,7 +10,7 @@ $( document ).ready(function() {
     $('#reload').on('click', function(){
         $.ajax({
           type: "POST",
-          url: "/{{ project.name }}/crawl/{{ crawl.name }}/refresh",
+          url: "/{{ project.name }}/crawls/{{ crawls.name }}/refresh",
           success: function() {console.log('success')}
         });
     });
