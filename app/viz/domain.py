@@ -12,15 +12,15 @@ from functools import partial
 
 from app import db
 from plot import PlotManager
-
+from ..config import CRAWLS_PATH
 
 class Domain(PlotManager):
 
     def __init__(self, datasources, plot, sort='relevant'):
         # TODO Retrieve plot datasources from db
-        self.crawled_data = datasources['crawled'].data_uri
-        self.relevant_data = datasources['relevant'].data_uri
-        self.frontier_data = datasources['frontier'].data_uri
+        self.crawled_data = CRAWLS_PATH + datasources['crawled'].data_uri
+        self.relevant_data = CRAWLS_PATH+ datasources['relevant'].data_uri
+        self.frontier_data = CRAWLS_PATH + datasources['frontier'].data_uri
 
         self.sort = sort
 
