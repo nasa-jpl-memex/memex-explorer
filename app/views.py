@@ -31,8 +31,8 @@ from bokeh.plotting import ColumnDataSource
 from . import app, db
 from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
                     DataModel
-from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
-                     get_images, get_image, get_matches, db_add_crawl,
+from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
+                     get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_models, get_image_space)
 
 from .rest_api import api
@@ -52,6 +52,8 @@ from .crawls import AcheCrawl, NutchCrawl
 from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.harvest_rate import HarvestRate
+
+from .viz.plot import plot_exists
 # from .viz.termite import Termite
 
 
@@ -259,77 +261,69 @@ def stop_crawl(project_name, crawl_name):
 @app.route('/<project_name>/crawls/<crawl_name>/refresh', methods=['POST'])
 def refresh(project_name, crawl_name):
 
-    project = Project.query.filter_by(name=project_name)
-    domain_plot_name = crawl_name + "-domain"
-    domain_plot = Plot.query.filter_by(name=domain_plot_name).first()
+    project = get_project(project_name)
 
-    crawled_data_name = crawl_name + "-crawledpages"
-    relevant_data_name = crawl_name + "-relevantpages"
-    frontier_data_name = crawl_name + "-frontierpages"
-
-    # TODO use db_api
-    crawled = DataSource.query.filter_by(project_id=project.id, name= crawled_data_name)
-    relevant = DataSource.query.filter_by(project_id=project.id, name= relevant_data_name)
-    frontier = DataSource.query.filter_by(project_id=project.id, name= frontier_data_name)
-
+    ### Domain
+    domain_plot = get_plot(crawl_name + "-domain")
+    crawled = get_data_source(project.id, crawl_name + "-crawledpages")
+    relevant = get_data_source(project.id, crawl_name + "-relevantpages")
+    frontier = get_data_source(project.id, crawl_name + "-frontierpages")
     domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
 
     domain = Domain(domain_sources, domain_plot)
     domain.push_to_server()
+    ###
 
-    harvest_plot_name = crawl_name + "-domain"
-    harvest_plot = Plot.query.filter_by(name=harvest_plot_name).first()
 
-    harvest_data_name = crawl_name + "-harvest"
-    harvest_source = DataSource.query.filter_by(project_id=project.id, name= harvest_data_name)
+    ### Harvest
+    harvest_plot = get_plot(crawl_name + "-harvest")
+    harvest_source = get_data_source(project.id, crawl_name + "-harvest")
 
     harvest = Harvest(harvest_source, harvest_plot)
-
     harvest.push_to_server()
+    ###
 
     return "pushed"
 
 
 @app.route('/<project_name>/crawls/<crawl_name>/dashboard')
 def view_plots(project_name, crawl_name):
-    project = Project.query.filter_by(name=project_name).first()
-    crawl = Crawl.query.filter_by(name=crawl_name).first()
+
+    project = get_project(project_name)
+    crawl = get_crawl(crawl_name)
 
     key = project_name + '-' + crawl_name
     crawl_instance = CRAWLS_RUNNING.get(key)
 
     if crawl.crawler == 'ache':
         # TODO put all this is a function create_ache_dashboard
+
         ### Domain
-        domain_plot_name = crawl_name + "-domain"
-        domain_plot = Plot.query.filter_by(name=domain_plot_name).first()
+        domain_plot = get_plot(crawl_name + "-domain")
+        if domain_plot.autoload_tag and plot_exists(domain_plot):
+            domain_tag = domain_plot.autoload_tag
 
-        crawled_data_name = crawl_name + "-crawledpages"
-        relevant_data_name = crawl_name + "-relevantpages"
-        frontier_data_name = crawl_name + "-frontierpages"
+        else:
+            crawled = get_data_source(project.id, crawl_name + "-crawledpages")
+            relevant = get_data_source(project.id, crawl_name + "-relevantpages")
+            frontier = get_data_source(project.id, crawl_name + "-frontierpages")
+            domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
 
-        crawled = DataSource.query.filter_by(project_id=project.id, name= crawled_data_name).first()
-        relevant = DataSource.query.filter_by(project_id=project.id, name= relevant_data_name).first()
-        frontier = DataSource.query.filter_by(project_id=project.id, name= frontier_data_name).first()
-        domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
-        domain = Domain(domain_sources, domain_plot)
-        domain_tag, domain_source_id = domain.create_and_store()
-
-        domain_plot.source_id = domain_source_id
-        ### Harvest
-        harvest_plot_name = crawl_name + "-domain"
-        harvest_plot = Plot.query.filter_by(name=harvest_plot_name).first()
-
-        harvest_data_name = crawl_name + "-harvest"
-        harvest_source = DataSource.query.filter_by(project_id=project.id, name= harvest_data_name)
-        harvest = Harvest(harvest_source, harvest_plot)
-        harvest_tag, harvest_source_id = harvest.create_and_store()
-
-        plot.source_id = harvest_source_id
+            domain = Domain(domain_sources, domain_plot)
+            domain_tag = domain.create_and_store()
         ###
 
-        db.session.flush()
-        db.session.commit()
+
+        ### Harvest
+        harvest_plot = get_plot(crawl_name + "-harvest")
+        if harvest_plot.autoload_tag:
+            harvest_tag = harvest_plot.autoload_tag
+
+        else:
+            harvest_source = get_data_source(project.id, crawl_name + "-harvest")
+            harvest = Harvest(harvest_source, harvest_plot)
+            harvest_tag = harvest.create_and_store()
+        ###
 
         return render_template('dash.html', plots=[domain_tag, harvest_tag], crawl=crawl)
 

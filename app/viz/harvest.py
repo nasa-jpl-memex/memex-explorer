@@ -1,5 +1,6 @@
 from __future__ import division
 import csv
+import os
 import sys
 from blaze import *
 import pandas as pd
@@ -14,13 +15,13 @@ from bokeh.resources import CDN
 
 from plot import PlotManager
 
-from app import db
+from app import app, db
 
 class Harvest(PlotManager):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
     def __init__(self, datasource, plot):
-        self.harvest_data = datasource.data_uri
+        self.harvest_data = os.path.join(app.config['CRAWLS_PATH'], datasource.data_uri)
         super(Harvest, self).__init__(plot)
 
     def update_source(self):

@@ -34,3 +34,9 @@ class PlotManager(object):
         # Attach new data and push
         cds.data = self.source.data
         s.store_objects(cds)
+
+
+def plot_exists(plot_model):
+    s = Session()
+    doc_name = '%d_%s' % (plot_model.id, plot_model.name)
+    return any(x['title'] == doc_name for x in s.userinfo['docs'])
