@@ -78,12 +78,12 @@ def context():
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
         models = get_models()
-        images = get_image_space(project.id)
+        image_spaces = get_image_space(project.id)
 
 
         context_vars.update(dict(
             project=project, crawls=crawls, dashboards=dashboards, \
-            models=models, images=images))
+            models=models, image_spaces=image_spaces))
 
     # All pages should (potentially) be able to present all projects
     context_vars.update(projects=Project.query.all())
@@ -537,7 +537,7 @@ def compare(project_name, image_space_name, image_name):
     # TODO change to query by image_space. Requires db changes.
     images = get_images()
     img = get_image(image_name)
-
+    print(img)
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
@@ -577,6 +577,17 @@ def image_source(image_space_name, image_name):
     print(img_dir, img_filename)
 
     return send_from_directory(img_dir, img_filename)
+
+
+@app.route('/<project_name>/image_space/<image_space_name>/')
+def image_table(project_name, image_space_name):
+    #images = get_images_in_space(project_name, image_space_name)
+    project = get_project(project_name)
+    image_space = ImageSpace.query.filter_by(name=image_space_name).first()
+    images = get_images()
+    print(images)
+    print(image_space)
+    return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
 @app.route('/<project_name>/image_space/<image_space_name>/<image_name>')
