@@ -30,17 +30,17 @@
     <ul class="list-group">
         {%  for w in crawls if crawls %}
         <li class="list-group-item">
-            <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}">Crawl: {{ w.name }}</a>
+            <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}"><i class="fa fa-search"></i>  {{ w.name }}</a>
         </li>
         {% endfor %}
         {% for x in dashboards if dashboards %}
         <li class="list-group-item">
-            <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}">Dashboard: {{ x.name }}</a>
+            <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}"><i class="fa fa-line-chart"></i> {{ x.name }}</a>
         </li>
         {% endfor %}
         {% for x in images if images %}
         <li class="list-group-item">
-            <a href="#">Image Space: {{ x.name }}</a>
+            <a href="#"><i class="fa fa-image"></i> {{ x.name }}</a>
         </li>
         {% endfor %}
         </ul>
@@ -55,7 +55,7 @@
         <h3> Add apps to {{ project.name }}</h3>
         <div class='col-sm-2 text-center'>
          <a href="{{ url_for('add_crawl', project_name=project.name) }}" class='app-icon'>
-         <h1><i class="fa fa-archive"></i></h1>
+         <h1><i class="fa fa-search"></i></h1>
             <h3>Crawls</h3>
          </a>
         </div>
