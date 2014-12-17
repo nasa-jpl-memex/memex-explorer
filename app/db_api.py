@@ -37,17 +37,18 @@ def get_models():
     return DataModel.query.all()
 
 
-def get_images(project_id):
+def get_images():
     """Return all images under `project_id` that match `crawl_name`.
     """
-    return Image.query.filter_by(project_id=project_id)
+    # TODO change to query by image_space. Requires db changes.
+    return Image.query.all()
 
 
-def get_image(image_space_name, image_name):
+def get_image(image_name):
     """Return the image that matches `image_id`.
     """
     # TODO query just in that image_space
-    return Image.query.filter_by(name=image_name).first()
+    return Image.query.filter_by(img_file=image_name).first()
 
 def get_crawl_model(crawl):
     """Return the page classifier model used by that crawl.
@@ -58,12 +59,12 @@ def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
 
 
-def get_matches(project_id, image_id):
+def get_matches(project_id, image_name):
     """Return all images under `project_id` that match metadata on `image_id`.
     """
 
-    img = get_image(image_id)
-    return Image.query.filter_by(project_id=project_id, EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
+    img = get_image(image_name)
+    return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
 
 
 def db_add_crawl(project, form, seed_filename):
