@@ -220,6 +220,14 @@ def crawl(project_name, crawl_name):
     return render_template('crawl.html', crawl=crawl)
 
 
+@app.route('/<project_name>/crawls/<crawl_name>/delete', methods=['POST'])
+def delete_crawl(project_name, crawl_name):
+    crawl = get_crawl(crawl_name)
+    db.session.delete(crawl)
+    db.session.commit()
+    return redirect(url_for('project', project_name=project_name))
+
+
 @app.route('/<project_name>/crawls/<crawl_name>/run', methods=['POST'])
 def run_crawl(project_name, crawl_name):
     key = project_name + '-' + crawl_name
