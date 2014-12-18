@@ -55,7 +55,7 @@ def get_plot(plot_name):
     """
     return Plot.query.filter_by(name=plot_name).first()
 
-def get_image(image_space_name, image_name):
+def get_image(image_name):
     """Return the image that matches `image_id`.
     """
     # TODO query just in that image_space
