@@ -38,7 +38,7 @@ from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
 from .rest_api import api
 
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm, DataModelForm
+                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm
 from .mail import send_email
 
 from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
@@ -138,6 +138,23 @@ def delete_project(project_name):
     db.session.commit()
     flash('%s has successfully been deleted.' % project.name, 'success')
     return redirect(url_for('index'))
+
+
+@app.route('/<project_name>/edit', methods=['POST', 'GET'])
+def edit_project(project_name):
+    form = EditProjectForm()
+    project = get_project(project_name)
+    if form.validate_on_submit():
+        if form.name.data:
+            project.name = form.name.data
+        if form.description.data:
+            project.description = form.description.data
+        if form.icon.data:
+            project.icon = form.icon.data
+        db.session.commit()
+        flash('%s has successfully been edited.' % project.name, 'success')
+        return redirect(url_for('index'))
+    return render_template("edit_project.html", form=form)
 
 
 @app.route('/add_project', methods=['GET', 'POST'])

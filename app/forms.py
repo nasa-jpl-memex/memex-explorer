@@ -57,3 +57,11 @@ class ProjectForm(Form):
 class DataModelForm(Form):
     name = StringField('Name', validators = [DataRequired()])
     filename = FileField()
+
+
+# Forms for editing
+
+class EditProjectForm(Form):
+    name = StringField('Name')
+    description = TextAreaField('Description')
+    icon = StringField('Icon')
