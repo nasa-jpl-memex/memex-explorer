@@ -537,7 +537,6 @@ def compare(project_name, image_space_name, image_name):
     # TODO change to query by image_space. Requires db changes.
     images = get_images()
     img = get_image(image_name)
-    print(img)
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
@@ -574,8 +573,6 @@ def image_source(image_space_name, image_name):
     img_dir = os.path.join(BASEDIR, 'static', image_space_name, 'images_blurred/')
     img_filename = image_name
 
-    print(img_dir, img_filename)
-
     return send_from_directory(img_dir, img_filename)
 
 
@@ -585,8 +582,6 @@ def image_table(project_name, image_space_name):
     project = get_project(project_name)
     image_space = ImageSpace.query.filter_by(name=image_space_name).first()
     images = get_images()
-    print(images)
-    print(image_space)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
@@ -594,8 +589,7 @@ def image_table(project_name, image_space_name):
 def inspect(project_name, image_space_name, image_name):
     img = get_image(image_name)
     image_space = ImageSpace.query.filter_by(name=image_space_name).first()
-    print(img)
-    print(image_space.name)
+
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
