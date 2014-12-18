@@ -73,6 +73,7 @@
       <div class="row">
         <div class="col-sm-12 main">
           <div class="container">
+              <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
                 {% with errors = get_flashed_messages(category_filter=["error"]) %}
                 {% if errors %}
                 <div class="alert alert-dismissible alert-danger" role="alert">
@@ -105,7 +106,9 @@
                 </div>
                 {% endif %}
                 {% endwith %}
-          </div>
+               </div>
+              </div>
+              </div>
 
         {% block content %}
         {% endblock content %}
@@ -124,13 +127,13 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <!--script src="{{ url_for('static', filename="js/jquery.dataTables.min.js") }}"></script-->
+    <script src="{{ url_for('static', filename="js/jquery.dataTables.min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/bootstrap.min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/bokeh.min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/sweet-alert.min.js") }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{ url_for('static', filename="js/ie10-viewport-bug-workaround.js") }}"></script>
-    <!--script src="{{ url_for('static', filename="js/dataTables.bootstrap.js") }}"></script-->
+    <script src="{{ url_for('static', filename="js/dataTables.bootstrap.js") }}"></script>
     <script src="{{ url_for('static', filename="js/underscore-min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/backbone-min.js") }}"></script>
     <script src="{{ url_for('static', filename="js/app.js") }}"></script>

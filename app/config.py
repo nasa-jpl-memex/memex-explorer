@@ -44,3 +44,6 @@ CONFIG_FILES = os.path.join(BASEDIR, 'resources/configs/')
 LANG_DETECT_PATH = os.path.join(BASEDIR, 'resources/profiles/')
 
 CRAWLS_PATH = os.path.join(BASEDIR, 'resources/crawls/')
+
+IMAGE_SPACE_PATH = os.path.join(BASEDIR, 'resources/image_space/')
+
