@@ -31,9 +31,9 @@
           {% endif %}
         </div>
         <div id="collapseTwo" class="accordion-body collapse accordion-links">
-        {% for x in dashboards %}
+        {% for x in crawls %}
           <div class="accordion-inner">
-            <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}">{{ x.name }}</a>
+            <a href="{{ url_for('crawl_dash', project_name=project.name, crawl_name=x.name) }}">{{ x.name }}</a>
           </div>
         {% endfor %}
           <div class="accordion-inner">

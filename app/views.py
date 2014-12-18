@@ -287,7 +287,7 @@ def refresh(project_name, crawl_name):
 
 
 @app.route('/<project_name>/crawls/<crawl_name>/dashboard')
-def view_plots(project_name, crawl_name):
+def crawl_dash(project_name, crawl_name):
 
     project = get_project(project_name)
     crawl = get_crawl(crawl_name)
