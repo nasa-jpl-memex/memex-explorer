@@ -66,14 +66,14 @@
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFive">
             Image Spaces
           </a>
-          {% if images[0] %}
+          {% if image_spaces[0] %}
           <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseFive" class="accordion-body collapse accordion-links">
-        {% for x in images %}
+        {% for x in image_spaces %}
           <div class="accordion-inner">
-            <a href="#">{{ x.name }}</a>
+            <a href="{{ url_for('image_table', project_name = project.name, image_space_name=x.name) }}">{{ x.name }}</a>
           </div>
         {% endfor %}
           <div class="accordion-inner">

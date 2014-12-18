@@ -29,7 +29,7 @@ from bokeh.plotting import ColumnDataSource
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, \
+from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpace, \
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
@@ -80,12 +80,12 @@ def context():
         crawls = get_crawls(project.id)
         dashboards = get_dashboards(project.id)
         models = get_models()
-        images = get_image_space(project.id)
+        image_spaces = get_image_space(project.id)
 
 
         context_vars.update(dict(
             project=project, crawls=crawls, dashboards=dashboards, \
-            models=models, images=images))
+            models=models, image_spaces=image_spaces))
 
     # All pages should (potentially) be able to present all projects
     context_vars.update(projects=Project.query.all())
@@ -407,14 +407,14 @@ def contact():
 # Compare (Image Space)
 # ------------------------------------------------------------------------
 
-@app.route('/<project_name>/image_space/<image_space_name>/<image_id>/compare/')
-def compare(project_name, image_id):
+@app.route('/<project_name>/image_space/<image_space_name>/<image_name>/compare/')
+def compare(project_name, image_space_name, image_name):
 
     project = get_project(project_name)
-    images = get_images(project.id)
-
-    img = get_image(image_id)
-
+    image_space = ImageSpace.query.filter_by(name=image_space_name).first()
+    # TODO change to query by image_space. Requires db changes.
+    images = get_images()
+    img = get_image(image_name)
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
@@ -429,7 +429,7 @@ def compare(project_name, image_id):
     # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
     #                         for x in full_match_paths]
 
-    internal_matches = get_matches(project.id, img.id)
+    internal_matches = get_matches(project.id, img.img_file)
     for x in internal_matches:
         if (img.id, x.id) in app.MATCHES:
             x.match = "true"
@@ -441,24 +441,32 @@ def compare(project_name, image_id):
     # else:
     #     external_matches = []
 
-    return render_template('compare.html', image=img, exif_info=exif_info, 
+    return render_template('compare.html', image=img, exif_info=exif_info, image_space=image_space,
                             internal_matches=internal_matches,
                             # external_matches=external_matches
                              )
 
-@app.route('/static/image/<image_name>')
-def image_source(image_name):
-    img_dir = os.abspath.join(BASEDIR, 'image')
-
-    img_filename = "%s.jpg" % image_name
-    print(img_dir, img_filename)
+@app.route('/static/<image_space_name>/images/<image_name>')
+def image_source(image_space_name, image_name):
+    img_dir = os.path.join(BASEDIR, 'static', image_space_name, 'images_blurred/')
+    img_filename = image_name
 
     return send_from_directory(img_dir, img_filename)
 
 
-@app.route('/<project_name>/image_space/<image_space_name>/<image_id>')
-def inspect(project_name, image_space_name, image_id):
-    img = get_image(image_space_name, image_id)
+@app.route('/<project_name>/image_space/<image_space_name>/')
+def image_table(project_name, image_space_name):
+    #images = get_images_in_space(project_name, image_space_name)
+    project = get_project(project_name)
+    image_space = ImageSpace.query.filter_by(name=image_space_name).first()
+    images = get_images()
+    return render_template('image_table.html', images=images, project=project, image_space=image_space)
+
+
+@app.route('/<project_name>/image_space/<image_space_name>/<image_name>')
+def inspect(project_name, image_space_name, image_name):
+    img = get_image(image_name)
+    image_space = ImageSpace.query.filter_by(name=image_space_name).first()
 
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
@@ -468,5 +476,5 @@ def inspect(project_name, image_space_name, image_id):
               img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
               img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
 
-    return render_template('inspect.html', image=img, exif_info=exif_info)
+    return render_template('inspect.html', image=img, image_space=image_space, exif_info=exif_info)
 
