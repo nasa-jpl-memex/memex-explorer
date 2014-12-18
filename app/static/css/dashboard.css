@@ -392,6 +392,9 @@ ul.inline-icons {
   width: 100%;
   list-style: none; }
 
+.form-button {
+  display: inline-block; }
+
 .accordion-links {
   padding: 10px;
   border: 1px solid #E8E8E8;
@@ -419,3 +422,4 @@ ul.inline-icons {
   .inner {
     width: 100%; } }
 
+/*# sourceMappingURL=dashboard.css.map */

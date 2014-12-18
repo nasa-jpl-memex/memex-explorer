@@ -88,7 +88,7 @@ $( document ).ready(function() {
               <button id="editButton" type="button" class="btn btn-control">
                   <span class="fa fa-edit"></span>
               </button>
-              <form onsubmit='return confirm("Are you sure?");'>
+              <form onsubmit='return confirm("Are you sure?");' class='form-buttons'>
                 <button formmethod='post' formaction="{{ url_for('delete_crawl', project_name=project.name, crawl_name=crawl.name) }}" id="removeButton" type="submit" class="btn btn-control">
                     <span class="fa fa-close"></span>
                 </button>

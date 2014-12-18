@@ -131,6 +131,15 @@ def project(project_name):
     return render_template('project.html')
 
 
+@app.route('/<project_name>/delete', methods=['POST'])
+def delete_project(project_name):
+    project = get_project(project_name)
+    db.session.delete(project)
+    db.session.commit()
+    flash('%s has successfully been deleted.' % project.name, 'success')
+    return redirect(url_for('index'))
+
+
 @app.route('/add_project', methods=['GET', 'POST'])
 def add_project():
     form = ProjectForm(request.form)
@@ -225,6 +234,7 @@ def delete_crawl(project_name, crawl_name):
     crawl = get_crawl(crawl_name)
     db.session.delete(crawl)
     db.session.commit()
+    flash('%s has successfully been deleted.' % crawl.name, 'success')
     return redirect(url_for('project', project_name=project_name))
 
 
