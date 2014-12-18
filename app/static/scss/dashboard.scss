@@ -408,6 +408,23 @@ ul.inline-icons{
   width: 75%;
   margin: 0 auto;
 }
+
+
+button.projects{
+  border: 0;
+  background-color: #1D4971;
+  float:right;
+}
+
+.dropdown-menu{
+  right:1px;
+  top:50px;
+  max-width:150px;
+  li{
+    margin-left:5px;
+  }
+}
+
 @media (max-width: 769px) {
   .inner{
     width: 100%;
