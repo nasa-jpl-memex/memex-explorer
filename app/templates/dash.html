@@ -10,7 +10,7 @@ $( document ).ready(function() {
     $('#reload').on('click', function(){
         $.ajax({
           type: "POST",
-          url: "/{{ project.name }}/crawls/{{ crawls.name }}/refresh",
+          url: "/{{ project.name }}/crawls/{{ crawl.name }}/refresh",
           success: function() {console.log('success')}
         });
     });
@@ -30,9 +30,9 @@ $( document ).ready(function() {
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         {% if plots[0] %}
         {% for x in plots %}
-            <div class='col-sm-2'>
+            <div class='col-sm-6'>
                 <!-- In plot_hack branch was x instead of x.plot?-->
-                {{ x.plot|safe }}
+                {{ x | safe }}
             </div>
         {% endfor %}
         {% else %}

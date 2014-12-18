@@ -160,6 +160,7 @@ class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
+    url = db.Column(db.String(140))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     plots = db.relationship('Plot', secondary=plot_dashboard, \
         backref=db.backref('dashboard', lazy='dynamic'))
