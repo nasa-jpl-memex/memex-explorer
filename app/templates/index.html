@@ -33,7 +33,7 @@
                 </div>
                 <a href="/{{project.name}}">
                     <div class="panel-footer">
-                        <p>{{ project.description }}</p>
+                        <p>{{ project.description|truncate(255, True) }}</p>
                  
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                         <div class="clearfix"></div>
