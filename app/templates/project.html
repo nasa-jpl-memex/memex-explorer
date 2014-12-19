@@ -113,40 +113,4 @@
     </div>
 </div>
 
-<div class='row'>
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <h3> Add apps to {{ project.name }}</h3>
-        <div class='col-sm-3 text-center'>
-         <a href="{{ url_for('add_crawl', project_name=project.name) }}" class='app-icon'>
-         <h1><i class="fa fa-search"></i></h1>
-            <h4>Crawls</h4>
-         </a>
-        </div>
-        <div class='col-sm-3 text-center'>
-         <a href="#" class='app-icon'>
-         <h1><i class="fa fa-line-chart"></i></h1>
-            <h4>Dashboards</h4>
-         </a>
-        </div>
-        <div class='col-sm-3 text-center'>
-         <a href="#" class='app-icon'>
-         <h1><i class="fa fa-database"></i></h1>
-            <h4>Data Sources</h4>
-         </a>
-        </div>
-        <div class='col-sm-3 text-center'>
-         <a href="{{ url_for('add_model', project_name=project.name) }}" class='app-icon'>
-         <h1><i class="fa fa-archive"></i></h1>
-            <h4>Data Models</h4>
-         </a>
-        </div>
-        <div class='col-sm-3 text-center'>
-         <a href="#" class='app-icon'>
-         <h1><i class="fa fa-image"></i></h1>
-            <h4>Image Space</h4>
-         </a>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
