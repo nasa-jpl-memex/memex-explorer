@@ -38,7 +38,8 @@ from .db_api import (get_project, get_crawl, get_crawls, get_dashboards,
 from .rest_api import api
 
 from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm
+                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm, \
+                    EditCrawlForm
 from .mail import send_email
 
 from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
@@ -144,6 +145,7 @@ def delete_project(project_name):
 def edit_project(project_name):
     form = EditProjectForm()
     project = get_project(project_name)
+    original_name = project.name
     if form.validate_on_submit():
         if form.name.data:
             project.name = form.name.data
@@ -152,7 +154,7 @@ def edit_project(project_name):
         if form.icon.data:
             project.icon = form.icon.data
         db.session.commit()
-        flash('%s has successfully been edited.' % project.name, 'success')
+        flash('%s has successfully been edited.' % original_name, 'success')
         return redirect(url_for('index'))
     return render_template("edit_project.html", form=form)
 
@@ -253,6 +255,34 @@ def delete_crawl(project_name, crawl_name):
     db.session.commit()
     flash('%s has successfully been deleted.' % crawl.name, 'success')
     return redirect(url_for('project', project_name=project_name))
+
+
+@app.route('/<project_name>/crawls/<crawl_name>/edit', methods=['POST', 'GET'])
+def edit_crawl(project_name, crawl_name):
+    project = get_project(project_name)
+    crawl = Crawl.query.filter_by(project_id=project.id, name=crawl_name).first()
+    form = EditCrawlForm()
+    if form.validate_on_submit():
+        if form.name.data:
+            crawl.name = form.name.data
+        if form.description.data:
+            crawl.description = form.description.data
+        if form.crawler.data == 'nutch':
+            crawl.crawler = form.crawler.data
+            crawl.data_model_id = ''
+        elif form.crawler.data == 'ache':
+            crawl.crawler = form.crawler.data
+        if form.seeds_list.data: 
+            seed_filename = secure_filename(form.seeds_list.data.filename)
+            form.seeds_list.data.save(SEED_FILES + seed_filename)
+            crawl.seeds_list = SEED_FILES + seed_filename
+        if form.data_model.data:
+            crawl.data_model_id = form.data_model.data.id
+        db.session.commit()
+        flash('%s has successfully been changed.' % crawl.name, 'success')
+        return redirect(url_for('project', project_name=project_name))
+
+    return render_template('edit_crawl.html', form=form)
 
 
 @app.route('/<project_name>/crawls/<crawl_name>/run', methods=['POST'])
