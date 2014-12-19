@@ -42,7 +42,7 @@ from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
 from .mail import send_email
 
 from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
-                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
+                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 
 from .auth import requires_auth
 from .plotting import plot_builder
@@ -455,7 +455,7 @@ def compare(project_name, image_space_name, image_name):
 
 @app.route('/static/<image_space_name>/images/<image_name>')
 def image_source(image_space_name, image_name):
-    img_dir = os.path.join(BASEDIR, 'static', image_space_name, 'images_blurred/')
+    img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_name, 'images_blurred/')
     img_filename = image_name
 
     return send_from_directory(img_dir, img_filename)
