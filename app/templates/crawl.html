@@ -82,10 +82,10 @@ $( document ).ready(function() {
               </button>
               </div>
               <div class='col-md-2'>
-              <button id="seedButton" type="button" class="btn btn-control">
+              <!-- <button id="seedButton" type="button" class="btn btn-control">
                   <i class="fa fa-file-o"></i>
-              </button>
-              <a href="{{ url_for('edit_crawl', project_name=project.name, crawl_name=crawl.name) }}">
+              </button> -->
+              <a href="{{ url_for('edit_crawl', project_name=project.name, crawl_name=crawl.name) }}" style='text-decoration:none;'>
                 <button id="editButton" type="button" class="btn btn-control">
                   <i class="fa fa-edit"></i>
                 </button>

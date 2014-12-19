@@ -386,10 +386,10 @@ ul.inline-icons{
   display:inline-block;
 }
 
-#editButton, #removeButton{
-  min-height:40px;
-  min-width:40px;
-}
+#editButton, #removeButton, #seedButton{
+    min-height:40px;
+    min-width:40px;
+  }
 
 .accordion-links{
   padding:10px;
