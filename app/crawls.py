@@ -15,8 +15,10 @@ class AcheCrawl(object):
         self.proc = None
 
     def start(self):
-        self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.config, self.seeds_file,
-                                      self.model_dir, LANG_DETECT_PATH])
+        with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
+            with open(os.path.join(self.crawl_dir,'stderr.txt'), 'w') as stderr:
+                self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.config, self.seeds_file,
+                                          self.model_dir, LANG_DETECT_PATH], stdout=stdout, stderr=stderr)
         return self.proc.pid
 
     def stop(self):

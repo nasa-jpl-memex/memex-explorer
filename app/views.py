@@ -273,6 +273,7 @@ def refresh(project_name, crawl_name):
     crawled = get_data_source(project.id, crawl_name + "-crawledpages")
     relevant = get_data_source(project.id, crawl_name + "-relevantpages")
     frontier = get_data_source(project.id, crawl_name + "-frontierpages")
+    #domain_sources = dict(crawled=crawled, relevant=relevant)
     domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
 
     domain = Domain(domain_sources, domain_plot)
@@ -313,6 +314,7 @@ def crawl_dash(project_name, crawl_name):
             relevant = get_data_source(project.id, crawl_name + "-relevantpages")
             frontier = get_data_source(project.id, crawl_name + "-frontierpages")
             domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
+            #domain_sources = dict(crawled=crawled, relevant=relevant)
 
             domain = Domain(domain_sources, domain_plot)
             domain_tag = domain.create_and_store()
