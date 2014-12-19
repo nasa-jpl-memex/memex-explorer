@@ -3,11 +3,11 @@
     <div class="accordion" id="accordion2">
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+           <a href="{{ url_for('crawls', project_name=project.name) }}">
           Crawls
           </a>
           {% if crawls[0] %}
-          <a href="{{ url_for('crawls', project_name=project.name) }}" style='float:right;'><i class="fa fa-list"></i></a>
+         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"  style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseOne" class="accordion-body collapse accordion-links">
@@ -23,11 +23,11 @@
       </div>
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+          <a href="#" >
             Dashboards
           </a>
           {% if dashboards[0] %}
-          <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseTwo" class="accordion-body collapse accordion-links">
@@ -45,11 +45,11 @@
       </div>
     <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
+          <a href="#">
             Data Models
           </a>
           {% if models[0] %}
-          <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseFour" class="accordion-body collapse accordion-links">
@@ -65,11 +65,11 @@
       </div>
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFive">
+          <a href="#">
             Image Spaces
           </a>
           {% if image_spaces[0] %}
-          <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFive" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseFive" class="accordion-body collapse accordion-links">
@@ -85,11 +85,11 @@
       </div>
       <div class="accordion-group">
         <div class="accordion-heading sidebar-buttons">
-          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+          <a href="#">
             Data Sources
           </a>
           {% if data_sources %}
-            <a href="#" style='float:right;'><i class="fa fa-list"></i></a>
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" style='float:right;'><i class="fa fa-list"></i></a>
           {% endif %}
         </div>
         <div id="collapseThree" class="accordion-body collapse accordion-links">
