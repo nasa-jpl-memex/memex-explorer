@@ -29,34 +29,6 @@
 
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-<<<<<<< HEAD
-=======
-{% if crawls.count() or dashboards.count() or images.count() %}
-    <h3>Apps in {{ project.name }}</h3>
-    <ul class="list-group">
-        {%  for w in crawls if crawls %}
-        <li class="list-group-item">
-            <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}"><i class="fa fa-search"></i>  {{ w.name }}</a>
-        </li>
-        {% endfor %}
-        {% for x in dashboards if dashboards %}
-        <li class="list-group-item">
-            <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}"><i class="fa fa-line-chart"></i> {{ x.name }}</a>
-        </li>
-        {% endfor %}
-        {% for x in images if images %}
-        <li class="list-group-item">
-            <a href="#"><i class="fa fa-image"></i> {{ x.name }}</a>
-        </li>
-        {% endfor %}
-        </ul>
-{% else %}
-    <h3> No apps installed in {{ project.name }}</h3>
-{% endif %}
-    </div>
-</div>
->>>>>>> master
-
     <div class="row">
         <div class="col-sm-3">
             <h3><a href="{{ url_for('crawls', project_name=project.name) }}">
