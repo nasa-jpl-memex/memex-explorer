@@ -243,16 +243,16 @@ def crawls(project_slug):
     return render_template('crawls.html')
 
 
-@app.route('/<project_slug>/crawls/<crawl_name>')
-def crawl(project_slug, crawl_name):
+@app.route('/<project_slug>/crawls/<crawl_slug>')
+def crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
-    crawl = get_crawl(crawl_name)
+    crawl = get_crawl(crawl_slug)
 
     if not project:
         flash("Project '%s' was not found." % project_slug, 'error')
         abort(404)
     elif not crawl:
-        flash("Crawl '%s' was not found." % crawl_name, 'error')
+        flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
     return render_template('crawl.html', crawl=crawl)
