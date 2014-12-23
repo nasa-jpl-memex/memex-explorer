@@ -6,9 +6,7 @@
            <a href="{{ url_for('crawls', project_slug=project.slug) }}">
           Crawls
           </a>
-          {% if crawls[0] %}
          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"  style='float:right;'><i class="fa fa-list"></i></a>
-          {% endif %}
         </div>
         <div id="collapseOne" class="accordion-body collapse accordion-links">
         {% for w in crawls if crawls %}
@@ -26,9 +24,7 @@
           <a href="#" >
             Dashboards
           </a>
-          {% if dashboards[0] %}
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo" style='float:right;'><i class="fa fa-list"></i></a>
-          {% endif %}
         </div>
         <div id="collapseTwo" class="accordion-body collapse accordion-links">
         {% for x in crawls %}
@@ -48,9 +44,7 @@
           <a href="#">
             Data Models
           </a>
-          {% if models[0] %}
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour" style='float:right;'><i class="fa fa-list"></i></a>
-          {% endif %}
         </div>
         <div id="collapseFour" class="accordion-body collapse accordion-links">
         {% for x in models %}
@@ -68,9 +62,7 @@
           <a href="#">
             Image Spaces
           </a>
-          {% if image_spaces[0] %}
           <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFive" style='float:right;'><i class="fa fa-list"></i></a>
-          {% endif %}
         </div>
         <div id="collapseFive" class="accordion-body collapse accordion-links">
         {% for x in image_spaces %}
