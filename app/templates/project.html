@@ -38,7 +38,7 @@
             <ul class="list-group">
                 {%  for w in crawls %}
                 <li class="list-group-item">
-                    <a href="{{ url_for('crawl', project_name=project.name, crawl_name=w.name) }}"><i class="fa fa-search"></i>  {{ w.name }}</a>
+                    <a href="{{ url_for('crawl', project_slug=project.slug, crawl_slug=w.slug) }}"><i class="fa fa-search"></i>  {{ w.name }}</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -49,12 +49,12 @@
 
         <div class="col-sm-3">
             <h3><a href="#">
-              <i class="fa fa-line-chart"> &nbsp; </i>Dashboards</a> &nbsp;&nbsp;&nbsp; <a href="{{ url_for('add_dashboard', project_name=project.name) }}"><i class="fa fa-plus-square"></i></h3>
+              <i class="fa fa-line-chart"> &nbsp; </i>Dashboards</a> &nbsp;&nbsp;&nbsp; <a href="{{ url_for('add_dashboard', project_slug=project.slug) }}"><i class="fa fa-plus-square"></i></h3>
             {%  if dashboards and dashboards[0] %}
             <ul class="list-group">
                 {% for x in dashboards %}
                 <li class="list-group-item">
-                    <a href="{{ url_for('dash', project_name=project.name, dashboard_name=x.name) }}"><i class="fa fa-line-chart"></i> {{ x.name }}</a>
+                    <a href="{{ url_for('dash', project_slug=project.slug, dashboard_name=x.name) }}"><i class="fa fa-line-chart"></i> {{ x.name }}</a>
                 </li>
                 {% endfor %}
             </ul>
