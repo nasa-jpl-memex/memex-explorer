@@ -83,25 +83,5 @@
           </div>
         </div>
       </div>
-      <div class="accordion-group">
-        <div class="accordion-heading sidebar-buttons">
-          <a href="#">
-            Data Sources
-          </a>
-          {% if data_sources %}
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree" style='float:right;'><i class="fa fa-list"></i></a>
-          {% endif %}
-        </div>
-        <div id="collapseThree" class="accordion-body collapse accordion-links">
-        {% for y in data_sources %}
-          <div class="accordion-inner">
-            <a href="#">{{ y.name }}</a>
-          </div>
-        {% endfor %}
-          <div class="accordion-inner">
-            <a href="#">+ Add Data Source</a>
-          </div>
-        </div>
-      </div>
     </div>
 </div>
