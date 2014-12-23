@@ -29,10 +29,9 @@
 
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <div class="row">
-        <div class="col-sm-3">
-            <h3><a href="{{ url_for('crawls', project_slug=project.slug) }}">
-              <i class="fa fa-search"> &nbsp; </i>Crawls</a> &nbsp;&nbsp;&nbsp; <a href="{{ url_for('add_crawl', project_slug=project.slug) }}"><i class="fa fa-plus-square"></i></h3>
+        <div class="col-sm-4">
+            <h4><a href="{{ url_for('crawls', project_slug=project.slug) }}">
+              <i class="fa fa-search"> &nbsp; </i>Crawls</a> &nbsp;&nbsp;&nbsp; <a href="{{ url_for('add_crawl', project_slug=project.slug) }}"><i class="fa fa-plus-square"></i></h4>
 
             {%  if crawls and crawls[0] %}
             <ul class="list-group">
@@ -47,70 +46,19 @@
             {% endif %}
         </div>
 
-        <div class="col-sm-3">
-            <h3><a href="#">
-              <i class="fa fa-line-chart"> &nbsp; </i>Dashboards</a> &nbsp;&nbsp;&nbsp; <a href="{{ url_for('add_dashboard', project_slug=project.slug) }}"><i class="fa fa-plus-square"></i></h3>
-            {%  if dashboards and dashboards[0] %}
-            <ul class="list-group">
-                {% for x in dashboards %}
-                <li class="list-group-item">
-                    <a href="{{ url_for('dash', project_slug=project.slug, dashboard_name=x.name) }}"><i class="fa fa-line-chart"></i> {{ x.name }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-                <p>No Dashboards Registered.</p>
-            {%  endif %}
-        </div>
-
-        <div class="col-sm-3">
-             <h3><a href="#">
-              <i class="fa fa-image"> &nbsp; </i>Image Spaces</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h3>
+        <div class="col-sm-4">
+             <h4><a href="#">
+              <i class="fa fa-image"> &nbsp; </i>Image Spaces</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h4>
             {%  if image_spaces and image_spaces[0] %}
             <ul class="list-group">
                 {% for x in image_spaces %}
                 <li class="list-group-item">
-                    <a href="#"><i class="fa fa-image"></i> {{ x.name }}</a>
+                    <a href="{{ url_for('image_table', project_slug = project.slug, image_space_slug=x.slug) }}"><i class="fa fa-image"></i> {{ x.name }}</a>
                 </li>
                 {% endfor %}
                 </ul>
             {% else %}
                 <p>No Image Spaces Registered.</p>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row">
-
-         <div class="col-sm-3">
-             <h3><a href="#">
-              <i class="fa fa-database"> &nbsp; </i>Data Sources</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h3>
-            {%  if data_sources and data_sources[0] %}
-            <ul class="list-group">
-                {% for x in data_sources %}
-                <li class="list-group-item">
-                    <a href="#"><i class="fa fa-database"></i> {{ x.name }}</a>
-                </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p>No Data Sources Registered.</p>
-            {% endif %}
-        </div>
-
-
-         <div class="col-sm-3">
-             <h3><a href="#">
-              <i class="fa fa-archive"> &nbsp; </i>Data Models</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h3>
-            {%  if models and models[0] %}
-            <ul class="list-group">
-                {% for x in models %}
-                <li class="list-group-item">
-                    <a href="#"><i class="fa fa-archive"></i> {{ x.name }}</a>
-                </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p>No Data Models Registered.</p>
             {% endif %}
         </div>
     </div>
