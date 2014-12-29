@@ -37,6 +37,15 @@ def get_models():
     return DataModel.query.all()
 
 
+def get_model(**kwargs):
+    if kwargs['name']:
+        return DataModel.query.filter_by(name=kwargs['name']).first()
+    elif kwargs['id']:
+        return DataModel.query.filter_by(id=kwargs['id']).first()
+    else:
+        return "Must supply either a record name or ID."
+
+
 def get_images():
     """Return all images under `project_id` that match `crawl_name`.
     """
@@ -86,13 +95,19 @@ def get_matches(project_id, image_name):
 #    # TODO modify db model so we have a link between image and image_space
 #     return
 
+def db_add_model(name):
+    model = DataModel(name=name, filename=MODEL_FILES + name)
+    db.session.add(model)
+    db.session.commit()
+    return get_model(name=name)
 
-def db_add_crawl(project, form, seed_filename):
+
+def db_add_crawl(project, form, seed_filename, model_id=None):
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
-                  data_model_id=form.data_model.data.id,
+                  data_model_id=model_id,
                   config = os.path.join(CONFIG_FILES,'config_default'),
                   seeds_list = SEED_FILES + seed_filename)
 

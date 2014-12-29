@@ -39,28 +39,36 @@
         <span style="color: red;">[{{error}}]</span>
         {% endfor %}
      </div>
-     
+     <br> 
    <div class="form-group">
        <label class="col-sm-2 control-label">New <br>Model</label>
       <div class='col-sm-3'>
-          <br>
-          <input id="radio1" class="model_options" name="model_radio" type="radio" value="new"> <br>
+          <div class='col-sm-2'>
+              <br>
+          <input id="radio1" class="model_options" name="model_radio" type="radio" value="new">
+          </div>
+          <div class='col-sm-6'>
         Name: {{form.new_model_name(class_="model_options")}}
-        {{ form.new_model(class_="model_options")|safe }}
+        <input class="model_options" type="file" id="new_model" name="new_model" multiple>
+    </div>
       </div>
       <label class="col-sm-2 control-label">Existing <br>Model</label>
       <div class="col-sm-3">
+          <div class='col-sm-2'>
           <br>
         <input id="radio2" class="model_radio model_options" name="model_radio" type="radio" value="existing">
-        {{form.data_model(class_="form-control model_options")}}
+    </div>
+      <div class="col-sm-10">
+          <br> {{form.data_model(class_="form-control model_options")}}
       </div>
+  </div>
       {% for error in form.errors.data_model %}
       <span style="color: red;">[{{error}}]</span>
       {% endfor %}
    </div>
    <br><br>
 
-    <div class="form-group">
+   {# <div class="form-group">
         <label class="col-sm-2 control-label">{{form.config.label}}</label>
         <div class="col-sm-6">
           {{ form.config|safe }}
@@ -68,7 +76,7 @@
         {% for error in form.errors.config %}
         <span style="color: red;">[{{error}}]</span>
         {% endfor %}
-    </div>
+    </div> #}
     
    
     <div class="form-group">
