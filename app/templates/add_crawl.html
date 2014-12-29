@@ -44,8 +44,9 @@
        <label class="col-sm-2 control-label">New <br>Model</label>
       <div class='col-sm-3'>
           <br>
-          <input id="radio1" class="model_options" name="model_radio" type="radio" value="new"> 
-        <input type="file" class="model_options" id="new_model">
+          <input id="radio1" class="model_options" name="model_radio" type="radio" value="new"> <br>
+        Name: {{form.new_model_name(class_="model_options")}}
+        {{ form.new_model(class_="model_options")|safe }}
       </div>
       <label class="col-sm-2 control-label">Existing <br>Model</label>
       <div class="col-sm-3">
@@ -57,6 +58,7 @@
       <span style="color: red;">[{{error}}]</span>
       {% endfor %}
    </div>
+   <br><br>
 
     <div class="form-group">
         <label class="col-sm-2 control-label">{{form.config.label}}</label>

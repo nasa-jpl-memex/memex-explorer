@@ -24,6 +24,8 @@ class CrawlForm(Form):
     seeds_list = FileField('Seeds List', validators=[DataRequired()])
     data_model = QuerySelectField('Data Model', query_factory=data_models, \
                                   allow_blank=True, get_label='name')
+    new_model = FileField()
+    new_model_name = StringField()
 
 
 class MonitorDataForm(Form):
