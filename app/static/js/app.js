@@ -3,7 +3,7 @@ var CrawlForm, crawl_form,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 CrawlForm = (function(_super) {
-  var crawler, data_model, model_options, model_radio, new_model;
+  var crawler, data_model, model_options, new_model, radio1, radio2;
 
   __extends(CrawlForm, _super);
 
@@ -19,7 +19,9 @@ CrawlForm = (function(_super) {
 
   model_options = $('.model_options');
 
-  model_radio = $(".model_radio");
+  radio1 = $('#radio1');
+
+  radio2 = $('#radio2');
 
   CrawlForm.prototype.initialize = function() {
     return model_options.prop("disabled", true);
@@ -27,21 +29,21 @@ CrawlForm = (function(_super) {
 
   crawler.change(function() {
     if (crawler.val() === "ache") {
-      return model_options.prop("disabled", false);
+      radio1.prop("disabled", false);
+      return radio2.prop("disabled", false);
     } else {
       return model_options.prop("disabled", true);
     }
   });
 
-  model_radio.change(function() {
-    if (model_radio.val() === "new") {
-      new_model.prop("disabled", false);
-      data_model.prop("disabled", true);
-    }
-    if (model_radio.val() === "existing") {
-      new_model.prop("disabled", true);
-      return data_model.prop("disabled", false);
-    }
+  radio1.change(function() {
+    data_model.prop("disabled", true);
+    return new_model.prop("disabled", false);
+  });
+
+  radio2.change(function() {
+    data_model.prop("disabled", false);
+    return new_model.prop("disabled", true);
   });
 
   return CrawlForm;

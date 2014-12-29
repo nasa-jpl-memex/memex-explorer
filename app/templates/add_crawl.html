@@ -44,17 +44,14 @@
        <label class="col-sm-2 control-label">New <br>Model</label>
       <div class='col-sm-3'>
           <br>
-          <input class="model_radio model_options" name="model_radio" type="radio" value="new" checked> 
+          <input id="radio1" class="model_options" name="model_radio" type="radio" value="new"> 
         <input type="file" class="model_options" id="new_model">
       </div>
       <label class="col-sm-2 control-label">Existing <br>Model</label>
       <div class="col-sm-3">
           <br>
-        <input class="model_radio model_options" name="model_radio" type="radio" value="existing">
-        <select class="form-control model_options" id="crawler" name="crawler">
-            <option value="nutch">Nutch</option>
-            <option value="ache">Ache</option>
-        </select>
+        <input id="radio2" class="model_radio model_options" name="model_radio" type="radio" value="existing">
+        {{form.data_model(class_="form-control model_options")}}
       </div>
       {% for error in form.errors.data_model %}
       <span style="color: red;">[{{error}}]</span>
