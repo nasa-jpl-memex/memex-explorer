@@ -6,14 +6,13 @@
 $( document ).ready(function() {
 
 
-    ME = {polling: true};
+    var ME = ME || {};
+    ME.polling = true;
 
     function show_error(){
-
             ME.polling = false;
             // alert("Error: could not start crawl.")
             $( '#status' ).text( "Error (could not start crawl)" );
-
     }
 
     $('#playButton').on('click', function() {
@@ -44,7 +43,10 @@ $( document ).ready(function() {
             if (retval == "Error") show_error();
             else $( '#status' ).text(retval);
           },
-          });
+          failure: function() {
+            show_error();
+          }
+        });
     });
 
     (function pollStatus() {
@@ -58,7 +60,7 @@ $( document ).ready(function() {
             success: function(data) { $('#status').text( data ) },
             complete: setTimeout(pollStatus, 5000),
             timeout: 2000
-    });
+        });
     })();
 });
 
@@ -76,7 +78,7 @@ $( document ).ready(function() {
 </div>
 <div class='row'>
         <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
-            <div class='col-md-2'>
+            <div class='col-xs-2'>
               <button id="playButton" title="Start Crawl" type="button" class="btn btn-control">
                   <i class="fa fa-play"></i>
               </button>
@@ -84,7 +86,7 @@ $( document ).ready(function() {
                   <span class="fa fa-stop"></span>
               </button>
               </div>
-              <div class='col-md-2'>
+              <div class='col-xs-2'>
               <!-- <button id="seedButton" type="button" class="btn btn-control">
                   <i class="fa fa-file-o"></i>
               </button> -->
