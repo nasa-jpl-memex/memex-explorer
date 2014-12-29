@@ -5,40 +5,30 @@
 <script>
 $( document ).ready(function() {
 
-    function playSuccess() {
-        console.log("Run OK")
-        // TODO disable button?
-        pollStatusNow();
+
+    ME = {polling: true};
+
+    function show_error(){
+
+            ME.polling = false;
+            // alert("Error: could not start crawl.")
+            $( '#status' ).text( "Error (could not start crawl)" );
+
     }
 
-    function stopSuccess() {
-        console.log("Stop OK");
-        // TODO disable button?
-        pollStatusNow();
-    }
-
-    function pollStatusNow() {
-        $.ajax({
-            url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/status",
-            type: "GET",
-            success: function(data) {
-                $( '#status' ).text( data );
-                console.log("polling now " + data);
-            },
-            timeout: 2000
-        });
-    }
-
-    $('#playButton').on('click', function(){
+    $('#playButton').on('click', function() {
 
         $( '#status' ).text( "Starting..." );
 
         $.ajax({
           type: "POST",
-          url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/run",
-          success: playSuccess,
+            url: "{{ url_for('run_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}",
+          success: function(retval) {
+            if (retval == "Error") show_error();
+            else $( '#status' ).text(retval);
+          },
           failure: function() {
-            $( '#status' ).text( "Error (could not start crawl)" );
+            show_error();
           }
         });
     });
@@ -49,20 +39,24 @@ $( document ).ready(function() {
 
         $.ajax({
           type: "POST",
-          url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stop",
-          success: stopSuccess
+            url: "{{ url_for('stop_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}",
+          success: function(retval) {
+            if (retval == "Error") show_error();
+            else $( '#status' ).text(retval);
+          },
           });
     });
 
     (function pollStatus() {
+
+      // If polling has been turned off, break the loop
+      if (!ME.polling) return;
+
         $.ajax({
-            url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/status",
+            url: "{{ url_for('status_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}",
             type: "GET",
-            success: function(data) {
-                $( '#status' ).text( data );
-                console.log("polling " + data);
-            },
-            complete: setTimeout(function() {pollStatus()}, 5000),
+            success: function(data) { $('#status').text( data ) },
+            complete: setTimeout(pollStatus, 5000),
             timeout: 2000
     });
     })();
