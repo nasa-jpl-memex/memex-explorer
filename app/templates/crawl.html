@@ -30,19 +30,28 @@ $( document ).ready(function() {
     }
 
     $('#playButton').on('click', function(){
+
+        $( '#status' ).text( "Starting..." );
+
         $.ajax({
           type: "POST",
           url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/run",
-          success: playSuccess
+          success: playSuccess,
+          failure: function() {
+            $( '#status' ).text( "Error (could not start crawl)" );
+          }
         });
     });
 
     $('#stopButton').on('click', function(){
+
+        $( '#status' ).text( "Stopping..." );
+
         $.ajax({
           type: "POST",
           url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stop",
           success: stopSuccess
-        });
+          });
     });
 
     (function pollStatus() {
@@ -68,7 +77,7 @@ $( document ).ready(function() {
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>{{ crawl.name }}</h1>
-    <p>Status: <span id="status">Unknown</span></p>
+    <p>Crawl Status: <span id="status">Unknown</span></p>
   </div>
 </div>
 <div class='row'>
