@@ -3,7 +3,6 @@ import os
 
 from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH, IMAGE_SPACE_PATH
 
-
 class AcheCrawl(object):
 
     def __init__(self, crawl_name, seeds_file, model_name, conf_name):
@@ -16,7 +15,6 @@ class AcheCrawl(object):
         # TODO record start and stop variables
         #self.start_timestamp
         #self.stop_timestamp
-
 
     def start(self):
         with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
