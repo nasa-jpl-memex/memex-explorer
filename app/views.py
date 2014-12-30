@@ -193,18 +193,25 @@ def add_crawl(project_slug):
     form = CrawlForm()
     if form.validate_on_submit():
         if form.new_model_name.data:
-            os.mkdir(MODEL_FILES + form.new_model_name.data)
-            files = request.files.getlist("files")
-            for x in files:
-                x.save(MODEL_FILES + form.new_model_name.data + '/' + x.filename) 
+            model_directory = MODEL_FILES + form.new_model_name.data
+            os.mkdir(model_directory)
+            model_file = secure_filename(form.new_model_file.data.filename)
+            model_features = secure_filename(form.new_model_features.data.filename)
+            form.new_model_file.data.save(model_directory + '/' + model_file)
+            form.new_model_features.data.save(model_directory + '/' + model_features)
             db_add_model(form.new_model_name.data)
+            model = get_model(name=form.new_model_name.data)
+        elif form.data_model.data:
+            model = get_model(id=form.data_model.data.id)
+        else:
+            model = None
         seed_filename = secure_filename(form.seeds_list.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
         project = get_project(project_slug)
-        crawl = db_add_crawl(project, form, seed_filename)
+        crawl = db_add_crawl(project, form, seed_filename, model)
         subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
 
         if crawl.crawler == 'ache':

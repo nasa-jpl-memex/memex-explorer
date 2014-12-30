@@ -3,6 +3,7 @@ import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
 from .models import (Project, Crawl, Dashboard, Image,
                      DataSource, Plot, DataModel, ImageSpace)
+from webhelpers import text
 
 MATCHES = app.MATCHES
 
@@ -101,14 +102,19 @@ def db_add_model(name):
     db.session.commit()
 
 
-def db_add_crawl(project, form, seed_filename):
+def db_add_crawl(project, form, seed_filename, model=None):
+    try:
+        data_model = model.id
+    except:
+        data_model = None
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
-                  data_model_id=form.data_model.data,
+                  data_model_id=data_model,
                   config = os.path.join(CONFIG_FILES,'config_default'),
-                  seeds_list = SEED_FILES + seed_filename)
+                  seeds_list = SEED_FILES + seed_filename,
+                  slug=text.urlify(form.name.data))
 
     db.session.add(crawl)
     db.session.commit()

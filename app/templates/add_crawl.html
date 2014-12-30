@@ -49,7 +49,8 @@
           </div>
           <div class='col-sm-6'>
         Name: {{form.new_model_name(class_="model_options")}}
-        <input class="model_options" type="file" id="new_model" name="new_model" multiple>
+        Model: {{form.new_model_file(class_="model_options")|safe}}
+        Features: {{form.new_model_features(class_="model_options")|safe}}
     </div>
       </div>
       <label class="col-sm-2 control-label">Existing <br>Model</label>
