@@ -536,11 +536,10 @@ def contact():
 
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/compare/')
 def compare(project_slug, image_space_slug, image_name):
-
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
     # TODO change to query by image_space. Requires db changes.
-    images = get_images()
+    images = get_image_space(image_space_slug)
     img = get_image(image_name)
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
@@ -573,20 +572,18 @@ def compare(project_slug, image_space_slug, image_name):
                             # external_matches=external_matches
                              )
 
-@app.route('/static/<image_space_slug>/images/<image_name>')
+@app.route('/static/images/<image_space_slug>/<image_name>')
 def image_source(image_space_slug, image_name):
-    img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images_blurred/')
+    img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug)
     img_filename = image_name
-
     return send_from_directory(img_dir, img_filename)
 
 
 @app.route('/<project_slug>/image_space/<image_space_slug>/')
 def image_table(project_slug, image_space_slug):
-    #images = get_images_in_space(project_slug, image_space_name)
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(name=image_space_slug).first()
-    images = get_images()
+    images = get_images(image_space.slug)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
