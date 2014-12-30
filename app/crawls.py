@@ -28,14 +28,15 @@ class AcheCrawl(object):
             self.proc.kill()
 
     def status(self):
+        self.proc.poll()
         if self.proc is None:
             return "No process exists"
         elif self.proc.returncode is None:
             return "Running"
         elif self.proc.returncode < 0:
-            return "Stopped (Unused)"
+            return "Process was terminated by signal %s" % self.proc.returncode
         else:
-            return "An error occurred"
+            return "Process ended"
 
 
 class NutchCrawl(object):
