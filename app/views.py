@@ -193,6 +193,10 @@ def add_crawl(project_slug):
     form = CrawlForm()
     if form.validate_on_submit():
         if form.new_model_name.data:
+            registered_model = DataModel.query.filter_by(name=form.new_model_name.data).first()
+            if registered_model:
+                flash('Data model name already exists, please choose another name', 'error')
+                return render_template('add_crawl.html', form=form)
             model_directory = MODEL_FILES + form.new_model_name.data
             os.mkdir(model_directory)
             model_file = secure_filename(form.new_model_file.data.filename)
