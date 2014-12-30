@@ -106,7 +106,7 @@ def db_add_crawl(project, form, seed_filename):
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
-                  data_model_id=form.data_model.data.id,
+                  data_model_id=form.data_model.data,
                   config = os.path.join(CONFIG_FILES,'config_default'),
                   seeds_list = SEED_FILES + seed_filename)
 

@@ -196,7 +196,7 @@ def add_crawl(project_slug):
             os.mkdir(MODEL_FILES + form.new_model_name.data)
             files = request.files.getlist("files")
             for x in files:
-                x.save(MODEL_FILES + form.name.data + '/' + x.filename) 
+                x.save(MODEL_FILES + form.new_model_name.data + '/' + x.filename) 
             db_add_model(form.new_model_name.data)
         seed_filename = secure_filename(form.seeds_list.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
