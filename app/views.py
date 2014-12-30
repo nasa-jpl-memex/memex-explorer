@@ -33,7 +33,8 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
-                     db_init_ache, get_crawl_model, get_model, get_models, get_image_space)
+                     db_init_ache, get_crawl_model, get_model, get_models, get_image_space, \
+                     db_add_model)
 
 from .rest_api import api
 
@@ -191,21 +192,19 @@ def add_project():
 def add_crawl(project_slug):
     form = CrawlForm()
     if form.validate_on_submit():
-    #    if form.new_model_name.data:
-    #        os.mkdir(MODEL_FILES + form.new_model_name.data)
-    #        files = request.files.getlist("files")
-    #        for x in files:
-    #            x.save(MODEL_FILES + form.name.data + '/' + x.filename) 
-    #        model = db_add_model(form.new_model_name.data)
-    #    elif form.data_model.id.data:
-            #        model = get_model(id=form.data_model.id.data)
+        if form.new_model_name.data:
+            os.mkdir(MODEL_FILES + form.new_model_name.data)
+            files = request.files.getlist("files")
+            for x in files:
+                x.save(MODEL_FILES + form.name.data + '/' + x.filename) 
+            db_add_model(form.new_model_name.data)
         seed_filename = secure_filename(form.seeds_list.data.filename)
         form.seeds_list.data.save(SEED_FILES + seed_filename)
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
         project = get_project(project_slug)
-        crawl = db_add_crawl(project, form, seed_filename, model)
+        crawl = db_add_crawl(project, form, seed_filename)
         subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
 
         if crawl.crawler == 'ache':
@@ -218,6 +217,8 @@ def add_crawl(project_slug):
         flash('%s has successfully been registered!' % form.name.data, 'success')
         return redirect(url_for('crawl', project_slug=get_project(project_slug),
                                          crawl_name=form.name.data))
+    else:
+        print(form.errors)
 
     return render_template('add_crawl.html', form=form)
 

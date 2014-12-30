@@ -38,12 +38,12 @@ def get_models():
 
 
 def get_model(**kwargs):
-    if kwargs['name']:
+    if 'name' in kwargs:
         return DataModel.query.filter_by(name=kwargs['name']).first()
-    elif kwargs['id']:
+    elif 'id' in kwargs:
         return DataModel.query.filter_by(id=kwargs['id']).first()
     else:
-        return "Must supply either a record name or ID."
+        raise Exception("Must supply either a record name or ID.")
 
 
 def get_images():
@@ -99,15 +99,14 @@ def db_add_model(name):
     model = DataModel(name=name, filename=MODEL_FILES + name)
     db.session.add(model)
     db.session.commit()
-    return get_model(name=name)
 
 
-def db_add_crawl(project, form, seed_filename, model_id=None):
+def db_add_crawl(project, form, seed_filename):
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
-                  data_model_id=model_id,
+                  data_model_id=form.data_model.data.id,
                   config = os.path.join(CONFIG_FILES,'config_default'),
                   seeds_list = SEED_FILES + seed_filename)
 
