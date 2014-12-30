@@ -572,7 +572,7 @@ def compare(project_slug, image_space_slug, image_name):
                             # external_matches=external_matches
                              )
 
-@app.route('/static/<image_space_slug>/images/<image_name>')
+@app.route('/<image_space_slug>/images/<image_name>')
 def image_source(image_space_slug, image_name):
     img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images')
     img_filename = image_name

@@ -45,7 +45,7 @@ class NutchCrawl(object):
     def __init__(self, seed_dir, crawl_dir):
         self.seed_dir =  os.path.join(SEED_FILES, seed_dir)
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_dir)
-        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl_dir)
+        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl_dir, 'images')
         #TODO Switch from "1" to parameter.
         # For now let's set up number_of_rounds to 1.
         self.number_of_rounds = "1"

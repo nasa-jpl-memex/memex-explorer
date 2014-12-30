@@ -1,6 +1,6 @@
 from . import app, db
 import os
-from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH
+from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 from .models import (Project, Crawl, Dashboard, Image,
                      DataSource, Plot, DataModel, ImageSpace)
 
