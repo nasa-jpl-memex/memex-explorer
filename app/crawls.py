@@ -70,3 +70,26 @@ class NutchCrawl(object):
         else:
             self.status = "Crawl process ended"
         return self.status
+
+    def dump_images(self):
+        subprocess.Popen(['mkdir', self.img_dir]).wait()
+        with open(os.path.join(self.crawl_dir, 'img_stdout.txt'), 'w') as stdout:
+            with open(os.path.join(self.crawl_dir,'img_stderr.txt'), 'w') as stderr:
+                img_dump_proc = subprocess.Popen(['nutch', 'dump', '-outputDir', self.img_dir, '-segment',
+                              os.path.join(self.crawl_dir, 'segments'), '-mimetype', 'image/jpeg', 'image/png'],
+                                            stdout=stdout, stderr=stderr)
+                img_dump_proc.wait()
+
+        return "Dumping images"
+
+    def stats(self):
+        with open(os.path.join(self.crawl_dir, 'stats_stdout.txt'), 'w') as stdout:
+            with open(os.path.join(self.crawl_dir,'stats_stderr.txt'), 'w') as stderr:
+                stats_proc = subprocess.Popen(['nutch', 'readdb', os.path.join(self.crawl_dir, 'crawldb'), '-stats'],
+                                              stdout=stdout, stderr=stderr)
+                # Wait until process finishes
+                stats_proc.wait()
+        with open(os.path.join(self.crawl_dir, 'stats_stdout.txt'), 'r') as stdout:
+            stats_output = stdout.read()
+
+        return stats_output
