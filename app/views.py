@@ -25,6 +25,8 @@ from blaze import resource, discover, Data, into, compute
 from pandas import DataFrame
 from bokeh.plotting import ColumnDataSource
 
+import exifread
+
 # Local Imports
 # -------------
 
@@ -33,7 +35,8 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
-                     db_init_ache, get_crawl_model, get_models, get_image_space)
+                     db_init_ache, get_crawl_model, get_models, db_add_image_space_from_crawl,
+                     db_process_exif, get_image_space)
 
 from .rest_api import api
 
@@ -59,7 +62,7 @@ from .viz.plot import plot_exists
 
 
 # Dictionary of crawls by key(project_slug-crawl_name)
-CRAWLS_RUNNING = {}
+CRAWLS = {}
 
 
 @app.context_processor
@@ -299,7 +302,7 @@ def edit_crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/run', methods=['POST'])
 def run_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
-    if CRAWLS_RUNNING.has_key(key):
+    if CRAWLS.has_key(key):
         return "Crawl is already running."
     else:
         crawl = get_crawl(crawl_slug)
@@ -309,12 +312,12 @@ def run_crawl(project_slug, crawl_slug):
             crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name,
                                        conf_name=crawl.config)
             pid = crawl_instance.start()
-            CRAWLS_RUNNING[key] = crawl_instance
+            CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         elif crawl.crawler=="nutch":
             crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
             pid = crawl_instance.start()
-            CRAWLS_RUNNING[key] = crawl_instance
+            CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         else:
             abort(400)
@@ -323,10 +326,9 @@ def run_crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/stop', methods=['POST'])
 def stop_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
-    crawl_instance = CRAWLS_RUNNING.get(key)
+    crawl_instance = CRAWLS.get(key)
     if crawl_instance is not None:
         crawl_instance.stop()
-        del CRAWLS_RUNNING[key]
         return "Crawl stopped"
     else:
         abort(400)
@@ -368,7 +370,7 @@ def crawl_dash(project_slug, crawl_slug):
     crawl = get_crawl(crawl_slug)
 
     key = project_slug + '-' + crawl_slug
-    crawl_instance = CRAWLS_RUNNING.get(key)
+    crawl_instance = CRAWLS.get(key)
 
     if crawl.crawler == 'ache':
         # TODO put all this is a function create_ache_dashboard
@@ -411,11 +413,12 @@ def crawl_dash(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/status', methods=['GET'])
 def status_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
-    crawl_instance = CRAWLS_RUNNING.get(key)
+    crawl_instance = CRAWLS.get(key)
     if crawl_instance is not None:
-        return crawl_instance.status()
+        status = crawl_instance.get_status()
+        return status
     else:
-        return "Stopped"
+        return "Crawl not started"
 
 
 
