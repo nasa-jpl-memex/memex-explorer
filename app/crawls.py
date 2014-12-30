@@ -1,7 +1,7 @@
 import subprocess
 import os
 
-from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH
+from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH, IMAGE_SPACE_PATH
 
 
 class AcheCrawl(object):
@@ -41,12 +41,14 @@ class AcheCrawl(object):
 class NutchCrawl(object):
 
     def __init__(self, seed_dir, crawl_dir):
-        self.seed_dir =  SEED_FILES + "/" + seed_dir
-        self.crawl_dir = CRAWLS_PATH + "/" + crawl_dir
-        #TODO Switch from "2" to parameter.
-        # For now let's set up number_of_rounds to 2.
-        self.number_of_rounds = "2"
+        self.seed_dir =  os.path.join(SEED_FILES, seed_dir)
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_dir)
+        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl_dir)
+        #TODO Switch from "1" to parameter.
+        # For now let's set up number_of_rounds to 1.
+        self.number_of_rounds = "1"
         #self.number_of_rounds = numberOfRounds
+        self.status = ""
         self.proc = None
 
     def start(self):
