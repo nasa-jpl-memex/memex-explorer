@@ -230,30 +230,6 @@ def add_crawl(project_slug):
     return render_template('add_crawl.html', form=form)
 
 
-@app.route('/<project_slug>/add_model', methods=['GET', 'POST'])
-def add_model(project_slug):
-    form = DataModelForm()
-    if form.validate_on_submit():
-        registered_model = DataModel.query.filter_by(name=form.name.data).first()
-        if registered_model:
-            flash('Data model name already exists, please choose another name', 'error')
-            return render_template('add_data_model.html', form=form)
-        files = request.files.getlist("files")
-        os.mkdir(MODEL_FILES + form.name.data)
-        for x in files:
-            x.save(MODEL_FILES + form.name.data + '/' + x.filename)
-        model = DataModel(name=form.name.data,
-                          filename=MODEL_FILES + form.name.data)
-
-        db.session.add(model)
-        db.session.commit()
-        flash('Model has successfully been registered!', 'success')
-        return redirect(url_for('project',
-                                project_slug=get_project(project_slug).name))
-
-    return render_template('add_data_model.html', form=form)
-
-
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
     return render_template('crawls.html')
