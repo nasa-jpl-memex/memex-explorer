@@ -57,6 +57,28 @@ $( document ).ready(function() {
             timeout: 2000
     });
     })();
+
+    $('#imageDump').on('click', function(){
+        $.ajax({
+          type: "POST",
+          url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/dump",
+          success: console.log("crawlImagesDumped")
+        }).done(function() {
+          window.location.href = "/{{ project.slug }}/image_space/{{ crawl.slug }}"
+        });
+    });
+
+    $('#stats').on('click', function(){
+        $.ajax({
+          type: "GET",
+          url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
+          success: function(data) {
+                $( '#stats-data' ).text( data );
+                console.log("stats-data" + data);
+            },
+        });
+    });
+
 });
 
 </script>
