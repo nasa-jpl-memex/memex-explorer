@@ -55,6 +55,7 @@ def get_plot(plot_name):
     """
     return Plot.query.filter_by(name=plot_name).first()
 
+
 def get_image(image_name):
     """Return the image that matches `image_id`.
     """
@@ -80,21 +81,14 @@ def get_matches(project_id, image_name):
     return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
 
 
-#def get_images_in_space(project_slug, image_space_slug):
-#     """Return all images under `project_id` that match metadata on `image_id`.
-#    """
-#    # TODO modify db model so we have a link between image and image_space
-#     return
-
-
 def db_add_crawl(project, form, seed_filename):
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
                   data_model_id=form.data_model.data.id,
-                  config = os.path.join(CONFIG_FILES,'config_default'),
-                  seeds_list = SEED_FILES + seed_filename)
+                  config=os.path.join(CONFIG_FILES, 'config_default'),
+                  seeds_list=SEED_FILES + seed_filename)
 
     db.session.add(crawl)
     db.session.commit()
@@ -122,9 +116,9 @@ def db_init_ache(project, crawl):
 
     harvest_data_uri = os.path.join(CRAWLS_PATH, crawl.name, 'data/data_monitor/harvestinfo.csv')
     harvest_data = DataSource(name=key + '-harvestinfo',
-                               data_uri=harvest_data_uri,
-                               project_id=project.id,
-                               crawl=crawl)
+                              data_uri=harvest_data_uri,
+                              project_id=project.id,
+                              crawl=crawl)
 
     crawl.data_source.append(crawled_data)
     crawl.data_source.append(relevant_data)
@@ -156,6 +150,43 @@ def db_init_ache(project, crawl):
     db.session.add(harvest_plot)
     db.session.commit()
 
+
+def db_process_exif(exif_data, img_path, image_space):
+    """ Store the EXIF data from the image in the db"""
+    LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
+    MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
+    BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
+    MISN = getattr(exif_data.get('MakerNote InternalSerialNumber'), 'values', None)
+    MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
+    IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
+
+    image = Image(img_file=img_path,
+                  EXIF_LensSerialNumber=LSVN,
+                  MakerNote_SerialNumberFormat=MSNF,
+                  EXIF_BodySerialNumber=BSN,
+                  MakerNote_InternalSerialNumber=MISN,
+                  MakerNote_SerialNumber=MSN,
+                  Image_BodySerialNumber=IBSN,
+                  Uploaded=1,
+    )
+
+    image_space.images.append(image)
+    # Add uploaded image to the database
+    db.session.add(image)
+    db.session.commit()
+
+
+def db_add_image_space_from_crawl(project, crawl):
+    image_space = ImageSpace(images_location=os.path.join(IMAGE_SPACE_PATH, crawl.slug),
+                             project_id=project.id,
+                             name=crawl.slug,
+                             slug=crawl.slug,
+    )
+
+    # Add uploaded image to the database
+    db.session.add(image_space)
+    db.session.commit()
+    return image_space
 
 def set_match(source_id, match_id, match):
     if match:
