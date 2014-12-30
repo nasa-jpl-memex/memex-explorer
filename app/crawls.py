@@ -14,6 +14,7 @@ class AcheCrawl(object):
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_name)
         self.proc = None
 
+
     def start(self):
         with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
             with open(os.path.join(self.crawl_dir,'stderr.txt'), 'w') as stderr:
@@ -47,9 +48,9 @@ class NutchCrawl(object):
         self.number_of_rounds = "2"
         #self.number_of_rounds = numberOfRounds
         self.proc = None
-        self.create_dir = subprocess.Popen(['mkdir', self.crawl_dir])
 
     def start(self):
+        subprocess.Popen(['mkdir', self.crawl_dir]).wait()
         self.proc = subprocess.Popen(['crawl', self.seed_dir, self.crawl_dir, self.number_of_rounds])
         return self.proc.pid
 
@@ -58,12 +59,14 @@ class NutchCrawl(object):
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
 
-    def status(self):
+    def get_status(self):
+        self.proc.poll()
         if self.proc is None:
-            return "No process exists"
+            self.status = "No process exists"
         elif self.proc.returncode is None:
-            return "Running"
+            self.status = "Running crawl"
         elif self.proc.returncode < 0:
-            return "Stopped (Unused)"
+            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
         else:
-            return "An error occurred"
+            self.status = "Crawl process ended"
+        return self.status
