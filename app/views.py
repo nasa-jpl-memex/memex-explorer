@@ -421,6 +421,54 @@ def status_crawl(project_slug, crawl_slug):
         return "Crawl not started"
 
 
+@app.route('/<project_slug>/crawls/<crawl_slug>/stats', methods=['GET'])
+def stats_crawl(project_slug, crawl_slug):
+    key = project_slug + '-' + crawl_slug
+    crawl_instance = CRAWLS.get(key)
+    if crawl_instance is not None:
+        return crawl_instance.stats()
+    else:
+        crawl = get_crawl(crawl_slug)
+        seeds_list = crawl.seeds_list
+        if crawl.crawler=="ache":
+            model = get_crawl_model(crawl)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name,
+                                       conf_name=crawl.config)
+            #TODO get ache stats
+            #crawl_instance.stats()
+            print(crawl_instance)
+            return "No stats for ACHE crawls"
+
+        elif crawl.crawler=="nutch":
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+            print("nutch instance" + str(crawl_instance))
+            stats_output = crawl_instance.stats()
+            print("crawl stats:" + stats_output)
+            return stats_output
+
+
+@app.route('/<project_slug>/crawls/<crawl_slug>/dump', methods=['POST'])
+def dump_images(project_slug, crawl_slug):
+    project = get_project(project_slug)
+    key = project_slug + '-' + crawl_slug
+    crawl = get_crawl(crawl_slug)
+    crawl_instance = CRAWLS.get(key)
+    if crawl_instance is not None and crawl.crawler=="ache":
+        return "No image dump for ACHE crawls"
+    elif crawl_instance is not None and crawl.crawler=="nutch":
+        crawl_instance.dump_images()
+        image_space = db_add_image_space_from_crawl(crawl=crawl, project=project)
+        images = os.listdir(crawl_instance.img_dir)
+        for image in images:
+            image_path = os.path.join(crawl_instance.img_dir, image)
+            with open(image_path, 'rb') as f:
+                exif_data = exifread.process_file(f)
+                db_process_exif(exif_data, image, image_space)
+        print("Images dumped for NUTCH crawl %s" % crawl.name)
+        return redirect(url_for('image_table', project_slug=project.slug, image_space_slug=crawl.slug))
+    else:
+        return "Could not dump images"
+
 
 # Plot & Dashboard
 # -----------------------------------------------------------------------------
