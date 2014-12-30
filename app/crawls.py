@@ -13,6 +13,9 @@ class AcheCrawl(object):
         self.model_dir = os.path.join(MODEL_FILES, model_name)
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_name)
         self.proc = None
+        # TODO record start and stop variables
+        #self.start_timestamp
+        #self.stop_timestamp
 
 
     def start(self):
@@ -51,6 +54,9 @@ class NutchCrawl(object):
         #self.number_of_rounds = numberOfRounds
         self.status = ""
         self.proc = None
+        # TODO record start and stop variables
+        #self.start_timestamp
+        #self.stop_timestamp
 
     def start(self):
         subprocess.Popen(['mkdir', self.crawl_dir]).wait()
