@@ -36,6 +36,12 @@ image_image = db.Table('image_image',
     db.Column('match_image_id', db.Integer, db.ForeignKey('image.id'))
 )
 
+# Link image to image_space
+image_image_space = db.Table('image_image_space',
+    db.Column('image_space_id', db.Integer, db.ForeignKey('image_space.id')),
+    db.Column('image_id', db.Integer, db.ForeignKey('image.id'))
+)
+
 # A dashboard (usually) contains many plots, 
 #   many dashboards can contain the same plot.
 plot_dashboard = db.Table('plot_dashboard',
