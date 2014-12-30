@@ -77,6 +77,7 @@
     function(isConfirm){
         if (isConfirm){
             $.post("{{ url_for('delete_project', project_slug=project.slug) }}");
+            window.location.href = "{{ url_for('index') }}";
         } else {
           swal("Cancelled", "You cancelled the delete process", "error");
         }
