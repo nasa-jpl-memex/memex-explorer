@@ -37,11 +37,11 @@ def get_models():
     return DataModel.query.all()
 
 
-def get_images():
-    """Return all images under `project_id` that match `crawl_name`.
+def get_images(image_space_slug):
+    """Return all images from an image space.
     """
-    # TODO change to query by image_space. Requires db changes.
-    return Image.query.all()
+    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
+    return image_space.images
 
 
 def get_data_source(project_id, data_source_name):
