@@ -90,11 +90,9 @@ $( document ).ready(function() {
                   <i class="fa fa-edit"></i>
                 </button>
               </a>
-              <form onsubmit='return confirm("Are you sure?");' class='form-button'>
-                <button formmethod='post' formaction="{{ url_for('delete_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}" id="removeButton" type="submit" title="Delete Crawl" class="btn btn-control">
+                <button id="removeButton" title="Delete Crawl" class="btn btn-control" type="button">
                     <span class="fa fa-close"></span>
                 </button>
-              </form>
             </div>
       </div>
 
@@ -143,4 +141,5 @@ $( document ).ready(function() {
         }
     });
 });
+</script>
 {% endblock content %}
