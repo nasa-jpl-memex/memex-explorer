@@ -78,7 +78,10 @@ def get_matches(project_id, image_name):
     """
 
     img = get_image(image_name)
-    return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
+    if img.EXIF_BodySerialNumber is not None:
+        return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
+    else:
+        return ()
 
 
 def db_add_crawl(project, form, seed_filename):
