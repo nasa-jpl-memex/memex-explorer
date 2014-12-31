@@ -12,6 +12,7 @@ import logging
 import json
 import datetime as dt
 import subprocess
+import traceback
 
 # Third-party Libraries
 # ---------------------
@@ -305,22 +306,24 @@ def run_crawl(project_slug, crawl_slug):
     if CRAWLS.has_key(key):
         return "Crawl is already running."
     else:
-        crawl = get_crawl(crawl_slug)
-        seeds_list = crawl.seeds_list
-        if crawl.crawler=="ache":
-            model = get_crawl_model(crawl)
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name,
-                                       conf_name=crawl.config)
-            pid = crawl_instance.start()
-            CRAWLS[key] = crawl_instance
-            return "Crawl %s running" % crawl.name
-        elif crawl.crawler=="nutch":
-            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
-            pid = crawl_instance.start()
-            CRAWLS[key] = crawl_instance
-            return "Crawl %s running" % crawl.name
-        else:
-            abort(400)
+        try:
+            crawl = get_crawl(crawl_slug)
+            seeds_list = crawl.seeds_list
+            if crawl.crawler == "ache":
+                model = get_crawl_model(crawl)
+                crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
+                                           model_name=model.name, conf_name=crawl.config)
+                pid = crawl_instance.start()
+                CRAWLS[key] = crawl_instance
+                return "Crawl %s running" % crawl.name
+            elif crawl.crawler == "nutch":
+                crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+                pid = crawl_instance.start()
+                CRAWLS[key] = crawl_instance
+                return "Crawl %s running" % crawl.name
+        except Exception as e:
+            traceback.print_exc()
+            return "Error"
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/stop', methods=['POST'])
@@ -331,7 +334,7 @@ def stop_crawl(project_slug, crawl_slug):
         crawl_instance.stop()
         return "Crawl stopped"
     else:
-        abort(400)
+        return "No such crawl"
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/refresh', methods=['POST'])
