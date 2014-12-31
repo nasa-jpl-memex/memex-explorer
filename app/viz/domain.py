@@ -6,6 +6,8 @@ from __future__ import division
 import pandas as pd
 from blaze import into
 from bokeh.plotting import *
+from bokeh.embed import components
+from bokeh.resources import INLINE
 from bokeh.models import ColumnDataSource, DataRange1d, FactorRange
 from tld import get_tld
 from functools import partial
@@ -57,12 +59,9 @@ class Domain(PlotManager):
         source = into(ColumnDataSource, df)
         return source
 
-
-    def create_and_store(self):
+    def create(self):
 
         self.source = self.update_source()
-        output_server(self.doc_name)
-        curdoc().autostore = False
 
         xdr = DataRange1d(sources=[self.source.columns("crawled")])
         if self.sort == "frontier":
@@ -85,15 +84,14 @@ class Domain(PlotManager):
         p.xgrid.grid_line_color = '#8592A0'
         p.axis.major_label_text_font_size = "8pt"
 
-        cursession().store_document(curdoc())
-        autoload_tag = autoload_server(p, cursession())
 
         # Save ColumnDataSource model id to database model 
         self.plot.source_id = self.source._id
 
         # Save autoload_server tag as well
-        self.plot.autoload_tag = autoload_tag
         db.session.flush()
         db.session.commit()
         
-        return autoload_server(p, cursession())
+        script, div = components(p, INLINE)
+
+        return (script, div)

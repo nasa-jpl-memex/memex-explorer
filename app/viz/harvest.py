@@ -5,6 +5,8 @@ import sys
 from blaze import *
 import pandas as pd
 from bokeh.plotting import *
+from bokeh.embed import components
+from bokeh.resources import INLINE
 from bokeh.objects import HoverTool
 from bokeh.models import ColumnDataSource
 from collections import OrderedDict
@@ -33,12 +35,9 @@ class Harvest(PlotManager):
         source = into(ColumnDataSource, df)
         return source
 
-    def create_and_store(self):
+    def create(self):
 
         self.source = self.update_source()
-
-        output_server(self.doc_name)
-        curdoc().autostore = False
 
         p = figure(plot_width=500, plot_height=250,
                    title="Harvest Plot", x_axis_type='datetime',
@@ -66,5 +65,6 @@ class Harvest(PlotManager):
         db.session.flush()
         db.session.commit()
 
-        cursession().store_document(curdoc())
-        return autoload_server(p, cursession())
+        script, div = components(p, INLINE)
+
+        return (script, div)
