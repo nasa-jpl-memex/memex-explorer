@@ -3,6 +3,7 @@ import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 from .models import (Project, Crawl, Dashboard, Image,
                      DataSource, Plot, DataModel, ImageSpace)
+from webhelpers import text
 
 MATCHES = app.MATCHES
 
@@ -35,6 +36,15 @@ def get_models():
     Return all models that match 'project_id'
     """
     return DataModel.query.all()
+
+
+def get_model(**kwargs):
+    if 'name' in kwargs:
+        return DataModel.query.filter_by(name=kwargs['name']).first()
+    elif 'id' in kwargs:
+        return DataModel.query.filter_by(id=kwargs['id']).first()
+    else:
+        raise Exception("Must supply either a record name or ID.")
 
 
 def get_images(image_space_slug):
@@ -81,14 +91,34 @@ def get_matches(project_id, image_name):
     return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
 
 
-def db_add_crawl(project, form, seed_filename):
+def db_add_model(name):
+    model = DataModel(name=name, filename=MODEL_FILES + name)
+    db.session.add(model)
+    db.session.commit()
+
+
+def db_add_crawl(project, form, seed_filename, model=None):
+    try:
+        data_model = model.id
+    except:
+        data_model = None
+
+    if form.crawler.data == "nutch":
+        # TODO check if "/" is necessary
+        seed_list = text.urlify(form.name.data) + "/"
+    elif form.crawler.data == "ache":
+        seed_list = seed_filename
+    else:
+        seed_list = "None"
+
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
-                  data_model_id=form.data_model.data.id,
-                  config=os.path.join(CONFIG_FILES, 'config_default'),
-                  seeds_list=SEED_FILES + seed_filename)
+                  data_model_id=data_model,
+                  config = 'config_default',
+                  seeds_list = seed_list,
+                  slug=text.urlify(form.name.data))
 
     db.session.add(crawl)
     db.session.commit()

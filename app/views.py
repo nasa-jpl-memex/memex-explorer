@@ -35,8 +35,8 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
-                     db_init_ache, get_crawl_model, get_models, db_add_image_space_from_crawl,
-                     db_process_exif, get_image_space)
+                     db_init_ache, get_crawl_model, get_model, get_models, db_add_image_space_from_crawl,
+                     db_process_exif, get_image_space, db_add_model)
 
 from .rest_api import api
 
@@ -194,14 +194,36 @@ def add_project():
 def add_crawl(project_slug):
     form = CrawlForm()
     if form.validate_on_submit():
+        if form.new_model_name.data:
+            registered_model = DataModel.query.filter_by(name=form.new_model_name.data).first()
+            if registered_model:
+                flash('Data model name already exists, please choose another name', 'error')
+                return render_template('add_crawl.html', form=form)
+            model_directory = MODEL_FILES + form.new_model_name.data
+            os.mkdir(model_directory)
+            model_file = secure_filename(form.new_model_file.data.filename)
+            model_features = secure_filename(form.new_model_features.data.filename)
+            form.new_model_file.data.save(model_directory + '/' + model_file)
+            form.new_model_features.data.save(model_directory + '/' + model_features)
+            db_add_model(form.new_model_name.data)
+            model = get_model(name=form.new_model_name.data)
+        elif form.data_model.data:
+            model = get_model(id=form.data_model.data.id)
+        else:
+            model = None
         seed_filename = secure_filename(form.seeds_list.data.filename)
-        form.seeds_list.data.save(SEED_FILES + seed_filename)
+        if form.crawler.data == "ache":
+            form.seeds_list.data.save(SEED_FILES + seed_filename)
+        elif form.crawler.data == "nutch":
+            seed_folder = text.urlify(form.name.data)
+            subprocess.Popen(['mkdir', os.path.join(SEED_FILES, seed_folder)]).wait()
+            form.seeds_list.data.save(os.path.join(SEED_FILES, seed_folder, seed_filename))
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
         project = get_project(project_slug)
-        crawl = db_add_crawl(project, form, seed_filename)
-        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
+        crawl = db_add_crawl(project, form, seed_filename, model)
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)]).wait()
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
@@ -211,34 +233,12 @@ def add_crawl(project_slug):
             pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_slug=get_project(project_slug),
-                                         crawl_name=form.name.data))
+        return redirect(url_for('crawl', project_slug=project.slug,
+                                         crawl_slug=crawl.slug))
+    else:
+        print(form.errors)
 
     return render_template('add_crawl.html', form=form)
-
-
-@app.route('/<project_slug>/add_model', methods=['GET', 'POST'])
-def add_model(project_slug):
-    form = DataModelForm()
-    if form.validate_on_submit():
-        registered_model = DataModel.query.filter_by(name=form.name.data).first()
-        if registered_model:
-            flash('Data model name already exists, please choose another name', 'error')
-            return render_template('add_data_model.html', form=form)
-        files = request.files.getlist("files")
-        os.mkdir(MODEL_FILES + form.name.data)
-        for x in files:
-            x.save(MODEL_FILES + form.name.data + '/' + x.filename)
-        model = DataModel(name=form.name.data,
-                          filename=MODEL_FILES + form.name.data)
-
-        db.session.add(model)
-        db.session.commit()
-        flash('Model has successfully been registered!', 'success')
-        return redirect(url_for('project',
-                                project_slug=get_project(project_slug).name))
-
-    return render_template('add_data_model.html', form=form)
 
 
 @app.route('/<project_slug>/crawls')
