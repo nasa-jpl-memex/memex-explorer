@@ -212,13 +212,18 @@ def add_crawl(project_slug):
         else:
             model = None
         seed_filename = secure_filename(form.seeds_list.data.filename)
-        form.seeds_list.data.save(SEED_FILES + seed_filename)
+        if form.crawler.data == "ache":
+            form.seeds_list.data.save(SEED_FILES + seed_filename)
+        elif form.crawler.data == "nutch":
+            seed_folder = text.urlify(form.name.data)
+            subprocess.Popen(['mkdir', os.path.join(SEED_FILES, seed_folder)]).wait()
+            form.seeds_list.data.save(os.path.join(SEED_FILES, seed_folder, seed_filename))
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
         project = get_project(project_slug)
         crawl = db_add_crawl(project, form, seed_filename, model)
-        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)])
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)]).wait()
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)

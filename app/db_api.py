@@ -103,13 +103,21 @@ def db_add_crawl(project, form, seed_filename, model=None):
     except:
         data_model = None
 
+    if form.crawler.data == "nutch":
+        # TODO check if "/" is necessary
+        seed_list = text.urlify(form.name.data) + "/"
+    elif form.crawler.data == "ache":
+        seed_list = seed_filename
+    else:
+        seed_list = "None"
+
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
                   project_id=project.id,
                   data_model_id=data_model,
-                  config = os.path.join(CONFIG_FILES,'config_default'),
-                  seeds_list = SEED_FILES + seed_filename,
+                  config = 'config_default',
+                  seeds_list = seed_list,
                   slug=text.urlify(form.name.data))
 
     db.session.add(crawl)
