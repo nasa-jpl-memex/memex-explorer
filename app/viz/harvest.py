@@ -19,6 +19,10 @@ from plot import PlotManager
 
 from app import app, db
 
+GREEN = "#47a838"
+DARK_GRAY = "#2e2e2e"
+LIGHT_GRAY = "#6e6e6e"
+
 class Harvest(PlotManager):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
@@ -43,15 +47,15 @@ class Harvest(PlotManager):
                    title="Harvest Plot", x_axis_type='datetime',
                    tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
-        p.line(x="timestamp", y="relevant_pages", color="red", width=0.2,
+        p.line(x="timestamp", y="relevant_pages", color=GREEN, width=0.2,
                legend="relevant", source=self.source)
         p.scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6,
-                  color="red", source=self.source)
+                  color=GREEN, source=self.source)
 
-        p.line(x="timestamp", y="downloaded_pages", color="blue", width=0.2,
+        p.line(x="timestamp", y="downloaded_pages", color=DARK_GRAY, width=0.2,
                legend="downloaded", source=self.source)
         p.scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6,
-                 color="blue", source=self.source)
+                 color=DARK_GRAY, source=self.source)
 
         hover = p.select(dict(type=HoverTool))
         hover.tooltips = OrderedDict([
