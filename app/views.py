@@ -228,8 +228,8 @@ def add_crawl(project_slug):
             pass
 
         flash('%s has successfully been registered!' % form.name.data, 'success')
-        return redirect(url_for('crawl', project_slug=get_project(project_slug),
-                                         crawl_name=form.name.data))
+        return redirect(url_for('crawl', project_slug=project.slug,
+                                         crawl_slug=crawl.slug))
     else:
         print(form.errors)
 
