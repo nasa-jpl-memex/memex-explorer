@@ -46,7 +46,7 @@ from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
                     CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 
 from .auth import requires_auth
-from .plotting import plot_builder
+from .plotting import default_ache_dash
 from .crawls import AcheCrawl, NutchCrawl
 
 
@@ -252,7 +252,16 @@ def crawl(project_slug, crawl_slug):
         flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
-    return render_template('crawl.html', crawl=crawl)
+
+    if crawl.crawler == 'ache':
+       scripts, divs = default_ache_dash(project, crawl)
+       return render_template('crawl.html', crawl=crawl, scripts=scripts, divs=divs)
+    else:
+       return render_template('crawl.html', crawl=crawl)
+
+
+
+
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
