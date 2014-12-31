@@ -122,4 +122,25 @@ $( document ).ready(function() {
     </div>
   </div>
 </div>
+<script type="text/javascript">
+    $('#removeButton').click(function(){
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this project!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    },
+    function(isConfirm){
+        if (isConfirm){
+          $('<form action="/{{ project.slug }}/crawls/{{ crawl.slug }}/delete" method="post"></form>').submit();
+        } else {
+          swal("Cancelled", "You cancelled the delete process", "error");
+        }
+    });
+});
 {% endblock content %}
