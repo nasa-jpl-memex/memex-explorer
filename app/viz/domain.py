@@ -10,7 +10,9 @@ from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.models import ColumnDataSource, DataRange1d, FactorRange
 from tld import get_tld
-from functools import partial
+import traceback
+import subprocess
+import shlex
 
 from app import db
 from plot import PlotManager
@@ -20,14 +22,23 @@ from ..config import CRAWLS_PATH
 GREEN = "#47a838"
 DARK_GRAY = "#2e2e2e"
 LIGHT_GRAY = "#6e6e6e"
+TAIL_LENGTH = 10000
+
+
+def extract_tld(url):
+    try:
+        return get_tld(url, fail_silently=True)
+    except:
+        traceback.print_exc()
+        print "\n\nInvalid url: %s" % url
+        return url
 
 class Domain(PlotManager):
 
-    def __init__(self, datasources, plot, sort='relevant'):
+    def __init__(self, datasources, plot, sort='crawled'):
         # TODO Retrieve plot datasources from db
         self.crawled_data = CRAWLS_PATH + datasources['crawled'].data_uri
         self.relevant_data = CRAWLS_PATH+ datasources['relevant'].data_uri
-        self.frontier_data = CRAWLS_PATH + datasources['frontier'].data_uri
 
         self.sort = sort
 
@@ -37,22 +48,21 @@ class Domain(PlotManager):
     def update_source(self):
 
         # Relevant
-        df = pd.read_csv(self.relevant_data, delimiter='\t', header=None, names=['url', 'timestamp'])
-        df['domain'] = df['url'].apply(partial(get_tld, fail_silently=True))
+        relevant_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (TAIL_LENGTH, self.relevant_data)),
+                                stdout=subprocess.PIPE)
+        df = pd.read_csv(relevant_proc.stdout, delimiter='\t', header=None, names=['url', 'timestamp'])
+        df['domain'] = df['url'].apply(extract_tld)
         df1 = df.groupby(['domain']).size()
 
         # Crawled
-        df = pd.read_csv(self.crawled_data, delimiter='\t', header=None, names=['url', 'timestamp'])
-        df['domain'] = df['url'].apply(partial(get_tld, fail_silently=True))
+        crawled_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (TAIL_LENGTH, self.crawled_data)),
+                                stdout=subprocess.PIPE)
+        df = pd.read_csv(crawled_proc.stdout, delimiter='\t', header=None, names=['url', 'timestamp'])
+        df['domain'] = df['url'].apply(extract_tld)
         df2 = df.groupby(['domain']).size()
 
-        # Frontier
-        df = pd.read_csv(self.frontier_data, delimiter='\t', header=None, names=['url'])
-        df['domain'] = df['url'].apply(partial(get_tld, fail_silently=True))
-        df3 = df.groupby(['domain']).size()
-
-        df = pd.concat((df1, df2, df3), axis=1)
-        df.columns = ['relevant', 'crawled', 'frontier']
+        df = pd.concat((df1, df2), axis=1)
+        df.columns = ['relevant', 'crawled']
 
         df = df.sort(self.sort, ascending=False).head(25).fillna(value=0)
 
@@ -69,17 +79,12 @@ class Domain(PlotManager):
         self.source = self.update_source()
 
         xdr = DataRange1d(sources=[self.source.columns("crawled")])
-        if self.sort == "frontier":
-            xdr.sources.append(self.source.columns("frontier"))
 
         p = figure(plot_width=400, plot_height=400,
             title="Domains Sorted by %s" % self.sort, x_range = xdr,
             y_range = FactorRange(factors=self.source.data['index']),
             tools='reset, resize, save')
 
-        if self.sort == 'frontier':
-            p.rect(y='index', x='frontier_half', height=0.75, width='frontier',
-                   color=LIGHT_GRAY, source = self.source, legend="frontier")
         p.rect(y='index', x='crawled_half', height=0.75, width='crawled',
                color=DARK_GRAY, source = self.source, legend="crawled")
         p.rect(y='index', x='relevant_half', height=0.75, width='relevant',

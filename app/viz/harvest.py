@@ -14,6 +14,8 @@ import numpy as np
 import datetime as dt
 from bokeh.embed import components
 from bokeh.resources import CDN
+import subprocess
+import shlex
 
 from plot import PlotManager
 
@@ -32,7 +34,10 @@ class Harvest(PlotManager):
 
     def update_source(self):
 
-        df = pd.read_csv(self.harvest_data, delimiter='\t',
+        proc = subprocess.Popen(shlex.split("tail -n 800 %s" % self.harvest_data),
+                                stdout=subprocess.PIPE)
+
+        df = pd.read_csv(proc.stdout, delimiter='\t',
             names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
 

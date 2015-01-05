@@ -377,38 +377,11 @@ def crawl_dash(project_slug, crawl_slug):
     crawl_instance = CRAWLS_RUNNING.get(key)
 
     if crawl.crawler == 'ache':
-        # TODO put all this is a function create_ache_dashboard
-
-        ### Domain
-        domain_plot = get_plot(crawl.name + "-domain")
-        # if domain_plot.autoload_tag and plot_exists(domain_plot):
-        #     domain_tag = domain_plot.autoload_tag
-
-        # else:
-        crawled = get_data_source(project.id, crawl.name + "-crawledpages")
-        relevant = get_data_source(project.id, crawl.name + "-relevantpages")
-        frontier = get_data_source(project.id, crawl.name + "-frontierpages")
-        domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
-
-        domain = Domain(domain_sources, domain_plot)
-        domain_script, domain_div = domain.create()
-        ###
+        scripts, divs = default_ache_dash(project, crawl)
 
 
-        ### Harvest
-        harvest_plot = get_plot(crawl.name + "-harvest")
-        # if harvest_plot.autoload_tag:
-        #     harvest_tag = harvest_plot.autoload_tag
-
-        # else:
-        harvest_source = get_data_source(project.id, crawl.name + "-harvest")
-        
-        harvest = Harvest(harvest_source, harvest_plot)
-        harvest_script, harvest_div  = harvest.create()
-        ###
-
-        return render_template('dash.html', scripts=(domain_script, harvest_script),
-                                            divs=(domain_div, harvest_div), crawl=crawl)
+        return render_template('dash.html', scripts=scripts,
+                                            divs=divs, crawl=crawl)
 
     else:
         abort(400)
