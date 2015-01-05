@@ -117,16 +117,35 @@ $( document ).ready(function() {
                   <i class="fa fa-edit"></i>
                 </button>
               </a>
-              <form onsubmit='return confirm("Are you sure?");' class='form-button'>
-                <button formmethod='post' formaction="{{ url_for('delete_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}" id="removeButton" type="submit" title="Delete Crawl" class="btn btn-control">
+                <button id="removeButton" title="Delete Crawl" class="btn btn-control" type="button">
                     <span class="fa fa-close"></span>
                 </button>
-              </form>
             </div>
       </div>
 
   </div>
-
+<script type="text/javascript">
+    $('#removeButton').click(function(){
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this project!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    },
+    function(isConfirm){
+        if (isConfirm){
+          $('<form action="/{{ project.slug }}/crawls/{{ crawl.slug }}/delete" method="post"></form>').submit();
+        } else {
+          swal("Cancelled", "You cancelled the delete process", "error");
+        }
+    });
+});
+</script>
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <button id="stats" type="button" title="Get crawl stats" class="btn btn-default btn-duo center">
