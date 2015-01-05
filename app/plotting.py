@@ -75,6 +75,7 @@ def default_ache_dash(project, crawl):
     crawled = get_data_source(project.id, crawl.name + "-crawledpages")
     relevant = get_data_source(project.id, crawl.name + "-relevantpages")
     domain_sources = dict(crawled=crawled, relevant=relevant)
+
     if not all(os.path.exists(CRAWLS_PATH + x.data_uri) for x in domain_sources.values()):
         raise PlotsNotReadyException("Domain sources are not initialized.")
 
