@@ -32,13 +32,14 @@ class AcheCrawl(object):
     def get_status(self):
         self.proc.poll()
         if self.proc is None:
-            return "No process exists"
+            self.status = "No process exists"
         elif self.proc.returncode is None:
-            return "Running"
+            self.status = "Running crawl"
         elif self.proc.returncode < 0:
-            return "Process was terminated by signal %s" % self.proc.returncode
+            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
         else:
-            return "Process ended"
+            self.status = "Crawl process ended"
+        return self.status
 
 
 class NutchCrawl(object):
