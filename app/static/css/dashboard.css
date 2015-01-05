@@ -395,7 +395,7 @@ ul.inline-icons {
 .form-button {
   display: inline-block; }
 
-#editButton, #removeButton, #seedButton {
+#editButton, #removeButton, #seedButton, #playButton, #stopButton {
   min-height: 40px;
   min-width: 40px; }
 
