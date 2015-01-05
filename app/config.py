@@ -41,7 +41,7 @@ SEED_FILES = os.path.join(BASEDIR, 'resources/seeds/')
 MODEL_FILES = os.path.join(BASEDIR, 'resources/models/')
 CONFIG_FILES = os.path.join(BASEDIR, 'resources/configs/')
 # Temporal location of libs/profiles
-LANG_DETECT_PATH = os.path.join(BASEDIR, 'resources/profiles/')
+LANG_DETECT_PATH = os.path.join(BASEDIR, 'profiles/')
 
 CRAWLS_PATH = os.path.join(BASEDIR, 'resources/crawls/')
 
