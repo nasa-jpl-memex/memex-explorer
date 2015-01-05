@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import traceback
 
 from .viz.domain import Domain
 from .viz.harvest import Harvest
@@ -81,8 +82,12 @@ def default_ache_dash(project, crawl):
     if not all(os.path.exists(CRAWLS_PATH + x.data_uri) for x in domain_sources.values()):
         raise PlotsNotReadyException("Domain sources are not initialized.")
 
-    domain = Domain(domain_sources, domain_plot)
-    domain_script, domain_div = domain.create()
+    try:
+        domain = Domain(domain_sources, domain_plot)
+        domain_script, domain_div = domain.create()
+    except Exception as e:
+        traceback.print_exc()
+        raise PlotsNotReadyException("Unknown error (domain).")
     ###
 
 
@@ -93,8 +98,12 @@ def default_ache_dash(project, crawl):
     if not os.path.exists(CRAWLS_PATH + harvest_source.data_uri):
         raise PlotsNotReadyException("Harvest source is not initialized.")
 
-    harvest = Harvest(harvest_source, harvest_plot)
-    harvest_script, harvest_div  = harvest.create()
+    try:
+        harvest = Harvest(harvest_source, harvest_plot)
+        harvest_script, harvest_div  = harvest.create()
+    except Exception as e:
+        traceback.print_exc()
+        raise PlotsNotReadyException("Unknown error (harvest).")
     ###
 
     scripts = (domain_script, harvest_script)
