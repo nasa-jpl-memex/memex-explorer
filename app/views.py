@@ -36,7 +36,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
-                     db_init_ache, get_crawl_model, get_model, get_models, db_add_image_space_from_crawl,
+                     db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model)
 
 from .rest_api import api
@@ -315,27 +315,24 @@ def edit_crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/run', methods=['POST'])
 def run_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
-    if CRAWLS.has_key(key):
-        return "Crawl is already running."
-    else:
-        try:
-            crawl = get_crawl(crawl_slug)
-            seeds_list = crawl.seeds_list
-            if crawl.crawler == "ache":
-                model = get_crawl_model(crawl)
-                crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
-                                           model_name=model.name, conf_name=crawl.config)
-                pid = crawl_instance.start()
-                CRAWLS[key] = crawl_instance
-                return "Crawl %s running" % crawl.name
-            elif crawl.crawler == "nutch":
-                crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
-                pid = crawl_instance.start()
-                CRAWLS[key] = crawl_instance
-                return "Crawl %s running" % crawl.name
-        except Exception as e:
-            traceback.print_exc()
-            return "Error"
+    try:
+        crawl = get_crawl(crawl_slug)
+        seeds_list = crawl.seeds_list
+        if crawl.crawler == "ache":
+            model = get_crawl_model(crawl)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
+                                       model_name=model.name, conf_name=crawl.config)
+            pid = crawl_instance.start()
+            CRAWLS[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        elif crawl.crawler == "nutch":
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.slug)
+            pid = crawl_instance.start()
+            CRAWLS[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+    except Exception as e:
+        traceback.print_exc()
+        return "Error"
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/stop', methods=['POST'])
@@ -446,7 +443,7 @@ def dump_images(project_slug, crawl_slug):
         return "No image dump for ACHE crawls"
     elif crawl_instance is not None and crawl.crawler=="nutch":
         crawl_instance.dump_images()
-        image_space = db_add_image_space_from_crawl(crawl=crawl, project=project)
+        image_space = get_crawl_image_space(crawl=crawl, project=project)
         images = os.listdir(crawl_instance.img_dir)
         for image in images:
             image_path = os.path.join(crawl_instance.img_dir, image)
