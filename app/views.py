@@ -50,7 +50,7 @@ from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
                     CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 
 from .auth import requires_auth
-from .plotting import default_ache_dash
+from .plotting import default_ache_dash, PlotsNotReadyException
 from .crawls import AcheCrawl, NutchCrawl
 
 
@@ -258,10 +258,16 @@ def crawl(project_slug, crawl_slug):
 
 
     if crawl.crawler == 'ache':
-       scripts, divs = default_ache_dash(project, crawl)
-       return render_template('crawl.html', crawl=crawl, scripts=scripts, divs=divs)
+        try:
+            scripts, divs = default_ache_dash(project, crawl)
+        except PlotsNotReadyException as e:
+            traceback.print_exc()
+            return render_template('crawl.html', crawl=crawl)
+
+        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl)
+
     else:
-       return render_template('crawl.html', crawl=crawl)
+        return render_template('crawl.html', crawl=crawl)
 
 
 
