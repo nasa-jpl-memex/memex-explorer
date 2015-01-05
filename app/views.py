@@ -303,27 +303,24 @@ def edit_crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/run', methods=['POST'])
 def run_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
-    if CRAWLS.has_key(key):
-        return "Crawl is already running."
-    else:
-        try:
-            crawl = get_crawl(crawl_slug)
-            seeds_list = crawl.seeds_list
-            if crawl.crawler == "ache":
-                model = get_crawl_model(crawl)
-                crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
-                                           model_name=model.name, conf_name=crawl.config)
-                pid = crawl_instance.start()
-                CRAWLS[key] = crawl_instance
-                return "Crawl %s running" % crawl.name
-            elif crawl.crawler == "nutch":
-                crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
-                pid = crawl_instance.start()
-                CRAWLS[key] = crawl_instance
-                return "Crawl %s running" % crawl.name
-        except Exception as e:
-            traceback.print_exc()
-            return "Error"
+    try:
+        crawl = get_crawl(crawl_slug)
+        seeds_list = crawl.seeds_list
+        if crawl.crawler == "ache":
+            model = get_crawl_model(crawl)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
+                                       model_name=model.name, conf_name=crawl.config)
+            pid = crawl_instance.start()
+            CRAWLS[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+        elif crawl.crawler == "nutch":
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+            pid = crawl_instance.start()
+            CRAWLS[key] = crawl_instance
+            return "Crawl %s running" % crawl.name
+    except Exception as e:
+        traceback.print_exc()
+        return "Error"
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/stop', methods=['POST'])
