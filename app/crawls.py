@@ -28,6 +28,18 @@ class AcheCrawl(object):
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
 
+    def get_status(self):
+        self.proc.poll()
+        if self.proc is None:
+            self.status = "No process exists"
+        elif self.proc.returncode is None:
+            self.status = "Running crawl"
+        elif self.proc.returncode < 0:
+            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
+        else:
+            self.status = "Crawl process ended"
+        return self.status
+
     def status(self):
         self.proc.poll()
         if self.proc is None:
@@ -79,7 +91,7 @@ class NutchCrawl(object):
         return self.status
 
     def dump_images(self):
-        subprocess.Popen(['mkdir', self.img_dir]).wait()
+        subprocess.Popen(['mkdir', '-p', self.img_dir]).wait()
         with open(os.path.join(self.crawl_dir, 'img_stdout.txt'), 'w') as stdout:
             with open(os.path.join(self.crawl_dir,'img_stderr.txt'), 'w') as stderr:
                 img_dump_proc = subprocess.Popen(['nutch', 'dump', '-outputDir', self.img_dir, '-segment',
