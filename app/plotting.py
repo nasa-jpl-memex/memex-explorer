@@ -1,9 +1,15 @@
 from __future__ import absolute_import
 
+import os
+import traceback
+
 from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.termite import Termite    
 from .models import DataSource
+from .config import CRAWLS_PATH
+
+from .db_api import (get_plot, get_data_source)
 
 PLOT_NAMES = ('Domain Relevance',
               'Domain Crawled',
@@ -19,6 +25,8 @@ PLOT_TYPES = ('domain_by_relevance',
               'harvest_rate',
               'termite')
 
+class PlotsNotReadyException(Exception):
+    pass 
 
 def plot_builder(crawl, plot):
 
@@ -56,3 +64,49 @@ def plot_builder(crawl, plot):
         script, div = t.create_plot()
 
     return script, div
+
+
+def default_ache_dash(project, crawl):
+
+
+    ### Domain
+    domain_plot = get_plot(crawl.name + "-domain")
+
+    crawled = get_data_source(project.id, crawl.name + "-crawledpages")
+    relevant = get_data_source(project.id, crawl.name + "-relevantpages")
+    domain_sources = dict(crawled=crawled, relevant=relevant)
+
+    print [CRAWLS_PATH + x.data_uri for x in domain_sources.values()]
+    print [os.path.exists(CRAWLS_PATH + x.data_uri) for x in domain_sources.values()]
+
+    if not all(os.path.exists(CRAWLS_PATH + x.data_uri) for x in domain_sources.values()):
+        raise PlotsNotReadyException("Domain sources are not initialized.")
+
+    try:
+        domain = Domain(domain_sources, domain_plot)
+        domain_script, domain_div = domain.create()
+    except Exception as e:
+        traceback.print_exc()
+        raise PlotsNotReadyException("Unknown error (domain).")
+    ###
+
+
+    ### Harvest
+    harvest_plot = get_plot(crawl.name + "-harvest")
+
+    harvest_source = get_data_source(project.id, crawl.name + "-harvest")
+    if not os.path.exists(CRAWLS_PATH + harvest_source.data_uri):
+        raise PlotsNotReadyException("Harvest source is not initialized.")
+
+    try:
+        harvest = Harvest(harvest_source, harvest_plot)
+        harvest_script, harvest_div  = harvest.create()
+    except Exception as e:
+        traceback.print_exc()
+        raise PlotsNotReadyException("Unknown error (harvest).")
+    ###
+
+    scripts = (domain_script, harvest_script)
+    divs = (domain_div, harvest_div)
+
+    return scripts, divs
