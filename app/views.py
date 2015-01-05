@@ -36,7 +36,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
                     DataModel
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
-                     db_init_ache, get_crawl_model, get_model, get_models, db_add_image_space_from_crawl,
+                     db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model)
 
 from .rest_api import api
@@ -460,7 +460,7 @@ def dump_images(project_slug, crawl_slug):
         return "No image dump for ACHE crawls"
     elif crawl_instance is not None and crawl.crawler=="nutch":
         crawl_instance.dump_images()
-        image_space = db_add_image_space_from_crawl(crawl=crawl, project=project)
+        image_space = get_crawl_image_space(crawl=crawl, project=project)
         images = os.listdir(crawl_instance.img_dir)
         for image in images:
             image_path = os.path.join(crawl_instance.img_dir, image)
