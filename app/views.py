@@ -314,7 +314,7 @@ def run_crawl(project_slug, crawl_slug):
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         elif crawl.crawler == "nutch":
-            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name)
+            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.slug)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
