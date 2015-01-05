@@ -427,7 +427,6 @@ def stats_crawl(project_slug, crawl_slug):
                                        conf_name=crawl.config)
             #TODO get ache stats
             #crawl_instance.stats()
-            print(crawl_instance)
             return "No stats for ACHE crawls"
 
         elif crawl.crawler=="nutch":
