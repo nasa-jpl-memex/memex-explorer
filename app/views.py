@@ -257,26 +257,17 @@ def crawl(project_slug, crawl_slug):
         flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
-<<<<<<< HEAD
-    return render_template('crawl.html', crawl=crawl, model=model)
-=======
-
     if crawl.crawler == 'ache':
         try:
             scripts, divs = default_ache_dash(project, crawl)
         except PlotsNotReadyException as e:
             traceback.print_exc()
-            return render_template('crawl.html', crawl=crawl)
+            return render_template('crawl.html', crawl=crawl, model=model)
 
-        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl)
+        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl, model=model)
 
     else:
-        return render_template('crawl.html', crawl=crawl)
-
-
-
-
->>>>>>> master
+        return render_template('crawl.html', crawl=crawl, model=model)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
