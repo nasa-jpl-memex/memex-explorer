@@ -83,6 +83,24 @@ def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
 
 
+def get_crawl_image_space(project, crawl):
+    """Return the image_space of a crawl. If it doesn't exist, add it to the db.
+    """
+    image_space = ImageSpace.query.filter_by(name=crawl.slug, project_id=project.id).first()
+
+    if image_space is None:
+        image_space = ImageSpace(images_location=os.path.join(IMAGE_SPACE_PATH, crawl.slug),
+                                 project_id=project.id,
+                                 name=crawl.slug,
+                                 slug=crawl.slug,
+                                )
+
+        db.session.add(image_space)
+        db.session.commit()
+
+    return image_space
+
+
 def get_matches(project_id, image_name):
     """Return all images under `project_id` that match metadata on `image_id`.
     """
@@ -208,18 +226,6 @@ def db_process_exif(exif_data, img_path, image_space):
     db.session.add(image)
     db.session.commit()
 
-
-def db_add_image_space_from_crawl(project, crawl):
-    image_space = ImageSpace(images_location=os.path.join(IMAGE_SPACE_PATH, crawl.slug),
-                             project_id=project.id,
-                             name=crawl.slug,
-                             slug=crawl.slug,
-    )
-
-    # Add uploaded image to the database
-    db.session.add(image_space)
-    db.session.commit()
-    return image_space
 
 def set_match(source_id, match_id, match):
     if match:
