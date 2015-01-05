@@ -17,6 +17,7 @@ class AcheCrawl(object):
         #self.stop_timestamp
 
     def start(self):
+        subprocess.Popen(['mkdir', self.crawl_dir]).wait()
         with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
             with open(os.path.join(self.crawl_dir,'stderr.txt'), 'w') as stderr:
                 self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.config, self.seeds_file,
@@ -28,7 +29,7 @@ class AcheCrawl(object):
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
 
-    def status(self):
+    def get_status(self):
         self.proc.poll()
         if self.proc is None:
             return "No process exists"
