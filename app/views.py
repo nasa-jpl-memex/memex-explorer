@@ -50,16 +50,13 @@ from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
                     CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
 
 from .auth import requires_auth
-from .plotting import plot_builder
+from .plotting import default_ache_dash, PlotsNotReadyException
 from .crawls import AcheCrawl, NutchCrawl
 
 
 from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.harvest_rate import HarvestRate
-
-from .viz.plot import plot_exists
-# from .viz.termite import Termite
 
 
 # Dictionary of crawls by key(project_slug-crawl_name)
@@ -259,7 +256,22 @@ def crawl(project_slug, crawl_slug):
         flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
-    return render_template('crawl.html', crawl=crawl)
+
+    if crawl.crawler == 'ache':
+        try:
+            scripts, divs = default_ache_dash(project, crawl)
+        except PlotsNotReadyException as e:
+            traceback.print_exc()
+            return render_template('crawl.html', crawl=crawl)
+
+        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl)
+
+    else:
+        return render_template('crawl.html', crawl=crawl)
+
+
+
+
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
@@ -373,37 +385,11 @@ def crawl_dash(project_slug, crawl_slug):
     crawl_instance = CRAWLS.get(key)
 
     if crawl.crawler == 'ache':
-        # TODO put all this is a function create_ache_dashboard
-
-        ### Domain
-        domain_plot = get_plot(crawl.name + "-domain")
-        if domain_plot.autoload_tag and plot_exists(domain_plot):
-            domain_tag = domain_plot.autoload_tag
-
-        else:
-            crawled = get_data_source(project.id, crawl.name + "-crawledpages")
-            relevant = get_data_source(project.id, crawl.name + "-relevantpages")
-            frontier = get_data_source(project.id, crawl.name + "-frontierpages")
-            domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
-            #domain_sources = dict(crawled=crawled, relevant=relevant)
-
-            domain = Domain(domain_sources, domain_plot)
-            domain_tag = domain.create_and_store()
-        ###
+        scripts, divs = default_ache_dash(project, crawl)
 
 
-        ### Harvest
-        harvest_plot = get_plot(crawl.name + "-harvest")
-        if harvest_plot.autoload_tag:
-            harvest_tag = harvest_plot.autoload_tag
-
-        else:
-            harvest_source = get_data_source(project.id, crawl.name + "-harvest")
-            harvest = Harvest(harvest_source, harvest_plot)
-            harvest_tag = harvest.create_and_store()
-        ###
-
-        return render_template('dash.html', plots=[domain_tag, harvest_tag], crawl=crawl)
+        return render_template('dash.html', scripts=scripts,
+                                            divs=divs, crawl=crawl)
 
     else:
         abort(400)

@@ -17,6 +17,7 @@ class AcheCrawl(object):
         #self.stop_timestamp
 
     def start(self):
+        subprocess.Popen(['mkdir', self.crawl_dir]).wait()
         with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
             with open(os.path.join(self.crawl_dir,'stderr.txt'), 'w') as stderr:
                 self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.config, self.seeds_file,
@@ -39,17 +40,6 @@ class AcheCrawl(object):
         else:
             self.status = "Crawl process ended"
         return self.status
-
-    def status(self):
-        self.proc.poll()
-        if self.proc is None:
-            return "No process exists"
-        elif self.proc.returncode is None:
-            return "Running"
-        elif self.proc.returncode < 0:
-            return "Process was terminated by signal %s" % self.proc.returncode
-        else:
-            return "Process ended"
 
 
 class NutchCrawl(object):
