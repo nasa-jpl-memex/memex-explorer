@@ -251,6 +251,8 @@ def crawls(project_slug):
 def crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
     crawl = get_crawl(crawl_slug)
+    model = get_model(id=crawl.data_model_id)
+    print(model)
 
     if not project:
         flash("Project '%s' was not found." % project_slug, 'error')
@@ -259,7 +261,7 @@ def crawl(project_slug, crawl_slug):
         flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
-    return render_template('crawl.html', crawl=crawl)
+    return render_template('crawl.html', crawl=crawl, model=model)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])

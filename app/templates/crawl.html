@@ -149,11 +149,11 @@ $( document ).ready(function() {
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <button id="stats" type="button" title="Get crawl stats" class="btn btn-default btn-duo center">
-           Stats
+            <a>Get Stats</a>
         </button>
 
         <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
-           Images
+            <a>Get Images</a>
         </button>
 
       <h3>Description</h3>
@@ -165,6 +165,12 @@ $( document ).ready(function() {
       <p>...</p>
       <h3>Crawl Index</h3>
       <p>...</p>
+      {% if crawl.crawler == 'ache' %}
+      <h3>Crawl Model</h3>
+      <ul>
+          <li> {{ model.name }}</li>
+      </ul>
+      {% endif %}
     </div>
 
 
