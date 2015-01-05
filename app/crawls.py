@@ -28,6 +28,18 @@ class AcheCrawl(object):
             print("Killing %s" % str(self.proc.pid))
             self.proc.kill()
 
+    def get_status(self):
+        self.proc.poll()
+        if self.proc is None:
+            self.status = "No process exists"
+        elif self.proc.returncode is None:
+            self.status = "Running crawl"
+        elif self.proc.returncode < 0:
+            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
+        else:
+            self.status = "Crawl process ended"
+        return self.status
+
     def status(self):
         self.proc.poll()
         if self.proc is None:
