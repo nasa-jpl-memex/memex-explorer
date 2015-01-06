@@ -164,7 +164,7 @@ def db_init_ache(project, crawl):
                                project_id=project.id)
 
     harvest_data_uri = os.path.join(crawl.name, 'data_monitor/harvestinfo.csv')
-    harvest_data = DataSource(name=key + '-harvestinfo',
+    harvest_data = DataSource(name=key + '-harvest',
                               data_uri=harvest_data_uri,
                               project_id=project.id)
 
