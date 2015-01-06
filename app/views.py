@@ -566,6 +566,13 @@ def image_source(image_space_slug, image_name):
     return send_from_directory(img_dir, img_filename)
 
 
+@app.route('/<project_slug>/image_space')
+def image_space(project_slug):
+    project = get_project(project_slug)
+    image_spaces = ImageSpace.query.filter_by(project_id=project.id)
+    return render_template('image_space.html', project=project, image_spaces=image_spaces)
+
+
 @app.route('/<project_slug>/image_space/<image_space_slug>/')
 def image_table(project_slug, image_space_slug):
     project = get_project(project_slug)
