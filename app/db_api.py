@@ -147,23 +147,23 @@ def db_add_crawl(project, form, seed_filename, model=None):
 
 
 def db_init_ache(project, crawl):
-    key = project.slug + '-' + crawl.name
-    crawled_data_uri = os.path.join(crawl.name, 'data/data_monitor/crawledpages.csv')
+    key = crawl.name
+    crawled_data_uri = os.path.join(crawl.name, 'data_monitor/crawledpages.csv')
     crawled_data = DataSource(name=key + '-crawledpages',
                               data_uri=crawled_data_uri,
                               project_id=project.id)
 
-    relevant_data_uri = os.path.join(crawl.name, 'data/data_monitor/relevantpages.csv')
+    relevant_data_uri = os.path.join(crawl.name, 'data_monitor/relevantpages.csv')
     relevant_data = DataSource(name=key + '-relevantpages',
                                data_uri=relevant_data_uri,
                                project_id=project.id)
 
-    frontier_data_uri = os.path.join(crawl.name, 'data/data_monitor/frontierpages.csv')
+    frontier_data_uri = os.path.join(crawl.name, 'data_monitor/frontierpages.csv')
     frontier_data = DataSource(name=key + '-frontierpages',
                                data_uri=frontier_data_uri,
                                project_id=project.id)
 
-    harvest_data_uri = os.path.join(crawl.name, 'data/data_monitor/harvestinfo.csv')
+    harvest_data_uri = os.path.join(crawl.name, 'data_monitor/harvestinfo.csv')
     harvest_data = DataSource(name=key + '-harvestinfo',
                               data_uri=harvest_data_uri,
                               project_id=project.id)
