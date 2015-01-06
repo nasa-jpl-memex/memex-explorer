@@ -37,7 +37,7 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
-                     db_process_exif, get_image_space, db_add_model)
+                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names)
 
 from .rest_api import api
 
@@ -597,8 +597,11 @@ def inspect(project_slug, image_space_slug, image_name):
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
+    image_names = get_uploaded_image_names()
+    image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
+                    for filename in image_names]
     if request.method == 'GET':
-        return render_template('upload.html')
+        return render_template('upload.html', image_pages=image_pages)
     elif request.method == 'POST':
         uploaded_file = request.files['file']
         if uploaded_file and allowed_file(uploaded_file.filename):
@@ -608,9 +611,7 @@ def upload(project_slug):
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
                 process_exif(exif_data, filename)
-                # import pdb; pdb.set_trace()
-                return redirect(url_for('compare', project_slug=project_slug, image_name=filename)
-                    )
+                return redirect(url_for('compare', project_slug=project_slug, image_name=filename))
 
                 # TODO
 
