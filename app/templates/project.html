@@ -45,7 +45,7 @@
         </div>
 
         <div class="col-sm-4">
-             <h4><a href="#">
+             <h4><a href="{{ url_for('image_space', project_slug=project.slug) }}">
               <i class="fa fa-image"> &nbsp; </i>Image Spaces</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h4>
             {%  if image_spaces and image_spaces[0] %}
             <ul class="list-group">
