@@ -557,8 +557,18 @@ def compare(project_slug, image_name, image_space_slug=None):
                             # external_matches=external_matches
                              )
 
+
+@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
+def delete_image(project_slug, image_space_slug, image_name):
+    image = get_image(image_name) 
+    db.session.delete(image) 
+    db.session.commit()
+    flash('%s has successfully been deleted.' % image.img_file, 'success')
+    return redirect(url_for('image_table', project_slug=project_slug, image_space_slug=image_space_slug))
+
+
 @app.route('/<image_space_slug>/images/<image_name>')
-def image_source(image_space_slug, image_name):
+def image_source(image_space_slug, image_name): 
     img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images')
     img_filename = image_name
     return send_from_directory(img_dir, img_filename)
