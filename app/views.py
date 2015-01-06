@@ -58,6 +58,7 @@ from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.harvest_rate import HarvestRate
 
+from .images import allowed_file, lost_camera_retreive, image_retrieve, serve_upload_page, process_exif
 
 # Dictionary of crawls by key(project_slug-crawl_name)
 CRAWLS = {}
@@ -257,26 +258,19 @@ def crawl(project_slug, crawl_slug):
         flash("Crawl '%s' was not found." % crawl.name, 'error')
         abort(404)
 
-<<<<<<< HEAD
-    return render_template('crawl.html', crawl=crawl, model=model)
-=======
 
     if crawl.crawler == 'ache':
         try:
             scripts, divs = default_ache_dash(project, crawl)
         except PlotsNotReadyException as e:
             traceback.print_exc()
-            return render_template('crawl.html', crawl=crawl)
+            return render_template('crawl.html', crawl=crawl, model=model)
 
         return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl)
 
     else:
-        return render_template('crawl.html', crawl=crawl)
+        return render_template('crawl.html', crawl=crawl, model=model)
 
-
-
-
->>>>>>> master
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
@@ -523,9 +517,12 @@ def contact():
 
 # Compare (Image Space)
 # ------------------------------------------------------------------------
-
+@app.route('/<project_slug>/compare/<image_name>')
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/compare/')
-def compare(project_slug, image_space_slug, image_name):
+def compare(project_slug, image_name, image_space_slug=None):
+    if image_name is None:
+        return serve_upload_page()
+
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
     # TODO change to query by image_space. Requires db changes.
@@ -592,3 +589,54 @@ def inspect(project_slug, image_space_slug, image_name):
 
     return render_template('inspect.html', image=img, image_space=image_space, exif_info=exif_info)
 
+
+@app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
+def upload(project_slug):
+    if request.method == 'GET':
+        return render_template('upload.html')
+    elif request.method == 'POST':
+        uploaded_file = request.files['file']
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            filename = secure_filename(uploaded_file.filename)
+            full_path = os.path.join(app.config['UPLOAD_DIR'], filename)
+            uploaded_file.save(full_path)
+            with open(full_path, 'rb') as f:
+                exif_data = exifread.process_file(f)
+                process_exif(exif_data, filename)
+                # import pdb; pdb.set_trace()
+                return redirect(url_for('compare', project_slug=project_slug, image_name=filename)
+                    )
+
+                # TODO
+
+                # Get and properly parse every tag in exif_data  !important
+                      # Better to have a complete record from the get-go
+                      # Better factored out as a separate function, so it is easy
+                      #   to add heuristics for canonicalization as necessary.
+                # exif_proper, extra = utils.process_exif(exif_data)
+
+
+
+                # if extra:
+                    # review_path = os.path.join(
+                    #               app.config['REVIEW_DIR'], filename)
+                    # os.cp(full_path, review_path)
+                    # return render_template('review_exif.html',
+                    #                        image=review_path, exif=extra)
+
+
+                # Add uploaded image to the database
+                # image_id = db.store(filename, full_path, exif_proper)
+
+                # Launch background process to compare against lost camera databases
+                # utils.launch(utils.lost_camera, image_id)
+                # Launch background process for {feature, facial} recognition (v2)
+                # utils.launch(utils.feature_comparison, image_id)
+
+                # return jsonify(url_for('compare'), image=image_id)
+        else:
+            allowed = ', '.join(app.config['ALLOWED_EXTENSIONS'])
+            response = jsonify(dict(
+                error="File does not match allowed extensions: %s" % allowed))
+            response.status_code = 500
+            return response
