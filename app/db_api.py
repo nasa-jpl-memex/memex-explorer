@@ -201,26 +201,26 @@ def db_init_ache(project, crawl):
 
 def db_process_exif(exif_data, img_path, image_space):
     """ Store the EXIF data from the image in the db"""
-    LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
-    MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
-    BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
-    MISN = getattr(exif_data.get('MakerNote InternalSerialNumber'), 'values', None)
-    MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
-    IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
+    if not Image.query.filter_by(img_file=img_path).first():
+        LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
+        MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
+        BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
+        MISN = getattr(exif_data.get('MakerNote InternalSerialNumber'), 'values', None)
+        MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
+        IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-    image = Image(img_file=img_path,
-                  EXIF_LensSerialNumber=LSVN,
-                  MakerNote_SerialNumberFormat=MSNF,
-                  EXIF_BodySerialNumber=BSN,
-                  MakerNote_InternalSerialNumber=MISN,
-                  MakerNote_SerialNumber=MSN,
-                  Image_BodySerialNumber=IBSN,
-                  Uploaded=0)
-
-    image_space.images.append(image)
-    # Add uploaded image to the database
-    db.session.add(image)
-    db.session.commit()
+        image = Image(img_file=img_path,
+                      EXIF_LensSerialNumber=LSVN,
+                      MakerNote_SerialNumberFormat=MSNF,
+                      EXIF_BodySerialNumber=BSN,
+                      MakerNote_InternalSerialNumber=MISN,
+                      MakerNote_SerialNumber=MSN,
+                      Image_BodySerialNumber=IBSN,
+                      Uploaded=0)
+        image_space.images.append(image)
+        # Add uploaded image to the database
+        db.session.add(image)
+        db.session.commit()
 
 
 def set_match(source_id, match_id, match):
