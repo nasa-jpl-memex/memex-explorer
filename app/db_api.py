@@ -215,8 +215,7 @@ def db_process_exif(exif_data, img_path, image_space):
                   MakerNote_InternalSerialNumber=MISN,
                   MakerNote_SerialNumber=MSN,
                   Image_BodySerialNumber=IBSN,
-                  Uploaded=1,
-    )
+                  Uploaded=0)
 
     image_space.images.append(image)
     # Add uploaded image to the database
@@ -230,3 +229,9 @@ def set_match(source_id, match_id, match):
 
     elif not match:
         MATCHES.remove((source_id, match_id))
+
+
+def get_uploaded_image_names():
+    upload_dir = app.config['UPLOAD_DIR']
+    ret_list = os.listdir(upload_dir)
+    return ret_list

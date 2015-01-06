@@ -1,5 +1,5 @@
     options = {
-        url: "/upload",
+        url: "/{{ project.slug }}/upload_image",
         success:  function(file, response) {
              if (this.getUploadingFiles().length === 0
                  && this.getQueuedFiles().length === 0) {
