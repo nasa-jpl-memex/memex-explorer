@@ -218,8 +218,7 @@ def db_process_exif(exif_data, img_path, image_space):
                   MakerNote_InternalSerialNumber=MISN,
                   MakerNote_SerialNumber=MSN,
                   Image_BodySerialNumber=IBSN,
-                  Uploaded=0,
-    )
+                  Uploaded=0)
 
     image_space.images.append(image)
     # Add uploaded image to the database
