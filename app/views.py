@@ -561,6 +561,7 @@ def compare(project_slug, image_name, image_space_slug=None):
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
 def delete_image(project_slug, image_space_slug, image_name):
     image = get_image(image_name) 
+    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.img_file)
     db.session.delete(image) 
     db.session.commit()
     flash('%s has successfully been deleted.' % image.img_file, 'success')
