@@ -10,6 +10,8 @@
 <script>
 $( document ).ready(function() {
 
+    $('[data-toggle="tooltip"]').tooltip();
+
     $('#reload').on('click', function(){
         location.reload(true);
     });
@@ -109,10 +111,14 @@ $( document ).ready(function() {
 <div class='row'>
         <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
             <div class='col-xs-2'>
-              <button id="playButton" title="Start Crawl" type="button" class="btn btn-control">
+              <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
+                data-container="body"
+                data-toggle="tooltip" data-placement="bottom">
                   <i class="fa fa-play"></i>
               </button>
-              <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control">
+              <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
+                data-container="body"
+                data-toggle="tooltip" data-placement="bottom">
                   <span class="fa fa-stop"></span>
               </button>
               </div>
@@ -121,11 +127,15 @@ $( document ).ready(function() {
                   <i class="fa fa-file-o"></i>
               </button> -->
               <a href="{{ url_for('edit_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}" style='text-decoration:none;'>
-                <button id="editButton" type="button" title="Edit Crawl" class="btn btn-control">
+                <button id="editButton" type="button" title="Edit Crawl" class="btn btn-control"
+                data-container="body"
+                data-toggle="tooltip" data-placement="bottom">
                   <i class="fa fa-edit"></i>
                 </button>
               </a>
-                <button id="removeButton" title="Delete Crawl" class="btn btn-control" type="button">
+                <button id="removeButton" title="Delete Crawl" class="btn btn-control" type="button"
+                data-container="body"
+                data-toggle="tooltip" data-placement="bottom">
                     <span class="fa fa-close"></span>
                 </button>
             </div>
