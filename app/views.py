@@ -311,6 +311,7 @@ def edit_crawl(project_slug, crawl_slug):
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/run', methods=['POST'])
 def run_crawl(project_slug, crawl_slug):
+    project = get_project(project_slug)
     key = project_slug + '-' + crawl_slug
     try:
         crawl = get_crawl(crawl_slug)
@@ -319,13 +320,13 @@ def run_crawl(project_slug, crawl_slug):
             model = get_crawl_model(crawl)
             crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
                                        model_name=model.name, conf_name=crawl.config,
-                                       project_slug=project_slug)
+                                       project_id=project.id)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         elif crawl.crawler == "nutch":
-            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.slug,
-                                        project_slug=project_slug)
+            crawl_instance = NutchCrawl(crawl_name=crawl.name, seed_dir=seeds_list,
+                                        crawl_dir=crawl.slug, project_id=project.id)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
@@ -412,16 +413,18 @@ def stats_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
     crawl_instance = CRAWLS.get(key)
     if crawl_instance is not None:
-        return crawl_instance.statistics()
+        return jsonify(crawl_instance.statistics())
     else:
         crawl = get_crawl(crawl_slug)
         seeds_list = crawl.seeds_list
         if crawl.crawler == "ache":
             model = get_crawl_model(crawl)
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list, model_name=model.name,
-                                       conf_name=crawl.config, project_id=project.id)
+            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
+                                       model_name=model.name, conf_name=crawl.config,
+                                       project_id=project.id)
         elif crawl.crawler == "nutch":
-            crawl_instance = NutchCrawl(seed_dir=seeds_list, crawl_dir=crawl.name, project_id=project.id)
+            crawl_instance = NutchCrawl(crawl_name=crawl.name, seed_dir=seeds_list,
+                                        crawl_dir=crawl.slug, project_id=project.id)
 
         stats_output = crawl_instance.statistics()
         print("crawl stats:" + str(stats_output))

@@ -96,6 +96,13 @@ $( document ).ready(function() {
                       data.num_crawled +
                      '</p>'
                     );
+                } else {
+                  $( '#stats-data' ).html(
+                     '<h4>Harvest Rate</h4>' +
+                     '<p class="big-number">' +
+                      data.harvest_rate +
+                     '</p>'
+                    );
                 }
             },
         });

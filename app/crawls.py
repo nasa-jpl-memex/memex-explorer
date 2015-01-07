@@ -150,7 +150,7 @@ class AcheCrawl(Crawl):
 
 class NutchCrawl(Crawl):
 
-    def __init__(self, seed_dir, crawl_dir, project_id, num_rounds=1):
+    def __init__(self, seed_dir, crawl_dir, project_id, crawl_name, num_rounds=1):
         self.seed_dir =  os.path.join(SEED_FILES, seed_dir)
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_dir)
         self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl_dir, 'images')
