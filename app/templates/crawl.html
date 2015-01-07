@@ -109,6 +109,12 @@ $( document ).ready(function() {
                     );
                 }
             },
+          failure: function() {
+                  $( '#stats-data' ).html(
+                     '<h4>(Statistics are not yet available for this crawl.)</h4>'
+                    );
+
+          }
         });
     });
 
