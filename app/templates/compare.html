@@ -1,56 +1,5 @@
 {% extends "base.html" %}
 
-
-{%- block extrahead %}
-<script>
-$( document ).ready(function() {
-
-  var source_id = {{ image.id }};
-
-  function bool(val) {
-    if (val == "true") return true;
-    return false;
-  }
-
-  function set_match(source_id, match_id, match) {
-    $.ajax({
-      url: "/api/image_match/",
-      type: "POST",
-      data: {
-        source_id: source_id,
-        match_id: match_id,
-        match: match
-      },
-      success: function(response) {
-        console.log(response);
-      },
-      timeout: 2000
-    });
-  }
-
-  $('.thumbnail').on('click', function(){
-    var el = $(this)[0];
-
-    var match_id = el.dataset.id;
-    var match = el.dataset.match = !bool(el.dataset.match);
-
-    set_match(source_id, match_id, match);
-  });
-
-});
-
-</script>
-
-<style type="text/css">
-  [data-match="true"] {
-    border: 4px solid #1F8E0C;
-    /*margin: -1px;*/
-  }
-</style>
-
-{% endblock %}
-
-
 {% block content %}
 {% include 'sidebar.html' %}
 
