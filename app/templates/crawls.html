@@ -29,39 +29,8 @@
             {% endfor %}
         </table>
         {% else %}
-        <a href="#"><p>+ Add Images</p></a>
-        {% endif %}
+        <a href="{{ url_for('image_space', project_slug=project.slug) }}"><p>+ Add Images</p></a>
     </div>
-    <div class="col-sm-2">
-        {% if plots %}
-        <table class="table table-striped">
-            <tr>
-                <th>Plot(s)</th>
-            </tr>
-            {% for plot in plots %}
-            <tr>
-                <td>{{ plot.name }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <a href="#"><p>+ Add plots</p></a>
-        {% endif %}
-    </div>
-    <div class="col-sm-2">
-        {% if data_sources %}
-        <table class="table table-striped">
-            <tr>
-                <th>Data Source(s)</th>
-            </tr>
-            {% for data_source in data_sources %}
-            <tr>
-                <td>{{ data_source.name }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <a href="#"><p>+ Add Data Sources</p></a>
         {% endif %}
     </div>
     </div>
@@ -74,3 +43,4 @@
 </div>
 
 {% endblock %}
+
