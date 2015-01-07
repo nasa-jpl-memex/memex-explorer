@@ -17,21 +17,21 @@
         </a>
         <p>{{ crawl.description }}</p>
     <div class="col-sm-2">
-        {% if images %}
+        {% for image_space in image_spaces %}
+        {% if image_space.name == crawl.name %}
         <table class="table table-striped">
             <tr>
                 <th>Image(s)</th>
             </tr>
-            {% for image in images %}
+            {% for image in image_space.images %}
             <tr>
-                <td><a href="#">{{ image.name }}</a></td>
+                <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug, image_space_slug=image_space.slug) }}">{{ image.img_file }}</a></td>
             </tr>
             {% endfor %}
-        </table>
-        {% else %}
-        <a href="{{ url_for('image_space', project_slug=project.slug) }}"><p>+ Add Images</p></a>
-    </div>
+               </table>
+            <a href="{{ url_for('image_space', project_slug=project.slug) }}"><p>+ Add Images</p></a>
         {% endif %}
+        {% endfor %}
     </div>
     </div>
     {% endfor %}
