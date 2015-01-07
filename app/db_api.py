@@ -158,24 +158,24 @@ def db_add_crawl(project, form, seed_filename, model=None):
 
 
 def db_init_ache(project, crawl):
-    key = project.slug + '-' + crawl.name
-    crawled_data_uri = os.path.join(crawl.name, 'data/data_monitor/crawledpages.csv')
+    key = crawl.name
+    crawled_data_uri = os.path.join(crawl.name, 'data_monitor/crawledpages.csv')
     crawled_data = DataSource(name=key + '-crawledpages',
                               data_uri=crawled_data_uri,
                               project_id=project.id)
 
-    relevant_data_uri = os.path.join(crawl.name, 'data/data_monitor/relevantpages.csv')
+    relevant_data_uri = os.path.join(crawl.name, 'data_monitor/relevantpages.csv')
     relevant_data = DataSource(name=key + '-relevantpages',
                                data_uri=relevant_data_uri,
                                project_id=project.id)
 
-    frontier_data_uri = os.path.join(crawl.name, 'data/data_monitor/frontierpages.csv')
+    frontier_data_uri = os.path.join(crawl.name, 'data_monitor/frontierpages.csv')
     frontier_data = DataSource(name=key + '-frontierpages',
                                data_uri=frontier_data_uri,
                                project_id=project.id)
 
-    harvest_data_uri = os.path.join(crawl.name, 'data/data_monitor/harvestinfo.csv')
-    harvest_data = DataSource(name=key + '-harvestinfo',
+    harvest_data_uri = os.path.join(crawl.name, 'data_monitor/harvestinfo.csv')
+    harvest_data = DataSource(name=key + '-harvest',
                               data_uri=harvest_data_uri,
                               project_id=project.id)
 
@@ -212,27 +212,28 @@ def db_init_ache(project, crawl):
 
 def db_process_exif(exif_data, img_path, img_file, image_space):
     """ Store the EXIF data from the image in the db"""
-    LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
-    MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
-    BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
-    MISN = getattr(exif_data.get('MakerNote InternalSerialNumber'), 'values', None)
-    MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
-    IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
+    if not Image.query.filter_by(img_file=img_path).first():
+        LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
+        MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
+        BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
+        MISN = getattr(exif_data.get('MakerNote InternalSerialNumber'), 'values', None)
+        MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
+        IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-    image = Image(img_dir=img_path,
-                  img_file=img_file,
-                  EXIF_LensSerialNumber=LSVN,
-                  MakerNote_SerialNumberFormat=MSNF,
-                  EXIF_BodySerialNumber=BSN,
-                  MakerNote_InternalSerialNumber=MISN,
-                  MakerNote_SerialNumber=MSN,
-                  Image_BodySerialNumber=IBSN,
-                  Uploaded=0)
+        image = Image(img_dir=img_path,
+                      img_file=img_file,
+                      EXIF_LensSerialNumber=LSVN,
+                      MakerNote_SerialNumberFormat=MSNF,
+                      EXIF_BodySerialNumber=BSN,
+                      MakerNote_InternalSerialNumber=MISN,
+                      MakerNote_SerialNumber=MSN,
+                      Image_BodySerialNumber=IBSN,
+                      Uploaded=0)
 
-    image_space.images.append(image)
-    # Add uploaded image to the database
-    db.session.add(image)
-    db.session.commit()
+        image_space.images.append(image)
+        # Add uploaded image to the database
+        db.session.add(image)
+        db.session.commit()
 
 
 def set_match(source_id, match_id, match):

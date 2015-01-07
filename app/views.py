@@ -547,6 +547,16 @@ def image_source(image_directory, image_name):
     return send_from_directory(img_dir, img_filename)
 
 
+@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
+def delete_image(project_slug, image_space_slug, image_name):
+    image = get_image(image_name) 
+    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.img_file)
+    db.session.delete(image) 
+    db.session.commit()
+    flash('%s has successfully been deleted.' % image.img_file, 'success')
+    return redirect(url_for('image_table', project_slug=project_slug, image_space_slug=image_space_slug))
+
+
 @app.route('/uploaded_images/<image_name>')
 def uploaded_image(image_name):
     return send_from_directory(app.config['UPLOAD_DIR'], image_name)
