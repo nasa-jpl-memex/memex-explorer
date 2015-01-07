@@ -515,17 +515,12 @@ def contact():
 
 # Compare (Image Space)
 # ------------------------------------------------------------------------
-@app.route('/<project_slug>/compare/<image_name>')
-@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/compare/')
-def compare(project_slug, image_name, image_space_slug=None):
-    if image_name is None:
-        return serve_upload_page()
 
+@app.route('/<project_slug>/uploaded_image/<image_name>')
+def compare(project_slug, image_name):
     project = get_project(project_slug)
-    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
-    # TODO change to query by image_space. Requires db changes.
-    images = get_image_space(image_space_slug)
     img = get_image(image_name)
+
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
@@ -534,12 +529,6 @@ def compare(project_slug, image_name, image_space_slug=None):
               img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
               img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
 
-    # serial_matches = get_info_serial(img.EXIF_BodySerialNumber)
-    # full_match_paths = [app.config['STATIC_IMAGE_DIR'] + x.img_file for x in serial_matches
-    #                                                                  if x.Uploaded != 1]
-    # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
-    #                         for x in full_match_paths]
-
     internal_matches = get_matches(project.id, img.img_file)
     for x in internal_matches:
         if (img.id, x.id) in app.MATCHES:
@@ -547,21 +536,19 @@ def compare(project_slug, image_name, image_space_slug=None):
         else:
             x.match = "false"
 
-    # if img.EXIF_BodySerialNumber:
-    #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)
-    # else:
-    #     external_matches = []
+    return render_template('compare.html', image=img, exif_info=exif_info, internal_matches=internal_matches)
 
-    return render_template('compare.html', image=img, exif_info=exif_info, image_space=image_space,
-                            internal_matches=internal_matches,
-                            # external_matches=external_matches
-                             )
 
-@app.route('/<image_space_slug>/images/<image_name>')
-def image_source(image_space_slug, image_name):
+@app.route('/<image_directory>/images/<image_name>')
+def image_source(image_directory, image_name):
     img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images')
     img_filename = image_name
     return send_from_directory(img_dir, img_filename)
+
+
+@app.route('/uploaded_images/<image_name>')
+def uploaded_image(image_name):
+    return send_from_directory(app.config['UPLOAD_DIR'], image_name)
 
 
 @app.route('/<project_slug>/image_space')
