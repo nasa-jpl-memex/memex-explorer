@@ -34,12 +34,20 @@
   <div class="row">
     {% for img in internal_matches %}
     <div class="col-xs-6 col-sm-3">
-      <img src="{{ url_for('image_source', image_directory=img.img_dir, image_name=img.img_file) }}"
+
+    {% if img.Uploaded == 1 %}
+      <img src="{{ url_for('uploaded_image', image_name=img.img_file) }}"
         data-id="{{ img.id }}"
         data-match="{{ img.match }}"
         alt="{{ img }}"
         height="200" width="200"
         class="thumbnail">
+    {% else %}
+      <img src="{{ url_for('image_source', image_directory= img.img_dir, image_name=img.img_file) }}"
+        alt="{{ img }}"
+        height="200" width="200"
+        class="thumbnail">
+    {% endif %}
      <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.img_file) }}">{{ img }}</a></h4>
 
    </div>
@@ -47,17 +55,6 @@
 </div>
 {% endif %}
 
-{# {% if external_matches %}
-  <h3>Matched Images from Stolen Camera Finders</h3>
-  <div class="row">
-  {% for img in external_matches %}
-       <div class="col-xs-6 col-sm-3">
-        <img src="{{ url_for('static', filename = img[0]) }}" height="200" width="200" class="thumbnail" alt="{{ img[1] }}">
-        <h4>{{ img[1] }} <small>(from {{ img[2] }})</small></h4>
-      </div>
-  {% endfor %}
-  </div>
-{% endif %} #}
 
 {% endblock content %}
 
