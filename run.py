@@ -24,4 +24,10 @@ if __name__ == "__main__":
             import webbrowser
             webbrowser.open(url)
 
+    if not app.debug:
+        import logging
+        file_handler = logging.FileHandler('memex_explorer.log')
+        file_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(file_handler)
+
     app.run(host=app.config['HOST'], port=app.config['PORT'], debug=app.config['DEBUG'])
