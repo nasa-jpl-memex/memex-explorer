@@ -23,9 +23,9 @@
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug, image_space_slug=image_space.slug) }}">
-                      <img src="{{ url_for('image_source', image_space_slug=image_space.slug, image_name=image['img_file']) }}"
-                           height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}"></a>
+                  <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug) }}">
+                      <img src="{{ url_for('image_source', image_directory=image.img_dir, image_name=image['img_file']) }}"
+                           height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}"></a></td>
                        <form style='margin:0;padding:0;'>
                        <button formmethod='post' formaction="{{ url_for('delete_image', project_slug=project.slug, image_space_slug=image_space.slug, image_name=image.img_file) }}" type='submit' class="btn btn-default btn-duo center" style="margin:0px 0px 5px 0px;">
                           Delete

@@ -20,8 +20,8 @@
         </a>
       {% for image in image_space.images %}
         <div class="col-md-1 col-sm-2 col-xs-3 col-lg-1 thumb">
-             <a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug, image_space_slug=image_space.slug) }}">
-                <img src="{{ url_for('image_source', image_space_slug=image_space.slug, image_name=image['img_file']) }}"
+             <a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug) }}">
+                <img src="{{ url_for('image_source', image_directory=image.img_dir, image_name=image['img_file']) }}"
                    height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}">
              </a>
         </div>
