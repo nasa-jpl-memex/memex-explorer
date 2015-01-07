@@ -32,28 +32,29 @@ import exifread
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpace, \
-                    DataModel
+
+from .config import (ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, 
+                     CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH,
+                     UPLOAD_DIR)
+
+from .rest_api import api
+from .mail import send_email
+from .auth import requires_auth
+from .models import (Crawl, DataSource, Dashboard, Plot, Project, Image,
+                     ImageSpace, DataModel)
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
-                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names)
+                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
+                     get_image_space_from_name)
 
-from .rest_api import api
+from .forms import (CrawlForm, MonitorDataForm, PlotForm, ContactForm,
+                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm,
+                    EditCrawlForm)
 
-from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm, \
-                    EditCrawlForm
-from .mail import send_email
-
-from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
-                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
-
-from .auth import requires_auth
-from .plotting import default_ache_dash, PlotsNotReadyException
 from .crawls import AcheCrawl, NutchCrawl
 
-
+from .plotting import default_ache_dash, PlotsNotReadyException
 from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.harvest_rate import HarvestRate
@@ -447,7 +448,7 @@ def dump_images(project_slug, crawl_slug):
             image_path = os.path.join(crawl_instance.img_dir, image)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                db_process_exif(exif_data, image, image_space)
+                db_process_exif(exif_data, crawl_slug, image, image_space)
         print("Images dumped for NUTCH crawl %s" % crawl.name)
         return redirect(url_for('image_table', project_slug=project.slug, image_space_slug=crawl.slug))
     else:
@@ -517,17 +518,12 @@ def contact():
 
 # Compare (Image Space)
 # ------------------------------------------------------------------------
-@app.route('/<project_slug>/compare/<image_name>')
-@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/compare/')
-def compare(project_slug, image_name, image_space_slug=None):
-    if image_name is None:
-        return serve_upload_page()
 
+@app.route('/<project_slug>/uploaded_image/<image_name>')
+def compare(project_slug, image_name):
     project = get_project(project_slug)
-    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
-    # TODO change to query by image_space. Requires db changes.
-    images = get_image_space(image_space_slug)
     img = get_image(image_name)
+
     exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
               'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
               'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
@@ -536,12 +532,6 @@ def compare(project_slug, image_name, image_space_slug=None):
               img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
               img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
 
-    # serial_matches = get_info_serial(img.EXIF_BodySerialNumber)
-    # full_match_paths = [app.config['STATIC_IMAGE_DIR'] + x.img_file for x in serial_matches
-    #                                                                  if x.Uploaded != 1]
-    # internal_matches = [(x.split('/static/')[-1], x.split('/')[-1])
-    #                         for x in full_match_paths]
-
     internal_matches = get_matches(project.id, img.img_file)
     for x in internal_matches:
         if (img.id, x.id) in app.MATCHES:
@@ -549,15 +539,14 @@ def compare(project_slug, image_name, image_space_slug=None):
         else:
             x.match = "false"
 
-    # if img.EXIF_BodySerialNumber:
-    #     external_matches = lost_camera_retreive(img.EXIF_BodySerialNumber)
-    # else:
-    #     external_matches = []
+    return render_template('compare.html', image=img, exif_info=exif_info, internal_matches=internal_matches)
 
-    return render_template('compare.html', image=img, exif_info=exif_info, image_space=image_space,
-                            internal_matches=internal_matches,
-                            # external_matches=external_matches
-                             )
+
+@app.route('/<image_directory>/images/<image_name>')
+def image_source(image_directory, image_name):
+    img_dir = os.path.join(IMAGE_SPACE_PATH, image_directory, 'images')
+    img_filename = image_name
+    return send_from_directory(img_dir, img_filename)
 
 
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
@@ -570,11 +559,9 @@ def delete_image(project_slug, image_space_slug, image_name):
     return redirect(url_for('image_table', project_slug=project_slug, image_space_slug=image_space_slug))
 
 
-@app.route('/<image_space_slug>/images/<image_name>')
-def image_source(image_space_slug, image_name): 
-    img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images')
-    img_filename = image_name
-    return send_from_directory(img_dir, img_filename)
+@app.route('/uploaded_images/<image_name>')
+def uploaded_image(image_name):
+    return send_from_directory(app.config['UPLOAD_DIR'], image_name)
 
 
 @app.route('/<project_slug>/image_space')
@@ -592,27 +579,14 @@ def image_table(project_slug, image_space_slug):
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
-@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>')
-def inspect(project_slug, image_space_slug, image_name):
-    img = get_image(image_name)
-    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
-
-    exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
-              'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
-              'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
-
-             (img.EXIF_BodySerialNumber, img.EXIF_LensSerialNumber,
-              img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
-              img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
-
-    return render_template('inspect.html', image=img, image_space=image_space, exif_info=exif_info)
-
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
-    image_names = get_uploaded_image_names()
+    image_names = os.listdir(UPLOAD_DIR)
     image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
+
                     for filename in image_names]
+    image_space = get_image_space_from_name(image_space_name="uploaded_images")
     if request.method == 'GET':
         return render_template('upload.html', image_pages=image_pages)
     elif request.method == 'POST':
@@ -623,36 +597,10 @@ def upload(project_slug):
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                process_exif(exif_data, filename)
-                return redirect(url_for('compare', project_slug=project_slug, image_name=filename))
-
-                # TODO
-
-                # Get and properly parse every tag in exif_data  !important
-                      # Better to have a complete record from the get-go
-                      # Better factored out as a separate function, so it is easy
-                      #   to add heuristics for canonicalization as necessary.
-                # exif_proper, extra = utils.process_exif(exif_data)
+                process_exif(exif_data, 'uploaded_images', filename, image_space)
+                return jsonify(url=url_for('compare', project_slug=project_slug, image_name=filename))
 
 
-
-                # if extra:
-                    # review_path = os.path.join(
-                    #               app.config['REVIEW_DIR'], filename)
-                    # os.cp(full_path, review_path)
-                    # return render_template('review_exif.html',
-                    #                        image=review_path, exif=extra)
-
-
-                # Add uploaded image to the database
-                # image_id = db.store(filename, full_path, exif_proper)
-
-                # Launch background process to compare against lost camera databases
-                # utils.launch(utils.lost_camera, image_id)
-                # Launch background process for {feature, facial} recognition (v2)
-                # utils.launch(utils.feature_comparison, image_id)
-
-                # return jsonify(url_for('compare'), image=image_id)
         else:
             allowed = ', '.join(app.config['ALLOWED_EXTENSIONS'])
             response = jsonify(dict(
