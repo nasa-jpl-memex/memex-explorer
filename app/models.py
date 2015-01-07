@@ -140,6 +140,7 @@ class Image(db.Model):
     __tablename__ = "image"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
+    img_dir = db.Column(db.String(140))
     img_file = db.Column(db.String(140))
     EXIF_LensSerialNumber = db.Column(db.String(140))
     MakerNote_SerialNumberFormat = db.Column(db.String(140))
