@@ -541,7 +541,7 @@ def compare(project_slug, image_name):
 
 @app.route('/<image_directory>/images/<image_name>')
 def image_source(image_directory, image_name):
-    img_dir = os.path.join(IMAGE_SPACE_PATH, image_space_slug, 'images')
+    img_dir = os.path.join(IMAGE_SPACE_PATH, image_directory, 'images')
     img_filename = image_name
     return send_from_directory(img_dir, img_filename)
 
@@ -565,21 +565,6 @@ def image_table(project_slug, image_space_slug):
     images = get_images(image_space.slug)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
-
-@app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>')
-def inspect(project_slug, image_space_slug, image_name):
-    img = get_image(image_name)
-    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
-
-    exif_info = dict(zip(('EXIF_BodySerialNumber', 'EXIF_LensSerialNumber',
-              'Image_BodySerialNumber', 'MakerNote_InternalSerialNumber',
-              'MakerNote_SerialNumber', 'MakerNote_SerialNumberFormat'),
-
-             (img.EXIF_BodySerialNumber, img.EXIF_LensSerialNumber,
-              img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
-              img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
-
-    return render_template('inspect.html', image=img, image_space=image_space, exif_info=exif_info)
 
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
