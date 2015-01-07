@@ -6,8 +6,25 @@
 {% block extrahead %}
   <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
   <script>$( document ).ready(function() {
+
+    options = {
+        // url: "/upload",
+        success:  function(file, response) {
+             if (this.getUploadingFiles().length === 0
+                 && this.getQueuedFiles().length === 0) {
+                window.location.replace(response.url)}},
+        failure: function(file, response) {
+            alert(response);
+        }
+    }
+
+    Dropzone.options.filedrop = options;
+
        $("div#filedrop").dropzone({ url: "/{{ project.slug }}/upload_image" });
-       });</script>
+       
+   });
+
+  </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dropzone.css') }}">
 {% endblock %}
 

@@ -9,9 +9,8 @@
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1>Image Spaces</h1>
         <br>
-        <button id="upload" type="button" title="Upload image to find matches" class="btn btn-default btn-duo center">
-            <a href="{{url_for('upload', project_slug=project.slug)}}">Upload image to compare</a>
-        </button>
+        <a class="btn btn-default btn-padded center" href="{{url_for('upload', project_slug=project.slug)}}">Upload image to find matches</a>
+
     </div>
 
     {% for image_space in image_spaces %}
