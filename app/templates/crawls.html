@@ -29,7 +29,7 @@
             </tr>
             {% endfor %}
                </table>
-            <a href="{{ url_for('image_space', project_slug=project.slug) }}"><p>+ Add Images</p></a>
+            <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a>
         {% endif %}
         {% endfor %}
     </div>
