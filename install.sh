@@ -15,3 +15,4 @@ fi
 source activate memex-explorer
 
 echo `which python`
+. /scripts/create_folder_structure.sh

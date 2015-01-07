@@ -15,6 +15,6 @@ CONDA_ENV_NAME=memex-explorer
 ~/anaconda/bin/conda install -c binstar supervisor -n $CONDA_ENV_NAME --yes
 
 echo `which python`
-. activate $CONDA_ENV_NAME
+source activate $CONDA_ENV_NAME
+. /scripts/create_folder_structure.sh
 
-supervisord -c /vagrant/scripts/supervisord.conf

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-mkdir seeds
-mkdir configs
-mkdir models
-mkdir crawls
-mkdir image_space
+mkdir -p app/resources/seeds
+mkdir -p app/resources/configs
+mkdir -p app/resources/models
+mkdir -p app/resources/crawls
+mkdir -p app/resources/image_space/uploaded_images
 
-chmod a+rwX -R seeds
-chmod a+rwX -R models
-chmod a+rwX -R configs
-chmod a+rwX -R crawls
-chmod a+rwX -R image_space
+chmod -R a+rwX app/resources/seeds
+chmod -R a+rwX app/resources/models
+chmod -R a+rwX app/resources/configs
+chmod -R a+rwX app/resources/crawls
+chmod -R a+rwX app/resources/image_space
