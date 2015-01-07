@@ -15,14 +15,8 @@ CONDA_ENV_NAME=memex-explorer
 ~/anaconda/bin/conda install -c binstar supervisor -n $CONDA_ENV_NAME --yes
 
 echo `which python`
+. scripts/create_folder_structure.sh
+
 . activate $CONDA_ENV_NAME
 
-if [ -n "${ACHE_HOME}" ]; then
-  echo "ACHE HOME IS SET"
-else
-  echo "export ACHE_HOME=~/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/" | tee -a ~/.bash_profile
-  . ~/.bash_profile
-  . activate $CONDA_ENV_NAME
-fi
-
-supervisord -c /vagrant/scripts/supervisord.conf
+python manage.py db upgrade
