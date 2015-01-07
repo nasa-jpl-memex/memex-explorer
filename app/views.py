@@ -446,7 +446,7 @@ def dump_images(project_slug, crawl_slug):
             image_path = os.path.join(crawl_instance.img_dir, image)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                db_process_exif(exif_data, image, image_space)
+                db_process_exif(exif_data, crawl_slug, image, image_space)
         print("Images dumped for NUTCH crawl %s" % crawl.name)
         return redirect(url_for('image_table', project_slug=project.slug, image_space_slug=crawl.slug))
     else:
