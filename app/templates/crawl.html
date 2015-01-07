@@ -176,8 +176,8 @@ $( document ).ready(function() {
             <!-- <button type="button" id="reload" class="btn btn-primary">Refresh</button> -->
             <button type="button" id="reload">Refresh</button>
         </div>
-        {% else %}
-        <h3>There are no plots to show.</h3>
+        {# {% else %}
+        <h3>There are no plots to show.</h3> #}
        {% endif %}
     </div>
 </div>
@@ -187,19 +187,17 @@ $( document ).ready(function() {
         <button id="stats" type="button" title="Get crawl stats" class="btn btn-default btn-duo center">
             <a>Get Stats</a>
         </button>
+        {% if crawl.crawler == 'nutch' %}
         <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
             <a>Get Images</a>
         </button>
+        {% endif %}
       <h3>Description</h3>
       <ul>
           <li>{{ crawl.description }}</li>
       </ul>
       <h3>Summary Statistics</h3>
       <p><span id="stats-data"></span></p>
-      <h3>Crawl Settings</h3>
-      <p>...</p>
-      <h3>Crawl Index</h3>
-      <p>...</p>
       {% if crawl.crawler == 'ache' %}
       <h3>Crawl Model</h3>
       <ul>
