@@ -66,10 +66,16 @@ def get_plot(plot_name):
     return Plot.query.filter_by(name=plot_name).first()
 
 
-def get_image(image_name):
-    """Return the image that matches `image_id`.
+def get_image_in_image_space(image_space, image_name):
+    """Return an image from an image_space that matches `image_name`.
     """
-    # TODO query just in that image_space
+    image= Image.query.filter_by(img_file=image_name).first()
+    return image
+
+
+def get_image(image_name):
+    """Return the image that matches `image_name`.
+    """
     return Image.query.filter_by(img_file=image_name).first()
 
 
@@ -81,6 +87,12 @@ def get_crawl_model(crawl):
 
 def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
+
+
+def get_image_space_from_name(image_space_name):
+    """Return the image space that matches `image_space_name`
+    """
+    return ImageSpace.query.filter_by(name=image_space_name).first()
 
 
 def get_crawl_image_space(project, crawl):
@@ -104,7 +116,6 @@ def get_crawl_image_space(project, crawl):
 def get_matches(project_id, image_name):
     """Return all images under `project_id` that match metadata on `image_id`.
     """
-
     img = get_image(image_name)
     if img.EXIF_BodySerialNumber is not None:
         return Image.query.filter_by(EXIF_BodySerialNumber=img.EXIF_BodySerialNumber).all()
@@ -199,7 +210,7 @@ def db_init_ache(project, crawl):
     db.session.commit()
 
 
-def db_process_exif(exif_data, img_path, image_space):
+def db_process_exif(exif_data, img_path, img_file, image_space):
     """ Store the EXIF data from the image in the db"""
     if not Image.query.filter_by(img_file=img_path).first():
         LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
@@ -209,7 +220,8 @@ def db_process_exif(exif_data, img_path, image_space):
         MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
         IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-        image = Image(img_file=img_path,
+        image = Image(img_dir=img_path,
+                      img_file=img_file,
                       EXIF_LensSerialNumber=LSVN,
                       MakerNote_SerialNumberFormat=MSNF,
                       EXIF_BodySerialNumber=BSN,
@@ -217,6 +229,7 @@ def db_process_exif(exif_data, img_path, image_space):
                       MakerNote_SerialNumber=MSN,
                       Image_BodySerialNumber=IBSN,
                       Uploaded=0)
+
         image_space.images.append(image)
         # Add uploaded image to the database
         db.session.add(image)

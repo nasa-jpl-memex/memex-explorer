@@ -1,56 +1,5 @@
 {% extends "base.html" %}
 
-
-{%- block extrahead %}
-<script>
-$( document ).ready(function() {
-
-  var source_id = {{ image.id }};
-
-  function bool(val) {
-    if (val == "true") return true;
-    return false;
-  }
-
-  function set_match(source_id, match_id, match) {
-    $.ajax({
-      url: "/api/image_match/",
-      type: "POST",
-      data: {
-        source_id: source_id,
-        match_id: match_id,
-        match: match
-      },
-      success: function(response) {
-        console.log(response);
-      },
-      timeout: 2000
-    });
-  }
-
-  $('.thumbnail').on('click', function(){
-    var el = $(this)[0];
-
-    var match_id = el.dataset.id;
-    var match = el.dataset.match = !bool(el.dataset.match);
-
-    set_match(source_id, match_id, match);
-  });
-
-});
-
-</script>
-
-<style type="text/css">
-  [data-match="true"] {
-    border: 4px solid #1F8E0C;
-    /*margin: -1px;*/
-  }
-</style>
-
-{% endblock %}
-
-
 {% block content %}
 {% include 'sidebar.html' %}
 
@@ -60,7 +9,13 @@ $( document ).ready(function() {
   <div class="row vertical-align clear-bottom">
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
-      <img src="{{ url_for('image_source', image_space_slug=image_space.slug, image_name=image.img_file) }}" class="img-responsive" alt="Generic placeholder thumbnail">
+    {% if image.Uploaded == 1 %}
+      <img src="{{ url_for('uploaded_image', image_name=image.img_file) }}"
+           class="img-responsive" alt="Generic placeholder thumbnail">
+    {% else %}
+      <img src="{{ url_for('image_source', image_directory= image.img_dir, image_name=image.img_file) }}"
+           class="img-responsive" alt="Generic placeholder thumbnail">
+    {% endif %}
     </div>
     <div class="col-xs-5">
       <div>
@@ -79,13 +34,13 @@ $( document ).ready(function() {
   <div class="row">
     {% for img in internal_matches %}
     <div class="col-xs-6 col-sm-3">
-      <img src="{{ url_for('image_source', image_space_slug=image_space.slug, image_name=img.img_file) }}"
+      <img src="{{ url_for('image_source', image_directory=img.img_dir, image_name=img.img_file) }}"
         data-id="{{ img.id }}"
         data-match="{{ img.match }}"
         alt="{{ img }}"
         height="200" width="200"
         class="thumbnail">
-     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_space_slug=image_space.slug, image_name=img.img_file) }}">{{ img }}</a></h4>
+     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.img_file) }}">{{ img }}</a></h4>
 
    </div>
   {% endfor %}
