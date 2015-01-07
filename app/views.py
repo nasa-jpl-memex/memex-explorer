@@ -37,7 +37,8 @@ from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpa
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
-                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names)
+                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
+                     get_image_space_from_name)
 
 from .rest_api import api
 
@@ -570,8 +571,9 @@ def image_table(project_slug, image_space_slug):
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
     image_names = get_uploaded_image_names()
-    image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
+    image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug, image_name=filename) } \
                     for filename in image_names]
+    image_space = get_image_space_from_name(image_space_name="uploaded_images")
     if request.method == 'GET':
         return render_template('upload.html', image_pages=image_pages)
     elif request.method == 'POST':
@@ -582,36 +584,9 @@ def upload(project_slug):
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                process_exif(exif_data, filename)
+                process_exif(exif_data, 'uploaded_images', filename, image_space)
                 return redirect(url_for('compare', project_slug=project_slug, image_name=filename))
 
-                # TODO
-
-                # Get and properly parse every tag in exif_data  !important
-                      # Better to have a complete record from the get-go
-                      # Better factored out as a separate function, so it is easy
-                      #   to add heuristics for canonicalization as necessary.
-                # exif_proper, extra = utils.process_exif(exif_data)
-
-
-
-                # if extra:
-                    # review_path = os.path.join(
-                    #               app.config['REVIEW_DIR'], filename)
-                    # os.cp(full_path, review_path)
-                    # return render_template('review_exif.html',
-                    #                        image=review_path, exif=extra)
-
-
-                # Add uploaded image to the database
-                # image_id = db.store(filename, full_path, exif_proper)
-
-                # Launch background process to compare against lost camera databases
-                # utils.launch(utils.lost_camera, image_id)
-                # Launch background process for {feature, facial} recognition (v2)
-                # utils.launch(utils.feature_comparison, image_id)
-
-                # return jsonify(url_for('compare'), image=image_id)
         else:
             allowed = ', '.join(app.config['ALLOWED_EXTENSIONS'])
             response = jsonify(dict(
