@@ -32,28 +32,29 @@ import exifread
 # -------------
 
 from . import app, db
-from .models import Crawl, DataSource, Dashboard, Plot, Project, Image, ImageSpace, \
-                    DataModel
+
+from .config import (ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, 
+                     CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH,
+                     UPLOAD_DIR)
+
+from .rest_api import api
+from .mail import send_email
+from .auth import requires_auth
+from .models import (Crawl, DataSource, Dashboard, Plot, Project, Image,
+                     ImageSpace, DataModel)
 from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
-                     db_process_exif, get_image_space, db_add_model, get_uploaded_image_names)
+                     db_process_exif, get_image_space, db_add_model)
 
-from .rest_api import api
 
-from .forms import CrawlForm, MonitorDataForm, PlotForm, ContactForm, \
-                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm, \
-                    EditCrawlForm
-from .mail import send_email
+from .forms import (CrawlForm, MonitorDataForm, PlotForm, ContactForm,
+                    DashboardForm, ProjectForm, DataModelForm, EditProjectForm,
+                    EditCrawlForm)
 
-from .config import ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES, \
-                    CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
-
-from .auth import requires_auth
-from .plotting import default_ache_dash, PlotsNotReadyException
 from .crawls import AcheCrawl, NutchCrawl
 
-
+from .plotting import default_ache_dash, PlotsNotReadyException
 from .viz.domain import Domain
 from .viz.harvest import Harvest
 from .viz.harvest_rate import HarvestRate
@@ -608,7 +609,7 @@ def inspect(project_slug, image_space_slug, image_name):
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
-    image_names = get_uploaded_image_names()
+    image_names = os.listdir(UPLOAD_DIR)
     image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
                     for filename in image_names]
     if request.method == 'GET':
@@ -622,7 +623,7 @@ def upload(project_slug):
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
                 process_exif(exif_data, filename)
-                return redirect(url_for('compare', project_slug=project_slug, image_name=filename))
+                return jsonify(url=url_for('compare', project_slug=project_slug, image_name=filename))
 
                 # TODO
 
