@@ -83,6 +83,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">{{form.seeds_list.label}}</label>
         <div class="col-sm-10">
+        <p style='margin-top:5px;'><em>A seeds list is a file containing URLs, with one URL per line.</em></p>
           {{ form.seeds_list|safe }}
         </div>
         {% for error in form.errors.seeds_list %}
