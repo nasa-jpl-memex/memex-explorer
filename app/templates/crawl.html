@@ -88,9 +88,33 @@ $( document ).ready(function() {
           type: "GET",
           url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
           success: function(data) {
-                $( '#stats-data' ).text( data );
                 console.log("stats-data" + data);
+                if (data.nutch) {
+                  $( '#stats-data' ).html(
+                     '<h4>Pages Crawled</h4>' +
+                     '<p class="big-number">' +
+                      data.num_crawled +
+                     '</p>'
+                    );
+                } else {
+                  $( '#stats-data' ).html(
+                     '<h4>Harvest Rate</h4>' +
+                     '<p class="big-number">' +
+                      data.harvest_rate +
+                     '</p>' +
+                     '<h4>Pages Crawled</h4>' +
+                     '<p class="big-number">' +
+                      data.num_crawled +
+                     '</p>'
+                    );
+                }
             },
+          failure: function() {
+                  $( '#stats-data' ).html(
+                     '<h4>(Statistics are not yet available for this crawl.)</h4>'
+                    );
+
+          }
         });
     });
 
@@ -197,7 +221,7 @@ $( document ).ready(function() {
           <li>{{ crawl.description }}</li>
       </ul>
       <h3>Summary Statistics</h3>
-      <p><span id="stats-data"></span></p>
+      <span id="stats-data"></span>
       {% if crawl.crawler == 'ache' %}
       <h3>Crawl Model</h3>
       <ul>

@@ -102,3 +102,10 @@ color: black;
 .controls{
     padding-left: 40px;
 }
+
+
+/* Crawl page - controls statistics display */
+.big-number {
+    font-weight: bold;
+    font-size: 24px;
+}
