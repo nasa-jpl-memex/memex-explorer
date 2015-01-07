@@ -138,13 +138,11 @@ class AcheCrawl(Crawl):
         if stderr:
             raise AcheException(stderr)
 
-        # from ipsh import ipsh
-        # ipsh()
-
         ret = {}
         ret['nutch'] = False
         relevant, crawled = tuple(stdout.split('\t')[:2])
         ret['harvest_rate'] = "%.2f" % (float(relevant) / float(crawled))
+        ret['num_crawled'] = crawled
 
         return ret
 
