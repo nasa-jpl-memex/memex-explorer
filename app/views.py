@@ -607,3 +607,4 @@ def upload(project_slug):
                 error="File does not match allowed extensions: %s" % allowed))
             response.status_code = 500
             return response
+
