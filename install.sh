@@ -15,4 +15,3 @@ fi
 source activate memex-explorer
 
 echo `which python`
-echo "export ACHE_HOME='/opt/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/" | sudo tee -a /etc/bashrc

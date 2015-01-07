@@ -17,12 +17,4 @@ CONDA_ENV_NAME=memex-explorer
 echo `which python`
 . activate $CONDA_ENV_NAME
 
-if [ -n "${ACHE_HOME}" ]; then
-  echo "ACHE HOME IS SET"
-else
-  echo "export ACHE_HOME=~/anaconda/envs/memex-explorer/lib/python2.7/site-packages/ache/" | tee -a ~/.bash_profile
-  . ~/.bash_profile
-  . activate $CONDA_ENV_NAME
-fi
-
 supervisord -c /vagrant/scripts/supervisord.conf
