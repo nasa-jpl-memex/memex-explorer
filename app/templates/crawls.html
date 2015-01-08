@@ -17,17 +17,15 @@
         </a>
         <p>{{ crawl.description }}</p>
     <div class="col-sm-2">
-        {% for image_space in image_spaces %}
+        {% for image_space, images_size in image_table_zip %}
         {% if image_space.name == crawl.name %}
         <table class="table table-striped">
             <tr>
                 <th>Image(s)</th>
             </tr>
-            {% for image in image_space.images %}
             <tr>
-                <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug, image_space_slug=image_space.slug) }}">{{ image.img_file }}</a></td>
+                <td>{{ images_size }}</td>
             </tr>
-            {% endfor %}
                </table>
             <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a>
         {% endif %}

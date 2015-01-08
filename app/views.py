@@ -248,7 +248,9 @@ def add_crawl(project_slug):
 
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
-    return render_template('crawls.html')
+    image_spaces = get_image_space(get_project(project_slug).id)
+    images_array = [len(x.images) for x in image_spaces] 
+    return render_template('crawls.html', image_table_zip=zip(image_spaces, images_array))
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>')
