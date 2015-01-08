@@ -82,12 +82,13 @@ $( document ).ready(function() {
           window.location.href = "/{{ project.slug }}/image_space/{{ crawl.slug }}"
         });
     }); 
-    var statsPoll = function(){ $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
+    var statsPoll = function(){ 
+          $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
           success: function(data) {
                 console.log("stats-data" + data);
                 if (data.nutch) {
                   $( '#stats-data' ).html(
-                      '<div class="col-sm-2"><table class="table table-striped"><tr><th>Site(s) crawled</th></tr><tr><td>' 
+                      '<div class="col-sm-12"><table class="table table-striped"><tr><th>Site(s) crawled</th></tr><tr><td>' 
                       + data.num_crawled 
                       + '</td></tr></table>'
                     );
