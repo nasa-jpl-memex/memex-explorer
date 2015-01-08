@@ -81,26 +81,23 @@ $( document ).ready(function() {
         }).done(function() {
           window.location.href = "/{{ project.slug }}/image_space/{{ crawl.slug }}"
         });
-    }); var statsPoll = function(){ $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
+    }); 
+    var statsPoll = function(){ $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
           success: function(data) {
                 console.log("stats-data" + data);
                 if (data.nutch) {
                   $( '#stats-data' ).html(
-                     '<h4>Pages Crawled</h4>' +
-                     '<p class="big-number">' +
-                      data.num_crawled +
-                     '</p>'
+                      '<div class="col-sm-2"><table class="table table-striped"><tr><th>Site(s) crawled</th></tr><tr><td>' 
+                      + data.num_crawled 
+                      + '</td></tr></table>'
                     );
                 } else {
                   $( '#stats-data' ).html(
-                     '<h4>Harvest Rate</h4>' +
-                     '<p class="big-number">' +
-                      data.harvest_rate +
-                     '</p>' +
-                     '<h4>Pages Crawled</h4>' +
-                     '<p class="big-number">' +
-                      data.num_crawled +
-                     '</p>'
+                      '<div class="col-sm-12"><table class="table table-striped"><tr><th>Harvest Rate</th><th>Site(s) crawled</th></tr><tr><td>' 
+                      + data.harvest_rate 
+                      + '</td><td>' 
+                      + data.num_crawled 
+                      +'</td></tr></table></div>'
                     );
                 }
             },
@@ -113,7 +110,6 @@ $( document ).ready(function() {
     };
     var statsInterval = setInterval(function(){statsPoll()}, 10000);
 });
-
 </script>
 
 {% endblock %}
@@ -202,9 +198,6 @@ $( document ).ready(function() {
 
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <button id="stats" type="button" title="Get crawl stats" class="btn btn-default btn-duo center">
-            <a>Get Stats</a>
-        </button>
         {% if crawl.crawler == 'nutch' %}
         <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
             <a>Get Images</a>
@@ -215,7 +208,7 @@ $( document ).ready(function() {
           <li>{{ crawl.description }}</li>
       </ul>
       <h3>Summary Statistics</h3>
-      <span id="stats-data"></span>
+        <span id="stats-data">Getting crawl statistics...</span>
       {% if crawl.crawler == 'ache' %}
       <h3>Crawl Model</h3>
       <ul>
