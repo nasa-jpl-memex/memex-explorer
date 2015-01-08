@@ -81,12 +81,7 @@ $( document ).ready(function() {
         }).done(function() {
           window.location.href = "/{{ project.slug }}/image_space/{{ crawl.slug }}"
         });
-    });
-
-    $('#stats').on('click', function(){
-        $.ajax({
-          type: "GET",
-          url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
+    }); var statsPoll = function(){ $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
           success: function(data) {
                 console.log("stats-data" + data);
                 if (data.nutch) {
@@ -111,13 +106,12 @@ $( document ).ready(function() {
             },
           failure: function() {
                   $( '#stats-data' ).html(
-                     '<h4>(Statistics are not yet available for this crawl.)</h4>'
+                  '<h4>(Statistics are not yet available for this crawl.)</h4>'
                     );
-
           }
-        });
-    });
-
+        })
+    };
+    var statsInterval = setInterval(function(){statsPoll()}, 10000);
 });
 
 </script>
