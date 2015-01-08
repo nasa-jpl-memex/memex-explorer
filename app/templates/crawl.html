@@ -208,6 +208,13 @@ $( document ).ready(function() {
 
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+        {% if crawl.crawler == 'ache' %}
+        <a class="btn btn-default btn-padded center"
+        href="{{ url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug) }}">
+        Download Relevant Pages</a>
+        {% endif %}
+
         <button id="stats" type="button" title="Get crawl stats" class="btn btn-default btn-duo center">
             <a>Get Stats</a>
         </button>

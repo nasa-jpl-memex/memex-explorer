@@ -266,10 +266,9 @@ def crawl(project_slug, crawl_slug):
             traceback.print_exc()
             return render_template('crawl.html', crawl=crawl, model=model)
 
+        relevant_path = url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug)
 
-        return render_template('crawl.html', scripts=scripts,
-            # seedlist_url=relevant_path,
-                                divs=divs, crawl=crawl, model=model)
+        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl, model=model)
 
     else:
         return render_template('crawl.html', crawl=crawl, model=model)
@@ -568,7 +567,7 @@ def uploaded_image(image_name):
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/seeds')
-def crawl_seedlist(project_slug, crawl_slug):
+def relevant_pages(project_slug, crawl_slug):
 
     project = get_project(project_slug)
     crawl = get_crawl(crawl_slug)
