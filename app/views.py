@@ -271,6 +271,8 @@ def crawl(project_slug, crawl_slug):
             traceback.print_exc()
             return render_template('crawl.html', crawl=crawl, model=model)
 
+        relevant_path = url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug)
+
         return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl, model=model)
 
     else:
@@ -502,6 +504,18 @@ def delete_image(project_slug, image_space_slug, image_name):
 @app.route('/uploaded_images/<image_name>')
 def uploaded_image(image_name):
     return send_from_directory(app.config['UPLOAD_DIR'], image_name)
+
+
+@app.route('/<project_slug>/crawls/<crawl_slug>/seeds')
+def relevant_pages(project_slug, crawl_slug):
+
+    project = get_project(project_slug)
+    crawl = get_crawl(project, crawl_slug)
+
+    relevant = get_data_source(crawl, "relevantpages")
+    # relevant_path = CRAWLS_PATH + relevant.data_uri
+
+    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.directory), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
