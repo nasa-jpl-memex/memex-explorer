@@ -37,8 +37,8 @@ class Domain(PlotManager):
 
     def __init__(self, crawl, datasources, plot, sort='crawled'):
         # TODO Retrieve plot datasources from db
-        self.crawled_data = os.path.join(CRAWLS_PATH, crawl.directory, datasources['crawled'].data_uri)
-        self.relevant_data = os.path.join(CRAWLS_PATH, crawl.directory, datasources['relevant'].data_uri)
+        self.crawled_data = os.path.join(CRAWLS_PATH, str(crawl.id), datasources['crawled'].data_uri)
+        self.relevant_data = os.path.join(CRAWLS_PATH, str(crawl.id), datasources['relevant'].data_uri)
 
         self.sort = sort
 

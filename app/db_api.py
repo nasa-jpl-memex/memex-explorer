@@ -50,11 +50,9 @@ def get_images(image_space_slug):
 def get_data_source(crawl, data_source_name):
     """Return the data source from a crawl by `data_source_name`.
     """
-    data_sources = crawl.data_sources
+    data_source = DataSource.query.filter_by(name=data_source_name, crawl_id=crawl.id).first()
 
-    for data in data_sources:
-        if data.name == data_source_name:
-            return data
+    return data_source
 
 
 def get_plot(crawl, plot_name):
@@ -95,14 +93,13 @@ def get_image_space_from_name(image_space_name):
 def get_crawl_image_space(project, crawl):
     """Return the image_space of a crawl. If it doesn't exist, add it to the db.
     """
-    image_space = ImageSpace.query.filter_by(name=crawl.slug, project_id=project.id).first()
+    image_space = ImageSpace.query.filter_by(slug=crawl.slug, project_id=project.id).first()
 
     if image_space is None:
-        image_space = ImageSpace(directory=crawl.name,
-                                 project_id=project.id,
-                                 name=crawl.slug,
+        image_space = ImageSpace(project_id=project.id,
+                                 name=crawl.name,
                                  slug=crawl.slug,
-                                 crawl=crawl
+                                 crawl_id=crawl.id
                                 )
 
         db.session.add(image_space)
@@ -121,8 +118,8 @@ def get_matches(project_id, image_name):
         return ()
 
 
-def db_add_model(name):
-    model = DataModel(name=name, directory=name)
+def db_add_model(project, name):
+    model = DataModel(name=name, project_id=project.id)
     db.session.add(model)
     db.session.commit()
 
@@ -144,7 +141,6 @@ def db_add_crawl(project, form, seed_filename, model=None):
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
-                  directory=form.name.data,
                   project_id=project.id,
                   data_model_id=data_model,
                   config = 'config_default',
@@ -216,7 +212,7 @@ def db_init_ache(project, crawl):
 
 def db_process_exif(exif_data, img_path, filename, image_space):
     """ Store the EXIF data from the image in the db"""
-    if not Image.query.filter_by(directory=img_path, filename=filename).first():
+    if not Image.query.filter_by(filename=filename).first():
         LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
         MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
         BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
@@ -224,8 +220,7 @@ def db_process_exif(exif_data, img_path, filename, image_space):
         MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
         IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-        image = Image(directory=img_path,
-                      filename=filename,
+        image = Image(filename=filename,
                       EXIF_LensSerialNumber=LSVN,
                       MakerNote_SerialNumberFormat=MSNF,
                       EXIF_BodySerialNumber=BSN,

@@ -46,7 +46,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 
-def process_exif(exif_data, img_dir, filename, image_space):
+def process_exif(exif_data, img_dir, filename):
     # Get the EXIF data from the image
     LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
     MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
@@ -55,8 +55,7 @@ def process_exif(exif_data, img_dir, filename, image_space):
     MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
     IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-    image = Image(directory=img_dir,
-                  filename = filename,
+    image = Image(filename = filename,
                   EXIF_LensSerialNumber = LSVN,
                   MakerNote_SerialNumberFormat = MSNF,
                   EXIF_BodySerialNumber = BSN,
@@ -65,9 +64,6 @@ def process_exif(exif_data, img_dir, filename, image_space):
                   Image_BodySerialNumber = IBSN,
                   uploaded = 1,
                   )
-
-    image_space.images.append(image)
-    # Add uploaded image to the database
 
     # Add uploaded image to the database
     db.session.add(image)

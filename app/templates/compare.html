@@ -5,7 +5,7 @@
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-  <h3>{{ image }}</h3>
+  <h3>{{ image.filename }}</h3>
   <div class="row vertical-align clear-bottom">
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
@@ -13,7 +13,7 @@
       <img src="{{ url_for('uploaded_image', image_name=image.filename) }}"
            class="img-responsive" alt="Generic placeholder thumbnail">
     {% else %}
-      <img src="{{ url_for('image_source', image_directory= image.directory, image_name=image.filename) }}"
+      <img src="{{ url_for('image_source', image_directory= image.image_space.id, image_name=image.filename) }}"
            class="img-responsive" alt="Generic placeholder thumbnail">
     {% endif %}
     </div>
@@ -43,7 +43,7 @@
         height="200" width="200"
         class="thumbnail">
     {% else %}
-      <img src="{{ url_for('image_source', image_directory= img.directory, image_name=img.filename) }}"
+      <img src="{{ url_for('image_source', image_directory= image.image_space.id, image_name=img.filename) }}"
         alt="{{ img }}"
         height="200" width="200"
         class="thumbnail">

@@ -57,7 +57,6 @@ from .crawls import AcheCrawl, NutchCrawl
 from .plotting import default_ache_dash, PlotsNotReadyException
 from .viz.domain import Domain
 from .viz.harvest import Harvest
-from .viz.harvest_rate import HarvestRate
 
 from .images import allowed_file, lost_camera_retreive, image_retrieve, serve_upload_page, process_exif
 
@@ -192,6 +191,7 @@ def add_project():
 @app.route('/<project_slug>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_slug):
     form = CrawlForm()
+    project = get_project(project_slug)
     if form.validate_on_submit():
         existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
         if existing_crawl:
@@ -202,14 +202,14 @@ def add_crawl(project_slug):
             if registered_model:
                 flash('Data model name already exists, please choose another name', 'error')
                 return render_template('add_crawl.html', form=form)
-            model_directory = MODEL_FILES + form.new_model_name.data
+            db_add_model(project, form.new_model_name.data)
+            model = get_model(name=form.new_model_name.data)
+            model_directory = MODEL_FILES + str(model.id)
             os.mkdir(model_directory)
             model_file = secure_filename(form.new_model_file.data.filename)
             model_features = secure_filename(form.new_model_features.data.filename)
             form.new_model_file.data.save(model_directory + '/' + model_file)
             form.new_model_features.data.save(model_directory + '/' + model_features)
-            db_add_model(form.new_model_name.data)
-            model = get_model(name=form.new_model_name.data)
         elif form.data_model.data:
             model = get_model(id=form.data_model.data.id)
         else:
@@ -224,9 +224,8 @@ def add_crawl(project_slug):
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
-        project = get_project(project_slug)
         crawl = db_add_crawl(project, form, seed_filename, model)
-        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.directory)]).wait()
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, str(crawl.id))]).wait()
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
@@ -423,11 +422,11 @@ def dump_images(project_slug, crawl_slug):
     elif crawl.crawler=="nutch":
         if crawl_instance is None:
             crawl_instance = NutchCrawl(crawl)
-        crawl_instance.dump_images()
         image_space = get_crawl_image_space(crawl=crawl, project=project)
-        images = os.listdir(os.path.join(IMAGE_SPACE_PATH, image_space.directory, 'images'))
+        crawl_instance.dump_images(image_space)
+        images = os.listdir(os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images'))
         for image in images:
-            image_path = os.path.join(IMAGE_SPACE_PATH, image_space.directory, 'images', image)
+            image_path = os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images', image)
             print(image_path)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
@@ -515,7 +514,7 @@ def relevant_pages(project_slug, crawl_slug):
     relevant = get_data_source(crawl, "relevantpages")
     # relevant_path = CRAWLS_PATH + relevant.data_uri
 
-    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.directory), relevant.data_uri)
+    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.id), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
@@ -540,7 +539,6 @@ def upload(project_slug):
     image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
 
                     for filename in image_names]
-    image_space = get_image_space_from_name(image_space_name="uploaded_images")
     if request.method == 'GET':
         return render_template('upload.html', image_pages=image_pages)
     elif request.method == 'POST':
@@ -551,7 +549,7 @@ def upload(project_slug):
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                process_exif(exif_data, 'uploaded_images', filename, image_space)
+                process_exif(exif_data, 'uploaded_images', filename)
                 return jsonify(url=url_for('compare', project_slug=project_slug, image_name=filename))
 
 
