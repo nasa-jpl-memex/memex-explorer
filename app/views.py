@@ -321,6 +321,7 @@ def run_crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
     key = project_slug + '-' + crawl_slug
     try:
+        print(1)
         crawl = get_crawl(project, crawl_slug)
         seeds_list = crawl.seeds_list
         if crawl.crawler == "ache":
@@ -330,9 +331,11 @@ def run_crawl(project_slug, crawl_slug):
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         elif crawl.crawler == "nutch":
+            print(2)
             crawl_instance = NutchCrawl(crawl)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
+            print(3)
             return "Crawl %s running" % crawl.name
     except Exception as e:
         traceback.print_exc()

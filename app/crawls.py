@@ -138,17 +138,24 @@ class AcheCrawl(Crawl):
 
 class NutchCrawl(Crawl):
 
-    def __init__(self, crawl, num_rounds=1):
+    def __init__(self, crawl):
+        self.crawl = crawl
         self.seed_dir =  os.path.join(SEED_FILES, crawl.seeds_list)
         self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.directory)
         self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl.directory, 'images')
-        #TODO Switch from `1` to parameter.
-        self.number_of_rounds = num_rounds
         super(NutchCrawl, self).__init__(crawl)
 
     def start(self):
+        print 10
         make_dir(self.crawl_dir)
-        self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
+        print 20
+        self.proc = run_proc(
+            "python app/repeat.py --crawl_id {} --seed_dir {} --crawl_dir {}".format(
+                           self.crawl.id, self.seed_dir, self.crawl_dir))
+
+        if self.proc.stderr:
+            raise NutchException(self.proc.stderr.readlines())
+
         return self.proc.pid
 
     def dump_images(self):
