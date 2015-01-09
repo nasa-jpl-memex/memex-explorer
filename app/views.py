@@ -192,6 +192,7 @@ def add_project():
 @app.route('/<project_slug>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_slug):
     form = CrawlForm()
+    project = get_project(project_slug)
     if form.validate_on_submit():
         existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
         if existing_crawl:
@@ -208,7 +209,7 @@ def add_crawl(project_slug):
             model_features = secure_filename(form.new_model_features.data.filename)
             form.new_model_file.data.save(model_directory + '/' + model_file)
             form.new_model_features.data.save(model_directory + '/' + model_features)
-            db_add_model(form.new_model_name.data)
+            db_add_model(project, form.new_model_name.data)
             model = get_model(name=form.new_model_name.data)
         elif form.data_model.data:
             model = get_model(id=form.data_model.data.id)
@@ -224,9 +225,8 @@ def add_crawl(project_slug):
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
-        project = get_project(project_slug)
         crawl = db_add_crawl(project, form, seed_filename, model)
-        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.directory)]).wait()
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.id)]).wait()
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
@@ -425,9 +425,9 @@ def dump_images(project_slug, crawl_slug):
             crawl_instance = NutchCrawl(crawl)
         crawl_instance.dump_images()
         image_space = get_crawl_image_space(crawl=crawl, project=project)
-        images = os.listdir(os.path.join(IMAGE_SPACE_PATH, image_space.directory, 'images'))
+        images = os.listdir(os.path.join(IMAGE_SPACE_PATH, image_space.id, 'images'))
         for image in images:
-            image_path = os.path.join(IMAGE_SPACE_PATH, image_space.directory, 'images', image)
+            image_path = os.path.join(IMAGE_SPACE_PATH, image_space.id, 'images', image)
             print(image_path)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
@@ -515,7 +515,7 @@ def relevant_pages(project_slug, crawl_slug):
     relevant = get_data_source(crawl, "relevantpages")
     # relevant_path = CRAWLS_PATH + relevant.data_uri
 
-    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.directory), relevant.data_uri)
+    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.id), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
