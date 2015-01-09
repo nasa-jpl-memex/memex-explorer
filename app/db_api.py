@@ -1,8 +1,7 @@
 from . import app, db
 import os
 from .config import SEED_FILES, CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH
-from .models import (Project, Crawl, Dashboard, Image,
-                     DataSource, Plot, DataModel, ImageSpace)
+from .models import Project, Crawl, Image, DataSource, Plot, DataModel, ImageSpace
 from webhelpers import text
 
 MATCHES = app.MATCHES
@@ -13,10 +12,10 @@ def get_project(project_slug):
     return Project.query.filter_by(slug=project_slug).first()
 
 
-def get_crawl(crawl_slug):
-    """Return the first crawl that matches `crawl_name`.
+def get_crawl(project, crawl_slug):
+    """Return the crawl from the project that matches the `crawl_slug`.
     """
-    return Crawl.query.filter_by(slug=crawl_slug).first()
+    return Crawl.query.filter_by(project_id=project.id, slug=crawl_slug).first()
 
 
 def get_crawls(project_id):
