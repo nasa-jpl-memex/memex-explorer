@@ -15,7 +15,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 # -------------
 
 from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH, IMAGE_SPACE_PATH
-from .db_api import get_data_source
+from .db_api import get_data_source, get_model
 from .utils import make_dir, make_dirs, run_proc
 
 
@@ -56,26 +56,15 @@ class Crawl(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, crawl_name, project_id):
+    def __init__(self, crawl):
         """Initialize common crawl attributes."""
 
-        self.crawl_name = crawl_name
-        self.project_id = project_id
+        self.crawl_name = crawl.name
+        self.project_id = crawl.project_id
         self.status = "Starting"
 
         # Handle to crawl process
         self.proc = None
-
-    def start(self):
-        subprocess.Popen(['mkdir', self.crawl_dir]).wait()
-        with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
-            with open(os.path.join(self.crawl_dir,'stderr.txt'), 'w') as stderr:
-                self.proc = subprocess.Popen(['ache', 'startCrawl', self.crawl_dir, self.config, self.seeds_file,
-                                          self.model_dir, LANG_DETECT_PATH], stdout=stdout, stderr=stderr)
-        return self.proc.pid
-        # Common statistics to record across crawls, with suitable defaults
-        self.start_time = datetime.now()
-        self.stop_time = None
 
 
     @property
@@ -113,12 +102,14 @@ class Crawl(object):
 
 class AcheCrawl(Crawl):
 
-    def __init__(self, crawl_name, seeds_file, model_name, conf_name, project_id):
-        self.config = os.path.join(CONFIG_FILES, conf_name)
-        self.seeds_file = os.path.join(SEED_FILES, seeds_file)
-        self.model_dir = os.path.join(MODEL_FILES, model_name)
-        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_name)
-        super(AcheCrawl, self).__init__(crawl_name, project_id)
+    def __init__(self, crawl):
+        self.crawl = crawl
+        self.config = os.path.join(CONFIG_FILES, crawl.config)
+        self.seeds_file = os.path.join(SEED_FILES, crawl.seeds_list)
+        model = get_model(id=crawl.data_model_id)
+        self.model_dir = os.path.join(MODEL_FILES, model.directory)
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.directory)
+        super(AcheCrawl, self).__init__(crawl)
 
     def start(self):
         with open(os.path.join(self.crawl_dir, 'stdout.txt'), 'w') as stdout:
@@ -129,10 +120,9 @@ class AcheCrawl(Crawl):
                             stdout=stdout, stderr=stderr)
         return self.proc.pid
 
-
     def statistics(self):
-        harvest_source = get_data_source(self.project_id, self.crawl_name + "-harvest")
-        harvest_path = CRAWLS_PATH + harvest_source.data_uri
+        harvest_source = get_data_source(self.crawl, "harvest")
+        harvest_path = os.path.join(self.crawl_dir, harvest_source.data_uri)
         proc = run_proc("tail -n 1 %s" % harvest_path)
         stdout, stderr = proc.communicate()
         if stderr:
@@ -148,19 +138,18 @@ class AcheCrawl(Crawl):
 
 class NutchCrawl(Crawl):
 
-    def __init__(self, seed_dir, crawl_dir, project_id, crawl_name, num_rounds=1):
-        self.seed_dir =  os.path.join(SEED_FILES, seed_dir)
-        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl_dir)
-        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl_dir, 'images')
+    def __init__(self, crawl, num_rounds=1):
+        self.seed_dir =  os.path.join(SEED_FILES, crawl.seeds_list)
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.directory)
+        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl.directory, 'images')
         #TODO Switch from `1` to parameter.
         self.number_of_rounds = num_rounds
-        super(NutchCrawl, self).__init__(crawl_name, project_id)
+        super(NutchCrawl, self).__init__(crawl)
 
     def start(self):
         make_dir(self.crawl_dir)
         self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
         return self.proc.pid
-
 
     def dump_images(self):
         make_dirs(self.img_dir)
@@ -174,7 +163,6 @@ class NutchCrawl(Crawl):
             raise NutchException(stderr)
 
         return "Dumping images"
-
 
     def statistics(self):
         crawl_db_dir = os.path.join(self.crawl_dir, 'crawldb')
