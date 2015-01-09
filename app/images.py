@@ -55,8 +55,7 @@ def process_exif(exif_data, img_dir, filename, image_space):
     MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
     IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-    image = Image(directory=img_dir,
-                  filename = filename,
+    image = Image(filename = filename,
                   EXIF_LensSerialNumber = LSVN,
                   MakerNote_SerialNumberFormat = MSNF,
                   EXIF_BodySerialNumber = BSN,
