@@ -50,11 +50,9 @@ def get_images(image_space_slug):
 def get_data_source(crawl, data_source_name):
     """Return the data source from a crawl by `data_source_name`.
     """
-    data_sources = crawl.data_sources
+    data_source = DataSource.query.filter_by(name=data_source_name, crawl_id=crawl.id).first()
 
-    for data in data_sources:
-        if data.name == data_source_name:
-            return data
+    return data_source
 
 
 def get_plot(crawl, plot_name):
@@ -95,13 +93,13 @@ def get_image_space_from_name(image_space_name):
 def get_crawl_image_space(project, crawl):
     """Return the image_space of a crawl. If it doesn't exist, add it to the db.
     """
-    image_space = ImageSpace.query.filter_by(name=crawl.slug, project_id=project.id).first()
+    image_space = ImageSpace.query.filter_by(slug=crawl.slug, project_id=project.id).first()
 
     if image_space is None:
         image_space = ImageSpace(project_id=project.id,
-                                 name=crawl.slug,
+                                 name=crawl.name,
                                  slug=crawl.slug,
-                                 crawl=crawl
+                                 crawl_id=crawl.id
                                 )
 
         db.session.add(image_space)

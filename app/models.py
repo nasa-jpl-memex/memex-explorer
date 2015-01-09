@@ -36,7 +36,7 @@ class Crawl(db.Model):
     seeds_list = db.Column(db.String(64))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
-    image_space_id = db.Column(db.Integer, db.ForeignKey('image_space.id'))
+    image_space = db.relationship('ImageSpace', backref='crawl', uselist=False)
     data_sources = db.relationship('DataSource', backref='crawl', lazy='dynamic')
 
     def __repr__(self):
@@ -75,8 +75,8 @@ class ImageSpace(db.Model):
     slug = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    crawl_id = db.Column(db.Integer, db.ForeignKey('crawl.id'))
     images = db.relationship('Image', backref='image_space', lazy='dynamic')
-    crawl = db.relationship('Crawl', backref='image_space', uselist=False)
 
     def __repr__(self):
         return '<ImageSpace %r>' % (self.id)
