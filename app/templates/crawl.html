@@ -224,16 +224,12 @@ $( document ).ready(function() {
         </button>
         {% endif %}
       <h3>Description</h3>
-      <ul>
-          <li>{{ crawl.description }}</li>
-      </ul>
+      <p>{{ crawl.description }}</p>
       <h3>Summary Statistics</h3>
       <span id="stats-data"></span>
       {% if crawl.crawler == 'ache' %}
       <h3>Crawl Model</h3>
-      <ul>
-          <li> {{ model.name }}</li>
-      </ul>
+      <p> {{ model.name }}</p>
       {% endif %}
     </div>
   </div>
