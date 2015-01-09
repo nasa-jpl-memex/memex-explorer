@@ -170,7 +170,7 @@ $( document ).ready(function() {
     $('#removeButton').click(function(){
     swal({
         title: "Are you sure?",
-        text: "You will not be able to recover this project!",
+        text: "You will not be able to recover this crawl!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: '#DD6B55',
@@ -200,8 +200,8 @@ $( document ).ready(function() {
             <!-- <button type="button" id="reload" class="btn btn-primary">Refresh</button> -->
             <button type="button" id="reload">Refresh</button>
         </div>
-        {# {% else %}
-        <h3>There are no plots to show.</h3> #}
+        {% else %}
+        <h3>There are no plots to show.</h3>
        {% endif %}
     </div>
 </div>

@@ -13,6 +13,7 @@ import json
 import datetime as dt
 import subprocess
 import traceback
+import shutil
 
 # Third-party Libraries
 # ---------------------
@@ -194,6 +195,10 @@ def add_project():
 def add_crawl(project_slug):
     form = CrawlForm()
     if form.validate_on_submit():
+        existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
+        if existing_crawl:
+            flash('Crawl name already exists, please choose another name', 'error')
+            return render_template('add_crawl.html', form=form)
         if form.new_model_name.data:
             registered_model = DataModel.query.filter_by(name=form.new_model_name.data).first()
             if registered_model:
@@ -243,7 +248,9 @@ def add_crawl(project_slug):
 
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
-    return render_template('crawls.html')
+    image_spaces = get_image_space(get_project(project_slug).id)
+    images_array = [len(x.images) for x in image_spaces] 
+    return render_template('crawls.html', image_table_zip=zip(image_spaces, images_array))
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>')
@@ -275,6 +282,7 @@ def crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
 def delete_crawl(project_slug, crawl_slug):
     crawl = get_crawl(crawl_slug)
+    shutil.rmtree(CRAWLS_PATH + crawl.name)
     db.session.delete(crawl)
     db.session.commit()
     flash('%s has successfully been deleted.' % crawl.name, 'success')
