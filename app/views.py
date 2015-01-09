@@ -510,13 +510,12 @@ def uploaded_image(image_name):
 def relevant_pages(project_slug, crawl_slug):
 
     project = get_project(project_slug)
-    crawl = get_crawl(crawl_slug)
+    crawl = get_crawl(project, crawl_slug)
 
-    # TODO This `get_data_source` should not include the crawl.name
-    relevant = get_data_source(project.id, crawl.name + "-relevantpages")
+    relevant = get_data_source(crawl, "relevantpages")
     # relevant_path = CRAWLS_PATH + relevant.data_uri
 
-    return send_from_directory(CRAWLS_PATH, relevant.data_uri)
+    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.directory), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
