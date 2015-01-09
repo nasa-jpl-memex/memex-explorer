@@ -19,6 +19,7 @@ class Project(db.Model):
     icon = db.Column(db.String(64))
     crawls = db.relationship('Crawl', backref='project', lazy='dynamic')
     image_spaces = db.relationship('ImageSpace', backref='project', lazy='dynamic')
+    data_models = db.relationship('DataModel', backref='project', lazy='dynamic')
 
     def __repr__(self):
         return '<Project %r>' % (self.name)
@@ -30,7 +31,6 @@ class Crawl(db.Model):
     slug = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
     crawler = db.Column(db.String(64))
-    directory = db.Column(db.String(64), unique=True)
     status = db.Column(db.String(64))
     config = db.Column(db.String(64))
     seeds_list = db.Column(db.String(64))
@@ -47,7 +47,7 @@ class DataModel(db.Model):
     __tablename__ = "data_model"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, unique=True)
-    directory = db.Column(db.Text, unique=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     def __repr__(self):
         return '<DataModel %r>' % (self.name)
@@ -73,7 +73,6 @@ class ImageSpace(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     slug = db.Column(db.String(64), unique=True)
-    directory = db.Column(db.String(64), unique=True)
     description = db.Column(db.Text)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     images = db.relationship('Image', backref='image_space', lazy='dynamic')
@@ -86,7 +85,6 @@ class ImageSpace(db.Model):
 class Image(db.Model):
     __tablename__ = "image"
     id = db.Column(db.Integer, primary_key=True)
-    directory = db.Column(db.String(140))
     filename = db.Column(db.String(140))
     EXIF_LensSerialNumber = db.Column(db.String(140))
     MakerNote_SerialNumberFormat = db.Column(db.String(140))

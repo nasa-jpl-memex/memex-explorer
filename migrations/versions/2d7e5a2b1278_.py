@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 54d579099f8b
+Revision ID: 2d7e5a2b1278
 Revises: None
-Create Date: 2015-01-09 02:50:46.257285
+Create Date: 2015-01-09 13:21:39.667517
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '54d579099f8b'
+revision = '2d7e5a2b1278'
 down_revision = None
 
 from alembic import op
@@ -29,48 +29,24 @@ def upgrade():
     op.create_table('data_model',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.Text(), nullable=True),
-    sa.Column('directory', sa.Text(), nullable=True),
+    sa.Column('project_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('directory'),
     sa.UniqueConstraint('name')
     )
     op.create_table('image_space',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
     sa.Column('slug', sa.String(length=64), nullable=True),
-    sa.Column('directory', sa.String(length=64), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('project_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('directory'),
-    sa.UniqueConstraint('name'),
-    sa.UniqueConstraint('slug')
-    )
-    op.create_table('crawl',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=True),
-    sa.Column('slug', sa.String(length=64), nullable=True),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('crawler', sa.String(length=64), nullable=True),
-    sa.Column('directory', sa.String(length=64), nullable=True),
-    sa.Column('status', sa.String(length=64), nullable=True),
-    sa.Column('config', sa.String(length=64), nullable=True),
-    sa.Column('seeds_list', sa.String(length=64), nullable=True),
-    sa.Column('project_id', sa.Integer(), nullable=True),
-    sa.Column('data_model_id', sa.Integer(), nullable=True),
-    sa.Column('image_space_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['data_model_id'], ['data_model.id'], ),
-    sa.ForeignKeyConstraint(['image_space_id'], ['image_space.id'], ),
-    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('directory'),
     sa.UniqueConstraint('name'),
     sa.UniqueConstraint('slug')
     )
     op.create_table('image',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('directory', sa.String(length=140), nullable=True),
     sa.Column('filename', sa.String(length=140), nullable=True),
     sa.Column('EXIF_LensSerialNumber', sa.String(length=140), nullable=True),
     sa.Column('MakerNote_SerialNumberFormat', sa.String(length=140), nullable=True),
@@ -82,6 +58,25 @@ def upgrade():
     sa.Column('image_space_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['image_space_id'], ['image_space.id'], ),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('crawl',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('slug', sa.String(length=64), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('crawler', sa.String(length=64), nullable=True),
+    sa.Column('status', sa.String(length=64), nullable=True),
+    sa.Column('config', sa.String(length=64), nullable=True),
+    sa.Column('seeds_list', sa.String(length=64), nullable=True),
+    sa.Column('project_id', sa.Integer(), nullable=True),
+    sa.Column('data_model_id', sa.Integer(), nullable=True),
+    sa.Column('image_space_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['data_model_id'], ['data_model.id'], ),
+    sa.ForeignKeyConstraint(['image_space_id'], ['image_space.id'], ),
+    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('slug')
     )
     op.create_table('data_source',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -126,8 +121,8 @@ def downgrade():
     op.drop_index(op.f('ix_plot_endpoint'), table_name='plot')
     op.drop_table('plot')
     op.drop_table('data_source')
-    op.drop_table('image')
     op.drop_table('crawl')
+    op.drop_table('image')
     op.drop_table('image_space')
     op.drop_table('data_model')
     op.drop_table('project')
