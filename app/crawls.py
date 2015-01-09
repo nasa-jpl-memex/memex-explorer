@@ -169,7 +169,8 @@ class NutchCrawl(Crawl):
         return self.proc.pid
 
     def stop(self):
-        write_stop_flag = run_proc("touch %s stop_flag" % self.crawl_dir)
+        file = os.path.join(self.crawl_dir, "stop_flag")
+        write_stop_flag = run_proc("touch %s" % file)
         return write_stop_flag
 
     def dump_images(self, image_space):
