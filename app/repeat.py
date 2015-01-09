@@ -1,6 +1,7 @@
 
 print "W$TWFD"
 
+import os
 import argparse
 import subprocess
 import shlex
@@ -22,15 +23,22 @@ print "woohoo!!"
 
 args = parse_args()
 
-def keep_going(args.crawl_dir, args.crawl_id):
-    
-return os.path.exists(os.path.join())
-return crawl.status is not "stop requested"
+def keep_going(crawl_dir=args.crawl_dir, crawl_id=args.crawl_id):
+    return True
+    # return os.path.exists(os.path.join(crawl_dir, str(crawl_id), 'keep_going'))
 
-while keep_going(args.crawl_id):
+counter = 1
+
+while keep_going():
+    print "Loop %d" % counter
+    print
+    print
+    counter += 1
     proc = subprocess.Popen(shlex.split("crawl {} {} 1".format(args.seed_dir, args.crawl_dir)))
     stdout, stderr = proc.communicate()
     if stderr:
         raise NutchException(stderr)
 
     print stdout
+
+print "Finished"
