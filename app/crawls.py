@@ -107,8 +107,8 @@ class AcheCrawl(Crawl):
         self.config = os.path.join(CONFIG_FILES, crawl.config)
         self.seeds_file = os.path.join(SEED_FILES, crawl.seeds_list)
         model = get_model(id=crawl.data_model_id)
-        self.model_dir = os.path.join(MODEL_FILES, model.directory)
-        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.directory)
+        self.model_dir = os.path.join(MODEL_FILES, model.id)
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.id)
         super(AcheCrawl, self).__init__(crawl)
 
     def start(self):
@@ -140,8 +140,8 @@ class NutchCrawl(Crawl):
 
     def __init__(self, crawl, num_rounds=1):
         self.seed_dir =  os.path.join(SEED_FILES, crawl.seeds_list)
-        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.directory)
-        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl.directory, 'images')
+        self.crawl_dir = os.path.join(CRAWLS_PATH, crawl.id)
+        self.img_dir = os.path.join(IMAGE_SPACE_PATH, crawl.image_space.id, 'images')
         #TODO Switch from `1` to parameter.
         self.number_of_rounds = num_rounds
         super(NutchCrawl, self).__init__(crawl)
