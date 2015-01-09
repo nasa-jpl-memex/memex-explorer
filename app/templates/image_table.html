@@ -23,7 +23,7 @@
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug) }}">
+                  <td><a href="{{ url_for('compare', image_name=image.filename, project_slug=project.slug) }}">
                       <img src="{{ url_for('image_source', image_directory=image.image_space.id, image_name=image['filename']) }}"
                            height="75" width="75" class="thumbnail" alt="{{ image['filename'] }}"></a>
                        <form style='margin:0;padding:0;'>
