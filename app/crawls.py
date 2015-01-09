@@ -151,10 +151,8 @@ class NutchCrawl(Crawl):
         print 20
         self.proc = run_proc(
             "python app/repeat.py --crawl_id {} --seed_dir {} --crawl_dir {}".format(
-                           self.crawl.id, self.seed_dir, self.crawl_dir))
-
-        if self.proc.stderr:
-            raise NutchException(self.proc.stderr.readlines())
+                           self.crawl.id, self.seed_dir, self.crawl_dir),
+                stdout=None, stderr=None)
 
         return self.proc.pid
 
