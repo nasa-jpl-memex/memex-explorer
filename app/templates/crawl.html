@@ -223,8 +223,10 @@ $( document ).ready(function() {
             <a>Get Images</a>
         </button>
         {% endif %}
+      {% if crawl.description %}
       <h3>Description</h3>
       <p>{{ crawl.description }}</p>
+      {% endif %}
       <h3>Summary Statistics</h3>
       <span id="stats-data"></span>
       {% if crawl.crawler == 'ache' %}
