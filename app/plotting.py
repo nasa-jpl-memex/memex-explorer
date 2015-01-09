@@ -36,7 +36,7 @@ def default_ache_dash(crawl):
     relevant = get_data_source(crawl, "relevantpages")
     domain_sources = dict(crawled=crawled, relevant=relevant)
 
-    if not all(os.path.exists(os.path.join(CRAWLS_PATH, crawl.directory, x.data_uri)) for x in domain_sources.values()):
+    if not all(os.path.exists(os.path.join(CRAWLS_PATH, str(crawl.id), x.data_uri)) for x in domain_sources.values()):
         raise PlotsNotReadyException("Domain sources are not initialized.")
 
     try:
@@ -52,7 +52,7 @@ def default_ache_dash(crawl):
     harvest_plot = get_plot(crawl, "harvest")
 
     harvest_source = get_data_source(crawl, "harvest")
-    if not os.path.exists(os.path.join(CRAWLS_PATH, crawl.directory, harvest_source.data_uri)):
+    if not os.path.exists(os.path.join(CRAWLS_PATH, str(crawl.id), harvest_source.data_uri)):
         raise PlotsNotReadyException("Harvest source is not initialized.")
 
     try:

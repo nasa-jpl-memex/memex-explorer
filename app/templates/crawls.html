@@ -24,7 +24,7 @@
                 <th>Image(s)</th>
             </tr>
             <tr>
-                <td>{{ len(image_space.images) }}</td>
+                <td>{{ image_space.images.all()|length }}</td>
             </tr>
                </table>
                {# <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a> #}
