@@ -28,8 +28,8 @@ LIGHT_GRAY = "#6e6e6e"
 class Harvest(PlotManager):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
-    def __init__(self, datasource, plot):
-        self.harvest_data = os.path.join(app.config['CRAWLS_PATH'], datasource.data_uri)
+    def __init__(self, crawl, datasource, plot):
+        self.harvest_data = os.path.join(app.config['CRAWLS_PATH'], crawl.directory, datasource.data_uri)
         super(Harvest, self).__init__(plot)
 
     def update_source(self):
