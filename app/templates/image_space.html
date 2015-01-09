@@ -15,14 +15,14 @@
 
     {% for image_space in image_spaces %}
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <a href="{{ url_for('image_space', project_slug=project.slug, image_space_slug=image_space.slug) }}">
+        <a href="{{ url_for('image_table', project_slug=project.slug, image_space_slug=image_space.slug) }}">
             <p>{{ image_space.name }}</p>
         </a>
       {% for image in image_space.images %}
         <div class="col-md-1 col-sm-2 col-xs-3 col-lg-1 thumb">
-             <a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug) }}">
-                <img src="{{ url_for('image_source', image_directory=image.img_dir, image_name=image['img_file']) }}"
-                   height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}">
+             <a href="{{ url_for('compare', image_name=image.filename, project_slug=project.slug) }}">
+                <img src="{{ url_for('image_source', image_directory=image.directory, image_name=image['filename']) }}"
+                   height="75" width="75" class="thumbnail" alt="{{ image['filename'] }}">
              </a>
         </div>
             {% endfor %}
