@@ -93,12 +93,6 @@ class Crawl(object):
             self.status = "Crawl process ended"
         return self.status
 
-    def stop(self):
-        if self.proc is not None:
-            print("Killing %s" % str(self.proc.pid))
-            self.proc.kill()
-            self.stop_time = datetime.now()
-
 
 class AcheCrawl(Crawl):
 
@@ -119,6 +113,13 @@ class AcheCrawl(Crawl):
                                  self.model_dir, LANG_DETECT_PATH),
                             stdout=stdout, stderr=stderr)
         return self.proc.pid
+
+    def stop(self):
+        if self.proc is not None:
+            print("Killing %s" % str(self.proc.pid))
+            self.proc.kill()
+            self.stop_time = datetime.now()
+
 
     def statistics(self):
         harvest_source = get_data_source(self.crawl, "harvest")
@@ -148,15 +149,16 @@ class NutchCrawl(Crawl):
         super(NutchCrawl, self).__init__(crawl)
 
     def start(self):
-        print 10
-        make_dir(self.crawl_dir)
-        print 20
         self.proc = run_proc(
             "python app/repeat.py --crawl_id {} --seed_dir {} --crawl_dir {}".format(
                            self.crawl.id, self.seed_dir, self.crawl_dir),
                 stdout=None, stderr=None)
 
         return self.proc.pid
+
+    def stop(self):
+        write_stop_flag = run_proc("touch {} stop_flag").format(self.crawl_dir)
+        return write_stop_flag
 
     def dump_images(self, image_space):
         self.img_dir = os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images')
@@ -191,3 +193,21 @@ class NutchCrawl(Crawl):
         ret['nutch'] = True
 
         return ret
+
+    def keep_going(self):
+        if os.path.exists(os.path.join(self.crawl_dir, 'stop_flag')):
+            return False
+        else:
+            return True
+
+    def start_nutch_infinite_loop(self):
+        counter = 1
+        while self.keep_going():
+            self.proc.poll()
+            if self.status >= 0:
+                print "Loop %d" % counter
+                counter += 1
+                self.start()
+
+        else:
+            print "Finished"
