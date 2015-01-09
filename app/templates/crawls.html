@@ -17,14 +17,14 @@
         </a>
         <p>{{ crawl.description }}</p>
     <div class="col-sm-2">
-        {% for image_space, images_size in image_table_zip %}
+        {% for image_space in image_spaces %}
         {% if image_space.name == crawl.name %}
         <table class="table table-striped">
             <tr>
                 <th>Image(s)</th>
             </tr>
             <tr>
-                <td>{{ images_size }}</td>
+                <td>{{ len(image_space.images) }}</td>
             </tr>
                </table>
                {# <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a> #}
