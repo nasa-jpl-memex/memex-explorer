@@ -25,12 +25,6 @@ def get_crawls(project_id):
     return Crawl.query.filter_by(project_id=project_id)
 
 
-def get_dashboards(project_id):
-    """Return all dashboards that match `project_id`.
-    """
-    return Dashboard.query.filter_by(project_id=project_id)
-
-
 def get_models():
     """
     Return all models that match 'project_id'
@@ -54,29 +48,33 @@ def get_images(image_space_slug):
     return image_space.images
 
 
-def get_data_source(project_id, data_source_name):
-    """Return the data source under `project_id` that matches `data_source_name`.
+def get_data_source(crawl, data_source_name):
+    """Return the data source from a crawl by `data_source_name`.
     """
-    return DataSource.query.filter_by(project_id=project_id, name=data_source_name).first()
+    data_sources = crawl.data_sources
+
+    for data in data_sources:
+        if data.name == data_source_name:
+            return data
 
 
-def get_plot(plot_name):
-    """Return the plot that matches `plot_name`.
+def get_plot(crawl, plot_name):
+    """Return the plot from a crawl by name.
     """
-    return Plot.query.filter_by(name=plot_name).first()
+    return Plot.query.filter_by(crawl_id=crawl.id, name=plot_name).first()
 
 
 def get_image_in_image_space(image_space, image_name):
     """Return an image from an image_space that matches `image_name`.
     """
-    image= Image.query.filter_by(img_file=image_name).first()
+    image= Image.query.filter_by(filename=image_name).first()
     return image
 
 
 def get_image(image_name):
     """Return the image that matches `image_name`.
     """
-    return Image.query.filter_by(img_file=image_name).first()
+    return Image.query.filter_by(filename=image_name).first()
 
 
 def get_crawl_model(crawl):
@@ -101,10 +99,11 @@ def get_crawl_image_space(project, crawl):
     image_space = ImageSpace.query.filter_by(name=crawl.slug, project_id=project.id).first()
 
     if image_space is None:
-        image_space = ImageSpace(images_location=os.path.join(IMAGE_SPACE_PATH, crawl.slug),
+        image_space = ImageSpace(directory=crawl.name,
                                  project_id=project.id,
                                  name=crawl.slug,
                                  slug=crawl.slug,
+                                 crawl=crawl
                                 )
 
         db.session.add(image_space)
@@ -124,7 +123,7 @@ def get_matches(project_id, image_name):
 
 
 def db_add_model(name):
-    model = DataModel(name=name, filename=MODEL_FILES + name)
+    model = DataModel(name=name, directory=name)
     db.session.add(model)
     db.session.commit()
 
@@ -146,6 +145,7 @@ def db_add_crawl(project, form, seed_filename, model=None):
     crawl = Crawl(name=form.name.data,
                   description=form.description.data,
                   crawler=form.crawler.data,
+                  directory=form.name.data,
                   project_id=project.id,
                   data_model_id=data_model,
                   config = 'config_default',
@@ -158,24 +158,27 @@ def db_add_crawl(project, form, seed_filename, model=None):
 
 
 def db_init_ache(project, crawl):
-    key = crawl.name
-    crawled_data_uri = os.path.join(crawl.name, 'data_monitor/crawledpages.csv')
-    crawled_data = DataSource(name=key + '-crawledpages',
+    """ When an ache crawl is registered, we need to add in the database: the data sources associated with that
+    crawl (crawledpages, relevantpages and frontierpages), and the plots that are going to be available for that crawl
+    (domain and harvest).
+    """
+    crawled_data_uri = 'data_monitor/crawledpages.csv'
+    crawled_data = DataSource(name='crawledpages',
                               data_uri=crawled_data_uri,
                               project_id=project.id)
 
-    relevant_data_uri = os.path.join(crawl.name, 'data_monitor/relevantpages.csv')
-    relevant_data = DataSource(name=key + '-relevantpages',
+    relevant_data_uri = 'data_monitor/relevantpages.csv'
+    relevant_data = DataSource(name='relevantpages',
                                data_uri=relevant_data_uri,
                                project_id=project.id)
 
-    frontier_data_uri = os.path.join(crawl.name, 'data_monitor/frontierpages.csv')
-    frontier_data = DataSource(name=key + '-frontierpages',
+    frontier_data_uri = 'data_monitor/frontierpages.csv'
+    frontier_data = DataSource(name='frontierpages',
                                data_uri=frontier_data_uri,
                                project_id=project.id)
 
-    harvest_data_uri = os.path.join(crawl.name, 'data_monitor/harvestinfo.csv')
-    harvest_data = DataSource(name=key + '-harvest',
+    harvest_data_uri = 'data_monitor/harvestinfo.csv'
+    harvest_data = DataSource(name='harvest',
                               data_uri=harvest_data_uri,
                               project_id=project.id)
 
@@ -190,13 +193,15 @@ def db_init_ache(project, crawl):
     db.session.add(harvest_data)
 
     # Add domain plot to db
-    domain_plot = Plot(name=key + '-' + 'domain',
+    domain_plot = Plot(name='domain',
                        project_id=project.id,
+                       crawl_id=crawl.id,
                        )
 
     # Add harvest plot to db
-    harvest_plot = Plot(name=key + '-' + 'harvest',
+    harvest_plot = Plot(name='harvest',
                         project_id=project.id,
+                        crawl_id=crawl.id,
                         )
 
     crawled_data.plots.append(domain_plot)
@@ -210,9 +215,9 @@ def db_init_ache(project, crawl):
     db.session.commit()
 
 
-def db_process_exif(exif_data, img_path, img_file, image_space):
+def db_process_exif(exif_data, img_path, filename, image_space):
     """ Store the EXIF data from the image in the db"""
-    if not Image.query.filter_by(img_file=img_path).first():
+    if not Image.query.filter_by(directory=img_path, filename=filename).first():
         LSVN = getattr(exif_data.get('EXIF LensSerialNumber'), 'values', None)
         MSNF = getattr(exif_data.get('MakerNote SerialNumberFormat'), 'values', None)
         BSN = getattr(exif_data.get('EXIF BodySerialNumber'), 'values', None)
@@ -220,15 +225,15 @@ def db_process_exif(exif_data, img_path, img_file, image_space):
         MSN = getattr(exif_data.get('MakerNote SerialNumber'), 'values', None)
         IBSN = getattr(exif_data.get('Image BodySerialNumber'), 'values', None)
 
-        image = Image(img_dir=img_path,
-                      img_file=img_file,
+        image = Image(directory=img_path,
+                      filename=filename,
                       EXIF_LensSerialNumber=LSVN,
                       MakerNote_SerialNumberFormat=MSNF,
                       EXIF_BodySerialNumber=BSN,
                       MakerNote_InternalSerialNumber=MISN,
                       MakerNote_SerialNumber=MSN,
                       Image_BodySerialNumber=IBSN,
-                      Uploaded=0)
+                      uploaded=0)
 
         image_space.images.append(image)
         # Add uploaded image to the database
