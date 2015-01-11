@@ -193,7 +193,7 @@ def add_crawl(project_slug):
     form = CrawlForm()
     project = get_project(project_slug)
     if form.validate_on_submit():
-        existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
+        existing_crawl = Crawl.query.filter_by(slug=text.urlify(form.name.data)).first()
         if existing_crawl:
             flash('Crawl name already exists, please choose another name', 'error')
             return render_template('add_crawl.html', form=form)
