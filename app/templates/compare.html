@@ -5,15 +5,15 @@
 
 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-  <h3>{{ image }}</h3>
+  <h3>{{ image.filename }}</h3>
   <div class="row vertical-align clear-bottom">
     <div class="col-xs-7">
       <script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
-    {% if image.Uploaded == 1 %}
-      <img src="{{ url_for('uploaded_image', image_name=image.img_file) }}"
+    {% if image.uploaded == 1 %}
+      <img src="{{ url_for('uploaded_image', image_name=image.filename) }}"
            class="img-responsive" alt="Generic placeholder thumbnail">
     {% else %}
-      <img src="{{ url_for('image_source', image_directory= image.img_dir, image_name=image.img_file) }}"
+      <img src="{{ url_for('image_source', image_directory= image.image_space.id, image_name=image.filename) }}"
            class="img-responsive" alt="Generic placeholder thumbnail">
     {% endif %}
     </div>
@@ -35,20 +35,20 @@
     {% for img in internal_matches %}
     <div class="col-xs-6 col-sm-3">
 
-    {% if img.Uploaded == 1 %}
-      <img src="{{ url_for('uploaded_image', image_name=img.img_file) }}"
+    {% if img.uploaded == 1 %}
+      <img src="{{ url_for('uploaded_image', image_name=img.filename) }}"
         data-id="{{ img.id }}"
         data-match="{{ img.match }}"
         alt="{{ img }}"
         height="200" width="200"
         class="thumbnail">
     {% else %}
-      <img src="{{ url_for('image_source', image_directory= img.img_dir, image_name=img.img_file) }}"
+      <img src="{{ url_for('image_source', image_directory= image.image_space.id, image_name=img.filename) }}"
         alt="{{ img }}"
         height="200" width="200"
         class="thumbnail">
     {% endif %}
-     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.img_file) }}">{{ img }}</a></h4>
+     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename) }}">{{ img }}</a></h4>
 
    </div>
   {% endfor %}

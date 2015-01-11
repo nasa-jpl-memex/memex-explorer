@@ -23,13 +23,11 @@
             <tr>
                 <th>Image(s)</th>
             </tr>
-            {% for image in image_space.images %}
             <tr>
-                <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug, image_space_slug=image_space.slug) }}">{{ image.img_file }}</a></td>
+                <td>{{ image_space.images.all()|length }}</td>
             </tr>
-            {% endfor %}
                </table>
-            <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a>
+               {# <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a> #}
         {% endif %}
         {% endfor %}
     </div>

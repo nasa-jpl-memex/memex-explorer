@@ -13,6 +13,7 @@ import json
 import datetime as dt
 import subprocess
 import traceback
+import shutil
 
 # Third-party Libraries
 # ---------------------
@@ -37,12 +38,11 @@ from .config import (ADMINS, DEFAULT_MAIL_SENDER, BASEDIR, SEED_FILES,
                      CONFIG_FILES, MODEL_FILES, CRAWLS_PATH, IMAGE_SPACE_PATH,
                      UPLOAD_DIR)
 
-from .rest_api import api
 from .mail import send_email
 from .auth import requires_auth
-from .models import (Crawl, DataSource, Dashboard, Plot, Project, Image,
+from .models import (Crawl, DataSource, Plot, Project, Image,
                      ImageSpace, DataModel)
-from .db_api import (get_project, get_crawl, get_crawls, get_dashboards, get_data_source,
+from .db_api import (get_project, get_crawl, get_crawls, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
@@ -57,7 +57,6 @@ from .crawls import AcheCrawl, NutchCrawl
 from .plotting import default_ache_dash, PlotsNotReadyException
 from .viz.domain import Domain
 from .viz.harvest import Harvest
-from .viz.harvest_rate import HarvestRate
 
 from .images import allowed_file, lost_camera_retreive, image_retrieve, serve_upload_page, process_exif
 
@@ -82,13 +81,12 @@ def context():
             # abort(404)
 
         crawls = get_crawls(project.id)
-        dashboards = get_dashboards(project.id)
         models = get_models()
         image_spaces = get_image_space(project.id)
 
 
         context_vars.update(dict(
-            project=project, crawls=crawls, dashboards=dashboards, \
+            project=project, crawls=crawls, \
             models=models, image_spaces=image_spaces))
 
     # All pages should (potentially) be able to present all projects
@@ -193,20 +191,25 @@ def add_project():
 @app.route('/<project_slug>/add_crawl', methods=['GET', 'POST'])
 def add_crawl(project_slug):
     form = CrawlForm()
+    project = get_project(project_slug)
     if form.validate_on_submit():
+        existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
+        if existing_crawl:
+            flash('Crawl name already exists, please choose another name', 'error')
+            return render_template('add_crawl.html', form=form)
         if form.new_model_name.data:
             registered_model = DataModel.query.filter_by(name=form.new_model_name.data).first()
             if registered_model:
                 flash('Data model name already exists, please choose another name', 'error')
                 return render_template('add_crawl.html', form=form)
-            model_directory = MODEL_FILES + form.new_model_name.data
+            db_add_model(project, form.new_model_name.data)
+            model = get_model(name=form.new_model_name.data)
+            model_directory = MODEL_FILES + str(model.id)
             os.mkdir(model_directory)
             model_file = secure_filename(form.new_model_file.data.filename)
             model_features = secure_filename(form.new_model_features.data.filename)
             form.new_model_file.data.save(model_directory + '/' + model_file)
             form.new_model_features.data.save(model_directory + '/' + model_features)
-            db_add_model(form.new_model_name.data)
-            model = get_model(name=form.new_model_name.data)
         elif form.data_model.data:
             model = get_model(id=form.data_model.data.id)
         else:
@@ -221,9 +224,8 @@ def add_crawl(project_slug):
         # TODO allow upload configuration
         #config_filename = secure_filename(form.config.data.filename)
         #form.config.data.save(CONFIG_FILES + config_filename)
-        project = get_project(project_slug)
         crawl = db_add_crawl(project, form, seed_filename, model)
-        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, crawl.name)]).wait()
+        subprocess.Popen(['mkdir', os.path.join(CRAWLS_PATH, str(crawl.id))]).wait()
 
         if crawl.crawler == 'ache':
             db_init_ache(project, crawl)
@@ -243,13 +245,15 @@ def add_crawl(project_slug):
 
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
-    return render_template('crawls.html')
+    project = get_project(project_slug)
+    image_spaces = project.image_spaces.all()
+    return render_template('crawls.html', image_space=image_spaces)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>')
 def crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
-    crawl = get_crawl(crawl_slug)
+    crawl = get_crawl(project, crawl_slug)
     model = get_model(id=crawl.data_model_id)
 
     if not project:
@@ -261,10 +265,12 @@ def crawl(project_slug, crawl_slug):
 
     if crawl.crawler == 'ache':
         try:
-            scripts, divs = default_ache_dash(project, crawl)
+            scripts, divs = default_ache_dash(crawl)
         except PlotsNotReadyException as e:
             traceback.print_exc()
             return render_template('crawl.html', crawl=crawl, model=model)
+
+        relevant_path = url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug)
 
         return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl, model=model)
 
@@ -275,6 +281,7 @@ def crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
 def delete_crawl(project_slug, crawl_slug):
     crawl = get_crawl(crawl_slug)
+    shutil.rmtree(CRAWLS_PATH + crawl.name)
     db.session.delete(crawl)
     db.session.commit()
     flash('%s has successfully been deleted.' % crawl.name, 'success')
@@ -284,7 +291,7 @@ def delete_crawl(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/edit', methods=['POST', 'GET'])
 def edit_crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
-    crawl = Crawl.query.filter_by(project_id=project.id, name=crawl_slug).first()
+    crawl = Crawl.query.filter_by(project_id=project.id, slug=crawl_slug).first()
     form = EditCrawlForm()
     if form.validate_on_submit():
         if form.name.data:
@@ -315,19 +322,16 @@ def run_crawl(project_slug, crawl_slug):
     project = get_project(project_slug)
     key = project_slug + '-' + crawl_slug
     try:
-        crawl = get_crawl(crawl_slug)
+        crawl = get_crawl(project, crawl_slug)
         seeds_list = crawl.seeds_list
         if crawl.crawler == "ache":
             model = get_crawl_model(crawl)
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
-                                       model_name=model.name, conf_name=crawl.config,
-                                       project_id=project.id)
+            crawl_instance = AcheCrawl(crawl)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
         elif crawl.crawler == "nutch":
-            crawl_instance = NutchCrawl(crawl_name=crawl.name, seed_dir=seeds_list,
-                                        crawl_dir=crawl.slug, project_id=project.id)
+            crawl_instance = NutchCrawl(crawl)
             pid = crawl_instance.start()
             CRAWLS[key] = crawl_instance
             return "Crawl %s running" % crawl.name
@@ -351,12 +355,12 @@ def stop_crawl(project_slug, crawl_slug):
 def refresh(project_slug, crawl_slug):
 
     project = get_project(project_slug)
-    crawl = get_crawl(crawl_slug)
+    crawl = get_crawl(project, crawl_slug)
     ### Domain
-    domain_plot = get_plot(crawl_slug + "-domain")
-    crawled = get_data_source(project.id, crawl.name + "-crawledpages")
-    relevant = get_data_source(project.id, crawl.name + "-relevantpages")
-    frontier = get_data_source(project.id, crawl.name + "-frontierpages")
+    crawled = get_data_source(crawl, "crawledpages")
+    relevant = get_data_source(crawl, "relevantpages")
+    frontier = get_data_source(crawl, "frontierpages")
+    domain_plot = get_plot(crawl, "domain")
     #domain_sources = dict(crawled=crawled, relevant=relevant)
     domain_sources = dict(crawled=crawled, relevant=relevant, frontier=frontier)
 
@@ -364,37 +368,15 @@ def refresh(project_slug, crawl_slug):
     domain.push_to_server()
     ###
 
-
     ### Harvest
-    harvest_plot = get_plot(crawl.name + "-harvest")
-    harvest_source = get_data_source(project.id, crawl.name + "-harvest")
+    harvest_source = get_data_source(crawl, "harvest")
+    harvest_plot = get_plot(crawl, "harvest")
 
     harvest = Harvest(harvest_source, harvest_plot)
     harvest.push_to_server()
     ###
 
     return "pushed"
-
-
-@app.route('/<project_slug>/crawls/<crawl_slug>/dashboard')
-def crawl_dash(project_slug, crawl_slug):
-
-    project = get_project(project_slug)
-    crawl = get_crawl(crawl_slug)
-
-    key = project_slug + '-' + crawl_slug
-    crawl_instance = CRAWLS.get(key)
-
-    if crawl.crawler == 'ache':
-        scripts, divs = default_ache_dash(project, crawl)
-
-
-        return render_template('dash.html', scripts=scripts,
-                                            divs=divs, crawl=crawl)
-
-    else:
-        abort(400)
-
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/status', methods=['GET'])
@@ -416,16 +398,13 @@ def stats_crawl(project_slug, crawl_slug):
     if crawl_instance is not None:
         return jsonify(crawl_instance.statistics())
     else:
-        crawl = get_crawl(crawl_slug)
+        crawl = get_crawl(project, crawl_slug)
         seeds_list = crawl.seeds_list
         if crawl.crawler == "ache":
             model = get_crawl_model(crawl)
-            crawl_instance = AcheCrawl(crawl_name=crawl.name, seeds_file=seeds_list,
-                                       model_name=model.name, conf_name=crawl.config,
-                                       project_id=project.id)
+            crawl_instance = AcheCrawl(crawl)
         elif crawl.crawler == "nutch":
-            crawl_instance = NutchCrawl(crawl_name=crawl.name, seed_dir=seeds_list,
-                                        crawl_dir=crawl.slug, project_id=project.id)
+            crawl_instance = NutchCrawl(crawl)
 
         stats_output = crawl_instance.statistics()
         print("crawl stats:" + str(stats_output))
@@ -436,16 +415,19 @@ def stats_crawl(project_slug, crawl_slug):
 def dump_images(project_slug, crawl_slug):
     project = get_project(project_slug)
     key = project_slug + '-' + crawl_slug
-    crawl = get_crawl(crawl_slug)
+    crawl = get_crawl(project, crawl_slug)
     crawl_instance = CRAWLS.get(key)
-    if crawl_instance is not None and crawl.crawler=="ache":
+    if crawl.crawler=="ache":
         return "No image dump for ACHE crawls"
-    elif crawl_instance is not None and crawl.crawler=="nutch":
-        crawl_instance.dump_images()
+    elif crawl.crawler=="nutch":
+        if crawl_instance is None:
+            crawl_instance = NutchCrawl(crawl)
         image_space = get_crawl_image_space(crawl=crawl, project=project)
-        images = os.listdir(crawl_instance.img_dir)
+        crawl_instance.dump_images(image_space)
+        images = os.listdir(os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images'))
         for image in images:
-            image_path = os.path.join(crawl_instance.img_dir, image)
+            image_path = os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images', image)
+            print(image_path)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
                 db_process_exif(exif_data, crawl_slug, image, image_space)
@@ -455,49 +437,8 @@ def dump_images(project_slug, crawl_slug):
         return "Could not dump images"
 
 
-# Plot & Dashboard
+# Contact page
 # -----------------------------------------------------------------------------
-
-@app.route('/<project_slug>/add_dashboard', methods=['GET', 'POST'])
-def add_dashboard(project_slug):
-    project = get_project(project_slug)
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    form = DashboardForm(request.form)
-
-    if form.validate_on_submit():
-        data = Dashboard(name=form.name.data, description=form.description.data, \
-                        project_id=project.id)
-        db.session.add(data)
-        db.session.commit()
-        flash("Dashboard '%s' was successfully registered" % form.name.data, 'success')
-        return redirect(url_for('dash', project_slug=project.slug, \
-                        dashboard_name=form.name.data))
-
-    return render_template('add_dashboard.html', project=project, crawls=crawls,
-                            form=form, dashboards=dashboards)
-
-
-@app.route('/<project_slug>/dashboards/<dashboard_name>')
-def dash(project_slug, dashboard_name):
-    project = get_project(project_slug)
-    crawls = Crawl.query.filter_by(project_id=project.id)
-    dashboards = Dashboard.query.filter_by(project_id=project.id)
-    dashboard = Dashboard.query.filter_by(name=dashboard_name).first()
-    plots = Plot.query.filter_by(project_id=project.id)
-    if not dashboard:
-        flash("Dashboard '%s' was not found." % dashboard_name, 'error')
-        abort(404)
-    elif not project:
-        flash("Project '%s' was not found." % project_slug, 'error')
-        abort(404)
-    elif dashboard.project_id != project.id:
-        flash("Dashboard is not part of project '%s'." % project_slug, 'error')
-        abort(404)
-
-    return render_template('dash.html', project=project, crawls=crawls, \
-                           dashboards=dashboards, dashboard=dashboard, plots=plots)
-
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -532,7 +473,7 @@ def compare(project_slug, image_name):
               img.Image_BodySerialNumber, img.MakerNote_InternalSerialNumber,
               img.MakerNote_SerialNumber, img.MakerNote_SerialNumberFormat)))
 
-    internal_matches = get_matches(project.id, img.img_file)
+    internal_matches = get_matches(project.id, img.filename)
     for x in internal_matches:
         if (img.id, x.id) in app.MATCHES:
             x.match = "true"
@@ -552,16 +493,28 @@ def image_source(image_directory, image_name):
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
 def delete_image(project_slug, image_space_slug, image_name):
     image = get_image(image_name) 
-    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.img_file)
+    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.filename)
     db.session.delete(image) 
     db.session.commit()
-    flash('%s has successfully been deleted.' % image.img_file, 'success')
+    flash('%s has successfully been deleted.' % image.filename, 'success')
     return redirect(url_for('image_table', project_slug=project_slug, image_space_slug=image_space_slug))
 
 
 @app.route('/uploaded_images/<image_name>')
 def uploaded_image(image_name):
     return send_from_directory(app.config['UPLOAD_DIR'], image_name)
+
+
+@app.route('/<project_slug>/crawls/<crawl_slug>/seeds')
+def relevant_pages(project_slug, crawl_slug):
+
+    project = get_project(project_slug)
+    crawl = get_crawl(project, crawl_slug)
+
+    relevant = get_data_source(crawl, "relevantpages")
+    # relevant_path = CRAWLS_PATH + relevant.data_uri
+
+    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.id), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
@@ -575,9 +528,9 @@ def image_space(project_slug):
 def image_table(project_slug, image_space_slug):
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(name=image_space_slug).first()
-    images = get_images(image_space.slug)
+    images = image_space.images.all()
+    print(images)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
-
 
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
@@ -586,7 +539,6 @@ def upload(project_slug):
     image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
 
                     for filename in image_names]
-    image_space = get_image_space_from_name(image_space_name="uploaded_images")
     if request.method == 'GET':
         return render_template('upload.html', image_pages=image_pages)
     elif request.method == 'POST':
@@ -597,7 +549,7 @@ def upload(project_slug):
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
-                process_exif(exif_data, 'uploaded_images', filename, image_space)
+                process_exif(exif_data, 'uploaded_images', filename)
                 return jsonify(url=url_for('compare', project_slug=project_slug, image_name=filename))
 
 

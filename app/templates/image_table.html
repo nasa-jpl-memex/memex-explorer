@@ -10,7 +10,7 @@
             <table id="image_table" class="table table-striped table-bordered">
               <thead>
                 <tr>
-                  <th>img_file</th>
+                  <th>filename</th>
                   <th>EXIF_LSN <span class="glyphicon glyphicon-sort"></span></th>
                   <th>MakerNote_SNF <span class="glyphicon glyphicon-sort"></span></th>
                   <th>EXIF_BSN <span class="glyphicon glyphicon-sort"></span></th>
@@ -23,11 +23,11 @@
 
               {% for image in images %}
                 <tr>
-                  <td><a href="{{ url_for('compare', image_name=image.img_file, project_slug=project.slug) }}">
-                      <img src="{{ url_for('image_source', image_directory=image.img_dir, image_name=image['img_file']) }}"
-                           height="75" width="75" class="thumbnail" alt="{{ image['img_file'] }}"></a></td>
+                  <td><a href="{{ url_for('compare', image_name=image.filename, project_slug=project.slug) }}">
+                      <img src="{{ url_for('image_source', image_directory=image.image_space.id, image_name=image['filename']) }}"
+                           height="75" width="75" class="thumbnail" alt="{{ image['filename'] }}"></a>
                        <form style='margin:0;padding:0;'>
-                       <button formmethod='post' formaction="{{ url_for('delete_image', project_slug=project.slug, image_space_slug=image_space.slug, image_name=image.img_file) }}" type='submit' class="btn btn-default btn-duo center" style="margin:0px 0px 5px 0px;">
+                       <button formmethod='post' formaction="{{ url_for('delete_image', project_slug=project.slug, image_space_slug=image_space.slug, image_name=image.filename) }}" type='submit' class="btn btn-default btn-duo center" style="margin:0px 0px 5px 0px;">
                           Delete
                       </button>
                       </form>
