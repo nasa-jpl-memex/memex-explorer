@@ -407,8 +407,20 @@ def stats_crawl(project_slug, crawl_slug):
             crawl_instance = NutchCrawl(crawl)
 
         stats_output = crawl_instance.statistics()
-        print("crawl stats:" + str(stats_output))
         return jsonify(stats_output)
+
+
+@app.route('/<project_slug>/crawls/<crawl_slug>/update_stats', methods=['POST'])
+def update_stats(project_slug, crawl_slug):
+    project = get_project(project_slug)
+    crawl = get_crawl(project, crawl_slug)
+    if request.json['crawler'] == 'ache':
+        crawl.pages_crawled = request.json['crawled']
+        crawl.harvest_rate = request.json['harvest']
+    if request.json['crawler'] == 'nutch':
+        crawl.pages_crawled = request.json['crawled']
+    db.session.commit()
+    return 'success' 
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/dump', methods=['POST'])

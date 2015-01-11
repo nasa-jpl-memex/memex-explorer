@@ -82,7 +82,8 @@ $( document ).ready(function() {
           window.location.href = "/{{ project.slug }}/image_space/{{ crawl.slug }}"
         });
     }); 
-    var statsPoll = function(){ 
+
+    function statsPoll(){ 
           $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
           success: function(data) {
                 console.log("stats-data" + data);
@@ -92,6 +93,12 @@ $( document ).ready(function() {
                       + data.num_crawled 
                       + '</td></tr></table>'
                     );
+                  $.ajax({
+                    type: "POST", 
+                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
+                    contentType: 'application/json',
+                    data: JSON.stringify({crawled: data.num_crawled, crawler: 'nutch'}),
+                  });
                 } else {
                   $( '#stats-data' ).html(
                       '<div class="col-sm-12"><table class="table table-striped"><tr><th>Harvest Rate</th><th>Site(s) crawled</th></tr><tr><td>' 
@@ -100,6 +107,12 @@ $( document ).ready(function() {
                       + data.num_crawled 
                       +'</td></tr></table></div>'
                     );
+                  $.ajax({
+                    type: "POST", 
+                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
+                    contentType: 'application/json',
+                    data: JSON.stringify({crawled: data.num_crawled, harvest: data.harvest_rate, crawler:'ache'}),
+                  });
                 }
             },
           failure: function() {
@@ -109,8 +122,10 @@ $( document ).ready(function() {
           }
         })
     };
+
     var statsInterval = setInterval(function(){statsPoll()}, 10000);
 });
+
 </script>
 
 {% endblock %}
