@@ -245,9 +245,7 @@ def add_crawl(project_slug):
 
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
-    project = get_project(project_slug)
-    image_spaces = project.image_spaces.all()
-    return render_template('crawls.html', image_space=image_spaces)
+    return render_template('crawls.html')
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>')
