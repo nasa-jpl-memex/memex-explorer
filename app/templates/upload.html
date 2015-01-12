@@ -40,7 +40,7 @@
     {% if image_pages %}
     <ul class="list-group">
       {% for img in image_pages %}
-      <li class="list-group-item"><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename)}}">{{img.filename}}</a></li>
+      <li class="list-group-item"><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.name)}}">{{img.name}}</a></li>
       {% endfor %}
     </ul>
     {% else %}
