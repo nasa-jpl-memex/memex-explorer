@@ -24,20 +24,12 @@
                 <th>Pages Crawled</th>
             </tr>
             <tr>
-                <td>{{ crawl.pages_crawled }}</td>
-                {% if image_spaces[0] %}
-                {% for image_space in image_spaces %} 
-                {% if crawl.id == image_space.crawl_id %}
-                    {% if image_space.images %}
-                        <td>{{ image_space.images.all() | length }}</td>
-                    {% else %}
-                        <td>None</td>
-                    {% endif %}
-                {% endif %}
-                {% endfor %}
+                {% if crawl.image_space %}
+                    <td>{{ crawl.image_space.images.all() | length }}</td>
                 {% else %}
                     <td>None</td>
                 {% endif %}
+                <td>{{ crawl.pages_crawled }}</td>
             </tr>
         </table>
         {% else %}
