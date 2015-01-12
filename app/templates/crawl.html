@@ -137,6 +137,9 @@ $( document ).ready(function() {
             <div class='col-xs-2'>
               <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
                 data-container="body"
+                  {% if crawl.crawler == "ache" and crawl.status == "Running crawl" %}
+                    disabled
+                  {% endif %}
                 data-toggle="tooltip" data-placement="bottom">
                   <i class="fa fa-play"></i>
               </button>
