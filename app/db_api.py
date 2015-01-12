@@ -155,7 +155,8 @@ def db_add_crawl(project, form, seed_filename, model=None):
                   data_model_id=data_model,
                   config = 'config_default',
                   seeds_list = seed_list,
-                  slug=text.urlify(form.name.data))
+                  slug=text.urlify(form.name.data),
+                  status="Crawl has not been started")
 
     db.session.add(crawl)
     db.session.commit()
