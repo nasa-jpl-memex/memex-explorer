@@ -57,6 +57,31 @@ $( document ).ready(function() {
             show_error();
           }
         });
+        $.ajax({ type: "GET", url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/stats",
+          success: function(data) {
+                console.log("stats-data" + data);
+                if (data.nutch) {
+                  $.ajax({
+                    type: "POST",
+                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
+                    contentType: 'application/json',
+                    data: JSON.stringify({crawled: data.num_crawled, crawler: 'nutch'}),
+                  });
+                } else {
+                  $.ajax({
+                    type: "POST",
+                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
+                    contentType: 'application/json',
+                    data: JSON.stringify({crawled: data.num_crawled, harvest: data.harvest_rate, crawler:'ache'}),
+                  });
+                }
+            },
+          failure: function() {
+                  $( '#stats-data' ).html(
+                  '<h4>(Statistics are not yet available for this crawl.)</h4>'
+                    );
+          }
+        });
     });
 
     (function pollStatus() {
@@ -93,12 +118,6 @@ $( document ).ready(function() {
                       + data.num_crawled 
                       + '</td></tr></table>'
                     );
-                  $.ajax({
-                    type: "POST", 
-                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
-                    contentType: 'application/json',
-                    data: JSON.stringify({crawled: data.num_crawled, crawler: 'nutch'}),
-                  });
                 } else {
                   $( '#stats-data' ).html(
                       '<div class="col-sm-12"><table class="table table-striped"><tr><th>Harvest Rate</th><th>Site(s) crawled</th></tr><tr><td>' 
@@ -107,12 +126,6 @@ $( document ).ready(function() {
                       + data.num_crawled 
                       +'</td></tr></table></div>'
                     );
-                  $.ajax({
-                    type: "POST", 
-                    url: "/{{ project.slug }}/crawls/{{ crawl.slug }}/update_stats",
-                    contentType: 'application/json',
-                    data: JSON.stringify({crawled: data.num_crawled, harvest: data.harvest_rate, crawler:'ache'}),
-                  });
                 }
             },
           failure: function() {
