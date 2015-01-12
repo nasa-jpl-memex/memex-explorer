@@ -14,6 +14,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 # Local Imports
 # -------------
 
+from . import db
 from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH, IMAGE_SPACE_PATH
 from .db_api import get_data_source, get_model
 from .utils import make_dir, make_dirs, run_proc
@@ -118,6 +119,8 @@ class AcheCrawl(Crawl):
                                  self.crawl_dir, self.config, self.seeds_file,
                                  self.model_dir, LANG_DETECT_PATH),
                             stdout=stdout, stderr=stderr)
+        self.crawl.status = "Running crawl"
+        db.session.commit()
         return self.proc.pid
 
     def statistics(self):
@@ -139,6 +142,7 @@ class AcheCrawl(Crawl):
 class NutchCrawl(Crawl):
 
     def __init__(self, crawl, num_rounds=1):
+        self.crawl = crawl
         self.seed_dir =  os.path.join(SEED_FILES, crawl.seeds_list)
         self.crawl_dir = os.path.join(CRAWLS_PATH, str(crawl.id))
         #TODO Switch from `1` to parameter.
@@ -148,6 +152,8 @@ class NutchCrawl(Crawl):
     def start(self):
         make_dir(self.crawl_dir)
         self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
+        self.crawl.status = "Running crawl"
+        db.session.commit()
         return self.proc.pid
 
     def dump_images(self, image_space):

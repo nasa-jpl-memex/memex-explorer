@@ -29,6 +29,8 @@ $( document ).ready(function() {
 
         $( '#status' ).text( "Starting..." );
 
+        this.disabled = true;
+
         $.ajax({
           type: "POST",
             url: "{{ url_for('run_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}",
