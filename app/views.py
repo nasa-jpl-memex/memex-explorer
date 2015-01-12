@@ -382,12 +382,21 @@ def refresh(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/status', methods=['GET'])
 def status_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
+    project = get_project(project_slug)
+    crawl = get_crawl(project=project, crawl_slug=crawl_slug)
     crawl_instance = CRAWLS.get(key)
     if crawl_instance is not None:
         status = crawl_instance.get_status()
-        return status
+    elif crawl.crawler == "nutch":
+        crawl_instance = NutchCrawl(crawl)
+        status = crawl_instance.get_status()
+    elif crawl.crawler == "ache":
+        crawl_instance = AcheCrawl(crawl)
+        status = crawl_instance.get_status()
     else:
-        return "Crawl not started"
+        status = "Error, no status found"
+
+    return status
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/stats', methods=['GET'])
