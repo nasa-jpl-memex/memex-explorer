@@ -24,6 +24,7 @@ class Project(db.Model):
     def __repr__(self):
         return '<Project %r>' % (self.name)
 
+
 class Crawl(db.Model):
     __tablename__ = "crawl"
     id = db.Column(db.Integer, primary_key=True)

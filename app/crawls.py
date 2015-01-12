@@ -11,11 +11,15 @@ from datetime import datetime
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 
+import thread
+import threading
+import time
+
 # Local Imports
 # -------------
 
 from .config import SEED_FILES, MODEL_FILES, CONFIG_FILES, CRAWLS_PATH, LANG_DETECT_PATH, IMAGE_SPACE_PATH
-from .db_api import get_data_source, get_model
+from .db_api import get_data_source, get_model, set_crawl_status
 from .utils import make_dir, make_dirs, run_proc
 
 
@@ -61,7 +65,6 @@ class Crawl(object):
 
         self.crawl_name = crawl.name
         self.project_id = crawl.project_id
-        self.status = "Starting"
 
         # Handle to crawl process
         self.proc = None
@@ -76,30 +79,6 @@ class Crawl(object):
         return delta.total_seconds()
 
 
-    @abstractmethod
-    def statistics(self):
-        return
-
-
-    def get_status(self):
-        self.proc.poll()
-        if self.proc is None:
-            self.status = "No process exists"
-        elif self.proc.returncode is None:
-            self.status = "Crawl running"
-        elif self.proc.returncode < 0:
-            self.status = "Crawl was stopped"
-        else:
-            self.status = "Crawl is not running"
-        return self.status
-
-    def stop(self):
-        if self.proc is not None:
-            print("Killing %s" % str(self.proc.pid))
-            self.proc.kill()
-            self.stop_time = datetime.now()
-
-
 class AcheCrawl(Crawl):
 
     def __init__(self, crawl):
@@ -109,6 +88,7 @@ class AcheCrawl(Crawl):
         model = get_model(id=crawl.data_model_id)
         self.model_dir = os.path.join(MODEL_FILES, str(model.id))
         self.crawl_dir = os.path.join(CRAWLS_PATH, str(crawl.id))
+        self.status = crawl.status
         super(AcheCrawl, self).__init__(crawl)
 
     def start(self):
@@ -119,6 +99,13 @@ class AcheCrawl(Crawl):
                                  self.model_dir, LANG_DETECT_PATH),
                             stdout=stdout, stderr=stderr)
         return self.proc.pid
+
+    def stop(self):
+        if self.proc is not None:
+            print("Killing %s" % str(self.proc.pid))
+            self.proc.kill()
+            self.stop_time = datetime.now()
+
 
     def statistics(self):
         harvest_source = get_data_source(self.crawl, "harvest")
@@ -136,19 +123,44 @@ class AcheCrawl(Crawl):
 
         return ret
 
+    def get_status(self):
+        if self.proc is None:
+            pass
+        else:
+            self.proc.poll()
+            if self.proc is None:
+                self.status = "No process exists"
+            elif self.proc.returncode is None:
+                self.status = "Crawl running"
+            elif self.proc.returncode < 0:
+                self.status = "Crawl was stopped"
+            else:
+                self.status = "Crawl not running"
+        return self.status
+
+
 class NutchCrawl(Crawl):
 
     def __init__(self, crawl, num_rounds=1):
+        self.crawl = crawl
         self.seed_dir =  os.path.join(SEED_FILES, crawl.seeds_list)
         self.crawl_dir = os.path.join(CRAWLS_PATH, str(crawl.id))
-        #TODO Switch from `1` to parameter.
         self.number_of_rounds = num_rounds
+        self.status = crawl.status
         super(NutchCrawl, self).__init__(crawl)
 
     def start(self):
-        make_dir(self.crawl_dir)
+        if os.path.exists(os.path.join(self.crawl_dir, 'stop_flag')):
+            stop_file = os.path.join(self.crawl_dir, "stop_flag")
+            remove_stop_flag = Popen(['rm', stop_file]).wait()
         self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
+        self.status = set_crawl_status(self.crawl.id, "Crawl has previously ran")
         return self.proc.pid
+
+    def stop(self):
+        file = os.path.join(self.crawl_dir, "stop_flag")
+        write_stop_flag = run_proc("touch %s" % file)
+        return write_stop_flag
 
     def dump_images(self, image_space):
         self.img_dir = os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images')
@@ -164,8 +176,26 @@ class NutchCrawl(Crawl):
 
         return "Dumping images"
 
+    def get_status(self):
+        if self.proc is None:
+            pass
+        else:
+            self.proc.poll()
+            if self.proc is None:
+                self.status = "No process exists"
+            elif self.proc.returncode is None:
+                self.status = "Crawl running"
+            elif self.proc.returncode < 0:
+                self.status = "Crawl was stopped"
+            elif self.status == "Crawl not running" and self.keep_going():
+                self.start()
+                self.status = "Crawl running"
+            else:
+                self.status = "Crawl not running"
+        return self.status
+
     def statistics(self):
-        crawl_db_dir = os.path.join(self.crawl_dir, 'crawldb')
+        crawl_db_dir = os.path.join( self.crawl_dir, 'crawldb')
         proc_str = "nutch readdb {} -stats".format(crawl_db_dir)
         stats_proc = run_proc(proc_str)
                                               
@@ -183,3 +213,9 @@ class NutchCrawl(Crawl):
         ret['nutch'] = True
 
         return ret
+
+    def keep_going(self):
+        if os.path.exists(os.path.join(self.crawl_dir, 'stop_flag')):
+            return False
+        else:
+            return True

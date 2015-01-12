@@ -17,6 +17,12 @@ def get_crawl(project, crawl_slug):
     """
     return Crawl.query.filter_by(project_id=project.id, slug=crawl_slug).first()
 
+def get_crawl_by_id(crawl_id):
+    """Return the crawl that matches `crawl_id`.
+    """
+    return Crawl.query.filter_by(id=crawl_id).first()
+
+
 
 def get_crawls(project_id):
     """Return all crawls that match `project_id`.
@@ -79,6 +85,10 @@ def get_crawl_model(crawl):
     """
     return DataModel.query.filter_by(id=crawl.data_model_id).first()
 
+def set_crawl_status(crawl, status):
+    crawl.status = status
+    db.session.flush()
+    db.session.commit()
 
 def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
@@ -145,7 +155,8 @@ def db_add_crawl(project, form, seed_filename, model=None):
                   data_model_id=data_model,
                   config = 'config_default',
                   seeds_list = seed_list,
-                  slug=text.urlify(form.name.data))
+                  slug=text.urlify(form.name.data),
+                  status="Crawl has not been started")
 
     db.session.add(crawl)
     db.session.commit()
