@@ -198,7 +198,7 @@ def add_crawl(project_slug):
     form = CrawlForm()
     project = get_project(project_slug)
     if form.validate_on_submit():
-        existing_crawl = Crawl.query.filter_by(name=form.name.data).first()
+        existing_crawl = Crawl.query.filter_by(slug=text.urlify(form.name.data)).first()
         if existing_crawl:
             flash('Crawl name already exists, please choose another name', 'error')
             return render_template('add_crawl.html', form=form)
@@ -250,9 +250,7 @@ def add_crawl(project_slug):
 
 @app.route('/<project_slug>/crawls')
 def crawls(project_slug):
-    project = get_project(project_slug)
-    image_spaces = project.image_spaces.all()
-    return render_template('crawls.html', image_space=image_spaces)
+    return render_template('crawls.html')
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>')
@@ -393,12 +391,21 @@ def refresh(project_slug, crawl_slug):
 @app.route('/<project_slug>/crawls/<crawl_slug>/status', methods=['GET'])
 def status_crawl(project_slug, crawl_slug):
     key = project_slug + '-' + crawl_slug
+    project = get_project(project_slug)
+    crawl = get_crawl(project=project, crawl_slug=crawl_slug)
     crawl_instance = CRAWLS.get(key)
     if crawl_instance is not None:
         status = crawl_instance.get_status()
-        return status
+    elif crawl.crawler == "nutch":
+        crawl_instance = NutchCrawl(crawl)
+        status = crawl_instance.get_status()
+    elif crawl.crawler == "ache":
+        crawl_instance = AcheCrawl(crawl)
+        status = crawl_instance.get_status()
     else:
-        return "Crawl not started"
+        status = "Error, no status found"
+
+    return status
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/stats', methods=['GET'])
@@ -418,8 +425,20 @@ def stats_crawl(project_slug, crawl_slug):
             crawl_instance = NutchCrawl(crawl)
 
         stats_output = crawl_instance.statistics()
-        print("crawl stats:" + str(stats_output))
         return jsonify(stats_output)
+
+
+@app.route('/<project_slug>/crawls/<crawl_slug>/update_stats', methods=['POST'])
+def update_stats(project_slug, crawl_slug):
+    project = get_project(project_slug)
+    crawl = get_crawl(project, crawl_slug)
+    if request.json['crawler'] == 'ache':
+        crawl.pages_crawled = request.json['crawled']
+        crawl.harvest_rate = request.json['harvest']
+    if request.json['crawler'] == 'nutch':
+        crawl.pages_crawled = request.json['crawled']
+    db.session.commit()
+    return 'success' 
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/dump', methods=['POST'])

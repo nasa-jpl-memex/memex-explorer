@@ -16,20 +16,42 @@
             <p>{{ crawl.name }}</p>
         </a>
         <p>{{ crawl.description }}</p>
-    <div class="col-sm-2">
-        {% for image_space in image_spaces %}
-        {% if image_space.name == crawl.name %}
+    <div class="col-sm-6">
+        {% if crawl.crawler == 'nutch' %}
         <table class="table table-striped">
             <tr>
-                <th>Image(s)</th>
+                <th>Images</th>
+                <th>Pages Crawled</th>
             </tr>
             <tr>
-                <td>{{ image_space.images.all()|length }}</td>
+                <td>{{ crawl.pages_crawled }}</td>
+                {% if image_spaces[0] %}
+                {% for image_space in image_spaces %} 
+                {% if crawl.id == image_space.crawl_id %}
+                    {% if image_space.images %}
+                        <td>{{ image_space.images.all() | length }}</td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                    <td>None</td>
+                {% endif %}
             </tr>
-               </table>
-               {# <a href="{{url_for('upload', project_slug=project.slug)}}"><p>+ Add Images</p></a> #}
+        </table>
+        {% else %}
+        <table class="table table-striped">
+            <tr>
+                <th>Pages Crawled</th>
+                <th>Harvest Rate</th>
+            </tr>
+            <tr>
+                <td>{{ crawl.pages_crawled }}</td>
+                <td>{{ crawl.harvest_rate }}</td>
+            </tr>
+        </table>
         {% endif %}
-        {% endfor %}
     </div>
     </div>
     {% endfor %}

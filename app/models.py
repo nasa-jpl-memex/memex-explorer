@@ -24,6 +24,7 @@ class Project(db.Model):
     def __repr__(self):
         return '<Project %r>' % (self.name)
 
+
 class Crawl(db.Model):
     __tablename__ = "crawl"
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +39,8 @@ class Crawl(db.Model):
     data_model_id = db.Column(db.Integer, db.ForeignKey('data_model.id'))
     image_space = db.relationship('ImageSpace', backref='crawl', uselist=False)
     data_sources = db.relationship('DataSource', backref='crawl', lazy='dynamic')
+    pages_crawled = db.Column(db.BigInteger)
+    harvest_rate = db.Column(db.Float)
 
     def __repr__(self):
         return '<Crawl %r>' % (self.name)
@@ -113,3 +116,4 @@ class Plot(db.Model):
 
     def __unicode__(self):
         return '<Plot %s>' % self.name
+
