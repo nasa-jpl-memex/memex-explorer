@@ -30,6 +30,7 @@ $( document ).ready(function() {
         $( '#status' ).text( "Starting..." );
 
         this.disabled = true;
+        $('#stopButton').disabled = false;
 
         $.ajax({
           type: "POST",
@@ -147,6 +148,9 @@ $( document ).ready(function() {
               </button>
               <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
                 data-container="body"
+                  {% if crawl.crawler == "ache" and crawl.status != "Running crawl" %}
+                    disabled
+                  {% endif %}
                 data-toggle="tooltip" data-placement="bottom">
                   <span class="fa fa-stop"></span>
               </button>
