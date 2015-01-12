@@ -119,8 +119,6 @@ class AcheCrawl(Crawl):
                                  self.crawl_dir, self.config, self.seeds_file,
                                  self.model_dir, LANG_DETECT_PATH),
                             stdout=stdout, stderr=stderr)
-        self.crawl.status = "Running crawl"
-        db.session.commit()
         return self.proc.pid
 
     def statistics(self):
@@ -152,8 +150,6 @@ class NutchCrawl(Crawl):
     def start(self):
         make_dir(self.crawl_dir)
         self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
-        self.crawl.status = "Running crawl"
-        db.session.commit()
         return self.proc.pid
 
     def dump_images(self, image_space):
