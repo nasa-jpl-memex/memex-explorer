@@ -43,12 +43,12 @@
         height="200" width="200"
         class="thumbnail">
     {% else %}
-      <img src="{{ url_for('image_source', image_directory= image.image_space.id, image_name=img.filename) }}"
-        alt="{{ img }}"
+      <img src="{{ url_for('image_source', image_directory= img.image_space_id, image_name=img.filename) }}"
+        alt="{{ img.filename }}"
         height="200" width="200"
         class="thumbnail">
     {% endif %}
-     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename) }}">{{ img }}</a></h4>
+     <h4><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename) }}">{{ img.filename }}</a></h4>
 
    </div>
   {% endfor %}
