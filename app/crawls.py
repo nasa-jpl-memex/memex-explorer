@@ -209,7 +209,7 @@ class NutchCrawl(Crawl):
         if stderr:
             raise NutchException(stderr)
 
-        ret = {}
+        ret = {'num_crawled': 0}
 
         for line in stdout.split('\n'):
             if 'db_fetched' in line:
