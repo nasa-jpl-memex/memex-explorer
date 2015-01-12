@@ -116,3 +116,4 @@ class Plot(db.Model):
 
     def __unicode__(self):
         return '<Plot %s>' % self.name
+
