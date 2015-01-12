@@ -89,7 +89,7 @@ class Crawl(object):
         elif self.proc.returncode is None:
             self.status = "Running crawl"
         elif self.proc.returncode < 0:
-            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
+            self.status = "Crawl was stopped"
         else:
             self.status = "Crawl process ended"
         return self.status
