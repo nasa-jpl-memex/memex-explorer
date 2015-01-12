@@ -42,6 +42,7 @@ from .mail import send_email
 from .auth import requires_auth
 from .models import (Crawl, DataSource, Plot, Project, Image,
                      ImageSpace, DataModel)
+from .utils import make_dir
 from .db_api import (get_project, get_crawl, get_crawls, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
@@ -209,7 +210,7 @@ def add_crawl(project_slug):
             db_add_model(project, form.new_model_name.data)
             model = get_model(name=form.new_model_name.data)
             model_directory = MODEL_FILES + str(model.id)
-            os.mkdir(model_directory)
+            make_dir(model_directory)
             model_file = secure_filename(form.new_model_file.data.filename)
             model_features = secure_filename(form.new_model_features.data.filename)
             form.new_model_file.data.save(model_directory + '/' + model_file)
@@ -270,14 +271,20 @@ def crawl(project_slug, crawl_slug):
             scripts, divs = default_ache_dash(crawl)
         except PlotsNotReadyException as e:
             traceback.print_exc()
-            return render_template('crawl.html', crawl=crawl, model=model)
+            return render_template('crawl.html', crawl=crawl,
+                status=status_crawl(project_slug, crawl_slug), model=model)
 
-        relevant_path = url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug)
 
-        return render_template('crawl.html', scripts=scripts, divs=divs, crawl=crawl, model=model)
+        relevant_path = url_for('relevant_pages', project_slug=project.slug,
+                crawl_slug=crawl.slug)
+
+        return render_template('crawl.html', scripts=scripts,
+                status=status_crawl(project_slug, crawl_slug), divs=divs,
+                crawl=crawl, model=model)
 
     else:
-        return render_template('crawl.html', crawl=crawl, model=model)
+        return render_template('crawl.html', crawl=crawl,
+                status=status_crawl(project_slug, crawl_slug),  model=model)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])

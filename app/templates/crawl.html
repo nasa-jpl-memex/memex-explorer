@@ -29,6 +29,9 @@ $( document ).ready(function() {
 
         $( '#status' ).text( "Starting..." );
 
+        this.disabled = true;
+        $('#stopButton').removeAttr("disabled");
+
         $.ajax({
           type: "POST",
             url: "{{ url_for('run_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}",
@@ -45,6 +48,7 @@ $( document ).ready(function() {
     $('#stopButton').on('click', function(){
 
         $( '#status' ).text( "Stopping..." );
+        this.disabled = true;
 
         $.ajax({
           type: "POST",
@@ -143,11 +147,17 @@ $( document ).ready(function() {
             <div class='col-xs-2'>
               <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
                 data-container="body"
+                  {% if crawl.crawler == "ache" and status == "Running crawl" or status == "Crawl was stopped" %}
+                    disabled
+                  {% endif %}
                 data-toggle="tooltip" data-placement="bottom">
                   <i class="fa fa-play"></i>
               </button>
               <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
                 data-container="body"
+                  {% if crawl.crawler == "ache" and status != "Running crawl" %}
+                    disabled
+                  {% endif %}
                 data-toggle="tooltip" data-placement="bottom">
                   <span class="fa fa-stop"></span>
               </button>
