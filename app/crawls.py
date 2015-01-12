@@ -86,11 +86,11 @@ class Crawl(object):
         if self.proc is None:
             self.status = "No process exists"
         elif self.proc.returncode is None:
-            self.status = "Running crawl"
+            self.status = "Crawl running"
         elif self.proc.returncode < 0:
-            self.status = "Crawl process was terminated by signal %s" % self.proc.returncode
+            self.status = "Crawl was stopped"
         else:
-            self.status = "Crawl process ended"
+            self.status = "Crawl is not running"
         return self.status
 
     def stop(self):
