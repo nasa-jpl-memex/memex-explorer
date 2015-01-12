@@ -65,7 +65,6 @@ class Crawl(object):
 
         self.crawl_name = crawl.name
         self.project_id = crawl.project_id
-        self.status = "Starting"
 
         # Handle to crawl process
         self.proc = None
@@ -90,7 +89,7 @@ class AcheCrawl(Crawl):
         model = get_model(id=crawl.data_model_id)
         self.model_dir = os.path.join(MODEL_FILES, str(model.id))
         self.crawl_dir = os.path.join(CRAWLS_PATH, str(crawl.id))
-        self.status = None
+        self.status = crawl.status
         super(AcheCrawl, self).__init__(crawl)
 
     def start(self):
@@ -138,7 +137,7 @@ class AcheCrawl(Crawl):
                 self.status = "Crawl was stopped"
             else:
                 self.status = "Crawl not running"
-            return self.status
+        return self.status
 
 
 class NutchCrawl(Crawl):
