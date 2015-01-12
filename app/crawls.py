@@ -166,6 +166,12 @@ class NutchCrawl(Crawl):
 
     def statistics(self):
         crawl_db_dir = os.path.join(self.crawl_dir, 'crawldb')
+        if not os.path.exists(crawl_db_dir):
+            ret = {}
+            ret['num_crawled'] = 0
+            ret['nutch'] = True
+            return ret
+
         proc_str = "nutch readdb {} -stats".format(crawl_db_dir)
         stats_proc = run_proc(proc_str)
                                               
