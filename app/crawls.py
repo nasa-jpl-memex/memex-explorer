@@ -154,7 +154,7 @@ class NutchCrawl(Crawl):
             stop_file = os.path.join(self.crawl_dir, "stop_flag")
             remove_stop_flag = Popen(['rm', stop_file]).wait()
         self.proc = Popen(['crawl', self.seed_dir, self.crawl_dir, str(self.number_of_rounds)])
-        self.status = set_crawl_status(self.crawl.id, "Crawl has previously ran")
+        self.status = set_crawl_status(self.crawl, "Crawl has previously ran")
         return self.proc.pid
 
     def stop(self):
