@@ -85,6 +85,10 @@ def get_crawl_model(crawl):
     """
     return DataModel.query.filter_by(id=crawl.data_model_id).first()
 
+def set_crawl_status(crawl, status):
+    crawl.status = status
+    db.session.flush()
+    db.session.commit()
 
 def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
