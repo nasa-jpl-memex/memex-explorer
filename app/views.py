@@ -173,6 +173,10 @@ def add_project():
     form = ProjectForm(request.form)
 
     if form.validate_on_submit():
+        existing_project = get_project(text.urlify(form.name.data))
+        if existing_project:
+            flash("Project '%s' already exists" % existing_project.name, 'error')
+            return redirect(url_for('add_project'))
         project = Project(slug=text.urlify(form.name.data),
                           name=form.name.data,
                           description=form.description.data,

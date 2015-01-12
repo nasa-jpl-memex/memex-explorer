@@ -72,7 +72,7 @@
             Projects
             <span class="caret"></span>
           </button>
-            {% if projects[0] %}
+            {% if projects %}
           <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
             {% for x in projects %}
             <a href="{{ url_for('project', project_slug=x.slug) }}"><li>{{ x.name }}</li></a>
