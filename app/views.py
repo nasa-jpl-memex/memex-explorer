@@ -483,7 +483,7 @@ def contact():
 # Compare (Image Space)
 # ------------------------------------------------------------------------
 
-@app.route('/<project_slug>/uploaded_image/<image_name>')
+@app.route('/<project_slug>/image_space/<image_name>/compare')
 def compare(project_slug, image_name):
     project = get_project(project_slug)
     img = get_image(image_name)
