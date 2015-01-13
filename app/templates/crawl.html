@@ -10,6 +10,9 @@
 <script>
 $( document ).ready(function() {
 
+    $('#playButton').disable = True;
+    $('#stopButton').disable = True;
+
     $('[data-toggle="tooltip"]').tooltip();
 
     $('#reload').on('click', function(){
@@ -25,7 +28,7 @@ $( document ).ready(function() {
             $( '#status' ).text( "Error (could not start crawl)" );
     }
 
-    $('#playButton').on('click', function() {
+/*    $('#playButton').on('click', function() {
 
         $( '#status' ).text( "Starting..." );
 
@@ -44,8 +47,9 @@ $( document ).ready(function() {
           }
         });
     });
+*/
 
-    $('#stopButton').on('click', function(){
+/*    $('#stopButton').on('click', function(){
 
         $( '#status' ).text( "Stopping..." );
         this.disabled = true;
@@ -87,7 +91,7 @@ $( document ).ready(function() {
           }
         });
     });
-
+*/
     (function pollStatus() {
 
       // If polling has been turned off, break the loop
@@ -175,10 +179,10 @@ $( document ).ready(function() {
                   <span class="fa fa-stop"></span>
               </button>
               </div>
-              <div class='col-xs-2'>
-              <!-- <button id="seedButton" type="button" class="btn btn-control">
+              <!--div class='col-xs-2'>
+              <<button id="seedButton" type="button" class="btn btn-control">
                   <i class="fa fa-file-o"></i>
-              </button> -->
+              </button>
               <a href="{{ url_for('edit_crawl', project_slug=project.slug, crawl_slug=crawl.slug) }}" style='text-decoration:none;'>
                 <button id="editButton" type="button" title="Edit Crawl" class="btn btn-control"
                 data-container="body"
@@ -191,11 +195,11 @@ $( document ).ready(function() {
                 data-toggle="tooltip" data-placement="bottom">
                     <span class="fa fa-close"></span>
                 </button>
-            </div>
+            </div-->
       </div>
 
   </div>
-<script type="text/javascript">
+<!--script type="text/javascript">
     $('#removeButton').click(function(){
     swal({
         title: "Are you sure?",
@@ -216,7 +220,7 @@ $( document ).ready(function() {
         }
     });
 });
-</script>
+</script-->
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         {% if divs %}
