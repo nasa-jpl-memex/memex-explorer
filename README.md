@@ -44,3 +44,16 @@ Everything should **just work** by running:
  - conda bootstrap: conda.sh .  Everything is pushed into `install.sh` and `environment.yml` file for conda and env setupd
  - debian.sh: git, supervisor, make, JAVA
  - supervisor_ec2.sh: moves conf files and calls supervisor -- conf file is hard-coded to use env setup in `environment.yml` 
+
+## Docker Build Instructions
+
+### OSX
+```
+export DOCKER_TLS_VERIFY=1
+```
+
+```
+docker build -t memex_explorer .
+docker run -p 5000:80 memex_explorer
+```
+Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
