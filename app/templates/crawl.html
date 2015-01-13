@@ -159,7 +159,7 @@ $( document ).ready(function() {
         <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
             <div class='col-xs-2'>
               <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
-                data-container="body"
+                data-container="body">
                   {% if crawl.crawler == "ache" and status == "Running crawl" or status == "Crawl was stopped" %}
                     disabled
                   {% endif %}
@@ -167,7 +167,7 @@ $( document ).ready(function() {
                   <i class="fa fa-play"></i>
               </button>
               <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
-                data-container="body"
+                data-container="body">
                   {% if crawl.crawler == "ache" and status != "Running crawl" %}
                     disabled
                   {% endif %}
@@ -230,7 +230,7 @@ $( document ).ready(function() {
             <button type="button" id="reload">Refresh</button>
         </div>
         {% else %}
-        <h3>There are no plots to show.</h3>
+        <!--h3>There are no plots to show.</h3-->
        {% endif %}
     </div>
 </div>
