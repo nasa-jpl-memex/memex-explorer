@@ -49,7 +49,9 @@ Everything should **just work** by running:
 
 ### OSX
 ```
-export DOCKER_TLS_VERIFY=1
+boot2docker init
+boot2docker start
+$(boot2docker shellinit)
 ```
 
 ### Build
