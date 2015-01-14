@@ -566,12 +566,10 @@ def image_table(project_slug, image_space_slug):
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
-    image_names = os.listdir(UPLOAD_DIR)
-    image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
-                    for filename in image_names]
+    images = get_uploaded_image_names()
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        existing_file = get_uploaded_image_names()
+        existing_file = [x.filename for x in images]
         if uploaded_file.filename in existing_file:
             response = jsonify(dict(
                 error="Image already exists by that name."))
@@ -592,4 +590,5 @@ def upload(project_slug):
             response.status_code = 500
             return response
 
-    return render_template('upload.html', image_pages=image_pages)
+    return render_template('upload.html', images=images)
+

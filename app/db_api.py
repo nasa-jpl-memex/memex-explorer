@@ -255,6 +255,6 @@ def set_match(source_id, match_id, match):
 
 
 def get_uploaded_image_names():
-    upload_dir = app.config['UPLOAD_DIR']
-    ret_list = os.listdir(upload_dir)
-    return ret_list
+    uploaded_images = Image.query.filter_by(uploaded=1).all()    
+    return uploaded_images
+

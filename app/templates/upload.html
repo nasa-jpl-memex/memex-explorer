@@ -37,10 +37,10 @@
 
     <h3> Uploaded images </h3>
 
-    {% if image_pages %}
+    {% if images %}
     <ul class="list-group">
-      {% for img in image_pages %}
-      <li class="list-group-item"><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.name)}}">{{img.name}}</a></li>
+      {% for img in images %}
+      <li class="list-group-item"><a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename)}}">{{img.filename}}</a></li>
       {% endfor %}
     </ul>
     {% else %}
@@ -52,3 +52,4 @@
   </div>
 
 {% endblock %}
+
