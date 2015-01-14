@@ -45,15 +45,25 @@ Everything should **just work** by running:
  - debian.sh: git, supervisor, make, JAVA
  - supervisor_ec2.sh: moves conf files and calls supervisor -- conf file is hard-coded to use env setup in `environment.yml` 
 
-## Docker Build Instructions
+## Docker Instructions
 
 ### OSX
 ```
 export DOCKER_TLS_VERIFY=1
 ```
 
+### Build
 ```
 docker build -t memex_explorer .
 docker run -p 80:5000 memex_explorer
 ```
+
+## DockerHub
+
+```
+docker pull continuumio/memex_explorer
+docker run -p 80:5000 memex_explorer
+
+```
+
 Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
