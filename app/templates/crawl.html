@@ -10,9 +10,6 @@
 <script>
 $( document ).ready(function() {
 
-    $('#playButton').disable = True;
-    $('#stopButton').disable = True;
-
     $('[data-toggle="tooltip"]').tooltip();
 
     $('#reload').on('click', function(){
@@ -27,8 +24,11 @@ $( document ).ready(function() {
             // alert("Error: could not start crawl.")
             $( '#status' ).text( "Error (could not start crawl)" );
     }
-
-/*    $('#playButton').on('click', function() {
+{% if config.DEMO %}
+/*
+{% else %}
+{% endif %}
+$('#playButton').on('click', function() {
 
         $( '#status' ).text( "Starting..." );
 
@@ -47,9 +47,13 @@ $( document ).ready(function() {
           }
         });
     });
+{% if config.DEMO %}
 */
 
-/*    $('#stopButton').on('click', function(){
+/*
+{% else %}
+{% endif %}
+$('#stopButton').on('click', function(){
 
         $( '#status' ).text( "Stopping..." );
         this.disabled = true;
@@ -91,7 +95,12 @@ $( document ).ready(function() {
           }
         });
     });
+
+{% if config.DEMO %}
 */
+{% else %}
+{% endif %}
+
     (function pollStatus() {
 
       // If polling has been turned off, break the loop
@@ -161,9 +170,23 @@ $( document ).ready(function() {
 </div>
 <div class='row'>
         <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
+            {% if config.DEMO %}
+            <p><em>You are currently not connected to the internet. You can't start/stop a crawl,
+                but you can analyze previous results.</em></p>
             <div class='col-xs-2'>
               <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
-                data-container="body">
+                data-container="body" disabled data-toggle="tooltip" data-placement="bottom">
+                  <i class="fa fa-play"></i>
+              </button>
+              <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
+                data-container="body" disabled data-toggle="tooltip" data-placement="bottom">
+                  <span class="fa fa-stop"></span>
+              </button>
+              </div>
+            {% else %}
+            <div class='col-xs-2'>
+              <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
+                data-container="body"
                   {% if crawl.crawler == "ache" and status == "Running crawl" or status == "Crawl was stopped" %}
                     disabled
                   {% endif %}
@@ -171,7 +194,7 @@ $( document ).ready(function() {
                   <i class="fa fa-play"></i>
               </button>
               <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
-                data-container="body">
+                data-container="body"
                   {% if crawl.crawler == "ache" and status != "Running crawl" %}
                     disabled
                   {% endif %}
@@ -179,6 +202,7 @@ $( document ).ready(function() {
                   <span class="fa fa-stop"></span>
               </button>
               </div>
+            {% endif %}
               <!--div class='col-xs-2'>
               <<button id="seedButton" type="button" class="btn btn-control">
                   <i class="fa fa-file-o"></i>
