@@ -69,3 +69,5 @@ docker run -p 80:5000 memex_explorer
 ```
 
 Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
+To update an existing Docker, use the above 2 commands to pull the
+latest version.
