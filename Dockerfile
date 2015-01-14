@@ -12,8 +12,8 @@ RUN apt-get update && \
 
 RUN apt-get -y install wget bzip2
 
-RUN export JAVA_HOME=/usr/lib/ jvm/java-6-openjdk-amd64 | sudo tee -a /etc/bashrc
-RUN echo JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64 | sudo tee -a /etc/environment
+RUN export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64 | sudo tee -a /etc/bashrc
+RUN echo JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64 | sudo tee -a /etc/environment
 
 # Set environment variables.
 ENV HOME /root
