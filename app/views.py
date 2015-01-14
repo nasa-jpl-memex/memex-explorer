@@ -289,8 +289,9 @@ def crawl(project_slug, crawl_slug):
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
 def delete_crawl(project_slug, crawl_slug):
-    crawl = get_crawl(crawl_slug)
-    shutil.rmtree(CRAWLS_PATH + crawl.name)
+    project = get_project(project_slug)
+    crawl = get_crawl(project, crawl_slug)
+    shutil.rmtree(os.path.join(CRAWLS_PATH + str(crawl.id)))
     db.session.delete(crawl)
     db.session.commit()
     flash('%s has successfully been deleted.' % crawl.name, 'success')
