@@ -54,6 +54,6 @@ export DOCKER_TLS_VERIFY=1
 
 ```
 docker build -t memex_explorer .
-docker run -p 5000:80 memex_explorer
+docker run -p 80:5000 memex_explorer
 ```
 Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
