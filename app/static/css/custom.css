@@ -2,6 +2,11 @@
 
 /* Index page - project panels style */
 
+.table-blue {
+    background-color:whitesmoke;
+    color:#1D4971;
+}
+
 .panel-project {
     background-color:#1D4971;
 }

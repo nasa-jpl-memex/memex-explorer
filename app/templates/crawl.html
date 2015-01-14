@@ -131,18 +131,18 @@ $('#stopButton').on('click', function(){
                 console.log("stats-data" + data);
                 if (data.nutch) {
                   $( '#stats-data' ).html(
-                      '<tr><th>Sites crawled</th><td>'
+                      '<tr><th class="table-blue">Sites crawled</th><td>'
                       + data.num_crawled 
                       + '</td></tr>'
                     );
                 } else {
                   $( '#stats-data' ).html(
-                      '<th>Sites crawled</th><td>'
+                      '<tr><th class="table-blue">Sites crawled</th><td>'
                       + data.num_crawled
                       + '</td></tr>'
-                      + '<tr><th>Harvest rate</th><td>'
+                      + '<tr><th class="table-blue">Harvest rate</th><td>'
                       + data.harvest_rate
-                      + '</td>'
+                      + '</td</tr>'
                     );
                 }
             },
@@ -207,12 +207,12 @@ $('#stopButton').on('click', function(){
         <h3>Status: <small><span id="status">Getting crawl status...</span></small></h3>
         <table>
             <tr>
-              <th>Description</th>
+              <th class="table-blue">Description</th>
               <td>{{crawl.description}}</td>
             </tr>
             {% if crawl.crawler == 'ache' %}
             <tr>
-              <th>Crawl Model</th>
+              <th class="table-blue">Crawl Model</th>
               <td>{{ model.name }}</td>
             </tr>
             {% endif %}
@@ -221,6 +221,17 @@ $('#stopButton').on('click', function(){
             <tr><th colspan="2"><span>Getting crawl statistics...</span></th>
             </tr>
         </table>
+
+        {% if crawl.crawler == 'ache' and divs %}
+        <a class="btn btn-default btn-padded center"
+        href="{{ url_for('relevant_pages', project_slug=project.slug, crawl_slug=crawl.slug) }}">
+        Download Relevant Pages</a>
+        {% endif %}
+        {% if crawl.crawler == 'nutch' %}
+        <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
+            <a>Get Images</a>
+        </button>
+        {% endif %}
 
           <!--div class='col-xs-2'>
           <<button id="seedButton" type="button" class="btn btn-control">
