@@ -28,8 +28,6 @@ RUN wget --quiet http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_6
 
 ENV PATH /root/anaconda/bin:$PATH
 
-
-RUN conda config --set always_yes yes
 RUN conda config --set always_yes yes
 RUN conda config --add create_default_packages pip --add create_default_packages ipython
 RUN conda update conda
