@@ -437,6 +437,7 @@ def update_stats(project_slug, crawl_slug):
         crawl.harvest_rate = request.json['harvest']
     if request.json['crawler'] == 'nutch':
         crawl.pages_crawled = request.json['crawled']
+    db.session.flush()
     db.session.commit()
     return 'success' 
 
@@ -457,7 +458,6 @@ def dump_images(project_slug, crawl_slug):
         images = os.listdir(os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images'))
         for image in images:
             image_path = os.path.join(IMAGE_SPACE_PATH, str(image_space.id), 'images', image)
-            print(image_path)
             with open(image_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
                 db_process_exif(exif_data, crawl_slug, image, image_space)
@@ -544,7 +544,7 @@ def relevant_pages(project_slug, crawl_slug):
     relevant = get_data_source(crawl, "relevantpages")
     # relevant_path = CRAWLS_PATH + relevant.data_uri
 
-    return send_from_directory(os.path.join(CRAWLS_PATH, crawl.id), relevant.data_uri)
+    return send_from_directory(os.path.join(CRAWLS_PATH, str(crawl.id)), relevant.data_uri)
 
 
 @app.route('/<project_slug>/image_space')
@@ -557,9 +557,8 @@ def image_space(project_slug):
 @app.route('/<project_slug>/image_space/<image_space_slug>/')
 def image_table(project_slug, image_space_slug):
     project = get_project(project_slug)
-    image_space = ImageSpace.query.filter_by(name=image_space_slug).first()
+    image_space = ImageSpace.query.filter_by(slug=image_space_slug).first()
     images = image_space.images.all()
-    print(images)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
