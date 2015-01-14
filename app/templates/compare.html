@@ -36,7 +36,7 @@
     <div class="col-xs-6 col-sm-3">
 
     {% if img.uploaded == 1 %}
-    <a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename) }}"><
+    <a href="{{ url_for('compare', project_slug=project.slug, image_name=img.filename) }}">
       <img src="{{ url_for('uploaded_image', image_name=img.filename) }}"
         data-id="{{ img.id }}"
         data-match="{{ img.match }}"
