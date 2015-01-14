@@ -13,7 +13,7 @@
       <div class="form-group">
         <label class="col-sm-2 control-label">{{form.name.label}}</label>
         <div class="col-sm-10">
-           {{ form.name|safe }}
+            <input id="name" name="name" type="text" value="{{ crawl.name }}">
         </div>
         {% for error in form.errors.name %}
         <span style="color: red;">[{{error}}]</span>
@@ -23,7 +23,7 @@
      <div class="form-group">
         <label class="col-sm-2 control-label">{{form.description.label}}</label>
         <div class="col-sm-10">
-           {{ form.description|safe }}
+            <textarea id="description" name="description">{{ crawl.description }}</textarea>
         </div>
         {% for error in form.errors.description %}
         <span style="color: red;">[{{error}}]</span>

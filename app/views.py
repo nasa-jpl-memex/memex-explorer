@@ -317,7 +317,7 @@ def edit_crawl(project_slug, crawl_slug):
         flash('%s has successfully been changed.' % crawl.name, 'success')
         return redirect(url_for('project', project_slug=project_slug))
 
-    return render_template('edit_crawl.html', form=form)
+    return render_template('edit_crawl.html', form=form, crawl=crawl)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/run', methods=['POST'])
