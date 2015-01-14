@@ -47,7 +47,7 @@ from .db_api import (get_project, get_crawl, get_crawls, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
-                     get_image_space_from_name)
+                     get_image_space_from_slug)
 
 from .forms import (CrawlForm, MonitorDataForm, PlotForm, ContactForm,
                     DashboardForm, ProjectForm, DataModelForm, EditProjectForm,
@@ -524,7 +524,8 @@ def image_source(image_directory, image_name):
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
 def delete_image(project_slug, image_space_slug, image_name):
     image = get_image(image_name) 
-    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.filename)
+    image_space = get_image_space_from_slug(image_space_slug)
+    os.remove(IMAGE_SPACE_PATH + str(image_space.id) + '/images/' + image.filename)
     db.session.delete(image) 
     db.session.commit()
     flash('%s has successfully been deleted.' % image.filename, 'success')
@@ -560,7 +561,6 @@ def image_table(project_slug, image_space_slug):
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(name=image_space_slug).first()
     images = image_space.images.all()
-    print(images)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 

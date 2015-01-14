@@ -94,10 +94,10 @@ def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
 
 
-def get_image_space_from_name(image_space_name):
-    """Return the image space that matches `image_space_name`
+def get_image_space_from_slug(image_space_slug):
+    """Return the image space that matches `image_space_slug`
     """
-    return ImageSpace.query.filter_by(name=image_space_name).first()
+    return ImageSpace.query.filter_by(slug=image_space_slug).first()
 
 
 def get_crawl_image_space(project, crawl):
