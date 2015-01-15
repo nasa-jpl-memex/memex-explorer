@@ -94,10 +94,10 @@ def get_image_space(project_id):
     return ImageSpace.query.filter_by(project_id=project_id)
 
 
-def get_image_space_from_name(image_space_name):
-    """Return the image space that matches `image_space_name`
+def get_image_space_from_slug(image_space_slug):
+    """Return the image space that matches `image_space_slug`
     """
-    return ImageSpace.query.filter_by(name=image_space_name).first()
+    return ImageSpace.query.filter_by(slug=image_space_slug).first()
 
 
 def get_crawl_image_space(project, crawl):
@@ -255,6 +255,16 @@ def set_match(source_id, match_id, match):
 
 
 def get_uploaded_image_names():
-    upload_dir = app.config['UPLOAD_DIR']
-    ret_list = os.listdir(upload_dir)
-    return ret_list
+    uploaded_images = Image.query.filter_by(uploaded=1).all()    
+    return uploaded_images
+
+
+def image_name_increment(upload_file, images):
+    split_filename = upload_file.split('.')
+    image_names = [x.filename for x in images if split_filename[0] in x.filename]
+    if image_names:
+        upload_filename = split_filename[0] + '_' + str(len(image_names)) + '.' + split_filename[1]
+    else:
+        upload_filename = upload_file
+    return upload_filename
+

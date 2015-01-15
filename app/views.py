@@ -47,7 +47,7 @@ from .db_api import (get_project, get_crawl, get_crawls, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
-                     get_image_space_from_name)
+                     get_image_space_from_slug, image_name_increment)
 
 from .forms import (CrawlForm, MonitorDataForm, PlotForm, ContactForm,
                     DashboardForm, ProjectForm, DataModelForm, EditProjectForm,
@@ -517,7 +517,8 @@ def image_source(image_directory, image_name):
 @app.route('/<project_slug>/image_space/<image_space_slug>/<image_name>/delete', methods=['POST'])
 def delete_image(project_slug, image_space_slug, image_name):
     image = get_image(image_name) 
-    os.remove(IMAGE_SPACE_PATH + image_space_slug + '/images/' + image.filename)
+    image_space = get_image_space_from_slug(image_space_slug)
+    os.remove(IMAGE_SPACE_PATH + str(image_space.id) + '/images/' + image.filename)
     db.session.delete(image) 
     db.session.commit()
     flash('%s has successfully been deleted.' % image.filename, 'success')
@@ -553,34 +554,29 @@ def image_table(project_slug, image_space_slug):
     project = get_project(project_slug)
     image_space = ImageSpace.query.filter_by(name=image_space_slug).first()
     images = image_space.images.all()
-    print(images)
     return render_template('image_table.html', images=images, project=project, image_space=image_space)
 
 
 @app.route('/<project_slug>/upload_image', methods=['GET', 'POST'])
 def upload(project_slug):
-    image_names = os.listdir(UPLOAD_DIR)
-    image_pages = [ {"name":filename, "url":url_for('compare', project_slug=project_slug,  image_name=filename) } \
-
-                    for filename in image_names]
-    if request.method == 'GET':
-        return render_template('upload.html', image_pages=image_pages)
-    elif request.method == 'POST':
+    images = get_uploaded_image_names()
+    if request.method == 'POST':
         uploaded_file = request.files['file']
+        upload_filename = image_name_increment(uploaded_file.filename, images)
         if uploaded_file and allowed_file(uploaded_file.filename):
-            filename = secure_filename(uploaded_file.filename)
+            filename = secure_filename(upload_filename)
             full_path = os.path.join(app.config['UPLOAD_DIR'], filename)
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
                 exif_data = exifread.process_file(f)
                 process_exif(exif_data, 'uploaded_images', filename)
                 return jsonify(url=url_for('compare', project_slug=project_slug, image_name=filename))
-
-
         else:
             allowed = ', '.join(app.config['ALLOWED_EXTENSIONS'])
             response = jsonify(dict(
                 error="File does not match allowed extensions: %s" % allowed))
             response.status_code = 500
             return response
+
+    return render_template('upload.html', images=reversed(images))
 
