@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+ROM ubuntu:14.04
 
 MAINTAINER Benjamin Zaitlen <ben.zaitlen@continuum.io>
 
@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get -y install make && \
     apt-get -y install cmake && \
     apt-get -y install mc vim && \
-    apt-get -y install openjdk-6-jdk
+    apt-get -y install openjdk-7-jdk
 
 RUN apt-get -y install wget bzip2
 
@@ -42,8 +42,25 @@ WORKDIR /root/memex-explorer
 RUN bash home_install.sh
 
 # Run the server
-CMD ["/root/anaconda/envs/memex-explorer/bin/python", "run.py"]
 
 # Expose ports
 EXPOSE 80
+EXPOSE 22
 EXPOSE 5000
+
+RUN apt-get -y install openssh-server ssh
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+SH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+RUN echo 'root:ubuntu' | chpasswd
+
+ADD entrypoint /root/memex-explorer/entrypoint
+RUN chmod +x /root/memex-explorer/entrypoint
+
+ENV PATH /root/anaconda/envs/memex-explorer/bin:$PATH
+CMD ["/root/memex-explorer/entrypoint"]
