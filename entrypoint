@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/etc/init.d/ssh start
+/root/anaconda/envs/memex-explorer/bin/python run.py
