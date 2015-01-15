@@ -258,3 +258,13 @@ def get_uploaded_image_names():
     uploaded_images = Image.query.filter_by(uploaded=1).all()    
     return uploaded_images
 
+
+def image_name_increment(upload_file, images):
+    split_filename = upload_file.split('.')
+    image_names = [x.filename for x in images if split_filename[0] in x.filename]
+    if image_names:
+        upload_filename = split_filename[0] + '_' + str(len(image_names)) + '.' + split_filename[1]
+    else:
+        upload_filename = upload_file
+    return upload_filename
+

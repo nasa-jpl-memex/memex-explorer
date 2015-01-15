@@ -47,7 +47,7 @@ from .db_api import (get_project, get_crawl, get_crawls, get_data_source,
                      get_images, get_image, get_matches, db_add_crawl, get_plot,
                      db_init_ache, get_crawl_model, get_model, get_models, get_crawl_image_space,
                      db_process_exif, get_image_space, db_add_model, get_uploaded_image_names, get_image_in_image_space,
-                     get_image_space_from_slug)
+                     get_image_space_from_slug, image_name_increment)
 
 from .forms import (CrawlForm, MonitorDataForm, PlotForm, ContactForm,
                     DashboardForm, ProjectForm, DataModelForm, EditProjectForm,
@@ -569,14 +569,9 @@ def upload(project_slug):
     images = get_uploaded_image_names()
     if request.method == 'POST':
         uploaded_file = request.files['file']
-        existing_file = [x.filename for x in images]
-        if uploaded_file.filename in existing_file:
-            response = jsonify(dict(
-                error="Image already exists by that name."))
-            response.status_code = 500
-            return response
+        upload_filename = image_name_increment(uploaded_file.filename, images)
         if uploaded_file and allowed_file(uploaded_file.filename):
-            filename = secure_filename(uploaded_file.filename)
+            filename = secure_filename(upload_filename)
             full_path = os.path.join(app.config['UPLOAD_DIR'], filename)
             uploaded_file.save(full_path)
             with open(full_path, 'rb') as f:
