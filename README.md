@@ -3,18 +3,10 @@ memex-explorer
 
 # Install
 
-## (mini)conda
 ```
-wget http://bit.ly/miniconda
-bash Miniconda-latest-Linux-x86_64.sh
-bash install.sh
+git clone https://github.com/ContinuumIO/memex-explorer.git
+bash home_install.sh
 ```
-
-## Dependencies
-```
-conda env create -n memex -f environment.yml
-```
-
 # Usage
  
 ```
