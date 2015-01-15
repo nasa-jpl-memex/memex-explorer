@@ -585,5 +585,5 @@ def upload(project_slug):
             response.status_code = 500
             return response
 
-    return render_template('upload.html', images=images)
+    return render_template('upload.html', images=reversed(images))
 
