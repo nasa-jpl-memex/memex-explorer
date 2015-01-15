@@ -1,4 +1,4 @@
-ROM ubuntu:14.04
+FROM ubuntu:14.04
 
 MAINTAINER Benjamin Zaitlen <ben.zaitlen@continuum.io>
 
