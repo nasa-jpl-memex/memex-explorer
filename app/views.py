@@ -270,21 +270,13 @@ def crawl(project_slug, crawl_slug):
         try:
             scripts, divs = default_ache_dash(crawl)
         except PlotsNotReadyException as e:
-            traceback.print_exc()
-            return render_template('crawl.html', crawl=crawl,
-                status=status_crawl(project_slug, crawl_slug), model=model)
+            return render_template('crawl.html', crawl=crawl, model=model)
 
-
-        relevant_path = url_for('relevant_pages', project_slug=project.slug,
-                crawl_slug=crawl.slug)
-
-        return render_template('crawl.html', scripts=scripts,
-                status=status_crawl(project_slug, crawl_slug), divs=divs,
+        return render_template('crawl.html', scripts=scripts, divs=divs,
                 crawl=crawl, model=model)
 
     else:
-        return render_template('crawl.html', crawl=crawl,
-                status=status_crawl(project_slug, crawl_slug),  model=model)
+        return render_template('crawl.html', crawl=crawl, model=model)
 
 
 @app.route('/<project_slug>/crawls/<crawl_slug>/delete', methods=['POST'])
@@ -417,7 +409,6 @@ def stats_crawl(project_slug, crawl_slug):
         return jsonify(crawl_instance.statistics())
     else:
         crawl = get_crawl(project, crawl_slug)
-        seeds_list = crawl.seeds_list
         if crawl.crawler == "ache":
             model = get_crawl_model(crawl)
             crawl_instance = AcheCrawl(crawl)
