@@ -38,7 +38,7 @@ $( document ).ready(function() {
 
           <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
             data-container="body"
-              {% if crawl.crawler == "ache" and status == "Running crawl" or status == "Crawl was stopped" %}
+              {% if crawl.crawler == "ache" and crawl.status == "Running crawl" or crawl.status == "Crawl was stopped" %}
                 disabled
               {% endif %}
             data-toggle="tooltip" data-placement="bottom">
@@ -46,7 +46,7 @@ $( document ).ready(function() {
           </button>
           <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
             data-container="body"
-              {% if crawl.crawler == "ache" and status != "Running crawl" %}
+              {% if crawl.crawler == "ache" and crawl.status != "Running crawl" %}
                 disabled
               {% endif %}
             data-toggle="tooltip" data-placement="bottom">
@@ -57,7 +57,7 @@ $( document ).ready(function() {
         {% endif %}
 
     </h1>
-        <h3>Status: <small><span id="status">{% crawl.status %}</span></small></h3>
+        <h3>Status: <small><span id="status">{{ crawl.status }}</span></small></h3>
         <table>
             <tr>
               <th class="table-blue">Description</th>
@@ -71,8 +71,19 @@ $( document ).ready(function() {
             {% endif %}
         </table>
         <table id="stats-data">
-            <tr><th colspan="2"><span>Getting crawl statistics...</span></th>
-            </tr>
+        {% if crawl.crawler == "nutch" %}
+          <tr><th class="table-blue">Sites crawled</th>
+            <td>{{ crawl.pages_crawled }}</td>
+          </tr>
+        {% else %}
+          <tr><th class="table-blue">Sites crawled</th>
+            <td>{{ crawl.pages_crawled }}</td>
+          </tr>
+          <tr><th class="table-blue">Harvest rate</th>
+           <td>{{ crawl.harvest_rate }}</td>
+          </tr>
+
+        {% endif %}
         </table>
 
         {% if crawl.crawler == 'ache' and divs %}
