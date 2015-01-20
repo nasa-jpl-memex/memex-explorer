@@ -18,7 +18,7 @@
         <a href="{{ url_for('image_table', project_slug=project.slug, image_space_slug=image_space.slug) }}">
             <p>{{ image_space.name }}</p>
         </a>
-    {% if images %}
+    {% if image_space.images %}
       {% for image in image_space.images %}
         <div class="col-md-1 col-sm-2 col-xs-3 col-lg-1 thumb">
              <a href="{{ url_for('compare', image_name=image.filename, project_slug=project.slug) }}">
