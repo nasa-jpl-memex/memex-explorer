@@ -8,6 +8,7 @@ from __future__ import absolute_import, division, print_function
 # ----------------
 
 import os
+import re
 import logging
 import json
 import datetime as dt
@@ -201,6 +202,10 @@ def add_crawl(project_slug):
         existing_crawl = Crawl.query.filter_by(slug=text.urlify(form.name.data)).first()
         if existing_crawl:
             flash('Crawl name already exists, please choose another name', 'error')
+            return render_template('add_crawl.html', form=form)
+        if not re.match("^[a-zA-Z0-9 _\-\.]*$", form.name.data):
+            flash('Crawl names should consist of letters, numbers, spaces, '
+                  'and these permitted characters: " _ . - "', 'error')
             return render_template('add_crawl.html', form=form)
         if form.new_model_name.data:
             registered_model = DataModel.query.filter_by(name=form.new_model_name.data).first()
