@@ -94,6 +94,8 @@ class Domain(PlotManager):
         p.xgrid.grid_line_color = '#8592A0'
         p.axis.major_label_text_font_size = "8pt"
 
+        p.toolbar_location = None
+
         # Save ColumnDataSource model id to database model 
         self.plot.source_id = self.source._id
         db.session.flush()
