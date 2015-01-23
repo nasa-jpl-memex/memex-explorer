@@ -10,10 +10,6 @@
 <script>
 $( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
-
-    $('#reload').on('click', function(){
-        location.reload(true);
-    });
 </script>
 
 {% endblock %}
@@ -102,10 +98,6 @@ $( document ).ready(function() {
             {{ div | safe }}
         </div>
     {% endfor %}
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <button type="button" id="reload">Refresh</button>
-    </div>
-    {% else %}
    {% endif %}
   </div>
 
