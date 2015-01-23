@@ -50,4 +50,4 @@ IMAGE_SPACE_PATH= os.path.join(BASEDIR, 'resources/image_space/')
 
 UPLOAD_DIR = os.path.join(IMAGE_SPACE_PATH, 'uploaded_images/')
 
-ALLOWED_EXTENSIONS = set(('txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'))
+ALLOWED_EXTENSIONS = set(('png', 'jpg', 'jpeg', 'gif'))
