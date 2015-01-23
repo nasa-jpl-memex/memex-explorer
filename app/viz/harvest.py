@@ -69,6 +69,8 @@ class Harvest(PlotManager):
 
         p.legend.orientation = "top_left"
 
+        p.toolbar_location = None
+
         # Save ColumnDataSource model id to database model 
         self.plot.source_id = self.source._id
         db.session.flush()
