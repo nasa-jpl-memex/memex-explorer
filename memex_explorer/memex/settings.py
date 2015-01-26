@@ -49,6 +49,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+from django.conf import global_settings
+
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    "base.views.project_context_processor",
+)
+
 ROOT_URLCONF = 'memex.urls'
 
 WSGI_APPLICATION = 'memex.wsgi.application'
