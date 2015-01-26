@@ -1,65 +1,19 @@
-memex-explorer
-============
+# memex-explorer-django
+Memex explorer application re-written in Django 1.7
 
-# Install
-
+To setup the application, in an enviornment with Django 1.7 and Python 3 installed, run this command in the `memex_explorer` folder. This will create the database for the application using the migration scripts provided in the source code:
 ```
-git clone https://github.com/ContinuumIO/memex-explorer.git
-bash home_install.sh
+python manage.py migrate
 ```
-# Usage
- 
+Then, in the same folder run this command to launch the application as a local server:
 ```
-usage: run.py [-h] [-s]
-
-MEMEX Explorer
-
-optional arguments:
-  -h, --help  show this help message and exit
-  -s, --show  Auto-raise app in a browser window
+python manage.py runserver
 ```
-# Testing
-
-`python run_tests.py`
-
-
-# Deploying on EC2
-
-Everything should **just work** by running:
-
-```bash
-./deploy.sh
+To set up superuser access to the administrative panel, run this command and provide a username, email, and password:
 ```
-
-## Deploy Setup
-
- - conda bootstrap: conda.sh .  Everything is pushed into `install.sh` and `environment.yml` file for conda and env setupd
- - debian.sh: git, supervisor, make, JAVA
- - supervisor_ec2.sh: moves conf files and calls supervisor -- conf file is hard-coded to use env setup in `environment.yml` 
-
-## Docker Instructions
-
-### OSX
+python manage.py createsuperuser
 ```
-boot2docker init
-boot2docker start
-$(boot2docker shellinit)
+To make manual changes to the database, navigate to the following link and enter your username and password:
 ```
-
-### Build
+localhost:8000/admin
 ```
-docker build -t memex_explorer .
-docker run -p 80:5000 memex_explorer
-```
-
-## DockerHub
-
-```
-docker pull continuumio/memex_explorer
-docker run -p 80:5000 memex_explorer
-
-```
-
-Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
-To update an existing Docker, use the above 2 commands to pull the
-latest version.
