@@ -3,7 +3,7 @@ from django.db import models
 
 class Project(models.Model):
     name = models.CharField(max_length=64)
-    slug = models.CharField(max_length=64)
+    slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField()
     icon = models.CharField(max_length=64)
 
@@ -45,30 +45,4 @@ class DataSource(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class ImageSpace(models.Model):
-    name = models.CharField(max_length=64)
-    slug = models.CharField(max_length=64)
-    description = models.TextField()
-    project = models.ForeignKey(Project)
-    crawl = models.ForeignKey(Crawl)
-
-    def __str__(self):
-        return self.name
-
-
-class Image(models.Model):
-    filename = models.CharField(max_length=200)
-    EXIF_LensSerialNumber = models.CharField(max_length=200)
-    MakerNote_SerialNumberFormat = models.CharField(max_length=200)
-    EXIF_BodySerialNumber = models.CharField(max_length=200)
-    MakerNote_InternalSerialNumber = models.CharField(max_length=200)
-    MakerNote_SerialNumber = models.CharField(max_length=200)
-    Image_BodySerialNumber = models.CharField(max_length=200)
-    uploaded = models.BooleanField(default=False)
-    image_space = models.ForeignKey(ImageSpace)
-
-    def __str__(self):
-        return self.filename
 
