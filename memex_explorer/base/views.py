@@ -5,6 +5,10 @@ from base.models import Project
 from base.forms import AddProjectForm
 
 
+def project_context_processor(request):
+    pass
+
+
 class Index(generic.ListView):
     model = Project
     template_name = "base/index.html"
