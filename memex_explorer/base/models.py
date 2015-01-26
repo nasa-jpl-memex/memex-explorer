@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.utils.text import slugify
+
 
 class Project(models.Model):
     name = models.CharField(max_length=64)
@@ -9,6 +11,15 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            # Newly created object, so save to get self.id
+            super(Project, self).save(*args, **kwargs)
+        self.slug = '%i-%s' % (
+            self.id, slugify(self.name)
+        )
+        super(Project, self).save(*args, **kwargs)
 
 
 class DataModel(models.Model):
