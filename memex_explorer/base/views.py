@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.views import generic
 
 from base.models import Project
@@ -15,5 +15,10 @@ class AddProject(generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
     template_name = "base/add_project.html"
-    success_url = "/base"
+    success_url = "/"
+
+
+class Project(generic.DetailView):
+    model = Project
+    template_name = "base/project.html"
 
