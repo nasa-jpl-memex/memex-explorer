@@ -1,0 +1,95 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+
+<script>
+    $( document ).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+
+{% include "base/sidebar.html" %}
+
+<div class='row'>
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <h1>{{ project.name }}
+      <button title="Delete Project" id="removeButton" class="btn btn-control"
+              data-container="body"
+              data-toggle="tooltip" data-placement="bottom">
+          <span class="fa fa-close"></span>
+      </button>
+    <a href="">
+    <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
+            data-container="body"
+            data-toggle="tooltip" data-placement="bottom">
+        <i class="fa fa-edit"></i>
+    </button></a>
+    </h1>
+  <p>{{ project.description }}</p>
+</div>
+</div>
+<!-- <div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h2>Add a new application to your project:</h2>
+    </div>
+</div> -->
+
+<div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-4">
+            <h4><a href="#">
+              <i class="fa fa-search"> &nbsp; </i>Crawls</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h4>
+
+            {% if crawls %}
+            <ul class="list-group">
+                {%  for w in crawls %}
+                <li class="list-group-item">
+                    <a href="#"><i class="fa fa-search"></i>  {{ w.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>No Crawls Registered.</p>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-4">
+             <h4><a href="#">
+              <i class="fa fa-image"> &nbsp; </i>Image Spaces</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h4>
+            {%  if image_spaces %}
+            <ul class="list-group">
+                {% for x in image_spaces %}
+                <li class="list-group-item">
+                    <a href="#"><i class="fa fa-image"></i> {{ x.name }}</a>
+                </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No Image Spaces Registered.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{# <script type="text/javascript">
+    $('#removeButton').click(function(){
+    swal({
+        title: "Are you sure?",
+        text: "You will not be able to recover this project!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: "No, cancel!",
+        closeOnConfirm: false,
+        closeOnCancel: false
+    },
+    function(isConfirm){
+        if (isConfirm){
+          $('<form action="/{{ project.slug }}/delete" method="post"></form>').submit();
+        } else {
+          swal("Cancelled", "You cancelled the delete process", "error");
+        }
+    });
+});
+</script> #}
+{% endblock %}
