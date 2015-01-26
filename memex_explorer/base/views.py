@@ -5,20 +5,26 @@ from base.models import Project
 from base.forms import AddProjectForm
 
 
-class Index(generic.ListView):
+def project_context_processor(request):
+    return {
+        'projects': Project.objects.all()
+    }
+
+
+class IndexView(generic.ListView):
     model = Project
     template_name = "base/index.html"
     context_object_name = "projects"
 
 
-class AddProject(generic.edit.CreateView):
+class AddProjectView(generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
     template_name = "base/add_project.html"
     success_url = "/"
 
 
-class Project(generic.DetailView):
+class ProjectView(generic.DetailView):
     model = Project
     template_name = "base/project.html"
 
