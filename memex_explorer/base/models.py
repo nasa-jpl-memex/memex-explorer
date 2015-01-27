@@ -5,11 +5,12 @@ from django.core.validators import RegexValidator
 
 def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9 ]+$',
-        'Only alphanumeric characters are allowed.')
+        'Only numbers, letters, and spaces are allowed.')
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64)
     description = models.TextField()
     icon = models.CharField(max_length=64)
