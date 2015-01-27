@@ -1,7 +1,5 @@
 from django.views import generic
 
-from base.views import WithProjects
-
 from crawl_space.models import Crawl
 from crawl_space.forms import AddCrawlForm
 
