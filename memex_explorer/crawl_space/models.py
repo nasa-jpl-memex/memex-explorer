@@ -1,5 +1,6 @@
 from django.db import models
 from base.models import Project
+from django.utils.text import slugify
 
 
 class DataModel(models.Model):
@@ -18,8 +19,8 @@ class Crawl(models.Model):
     status = models.CharField(max_length=64)
     config = models.CharField(max_length=64)
     seeds_list = models.CharField(max_length=64)
-    pages_crawled = models.BigIntegerField()
-    harvest_rate = models.FloatField()
+    pages_crawled = models.BigIntegerField(default=0)
+    harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
     data_model = models.ForeignKey(DataModel)
 
@@ -27,12 +28,7 @@ class Crawl(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            # Newly created object, so save to get self.id
-            super(Crawl, self).save(*args, **kwargs)
-        self.slug = '%i-%s' % (
-            self.id, slugify(self.name)
-        )
+        self.slug = slugify(self.name)
         super(Crawl, self).save(*args, **kwargs)
 
 
