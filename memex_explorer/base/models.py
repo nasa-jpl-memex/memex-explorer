@@ -13,12 +13,7 @@ class Project(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            # Newly created object, so save to get self.id
-            super(Project, self).save(*args, **kwargs)
-        self.slug = '%i-%s' % (
-            self.id, slugify(self.name)
-        )
+        self.slug = slugify(self.name)
         super(Project, self).save(*args, **kwargs)
 
 
