@@ -17,6 +17,10 @@ class IndexView(generic.ListView):
     context_object_name = "projects"
 
 
+class AboutView(generic.TemplateView):
+    template_name = "base/about.html"
+    
+
 class AddProjectView(generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
