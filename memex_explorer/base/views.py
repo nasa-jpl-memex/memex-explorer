@@ -14,8 +14,11 @@ def project_context_processor(request):
 class IndexView(generic.ListView):
     model = Project
     template_name = "base/index.html"
-    context_object_name = "projects"
 
+
+class AboutView(generic.TemplateView):
+    template_name = "base/about.html"
+    
 
 class AddProjectView(generic.edit.CreateView):
     model = Project
