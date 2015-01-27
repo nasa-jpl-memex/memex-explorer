@@ -1,52 +1,28 @@
 # Test
-from django.test import TestCase, Client
+from memex.test_utils.unit_test_utils import UnitTestSkeleton
+from django.test import TestCase
 
 # App
 from base.forms import AddProjectForm
 
-# Utility
-from django.core.urlresolvers import reverse
-
 def form_errors(response):
     return response.context['form'].errors
 
-class TestViews(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.client = Client()
-
-
-    @classmethod
-    def get(cls, view_name, *args, **kwargs):
-        if 'slugs' in kwargs:
-            slugs = kwargs.pop('slugs')
-            return cls.client.get(
-                reverse(view_name, kwargs=slugs),
-                *args, follow=True, **kwargs)
-        else:
-            return cls.client.get(reverse(view_name),
-                *args, follow=True, **kwargs)
-
-    @classmethod
-    def post(cls, view_name, *args, **kwargs):
-        if 'slugs' in kwargs:
-            slugs = kwargs.pop('slugs')
-            return cls.client.post(
-                reverse(view_name, kwargs=slugs),
-                *args, follow=True, **kwargs)
-        else:
-            return cls.client.post(reverse(view_name),
-                *args, follow=True, **kwargs)
-
+class TestViews(UnitTestSkeleton):
 
     def test_front_page(self):
         response = self.get('base:index')
         assert 'base/index.html' in response.template_name
 
 
+    def test_about_page(self):
+        response = self.get('base:about')
+        assert 'base/about.html' in response.template_name
+
+
     def test_project_page(self):
-        response = self.post('base:add_project')
+        response = self.get('base:add_project')
         assert 'base/add_project.html' in response.template_name
 
 
@@ -59,21 +35,21 @@ class TestViews(TestCase):
 
     def test_add_project_no_description(self):
         response = self.post('base:add_project',
-            {'name': 'CATS!',
+            {'name': 'CATS',
              'icon': 'fa-arrows'})
         assert 'This field is required.' in form_errors(response)['description']
 
 
     def test_add_project(self):
         response = self.post('base:add_project',
-            {'name': 'CATS!',
+            {'name': 'CATS',
              'description': 'cats cats cats',
              'icon': 'fa-arrows'})
         assert 'base/index.html' in response.template_name
-        assert b'CATS!' in response.content
+        assert b'CATS' in response.content
 
 
-    def test_add_project_with_slug(self):
+    def test_add_project_with_right_slug(self):
         self.test_add_project()
 
         response = self.get('base:project',
@@ -85,7 +61,7 @@ class TestForms(TestCase):
 
     def test_project_form(self):
         form_data = {
-            'name': 'CATS!',
+            'name': 'CATS',
             'description': 'cats cats cats',
             'icon': 'fa-arrows'}
         form = AddProjectForm(data=form_data)
@@ -98,3 +74,13 @@ class TestForms(TestCase):
             'icon': 'fa-arrows'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
+        assert 'This field is required.' in form.errors['name']
+
+
+    def test_project_form_no_description(self):
+        form_data = {
+            'name': 'CATS',
+            'icon': 'fa-arrows'}
+        form = AddProjectForm(data=form_data)
+        assert form.is_valid() is False
+        assert 'This field is required.' in form.errors['description']

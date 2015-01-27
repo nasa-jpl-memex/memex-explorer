@@ -1,32 +1,20 @@
-from django.shortcuts import render
-
 from django.views import generic
 
-from base.models import Crawl, DataModel, DataSource
-from base.forms import AddCrawlForm
+from base.views import WithProjects
+
+from crawl_space.models import Crawl
+from crawl_space.forms import AddCrawlForm
 
 
-def project_context_processor(request):
-    return {
-        'projects': Project.objects.all()
-    }
-
-
-class IndexView(generic.ListView):
-    model = Project
-    template_name = "base/index.html"
-    context_object_name = "projects"
-
-
-class AddProjectView(generic.edit.CreateView):
-    model = Project
-    form_class = AddProjectForm
-    template_name = "base/add_project.html"
+class AddCrawlView(generic.edit.CreateView):
+    model = Crawl
+    form_class = AddCrawlForm
+    template_name = "crawl_space/add_crawl.html"
     success_url = "/"
 
 
-class ProjectView(generic.DetailView):
-    model = Project
-    template_name = "base/project.html"
+class CrawlView(generic.DetailView):
+    model = Crawl
+    template_name = "crawl_space/crawl.html"
 
 
