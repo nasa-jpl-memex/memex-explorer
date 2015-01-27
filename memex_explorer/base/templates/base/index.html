@@ -31,7 +31,7 @@
                         </div-->
                     </div>
                 </div>
-                <a href="/{{project.slug}}">
+                <a href="{% url 'base:project' slug=project.slug %}">
                     <div class="panel-footer">
                         <p>{{ project.description }}</p>
                  
