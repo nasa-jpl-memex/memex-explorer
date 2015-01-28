@@ -17,3 +17,9 @@ To make manual changes to the database, navigate to the following link and enter
 ```
 localhost:8000/admin
 ```
+To make changes to scss stylesheets, do the following from the root of the repository, where config.rb is located:
+```
+$ gem install compass
+$ compass watch
+```
+
