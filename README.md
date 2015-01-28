@@ -21,4 +21,5 @@ To make changes to scss stylesheets, do the following from the root of the repos
 ```
 $ gem install compass
 $ compass watch
+```
 
