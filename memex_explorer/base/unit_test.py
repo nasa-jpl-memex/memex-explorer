@@ -1,9 +1,11 @@
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton
 from django.test import TestCase
+from django.db import IntegrityError
 
 # App
 from base.forms import AddProjectForm
+from base.models import Project
 
 def form_errors(response):
     return response.context['form'].errors
@@ -59,6 +61,11 @@ class TestViews(UnitTestSkeleton):
 
 class TestForms(TestCase):
 
+    def setUp(self):
+        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles",
+            icon="fa-bicycle")
+        self.project = project
+
     def test_project_form(self):
         form_data = {
             'name': 'CATS',
@@ -66,7 +73,6 @@ class TestForms(TestCase):
             'icon': 'fa-arrows'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid()
-
 
     def test_project_form_no_name(self):
         form_data = {
@@ -76,7 +82,6 @@ class TestForms(TestCase):
         assert form.is_valid() is False
         assert 'This field is required.' in form.errors['name']
 
-
     def test_project_form_no_description(self):
         form_data = {
             'name': 'CATS',
@@ -84,3 +89,31 @@ class TestForms(TestCase):
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
         assert 'This field is required.' in form.errors['description']
+
+    def test_existing_project_error(self):
+        form_data = {
+            'name': 'Bicycles for sale',
+            'description': 'cats cats cats',
+            'icon': 'fa-arrows'}
+        form = AddProjectForm(data=form_data)
+        assert form.is_valid() is False
+        assert 'Project with this Name already exists.' in form.errors['name']
+
+
+class TestProjectQueries(TestCase):
+
+    def setUp(self):
+        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles",
+            icon="fa-bicycle")
+        self.project = project
+
+    def test_project_exists(self):
+        assert Project.objects.get(name="Bicycles for sale")
+
+    def test_unique_project(self):
+        with self.assertRaises(IntegrityError):
+            Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
+
+    def test_get_by_slug(self):
+        assert 'bicycles-for-sale' == self.project.slug
+
