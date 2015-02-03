@@ -1,0 +1,20 @@
+name: memex-explorer
+channels:
+    - blaze
+    - memex
+    - quasiben
+dependencies:
+    - blaze=0.6.7
+    - bokeh=0.7.0
+    - nutch
+    - ache=0.1.0
+    - django=1.7.3
+    - redis
+    - pip
+    - pip:
+        - py.test
+        - coverage
+        - pytest-cov
+        - pytest-django
+        - pytest-ipdb
+        - django-rq
