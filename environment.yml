@@ -4,6 +4,7 @@ channels:
     - memex
     - quasiben
 dependencies:
+    - python=3.4.2
     - blaze=0.6.7
     - bokeh=0.7.0
     - nutch
@@ -12,9 +13,8 @@ dependencies:
     - redis
     - pip
     - pip:
-        - py.test
+        - pytest
         - coverage
         - pytest-cov
         - pytest-django
-        - pytest-ipdb
         - django-rq
