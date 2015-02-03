@@ -6,6 +6,7 @@ $ wget http://bit.ly/miniconda
 $ bash Miniconda-latest-Linux-x86_64.sh
 $ bash install.sh
 $ conda env create -n memex -f environment.yml
+$ source activate memex
 ```
 * To setup the application, in an enviornment with Django 1.7 and Python 3 installed, run this command in the `memex_explorer` folder. This will create the database for the application using the migration scripts provided in the source code:
 ```
