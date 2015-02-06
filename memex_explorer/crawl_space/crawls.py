@@ -84,7 +84,7 @@ class AcheCrawl(Crawl):
         self.config = join(CONFIG_PATH, c.config)
         self.crawl_dir = c.get_crawl_path()
         self.seeds_file = crawl.seeds_list.path
-        self.model_dir = crawl.data_model.get_model_path()
+        self.model_dir = crawl.crawl_model.get_model_path()
         self._status = crawl.status
 
 

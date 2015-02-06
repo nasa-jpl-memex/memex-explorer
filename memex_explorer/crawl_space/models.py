@@ -36,6 +36,15 @@ class CrawlModel(models.Model):
     def get_model_path(instance):
         return join(MODEL_PATH, str(instance.pk))
 
+    def ensure_model_path(instance):
+        model_path = instance.get_model_path()
+        try:
+            os.makedirs(model_path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+        return model_path
     
     name = models.CharField(max_length=64)
     model = models.FileField(upload_to=get_upload_path, validators=[validate_model_file])
@@ -54,7 +63,7 @@ class CrawlModel(models.Model):
 
             model_path = self.ensure_model_path()
             model_dst = join(model_path, 'pageclassifier.model')
-            features_dst = join(crawl_path, 'pageclassifier.features')
+            features_dst = join(model_path, 'pageclassifier.features')
 
             shutil.move(self.model.path, model_dst)
             self.model.name = model_dst
