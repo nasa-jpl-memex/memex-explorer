@@ -20,7 +20,6 @@ from crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                   MODEL_PATH, CONFIG_PATH)
 
 from crawl_space.utils import join, touch, rm_if_exists
-from rq import get_current_job
 
 #  EXCEPTIONS
 # ============
