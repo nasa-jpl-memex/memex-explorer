@@ -13,7 +13,6 @@ class Project(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField()
-    icon = models.CharField(max_length=64)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

@@ -28,23 +28,20 @@ class TestViews(UnitTestSkeleton):
 
     def test_add_project_no_name(self):
         response = self.post('base:add_project',
-            {'description': 'cats cats cats',
-             'icon': 'fa-arrows'})
+            {'description': 'cats cats cats'})
         assert 'This field is required.' in form_errors(response)['name']
 
 
     def test_add_project_no_description(self):
         response = self.post('base:add_project',
-            {'name': 'CATS',
-             'icon': 'fa-arrows'})
+            {'name': 'CATS'})
         assert 'This field is required.' in form_errors(response)['description']
 
 
     def test_add_project_success(self):
         response = self.post('base:add_project',
             {'name': 'CATS',
-             'description': 'cats cats cats',
-             'icon': 'fa-arrows'})
+             'description': 'cats cats cats'})
         assert 'base/index.html' in response.template_name
         assert b'CATS' in response.content
 
@@ -60,30 +57,26 @@ class TestViews(UnitTestSkeleton):
 class TestForms(TestCase):
 
     def setUp(self):
-        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles",
-            icon="fa-bicycle")
+        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
         self.project = project
 
     def test_project_form(self):
         form_data = {
             'name': 'CATS',
-            'description': 'cats cats cats',
-            'icon': 'fa-arrows'}
+            'description': 'cats cats cats'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid()
 
     def test_project_form_no_name(self):
         form_data = {
-            'description': 'cats cats cats',
-            'icon': 'fa-arrows'}
+            'description': 'cats cats cats'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
         assert 'This field is required.' in form.errors['name']
 
     def test_project_form_no_description(self):
         form_data = {
-            'name': 'CATS',
-            'icon': 'fa-arrows'}
+            'name': 'CATS'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
         assert 'This field is required.' in form.errors['description']
@@ -91,8 +84,7 @@ class TestForms(TestCase):
     def test_existing_project_error(self):
         form_data = {
             'name': 'Bicycles for sale',
-            'description': 'cats cats cats',
-            'icon': 'fa-arrows'}
+            'description': 'cats cats cats'}
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
         assert 'Project with this Name already exists.' in form.errors['name']
@@ -101,8 +93,7 @@ class TestForms(TestCase):
 class TestProjectQueries(TestCase):
 
     def setUp(self):
-        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles",
-            icon="fa-bicycle")
+        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
         self.project = project
 
     def test_project_exists(self):

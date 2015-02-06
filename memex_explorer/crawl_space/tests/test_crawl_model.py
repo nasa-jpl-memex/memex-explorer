@@ -17,8 +17,7 @@ class TestAddDataModelView(UnitTestSkeleton):
         super(TestAddDataModelView, cls).setUpClass()
         cls.test_project = Project(
             name = "Model Test",
-            description = "Test Project Description",
-            icon = "fa-arrows")
+            description = "Test Project Description")
         cls.test_project.save()
 
     @property

@@ -30,8 +30,7 @@ class TestViews(UnitTestSkeleton):
 
         cls.test_project = Project(
             name = "Test",
-            description = "Test Project Description",
-            icon = "fa-arrows")
+            description = "Test Project Description")
         cls.test_project.save()
 
         cls.test_crawl = Crawl(
