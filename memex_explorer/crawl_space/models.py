@@ -2,6 +2,8 @@ import os
 import errno
 import shutil
 
+from crawl_space.utils import join
+
 from django.db import models
 from base.models import Project, alphanumeric_validator
 from django.utils.text import slugify
@@ -28,11 +30,11 @@ def validate_features_file(value):
 class CrawlModel(models.Model):
 
     def get_upload_path(instance, filename):
-        return os.path.join('models', instance.name, filename)
+        return join('models', instance.name, filename)
 
 
     def get_model_path(instance):
-        return os.path.join(MODEL_PATH, str(instance.pk))
+        return join(MODEL_PATH, str(instance.pk))
 
     
     name = models.CharField(max_length=64)
@@ -51,8 +53,8 @@ class CrawlModel(models.Model):
             super().save(*args, **kwargs)
 
             model_path = self.ensure_model_path()
-            model_dst = os.path.join(model_path, 'pageclassifier.model')
-            features_dst = os.path.join(crawl_path, 'pageclassifier.features')
+            model_dst = join(model_path, 'pageclassifier.model')
+            features_dst = join(crawl_path, 'pageclassifier.features')
 
             shutil.move(self.model.path, model_dst)
             self.model.name = model_dst
@@ -69,7 +71,7 @@ class Crawl(models.Model):
 
 
     def ensure_crawl_path(instance):
-        crawl_path = os.path.join(CRAWL_PATH, str(instance.pk))
+        crawl_path = join(CRAWL_PATH, str(instance.pk))
         try:
             os.makedirs(crawl_path)
         except OSError as e:
@@ -79,11 +81,11 @@ class Crawl(models.Model):
         return crawl_path
 
     def get_crawl_path(instance):
-        return os.path.join(CRAWL_PATH, str(instance.pk))
+        return join(CRAWL_PATH, str(instance.pk))
 
 
     def get_seeds_upload_path(instance, filename):
-        return os.path.join(SEEDS_TMP_DIR, filename)
+        return join(SEEDS_TMP_DIR, filename)
 
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
@@ -129,13 +131,14 @@ class Crawl(models.Model):
 
             # Nutch requires a seed directory, not a seed file
             if self.crawler == 'nutch':
-                seed_dir = os.mkdir(os.path.join(crawl_path, 'seeds'))
-                dst = os.path.join(crawl_path, 'seeds/seeds')
+                seed_dir = join(crawl_path, 'seeds')
+                os.mkdir(seed_dir)
+                dst = join(crawl_path, 'seeds/seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = seed_dir
 
             else:
-                dst = os.path.join(crawl_path, 'seeds')
+                dst = join(crawl_path, 'seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = dst
 

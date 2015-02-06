@@ -68,11 +68,7 @@ class CrawlView(generic.DetailView):
                     "--project", project_slug,
                     "--crawl", crawl_slug]
 
-            # TODO fire start
-            # from ipsh import ipsh; ipsh()
-            subprocess.Popen(call,
-               # env={'PYTHONPATH': os.pathsep.join(sys.path)})
-            )
+            subprocess.Popen(call)
 
             crawl_model.status = "starting"
             crawl_model.save()

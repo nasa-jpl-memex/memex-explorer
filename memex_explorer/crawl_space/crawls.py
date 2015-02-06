@@ -183,7 +183,6 @@ class NutchCrawl(Crawl):
             print('.', end="", flush=True)
             time.sleep(5)
 
-        from ipsh import ipsh; ipsh()
         self.proc.terminate()
         self.crawl.status = "stopped"
         self.crawl.save()

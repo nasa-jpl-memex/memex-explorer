@@ -14,4 +14,3 @@ class AddCrawlModelForm(ModelForm):
     class Meta:
         model = CrawlModel
         fields = ['name', 'model', 'features']
-

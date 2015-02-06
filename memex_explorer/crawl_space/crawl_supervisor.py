@@ -18,7 +18,6 @@ def parse_args():
 
 
 def get_crawl(project_slug, crawl_slug):
-    # from ipsh import ipsh; ipsh()
     return Crawl.objects.get(project=Project.objects.get(slug=project_slug),
                              slug=crawl_slug)
 
