@@ -31,7 +31,7 @@
 
 <div class='row'>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <h4><a href="crawl/all">
               <i class="fa fa-search"> &nbsp; </i>Crawls</a> &nbsp;&nbsp;&nbsp; <a href="crawl/add_crawl"><i class="fa fa-plus-square"></i></h4>
 
@@ -48,7 +48,7 @@
             {% endif %}
         </div>
 
-        <div class="col-sm-4">
+        <div class="col-sm-3">
              <h4><a href="#">
               <i class="fa fa-image"> &nbsp; </i>Image Spaces</a> &nbsp;&nbsp;&nbsp; <a href="#"><i class="fa fa-plus-square"></i></h4>
             {%  if image_spaces %}
@@ -61,6 +61,23 @@
                 </ul>
             {% else %}
                 <p>No Image Spaces Registered.</p>
+            {% endif %}
+        </div>
+
+        <div class="col-sm-3">
+            <h4><a href="crawl/all">
+              <i class="fa fa-search"> &nbsp; </i>Crawl Models</a> &nbsp;&nbsp;&nbsp; <a href="crawl/add_crawl_model"><i class="fa fa-plus-square"></i></h4>
+
+            {% if project.crawlmodel_set.all %}
+            <ul class="list-group">
+                {%  for w in project.crawlmodel_set.all %}
+                <li class="list-group-item">
+                    <i class="fa fa-search"></i>  {{ w }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+                <p>No Crawl Models Registered.</p>
             {% endif %}
         </div>
     </div>
