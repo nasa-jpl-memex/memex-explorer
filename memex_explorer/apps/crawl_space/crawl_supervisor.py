@@ -1,8 +1,8 @@
 import argparse
 
 from base.models import Project
-from crawl_space.models import Crawl
-from crawl_space.crawls import AcheCrawl, NutchCrawl
+from apps.crawl_space.models import Crawl
+from apps.crawl_space.crawls import AcheCrawl, NutchCrawl
 
 
 def parse_args():
@@ -13,7 +13,6 @@ def parse_args():
                         required=True, help="Project slug")
     parser.add_argument("-c", "--crawl", dest="crawl_slug", type=str,
                         required=True, help="Crawl slug")
-
     return parser.parse_args()
 
 

@@ -14,6 +14,6 @@ urlpatterns = patterns('',
         name='project'),
 
     # # Try other "_space" applications
-    url(r'^project/(?P<slug>[\w-]+)/crawl/', include('crawl_space.urls',
+    url(r'^project/(?P<slug>[\w-]+)/crawl/', include('apps.crawl_space.urls',
         namespace="crawl_space")),
 )

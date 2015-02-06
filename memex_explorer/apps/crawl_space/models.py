@@ -2,7 +2,7 @@ import os
 import errno
 import shutil
 
-from crawl_space.utils import join
+from apps.crawl_space.utils import join
 
 from django.db import models
 from base.models import Project, alphanumeric_validator
@@ -19,7 +19,7 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from crawl_space.settings import MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR
+from apps.crawl_space.settings import MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':

@@ -12,11 +12,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from base.models import Project
-from crawl_space.models import Crawl
-from crawl_space.forms import AddCrawlForm, AddCrawlModelForm
+from apps.crawl_space.models import Crawl
+from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 
 
-from crawl_space.utils import touch, join
+from apps.crawl_space.utils import touch, join
 
 class AddCrawlView(generic.edit.CreateView):
     form_class = AddCrawlForm
@@ -64,7 +64,7 @@ class CrawlView(generic.DetailView):
             crawl_slug = self.kwargs['crawl_slug']
 
             call = ["python",
-                    "crawl_space/crawl_supervisor.py",
+                    "apps/crawl_space/crawl_supervisor.py",
                     "--project", project_slug,
                     "--crawl", crawl_slug]
 

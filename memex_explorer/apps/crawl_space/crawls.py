@@ -16,10 +16,10 @@ from abc import ABCMeta, abstractmethod
 # Local Imports
 # -------------
 
-from crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
+from apps.crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                   MODEL_PATH, CONFIG_PATH)
 
-from crawl_space.utils import join, touch, rm_if_exists
+from apps.crawl_space.utils import join, touch, rm_if_exists
 
 #  EXCEPTIONS
 # ============

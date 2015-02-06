@@ -6,8 +6,8 @@ from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 # App
-from crawl_space.forms import AddCrawlForm
-from crawl_space.models import Crawl
+from apps.crawl_space.forms import AddCrawlForm
+from apps.crawl_space.models import Crawl
 from base.models import Project, alphanumeric_validator
 
 

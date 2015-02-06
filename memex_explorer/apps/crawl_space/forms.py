@@ -1,6 +1,6 @@
 from django.forms import ModelForm, RadioSelect, Select
 
-from crawl_space.models import Crawl, CrawlModel
+from apps.crawl_space.models import Crawl, CrawlModel
 
 
 class AddCrawlForm(ModelForm):
