@@ -3,9 +3,14 @@
 {% block title %}Add Project{% endblock %}
 
 {% block content %}
+<div class='row'>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+<h1>Add Project</h1>
 <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Create Project" />
+    <button type="submit" class="btn btn-primary">Add Project</button>
 </form>
+</div>
+</div>
 {% endblock %}
