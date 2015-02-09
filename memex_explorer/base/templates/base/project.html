@@ -65,14 +65,14 @@
         </div>
 
         <div class="col-sm-3">
-            <h4><a href="crawl/all">
-              <i class="fa fa-search"> &nbsp; </i>Crawl Models</a> &nbsp;&nbsp;&nbsp; <a href="crawl/add_crawl_model"><i class="fa fa-plus-square"></i></h4>
+            <h4>
+                <i class="fa fa-search"> &nbsp; </i>Crawl Models</a> &nbsp;&nbsp;&nbsp; <a href="crawl/add_crawl_model"><i class="fa fa-plus-square"></i></h4></a>
 
             {% if project.crawlmodel_set.all %}
             <ul class="list-group">
-                {%  for w in project.crawlmodel_set.all %}
+                {% for x in project.crawlmodel_set.all %}
                 <li class="list-group-item">
-                    <i class="fa fa-search"></i>  {{ w }}
+                    <i class="fa fa-bar-chart"></i> {{ x.name }}
                 </li>
                 {% endfor %}
             </ul>
