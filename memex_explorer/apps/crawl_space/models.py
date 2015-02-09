@@ -25,9 +25,6 @@ def validate_features_file(value):
     if value != 'pageclassifier.features':
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
-def validate_ache_crawl_model_requirement(value):
-    pass
-
 class CrawlModel(models.Model):
 
     def get_upload_path(instance, filename):

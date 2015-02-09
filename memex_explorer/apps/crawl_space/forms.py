@@ -8,7 +8,10 @@ class AddCrawlForm(ModelForm):
 
     def clean_crawl_model(self):
         crawl_model = self.cleaned_data['crawl_model']
-        crawler = self.cleaned_data['crawler']
+        try:
+            crawler = self.cleaned_data['crawler']
+        except KeyError:
+            raise ValidationError("Incorrect crawler type.")
         if not crawl_model and crawler == 'ache':
             raise ValidationError("Ache Crawls require a crawl model.")
 
@@ -16,6 +19,7 @@ class AddCrawlForm(ModelForm):
         model = Crawl
         fields = ['name', 'description', 'crawler', 'crawl_model', 'seeds_list']
         widgets = {'crawler': Select, 'crawl_model': Select}
+
 
 class AddCrawlModelForm(ModelForm):
 

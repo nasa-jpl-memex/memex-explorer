@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 # App
 from apps.crawl_space.forms import AddCrawlForm
-from apps.crawl_space.models import Crawl
+from apps.crawl_space.models import Crawl, CrawlModel
 from base.models import Project, alphanumeric_validator
 
 
@@ -42,6 +42,20 @@ class TestViews(UnitTestSkeleton):
             project = cls.test_project)
         cls.test_crawl.save()
 
+        cls.test_crawl_model = CrawlModel(
+            name = "Test Crawl Model",
+            model = cls.get_model_file(),
+            features = cls.get_features_file(),
+            project = cls.test_project,
+        )
+
+    @classmethod
+    def get_model_file(self):
+        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n', 'utf-8'))
+
+    @classmethod
+    def get_features_file(self):
+        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n', 'utf-8'))
 
     @classmethod
     def get_seeds(self):
@@ -57,7 +71,7 @@ class TestViews(UnitTestSkeleton):
 
         return {'name': 'Cat Crawl',
                 'description': 'Find all the cats.',
-                'crawler': 'ache',
+                'crawler': 'nutch',
                 'seeds_list': self.get_seeds()}
 
     @property
@@ -173,8 +187,9 @@ class TestForms(TestCase):
         seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8'))
         return {'seeds_list': seeds_file}
 
-    def test_project_form(self):
-        """Test the project form with valid form datay."""
+    def test_crawl_form(self):
+        """Test the project form with valid form data."""
         
         form = AddCrawlForm(self.form_data, self.file_data)
-        assert form.is_valid()
+        assert form.is_valid() is True
+
