@@ -25,13 +25,10 @@ def validate_features_file(value):
     if value != 'pageclassifier.features':
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
-
-
 class CrawlModel(models.Model):
 
     def get_upload_path(instance, filename):
         return join('models', instance.name, filename)
-
 
     def get_model_path(instance):
         return join(MODEL_PATH, str(instance.pk))
@@ -78,7 +75,6 @@ class CrawlModel(models.Model):
 
 class Crawl(models.Model):
 
-
     def ensure_crawl_path(instance):
         crawl_path = join(CRAWL_PATH, str(instance.pk))
         try:
@@ -91,7 +87,6 @@ class Crawl(models.Model):
 
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
-
 
     def get_seeds_upload_path(instance, filename):
         return join(SEEDS_TMP_DIR, filename)
@@ -145,7 +140,6 @@ class Crawl(models.Model):
                 dst = join(crawl_path, 'seeds/seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = seed_dir
-
             else:
                 dst = join(crawl_path, 'seeds')
                 shutil.move(self.seeds_list.path, dst)
