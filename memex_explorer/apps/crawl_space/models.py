@@ -2,7 +2,7 @@ import os
 import errno
 import shutil
 
-from apps.crawl_space.utils import join
+from os.path import join
 
 from django.db import models
 from base.models import Project, alphanumeric_validator

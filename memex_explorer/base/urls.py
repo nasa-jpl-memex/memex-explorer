@@ -1,7 +1,16 @@
 """Base url routes.
 
 This module also dynamically adds url routes to applications present in
-INSTALLED_APPS.
+INSTALLED_APPS; see the comments below.
+
+URLs
+----
+
+/
+about/
+add_project/
+project/
+
 """
 
 from django.conf.urls import patterns, include, url
@@ -11,13 +20,15 @@ from base import views
 project_slug = r'^projects/(?P<slug>[\w-]+)/'
 
 urlpatterns = patterns('',
-    url(r'^$', views.IndexView.as_view(), name='index'),       # Index
-    url(r'^about/$', views.AboutView.as_view(), name='about'), # About
+    url(r'^$', views.IndexView.as_view(), name='index'),
+
+    url(r'^about/$', views.AboutView.as_view(), name='about'),
 
     url(r'^add_project/$', views.AddProjectView.as_view(),
-        name='add_project'),                                   # Add Project
+        name='add_project'),
+    
     url(project_slug + r'$', views.ProjectView.as_view(),
-        name='project')                                        # Project
+        name='project')
 )
 
 
