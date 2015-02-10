@@ -37,7 +37,10 @@ urlpatterns = patterns('',
 #   See <https://github.com/ContinuumIO/memex-explorer/issues/316>
 
 from django.conf import settings
-space_apps = [x for x in settings.INSTALLED_APPS if "_space" in x]
+space_apps = [
+    x.lstrip("apps.") for x in settings.INSTALLED_APPS
+    if "_space" in x
+]
 
 inject_urls = [
     url(project_slug, include('apps.%s.urls' % app, namespace=app))
