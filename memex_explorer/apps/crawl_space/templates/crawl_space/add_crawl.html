@@ -6,20 +6,17 @@
 {% block content %}
 
 <div class='row'>
-    <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-2 main">
-<form action="" method="post" class="uniForm" enctype="multipart/form-data">
-    <h1>Add Crawl</h1>
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Add Crawl</button>
-</form>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="center">
+            <h1>Add Crawl</h1>
+            {% crispy form %}
+        </div>
+    </div>
 </div>
-</div>
+
+{% endblock %}
 
 {% load staticfiles %}
 {% block extrafooter %}
 <script src="{% static 'base/js/crawl_form.js' %}"></script>
 {% endblock %}
-
-{% endblock %}
-
