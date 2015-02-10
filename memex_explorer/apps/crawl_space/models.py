@@ -154,4 +154,3 @@ class Crawl(models.Model):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(slug=self.project.slug, crawl_slug=self.slug))
 
-
