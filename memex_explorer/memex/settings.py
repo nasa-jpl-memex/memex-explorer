@@ -41,10 +41,10 @@ INSTALLED_APPS = (
 )
 
 EXPLORER_APPS = (
-    'crawl_space'
+    'crawl_space',
 )
 
-INSTALLED_APPS += ("apps.%s" % app for app in EXPLORER_APPS)
+INSTALLED_APPS += tuple("apps.%s" % app for app in EXPLORER_APPS)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
