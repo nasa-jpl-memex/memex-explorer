@@ -33,7 +33,7 @@ class CrawlRunner(metaclass=ABCMeta):
     """Abstract base class for crawl runners.
 
     CrawlRunner subclasses are expected to implement these methods:
-        run(self)
+        call(self)
         log_statistics(self)
 
     Parameters
@@ -53,8 +53,6 @@ class CrawlRunner(metaclass=ABCMeta):
           ex. `resources/crawls/4/seeds`.
     stop_file : str
         Path to a sentinel file that indicates a stop has been requested.
-    call : list(str)
-        The tokenized call to the appropriate crawl process.
 
     """
 
@@ -69,9 +67,13 @@ class CrawlRunner(metaclass=ABCMeta):
     @property
     @abstractmethod
     def call(self):
+        """The tokenized call to the appropriate crawl process.
+        Ex:
+            return ['ache', 'startCrawl', *args]
+
+        """
         pass
 
-    @abstractmethod
     def run(self):
         """Run the crawl.
 
@@ -163,11 +165,6 @@ class AcheCrawlRunner(CrawlRunner):
                 LANG_DETECT_PATH]
 
 
-    def run(self):
-        """Implemented in CrawlRunner."""
-        super().run()
-
-
     def log_statistics(self):
         harvest_path = join(self.crawl_dir, 'data_monitor/harvestinfo.csv')
         proc = subprocess.Popen(["tail", "-n", "1", harvest_path],
@@ -203,9 +200,9 @@ class NutchCrawlRunner(CrawlRunner):
                 self.crawl_dir,
                 "1"]
 
-    def run(self):
-        """Implemented in CrawlRunner."""
-        super().run()
+    # def run(self):
+    #     pass
+    # TODO Help Nutch crawl in rounds
 
 
     def log_statistics(self):

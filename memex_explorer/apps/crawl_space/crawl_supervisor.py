@@ -47,7 +47,7 @@ def parse_args():
 
 
 
-class CrawlSupervisor(object):
+class CrawlSupervisor():
     """Wraps crawl process execution.
 
     Parameters
