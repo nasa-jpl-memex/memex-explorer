@@ -1,0 +1,23 @@
+language: python
+
+python:
+    - "3.4"
+
+branches:
+    only:
+        - memex-django
+
+install:
+    - wget http://bit.ly/miniconda
+    - bash Miniconda-latest-Linux-x86_64.sh
+    - bash install.sh
+    - conda env create -n memex -f environment.yml
+    - source activate memex
+
+script:
+    - coverage run $(which py.test)
+    - coverage report --show_missing
+
+after_success:
+    - coveralls
+
