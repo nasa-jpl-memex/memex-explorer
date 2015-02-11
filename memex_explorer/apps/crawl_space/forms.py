@@ -8,10 +8,12 @@ from apps.crawl_space.models import Crawl, CrawlModel
 
 
 class AddCrawlForm(CrispyModelForm):
+    """Add crawl form, with a user-specified crispy layout."""
 
     class Meta:
         model = Crawl
-        fields = ['name', 'description', 'crawler', 'crawl_model', 'seeds_list']
+        fields = ['name', 'description', 'crawler',
+                  'crawl_model', 'seeds_list']
         widgets = {'crawl_model': Select}
 
 
@@ -21,22 +23,22 @@ class AddCrawlForm(CrispyModelForm):
 
 
     def set_layout(self):
+        """Called in __init__ to register a custom layout."""
 
         self.helper.layout = Layout(
             Fieldset(None,
                 'name',
                 'description',
-                InlineRadios(
-                    'crawler'),
+                InlineRadios('crawler'),
                 'crawl_model',
                 'seeds_list',
-                FormActions(
-                    Submit('submit', "Submit"))
+                FormActions(Submit('submit', "Submit"))
             )
         )
 
 
 class AddCrawlModelForm(ModelForm):
+    """Add crawl model form, with an automatic crispy layout."""
     class Meta:
         model = CrawlModel
         fields = ['name', 'model', 'features']

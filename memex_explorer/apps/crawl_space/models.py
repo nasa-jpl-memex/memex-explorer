@@ -28,10 +28,23 @@ def validate_features_file(value):
 
 
 class CrawlModel(models.Model):
+    """CrawlModel model, specifically for ACHE crawls.
+
+    Model Fields
+    ------------
+
+    name = str(64)
+    model = FileField
+        Upload pageclassifier.model file
+    features = FileField
+        Upload pageclassifier.features file
+    project = fk to base.Project
+
+    """
+
 
     def get_upload_path(instance, filename):
         return join('models', instance.name, filename)
-
 
     def get_model_path(instance):
         return join(MODEL_PATH, str(instance.pk))
@@ -77,10 +90,32 @@ class CrawlModel(models.Model):
 
 
 class Crawl(models.Model):
+    """Crawl model.
 
+    Model Fields
+    ------------
+
+    name = str(64)
+    slug : str(64)
+        The `slug` field is derived from `name` on save, and is restricted
+        to URL-safe characters.
+    description : str
+    crawler : str
+        Either 'nutch' or 'ache'
+    status : str
+    config : str
+        [ACHE] Name of configuration directory, defaults to "config_default"
+    seeds_list : FileField
+        Upload text file containing seed URLs
+    pages_crawled : int
+    harvest_rate : float
+        [ACHE] Ratio of relevant pages in the crawl
+    project : fk to base.Project
+    crawl_model : fk to CrawlModel
+    """
 
     def ensure_crawl_path(instance):
-        crawl_path = join(CRAWL_PATH, str(instance.pk))
+        crawl_path = self.get_crawl_path()
         try:
             os.makedirs(crawl_path)
         except OSError as e:
@@ -132,7 +167,7 @@ class Crawl(models.Model):
             self.slug = slugify(self.name)
             super().save(*args, **kwargs)
 
-            # Ensure that the crawl path `resources/<crawl.pk>` exists
+            # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
             crawl_path = self.ensure_crawl_path()
 
             # Move the file from temporary directory to crawl directory,

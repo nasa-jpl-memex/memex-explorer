@@ -21,8 +21,8 @@ class Project(models.Model):
 
     name : str(64)
     slug : str(64)
-        The `slug` field is derived from `name` on save, and contains URL-safe
-        characters.
+        The `slug` field is derived from `name` on save, and is restricted
+        to URL-safe characters.
     description : str
 
     """
