@@ -14,6 +14,7 @@ install:
     - conda env create -n memex -f environment.yml
     - source activate memex
 
+
 script:
     - coverage run $(which py.test)
     - coverage report --show_missing
