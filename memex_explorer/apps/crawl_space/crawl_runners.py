@@ -42,12 +42,12 @@ class CrawlRunner(metaclass=ABCMeta):
     Parameters
     ----------
 
-    crawl_model : crawl_space.models.Crawl subclass
+    crawl : crawl_space.models.Crawl subclass
 
     Attributes
     ----------
 
-    crawl_model : crawl_space.models.Crawl subclass
+    crawl : crawl_space.models.Crawl subclass
     crawl_dir : str
         Path to crawl directory,
           ex. `resources/crawls/4`.
@@ -59,12 +59,12 @@ class CrawlRunner(metaclass=ABCMeta):
 
     """
 
-    def __init__(self, crawl_model):
-        """Initialize common CrawlRunner attributes based on `crawl_model`."""
+    def __init__(self, crawl):
+        """Initialize common CrawlRunner attributes based on `crawl`."""
 
-        self.crawl_model = crawl_model
-        self.crawl_dir = crawl_model.get_crawl_path()
-        self.seeds_path = crawl_model.seeds_list.path
+        self.crawl = crawl
+        self.crawl_dir = crawl.get_crawl_path()
+        self.seeds_path = crawl.seeds_list.path
         self.stop_file = join(self.crawl_dir, 'stop')
 
     @property
@@ -101,8 +101,8 @@ class CrawlRunner(metaclass=ABCMeta):
                 stdout=stdout, stderr=subprocess.STDOUT,
                 preexec_fn=os.setsid)
 
-        self.crawl_model.status = "running"
-        self.crawl_model.save()
+        self.crawl.status = "running"
+        self.crawl.save()
 
         stopped_by_user = False
         while self.proc.poll() is None:
@@ -120,8 +120,8 @@ class CrawlRunner(metaclass=ABCMeta):
             # self.proc.terminate()
             #TODO kill nutch child processes
 
-        self.crawl_model.status = "stopped"
-        self.crawl_model.save()
+        self.crawl.status = "stopped"
+        self.crawl.save()
         return True
 
     @abstractmethod
@@ -131,13 +131,13 @@ class CrawlRunner(metaclass=ABCMeta):
 
 class AcheCrawlRunner(CrawlRunner):
 
-    def __init__(self, crawl_model):
+    def __init__(self, crawl):
         """ACHE specific attributes."""
 
-        super().__init__(crawl_model)
+        super().__init__(crawl)
 
-        self.config_dir = join(CONFIG_PATH, self.crawl_model.config)
-        self.model_dir = self.crawl_model.get_model_path()
+        self.config_dir = join(CONFIG_PATH, self.crawl.config)
+        self.model_dir = self.crawl.crawl_model.get_model_path()
 
 
     @property
@@ -169,18 +169,18 @@ class AcheCrawlRunner(CrawlRunner):
             return
 
         relevant, crawled = tuple(harvest_stats.split('\t')[:2])
-        self.crawl_model.harvest_rate = "%.2f" % (float(relevant) / 
+        self.crawl.harvest_rate = "%.2f" % (float(relevant) / 
                                                   float(crawled))
-        self.crawl_model.pages_crawled = crawled
-        self.crawl_model.save()
+        self.crawl.pages_crawled = crawled
+        self.crawl.save()
 
 
 
 class NutchCrawlRunner(CrawlRunner):
 
-    def __init__(self, crawl_model):
+    def __init__(self, crawl):
         """Nutch specific attributes."""
-        super().__init__(crawl_model)
+        super().__init__(crawl)
 
 
     @property
