@@ -21,3 +21,8 @@ script:
 after_success:
     - coveralls
 
+notifications:
+    email: false
+    flowdock: "8736cc7601ed0761f6c9339ec747ded6"
+    on_success: "change"
+    on_failure: "always"
