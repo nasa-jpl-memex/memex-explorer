@@ -1,7 +1,5 @@
 """Provides CrawlRunner subclasses to wrap crawl process execution and
-monitoring.
-
-"""
+monitoring."""
 
 import os
 import signal
@@ -9,8 +7,7 @@ from os.path import join
 import subprocess
 import time
 
-from abc import ABCMeta, abstractmethod #, abstractproperty
-
+from abc import ABCMeta, abstractmethod
 
 from apps.crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                        MODEL_PATH, CONFIG_PATH)
@@ -54,6 +51,8 @@ class CrawlRunner(metaclass=ABCMeta):
     seeds_path : str
         Path to seeds file (or directory, in the case of Nutch),
           ex. `resources/crawls/4/seeds`.
+    stop_file : str
+        Path to a sentinel file that indicates a stop has been requested.
     call : list(str)
         The tokenized call to the appropriate crawl process.
 
@@ -92,6 +91,10 @@ class CrawlRunner(metaclass=ABCMeta):
         Then, as long as the process is running, every five seconds:
           1. Log statistics
           2. Check if a stop file has appeared, exit the process accordingly
+
+        When a process has ended--either naturally or after a stop was
+        requested--the crawl status is updated.
+
         """
 
         rm_if_exists(self.stop_file)
@@ -115,10 +118,7 @@ class CrawlRunner(metaclass=ABCMeta):
             time.sleep(5)
 
         if stopped_by_user:
-            # from ipsh import ipsh; ipsh()
             os.killpg(self.proc.pid, signal.SIGTERM)
-            # self.proc.terminate()
-            #TODO kill nutch child processes
 
         self.crawl.status = "stopped"
         self.crawl.save()
@@ -130,6 +130,19 @@ class CrawlRunner(metaclass=ABCMeta):
 
 
 class AcheCrawlRunner(CrawlRunner):
+    """Subclass of CrawlRunner that adds a few ACHE specific attributes.
+
+    Attributes
+    ----------
+
+    config_dir : str
+        Path to the ACHE configuration directory applied to this crawl.
+        Hardcoded to "resources/configs/config_default" at the moment.
+    model_dir : str
+        Path to the ACHE crawl model directory, containing "pageclassifier"
+        model and features file.
+
+    """
 
     def __init__(self, crawl):
         """ACHE specific attributes."""

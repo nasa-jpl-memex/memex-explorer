@@ -89,6 +89,7 @@ class Crawl(models.Model):
 
         return crawl_path
 
+        
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
 
