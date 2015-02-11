@@ -26,7 +26,9 @@ class AddProjectView(generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
     template_name = "base/add_project.html"
-    success_url = "/"
+    
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
 
 class ProjectView(generic.DetailView):
