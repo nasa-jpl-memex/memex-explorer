@@ -19,11 +19,11 @@ class Project(models.Model):
     Model Fields
     ------------
 
-    name : str(64)
-    slug : str(64)
+    name : str, 64 characters max
+    slug : str, 64 characters max
         The `slug` field is derived from `name` on save, and is restricted
         to URL-safe characters.
-    description : str
+    description : textfield
 
     """
 

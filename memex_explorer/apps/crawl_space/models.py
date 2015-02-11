@@ -31,12 +31,12 @@ class CrawlModel(models.Model):
     Model Fields
     ------------
 
-    name = str(64)
-    model = FileField
+    name : str, 64 characters max
+    model : FileField
         Upload pageclassifier.model file
-    features = FileField
+    features : FileField
         Upload pageclassifier.features file
-    project = fk to base.Project
+    project : fk to base.Project
 
     """
 
@@ -93,8 +93,8 @@ class Crawl(models.Model):
     Model Fields
     ------------
 
-    name = str(64)
-    slug : str(64)
+    name : str, 64 characters max
+    slug : str, 64 characters max
         The `slug` field is derived from `name` on save, and is restricted
         to URL-safe characters.
     description : str
