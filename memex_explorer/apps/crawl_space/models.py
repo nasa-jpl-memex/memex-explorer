@@ -113,7 +113,7 @@ class Crawl(models.Model):
     """
 
     def ensure_crawl_path(instance):
-        crawl_path = self.get_crawl_path()
+        crawl_path = instance.get_crawl_path()
         try:
             os.makedirs(crawl_path)
         except OSError as e:
