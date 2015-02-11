@@ -1,5 +1,6 @@
 # Memex Explorer project
 resources/
+test_resources/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

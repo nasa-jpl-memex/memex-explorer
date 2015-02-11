@@ -5,10 +5,12 @@ Test settings for memex project.
 import warnings
 import builtins
 
-
 # Use default settings, overriding only those deemed necessary
 from .settings import *
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'test_resources')
+
+MEDIA_URL = '/test_resources/'
 
 # Ignore (particular) warnings
 # ============================
