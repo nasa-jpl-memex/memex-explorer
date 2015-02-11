@@ -48,5 +48,7 @@ class TestProject(LiveServerTestCase):
         submit = ff.find_element_by_id('submit-id-submit')
         submit.click()
 
-        assert False
+        # Verify that we are redirected to the project page
+        assert ff.current_url == self.live_server_url + '/projects/test-name/'
+
 
