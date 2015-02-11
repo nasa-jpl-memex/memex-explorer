@@ -2,8 +2,8 @@
 from crawl processes.
 
 At the moment, this is a thin wrapper for the purpose of development. In
-production systems, this application should call out to a job queueing
-library managing crawl processes on distributed systems.
+production systems, Memex Explorer should leverage a job queue
+that manages crawl processes on distributed systems.
 
 
 Example
@@ -16,9 +16,8 @@ Example
 import argparse
 import inspect
 
-from base.models import Project
-from apps.crawl_space.models import Crawl
-from apps.crawl_space.crawls import AcheCrawl, NutchCrawl
+from apps.crawl_space.crawl_runners import AcheCrawlRunner, NutchCrawlRunner
+from apps.crawl_space.utils import get_crawl
 
 
 def parse_args():
@@ -46,23 +45,39 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_crawl(project_slug, crawl_slug):
-    return Crawl.objects.get(project=Project.objects.get(slug=project_slug),
-                             slug=crawl_slug)
 
 
 class CrawlSupervisor(object):
+    """Wraps crawl process execution.
+
+    Parameters
+    ----------
+
+    project_slug : str, required
+    crawl_slug : str, required
+
+    Attributes
+    ----------
+
+    crawl_model : crawl_space.models.CrawlModel
+    crawl : crawl_space.crawls.CrawlRunner subclass
+        Currently supports AcheCrawlRunner and NutchCrawlRunner.
+    """
 
     def __init__(self, *args, **kwargs):
 
-        c = self.crawl_model = get_crawl(kwargs['project_slug'], kwargs['crawl_slug'])
+        c = self.crawl_model = get_crawl(
+            kwargs['project_slug'],
+            kwargs['crawl_slug'])
+
         if c.crawler == 'ache':
-            self.crawl = AcheCrawl(c)
+            self.crawl = AcheCrawlRunner(c)
 
         elif c.crawler == 'nutch':
-            self.crawl = NutchCrawl(c)
+            self.crawl = NutchCrawlRunner(c)
 
     def start(self):
+        """Start the crawl process.""" 
         self.crawl.run()
 
 
