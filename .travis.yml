@@ -17,7 +17,7 @@ install:
 
 script:
     - coverage run $(which py.test)
-    - coverage report --show_missing
+    - coverage report --show-missing
 
 after_success:
     - coveralls
