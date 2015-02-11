@@ -5,17 +5,13 @@ channels:
     - quasiben
 dependencies:
     - python=3.4.2
-    - blaze=0.6.7
-    - bokeh=0.7.0
     - nutch
     - ache=0.1.0
     - django=1.7.3
-    - redis
+    - pytest
     - pip
     - pip:
-        - pytest
         - coverage
         - pytest-cov
         - pytest-django
-        - django-rq
         - django-crispy-forms
