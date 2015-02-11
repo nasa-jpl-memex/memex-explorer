@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# Application definitio
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -38,8 +38,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crispy_forms',
     'base',
-    'apps.crawl_space'
 )
+
+EXPLORER_APPS = (
+    'crawl_space'
+)
+
+INSTALLED_APPS += ("apps.%s" % app for app in EXPLORER_APPS)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

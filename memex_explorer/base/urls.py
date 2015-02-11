@@ -16,19 +16,15 @@ urlpatterns = patterns('',
 
 
 
-# The following lines "discover" Django applications in 
-#   based on the presence of "_space" in apps.__dict__.keys()—
-#   and builds a url route to each application, namespaced appropriately.
+# The following lines build a url route to each application listed in
+#   `settings.EXPLORER_APPS`, namespaced appropriately.
 #   See <https://github.com/ContinuumIO/memex-explorer/issues/316>
 
 from django.conf import settings
-space_apps = [x for x in settings.INSTALLED_APPS if "_space" in x]
-
 
 inject_urls = [
     url(project_slug, include('apps.%s.urls' % app, namespace=app))
-    for app in space_apps
+    for app in settings.EXPLORER_APPS
 ]
-
 
 urlpatterns += patterns('', *inject_urls)
