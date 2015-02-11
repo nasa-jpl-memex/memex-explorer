@@ -4,6 +4,8 @@ monitoring.
 """
 
 import os
+import signal
+from os.path import join
 import subprocess
 import time
 
@@ -12,7 +14,7 @@ from abc import ABCMeta, abstractmethod #, abstractproperty
 
 from apps.crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                        MODEL_PATH, CONFIG_PATH)
-from apps.crawl_space.utils import join, touch, rm_if_exists
+from apps.crawl_space.utils import touch, rm_if_exists
 
 
 # Exceptions
@@ -95,28 +97,31 @@ class CrawlRunner(metaclass=ABCMeta):
         rm_if_exists(self.stop_file)
 
         with open(join(self.crawl_dir, 'crawl_proc.log'), 'a') as stdout:
-            self.proc = subprocess.Popen(call,
-                stdout=stdout, stderr=subprocess.STDOUT)
+            self.proc = subprocess.Popen(self.call,
+                stdout=stdout, stderr=subprocess.STDOUT,
+                preexec_fn=os.setsid)
 
         self.crawl_model.status = "running"
         self.crawl_model.save()
 
-        stopped = False
+        stopped_by_user = False
         while self.proc.poll() is None:
             self.log_statistics()
             if rm_if_exists(self.stop_file):
-                stopped = True
+                stopped_by_user = True
                 break
 
             print('.', end="", flush=True)
             time.sleep(5)
 
-        if not stopped:
-            self.proc.terminate()
+        if stopped_by_user:
+            # from ipsh import ipsh; ipsh()
+            os.killpg(self.proc.pid, signal.SIGTERM)
+            # self.proc.terminate()
             #TODO kill nutch child processes
 
-        self.crawl.status = "stopped"
-        self.crawl.save()
+        self.crawl_model.status = "stopped"
+        self.crawl_model.save()
         return True
 
     @abstractmethod
@@ -134,12 +139,15 @@ class AcheCrawlRunner(CrawlRunner):
         self.config_dir = join(CONFIG_PATH, self.crawl_model.config)
         self.model_dir = self.crawl_model.get_model_path()
 
-        self.call = ["ache", "startCrawl",
-                     self.crawl_dir,
-                     self.config_dir,
-                     self.seeds_path,
-                     self.model_dir,
-                     LANG_DETECT_PATH]
+
+    @property
+    def call(self):
+        return ["ache", "startCrawl",
+                self.crawl_dir,
+                self.config_dir,
+                self.seeds_path,
+                self.model_dir,
+                LANG_DETECT_PATH]
 
 
     def run(self):
@@ -161,49 +169,30 @@ class AcheCrawlRunner(CrawlRunner):
             return
 
         relevant, crawled = tuple(harvest_stats.split('\t')[:2])
-        self.crawl.harvest_rate = "%.2f" % (float(relevant) / float(crawled))
-        self.crawl.pages_crawled = crawled
-        self.crawl.save()
+        self.crawl_model.harvest_rate = "%.2f" % (float(relevant) / 
+                                                  float(crawled))
+        self.crawl_model.pages_crawled = crawled
+        self.crawl_model.save()
 
 
 
-class NutchCrawl(CrawlRunner):
+class NutchCrawlRunner(CrawlRunner):
 
-    def __init__(self, crawl):
+    def __init__(self, crawl_model):
         """Nutch specific attributes."""
+        super().__init__(crawl_model)
 
-        super().__init__(crawl)
 
-
-        self.call = ["crawl",
-                     self.seed_dir,
-                     self.crawl_dir,
-                     "1"]
+    @property
+    def call(self):
+        return ["crawl",
+                self.seeds_path,
+                self.crawl_dir,
+                "1"]
 
     def run(self):
-        rm_if_exists(stop_file)
-
-
-        with open(join(self.crawl_dir, 'nutch.log'), 'a') as stdout:
-            self.proc = subprocess.Popen(call,
-                stdout=stdout, stderr=subprocess.STDOUT)
-
-        self.crawl.status = "running"
-        self.crawl.save()
-
-        while self.proc.poll() is None:
-            self.log_statistics()
-            if rm_if_exists(self.stop_file):
-                break
-
-            print('.', end="", flush=True)
-            time.sleep(5)
-
-        self.proc.terminate()
-        self.crawl.status = "stopped"
-        self.crawl.save()
-        return True
-
+        """Implemented in CrawlRunner."""
+        super().run()
 
 
     def log_statistics(self):

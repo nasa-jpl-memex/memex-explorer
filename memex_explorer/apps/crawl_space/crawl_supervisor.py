@@ -1,5 +1,5 @@
 """Crawl Supervisor is a free-standing script that monitors and logs output
-from crawl processes.
+from crawl processes, via CrawlRunner.
 
 At the moment, this is a thin wrapper for the purpose of development. In
 production systems, Memex Explorer should leverage a job queue
@@ -71,14 +71,14 @@ class CrawlSupervisor(object):
             kwargs['crawl_slug'])
 
         if c.crawler == 'ache':
-            self.crawl = AcheCrawlRunner(c)
+            self.crawl_runner = AcheCrawlRunner(c)
 
         elif c.crawler == 'nutch':
-            self.crawl = NutchCrawlRunner(c)
+            self.crawl_runner = NutchCrawlRunner(c)
 
     def start(self):
         """Start the crawl process.""" 
-        self.crawl.run()
+        self.crawl_runner.run()
 
 
 if __name__ == "__main__":
