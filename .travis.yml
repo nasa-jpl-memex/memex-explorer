@@ -8,12 +8,12 @@ branches:
         - memex-django
 
 install:
-    - wget http://bit.ly/miniconda
-    - bash Miniconda-latest-Linux-x86_64.sh
-    - bash install.sh
+    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda config --set always_yes yes
     - conda env create -n memex -f environment.yml
     - source activate memex
-
 
 script:
     - coverage run $(which py.test)
