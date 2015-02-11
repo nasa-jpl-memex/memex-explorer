@@ -1,4 +1,5 @@
 import os
+import shutil
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -7,7 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 # App
 from apps.crawl_space.forms import AddCrawlForm
-from apps.crawl_space.models import Crawl
+from apps.crawl_space.models import Crawl, CrawlModel
 from base.models import Project, alphanumeric_validator
 
 
@@ -36,12 +37,31 @@ class TestViews(UnitTestSkeleton):
         cls.test_crawl = Crawl(
             name = "Test Crawl",
             description = "Test Crawl Description",
-            crawler = "ache",
+            crawler = "nutch",
             config = "config_default",
             seeds_list = cls.get_seeds(),
             project = cls.test_project)
         cls.test_crawl.save()
 
+        cls.test_crawlmodel = CrawlModel(
+            name = "Test Crawl Model",
+            model = cls.get_model_file(),
+            features = cls.get_features_file(),
+            project = cls.test_project,
+        )
+        cls.test_crawlmodel.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.test_crawl.get_crawl_path())
+
+    @classmethod
+    def get_model_file(self):
+        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n', 'utf-8'))
+
+    @classmethod
+    def get_features_file(self):
+        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n', 'utf-8'))
 
     @classmethod
     def get_seeds(self):
@@ -58,7 +78,9 @@ class TestViews(UnitTestSkeleton):
         return {'name': 'Cat Crawl',
                 'description': 'Find all the cats.',
                 'crawler': 'ache',
-                'seeds_list': self.get_seeds()}
+                'seeds_list': self.get_seeds(),
+                'crawl_model': self.test_crawlmodel.pk,
+                }
 
     @property
     def slugs(self):
@@ -103,7 +125,10 @@ class TestViews(UnitTestSkeleton):
 
             response = self.post('base:crawl_space:add_crawl',
                 form_data, **self.slugs)
-            assert_form_errors(response, field)
+            if field == 'crawler':
+                assert_form_errors(response, 'crawler', 'crawl_model')
+            else:
+                assert_form_errors(response, field)
 
 
     def test_add_crawl_bad_name(self):
@@ -129,7 +154,7 @@ class TestViews(UnitTestSkeleton):
 
         response = self.post('base:crawl_space:add_crawl',
             form_data, **self.slugs)
-        assert_form_errors(response, 'crawler')
+        assert_form_errors(response, 'crawl_model', 'crawler')
 
 
     def test_add_crawl_success(self):
@@ -156,25 +181,28 @@ class TestViews(UnitTestSkeleton):
         assert crawl.project == self.test_project
 
 
-class TestForms(TestCase):
+#class TestForms(TestCase):
+#
+#    @property
+#    def form_data(self):
+#        """Provide a dictionary of valid form data."""
+#
+#        return {'name': 'Cat Crawl',
+#                'description': 'Find all the cats.',
+#                'crawler': 'nutch',
+#                'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8')),
+#                'crawl_model': '',
+#                }
+#
+#    @property
+#    def file_data(self):
+#        """Provide a dictionary including a seeds_list SimpleUploadedFile.
+#        Django requires files to be passed as a seperate argument."""
+#        seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8'))
+#        return {'seeds_list': seeds_file}
+#
+#    def test_crawl_form(self):
+#        """Test the project form with valid form data."""
+#        form = AddCrawlForm(self.form_data, self.file_data)
+#        assert form.is_valid()
 
-    @property
-    def form_data(self):
-        """Provide a dictionary of valid form data."""
-
-        return {'name': 'Cat Crawl',
-                'description': 'Find all the cats.',
-                'crawler': 'ache'}
-
-    @property
-    def file_data(self):
-        """Provide a dictionary including a seeds_list SimpleUploadedFile.
-        Django requires files to be passed as a seperate argument."""
-        seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8'))
-        return {'seeds_list': seeds_file}
-
-    def test_project_form(self):
-        """Test the project form with valid form datay."""
-        
-        form = AddCrawlForm(self.form_data, self.file_data)
-        assert form.is_valid()

@@ -38,8 +38,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crispy_forms',
     'base',
-    'apps.crawl_space'
 )
+
+EXPLORER_APPS = (
+    'crawl_space',
+)
+
+INSTALLED_APPS += tuple("apps.%s" % app for app in EXPLORER_APPS)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
