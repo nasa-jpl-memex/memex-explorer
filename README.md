@@ -1,6 +1,8 @@
+[![Build
+Status](https://travis-ci.org/ContinuumIO/blaze.png)](https://travis-ci.org/ContinuumIO/blaze)
 # memex-explorer-django
 Memex explorer application re-written in Django 1.7
-* To setup the enviornment, do the following:
+* To setup the environment, do the following:
 ```
 $ wget http://bit.ly/miniconda
 $ bash Miniconda-latest-Linux-x86_64.sh
