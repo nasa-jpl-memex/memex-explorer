@@ -1,6 +1,10 @@
-from django.forms import ModelForm
-from crispy_forms.helper import FormHelper
+"""Provides base forms, configured via django-crispy-forms.
 
+The `AddProjectForm` form represents the simplest instance."""
+
+from django.forms import ModelForm
+
+from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
 
@@ -20,6 +24,7 @@ class CrispyModelForm(ModelForm):
 
 
 class AddProjectForm(CrispyModelForm):
+    """Add Project crispy model form."""
     class Meta:
         model = Project
         fields = ['name', 'description']

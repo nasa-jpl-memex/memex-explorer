@@ -1,14 +1,43 @@
-import argparse
+"""Crawl Supervisor is a free-standing script that monitors and logs output
+from crawl processes, via CrawlRunner.
 
-from base.models import Project
-from apps.crawl_space.models import Crawl
-from apps.crawl_space.crawls import AcheCrawl, NutchCrawl
+At the moment, this is a thin wrapper for the purpose of development. In
+production systems, Memex Explorer should leverage a job queue
+that manages crawl processes on distributed systems.
+
+
+Example
+-------
+
+    $ python crawl_supervisor.py --project project_slug --crawl crawl_slug
+
+"""
+
+import argparse
+import inspect
+
+from apps.crawl_space.crawl_runners import AcheCrawlRunner, NutchCrawlRunner
+from apps.crawl_space.utils import get_crawl
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-         description='Construct and display a new dashboard.')
+    """Helper function to parse command line arguments.
 
+    Arguments
+    ---------
+
+    -p, --project : str, required
+        Project slug
+    -c, --crawl : str, required
+        Crawl slug
+
+    Returns
+    -------
+
+    argparse.Namespace    
+    """
+
+    parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--project", dest="project_slug", type=str,
                         required=True, help="Project slug")
     parser.add_argument("-c", "--crawl", dest="crawl_slug", type=str,
@@ -16,24 +45,40 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_crawl(project_slug, crawl_slug):
-    return Crawl.objects.get(project=Project.objects.get(slug=project_slug),
-                             slug=crawl_slug)
 
 
-class CrawlSupervisor(object):
+class CrawlSupervisor():
+    """Wraps crawl process execution.
+
+    Parameters
+    ----------
+
+    project_slug : str, required
+    crawl_slug : str, required
+
+    Attributes
+    ----------
+
+    crawl_model : crawl_space.models.CrawlModel
+    crawl : crawl_space.crawls.CrawlRunner subclass
+        Currently supports AcheCrawlRunner and NutchCrawlRunner.
+    """
 
     def __init__(self, *args, **kwargs):
 
-        c = self.crawl_model = get_crawl(kwargs['project_slug'], kwargs['crawl_slug'])
+        c = self.crawl_model = get_crawl(
+            kwargs['project_slug'],
+            kwargs['crawl_slug'])
+
         if c.crawler == 'ache':
-            self.crawl = AcheCrawl(c)
+            self.crawl_runner = AcheCrawlRunner(c)
 
         elif c.crawler == 'nutch':
-            self.crawl = NutchCrawl(c)
+            self.crawl_runner = NutchCrawlRunner(c)
 
     def start(self):
-        self.crawl.run()
+        """Start the crawl process.""" 
+        self.crawl_runner.run()
 
 
 if __name__ == "__main__":

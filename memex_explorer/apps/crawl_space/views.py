@@ -1,4 +1,5 @@
 import os
+from os.path import join
 import sys
 import json
 
@@ -16,7 +17,7 @@ from apps.crawl_space.models import Crawl
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 
 
-from apps.crawl_space.utils import touch, join
+from apps.crawl_space.utils import touch
 
 class AddCrawlView(generic.edit.CreateView):
     form_class = AddCrawlForm

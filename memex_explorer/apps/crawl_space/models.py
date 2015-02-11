@@ -2,7 +2,7 @@ import os
 import errno
 import shutil
 
-from apps.crawl_space.utils import join
+from os.path import join
 
 from django.db import models
 from base.models import Project, alphanumeric_validator
@@ -26,6 +26,20 @@ def validate_features_file(value):
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
 class CrawlModel(models.Model):
+    """CrawlModel model, specifically for ACHE crawls.
+
+    Model Fields
+    ------------
+
+    name : str, 64 characters max
+    model : FileField
+        Upload pageclassifier.model file
+    features : FileField
+        Upload pageclassifier.features file
+    project : fk to base.Project
+
+    """
+
 
     def get_upload_path(instance, filename):
         return join('models', instance.name, filename)
@@ -74,9 +88,32 @@ class CrawlModel(models.Model):
 
 
 class Crawl(models.Model):
+    """Crawl model.
+
+    Model Fields
+    ------------
+
+    name : str, 64 characters max
+    slug : str, 64 characters max
+        The `slug` field is derived from `name` on save, and is restricted
+        to URL-safe characters.
+    description : str
+    crawler : str
+        Either 'nutch' or 'ache'
+    status : str
+    config : str
+        [ACHE] Name of configuration directory, defaults to "config_default"
+    seeds_list : FileField
+        Upload text file containing seed URLs
+    pages_crawled : int
+    harvest_rate : float
+        [ACHE] Ratio of relevant pages in the crawl
+    project : fk to base.Project
+    crawl_model : fk to CrawlModel
+    """
 
     def ensure_crawl_path(instance):
-        crawl_path = join(CRAWL_PATH, str(instance.pk))
+        crawl_path = instance.get_crawl_path()
         try:
             os.makedirs(crawl_path)
         except OSError as e:
@@ -85,6 +122,7 @@ class Crawl(models.Model):
 
         return crawl_path
 
+        
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
 
@@ -126,7 +164,7 @@ class Crawl(models.Model):
             self.slug = slugify(self.name)
             super().save(*args, **kwargs)
 
-            # Ensure that the crawl path `resources/<crawl.pk>` exists
+            # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
             crawl_path = self.ensure_crawl_path()
 
             # Move the file from temporary directory to crawl directory,
