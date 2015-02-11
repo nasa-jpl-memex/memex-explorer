@@ -30,9 +30,15 @@ $ python manage.py createsuperuser
 ```
 $ py.test
 ```
-* To make changes to scss stylesheets, do the following from the root of the repository, where config.rb is located:
+# Installing Compass
+If you need to make changes to the .scss stylesheets, [Compass](http://compass-style.org/) is a useful tool. The following are instructions on how to install compass without using `sudo`.
+* For mac users, add this line to your `~/.bash_profile`:
+```
+export PATH=/Users/brittainchristopherhard/.gem/ruby/2.0.0/bin:$PATH
+```
+Then run `$ gem install compass --user-install`. This will install Compass on your system.
+* To make changes to the stylesheets, do:
 ```
 $ cd ../
-$ gem install compass
 $ compass watch
 ```
