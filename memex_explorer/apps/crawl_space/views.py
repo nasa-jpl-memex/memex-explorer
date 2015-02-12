@@ -8,6 +8,7 @@ import subprocess
 from django.views import generic
 from django.apps import apps
 from django.http import HttpResponse
+from django.contrib.messages.views import SuccessMessageMixin
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -19,9 +20,10 @@ from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 
 from apps.crawl_space.utils import touch
 
-class AddCrawlView(generic.edit.CreateView):
+class AddCrawlView(SuccessMessageMixin, generic.edit.CreateView):
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
+    success_message = "Crawl %(name)s was saved successfully."
 
     def get_success_url(self):
         return self.object.get_absolute_url()
@@ -49,7 +51,6 @@ class ListCrawlsView(generic.ListView):
 class CrawlView(generic.DetailView):
     model = Crawl
     template_name = "crawl_space/crawl.html"
-
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -116,9 +117,10 @@ class CrawlView(generic.DetailView):
         return context
 
 
-class AddCrawlModelView(generic.edit.CreateView):
+class AddCrawlModelView(SuccessMessageMixin, generic.edit.CreateView):
     form_class = AddCrawlModelForm
     template_name = "crawl_space/add_crawl_model.html"
+    success_message = "Crawl model %(name)s was added successfully."
 
     def form_valid(self, form):
         form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
