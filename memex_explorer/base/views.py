@@ -23,7 +23,7 @@ class AboutView(generic.TemplateView):
     template_name = "base/about.html"
     
 
-class AddProjectView(generic.edit.CreateView, SuccessMessageMixin):
+class AddProjectView(SuccessMessageMixin, generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
     template_name = "base/add_project.html"
@@ -32,11 +32,8 @@ class AddProjectView(generic.edit.CreateView, SuccessMessageMixin):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(cleaned_data,
-                                           name=self.object.name)
-
 
 class ProjectView(generic.DetailView):
     model = Project
     template_name = "base/project.html"
+
