@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import RegexValidator
+from django.core.urlresolvers import reverse
 
 
 def alphanumeric_validator():
@@ -31,6 +32,10 @@ class Project(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField()
+
+    def get_absolute_url(self):
+        return reverse('base:project',
+            kwargs=dict(slug=self.slug))
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

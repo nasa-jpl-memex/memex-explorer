@@ -42,7 +42,7 @@ class TestViews(UnitTestSkeleton):
         response = self.post('base:add_project',
             {'name': 'CATS',
              'description': 'cats cats cats'})
-        assert 'base/index.html' in response.template_name
+        assert 'base/project.html' in response.template_name
         assert b'CATS' in response.content
 
 
