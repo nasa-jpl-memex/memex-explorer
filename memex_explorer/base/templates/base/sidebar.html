@@ -9,10 +9,10 @@
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"  style='float:right;'><i class="fa fa-list"></i></a>
     </div>
     <div id="collapseOne" class="accordion-body collapse accordion-links">
-      {% if crawls %}
-      {% for w in crawls%}
+      {% if project.crawl_set.all %}
+      {% for w in project.crawl_set.all %}
       <div class="accordion-inner">
-        <a href="#">{{ w.name }}</a>
+          <a href="{{ w.get_absolute_url }}">{{ w.name }}</a>
       </div>
       {% endfor %}
       {% endif %}

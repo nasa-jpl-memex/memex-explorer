@@ -9,7 +9,7 @@ from base.forms import AddProjectForm
 
 def project_context_processor(request):
     return {
-        'projects': Project.objects.all()
+        'projects': Project.objects.all(),
     }
 
 
