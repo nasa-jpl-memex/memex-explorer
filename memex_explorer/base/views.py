@@ -27,7 +27,7 @@ class AddProjectView(SuccessMessageMixin, generic.edit.CreateView):
     model = Project
     form_class = AddProjectForm
     template_name = "base/add_project.html"
-    success_message = "%(name)s was saved successfully."
+    success_message = "Project %(name)s was added successfully."
 
     def get_success_url(self):
         return self.object.get_absolute_url()
