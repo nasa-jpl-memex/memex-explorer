@@ -48,7 +48,7 @@ class AddCrawlForm(CrispyModelForm):
         )
 
 
-class AddCrawlModelForm(ModelForm):
+class AddCrawlModelForm(CrispyModelForm):
     """Add crawl model form, with an automatic crispy layout."""
 
     class Meta:

@@ -27,7 +27,7 @@
     <!-- Custom styles for this template -->
     <link href="{% static 'base/css/custom.css' %}" rel="stylesheet">
     <link href="{% static 'base/css/dashboard.css' %}" rel="stylesheet">
-    <link href="{% static 'base/css/master.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/forms.css' %}" rel="stylesheet">
     {% block extrahead %}{% endblock %}
 
   </head>
@@ -37,12 +37,6 @@
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
           <a class="navbar-brand" href="/">MEMEX-EXPLORER</a>
         </div>
         <!-- <div class="navbar-collapse collapse">
@@ -76,38 +70,12 @@
         <div class="col-sm-12 main">
           <div class="container">
               <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                  {# {% with errors = get_flashed_messages(category_filter=["error"]) %} #}
-                {% if errors %}
-                <div class="alert alert-dismissible alert-danger" role="alert">
-                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  {% for error in errors %}
-                  {{ error }}
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {# {% endwith %} #}
-
-                {# {% with warnings = get_flashed_messages(category_filter=["info"]) %} #}
-                {% if warnings %}
-                <div class="alert alert-dismissible alert-warning" role="alert">
-                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  {% for warning in warnings %}
-                  {{ warning }}
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {# {% endwith %} #}
-
-                {# {% with messages = get_flashed_messages(category_filter=["success"]) %} #}
-                {% if messages %}
-                <div class="alert alert-dismissible alert-success" role="alert">
-                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  {% for message in messages %}
-                  {{ message }}
-                  {% endfor %}
-                </div>
-                {% endif %}
-                {# {% endwith %} #}
+                  {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
                </div>
               </div>
               </div>

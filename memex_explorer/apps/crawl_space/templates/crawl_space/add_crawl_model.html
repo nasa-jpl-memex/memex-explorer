@@ -1,18 +1,19 @@
 {% extends "base/base.html" %}
+{% load crispy_forms_tags %}
 
-{% block title %}Add Data Model{% endblock %}
+{% block title %}Add Crawl Model{% endblock %}
 
 {% block content %}
+
+{% include "base/sidebar.html" %}
+
 <div class='row'>
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-<form action="" method="post" enctype="multipart/form-data">
-    <h1>Add Crawl Model</h1>
-    {% csrf_token %}
-    {{ form.as_p }}
-    <br>
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
-</div>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="center">
+            <h1>Add Crawl Model</h1>
+            {% crispy form %}
+        </div>
+    </div>
 </div>
 {% endblock %}
 
