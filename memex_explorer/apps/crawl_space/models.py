@@ -1,5 +1,4 @@
 import os
-import errno
 import shutil
 
 from os.path import join
@@ -9,10 +8,6 @@ from base.models import Project, alphanumeric_validator
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-
-
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import DeferredAttribute
 
 
 def validate_model_file(value):
@@ -49,11 +44,7 @@ class CrawlModel(models.Model):
 
     def ensure_model_path(instance):
         model_path = instance.get_model_path()
-        try:
-            os.makedirs(model_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        os.makedirs(model_path, exist_ok=True)
 
         return model_path
     
@@ -114,12 +105,7 @@ class Crawl(models.Model):
 
     def ensure_crawl_path(instance):
         crawl_path = instance.get_crawl_path()
-        try:
-            os.makedirs(crawl_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-
+        os.makedirs(crawl_path, exist_ok=True)
         return crawl_path
 
         
@@ -174,7 +160,7 @@ class Crawl(models.Model):
             # Nutch requires a seed directory, not a seed file
             if self.crawler == 'nutch':
                 seed_dir = join(crawl_path, 'seeds')
-                os.mkdir(seed_dir)
+                os.makedirs(seed_dir, exist_ok=True)
                 dst = join(crawl_path, 'seeds/seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = seed_dir
