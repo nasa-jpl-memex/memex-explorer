@@ -5,10 +5,11 @@ import json
 
 import subprocess
 
-from django.views import generic
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import CreateView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
-from django.contrib.messages.views import SuccessMessageMixin
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -20,7 +21,20 @@ from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 
 from apps.crawl_space.utils import touch
 
-class AddCrawlView(SuccessMessageMixin, generic.edit.CreateView):
+
+class ProjectObjectMixin:
+
+    def get_project(self):
+        return Project.objects.get(slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.get_project()
+        return context
+
+
+class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
@@ -33,29 +47,18 @@ class AddCrawlView(SuccessMessageMixin, generic.edit.CreateView):
         return super().form_valid(form)
 
 
-class ListCrawlsView(generic.ListView):
+class ListCrawlsView(ProjectObjectMixin, ListView):
     model = Crawl
     template_name = "crawl_space/crawls.html"
 
-    def get_project(self):
-        return Project.objects.get(slug=self.kwargs['slug'])
 
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        context['project'] = self.get_project()
-        return context
-
-
-class CrawlView(generic.DetailView):
+class CrawlView(ProjectObjectMixin, DetailView):
     model = Crawl
     template_name = "crawl_space/crawl.html"
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-
 
     def post(self, request, *args, **kwargs):
         crawl_model = self.get_object()
@@ -103,21 +106,13 @@ class CrawlView(generic.DetailView):
                 post=request.POST)),
             content_type="application/json")
 
-
-
     def get_object(self):
         return Crawl.objects.get(
             project=Project.objects.get(slug=self.kwargs['slug']),
             slug=self.kwargs['crawl_slug'])
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        context['project'] = self.object.project
-        return context
 
-
-class AddCrawlModelView(SuccessMessageMixin, generic.edit.CreateView):
+class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     form_class = AddCrawlModelForm
     template_name = "crawl_space/add_crawl_model.html"
     success_message = "Crawl model %(name)s was added successfully."
