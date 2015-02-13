@@ -29,7 +29,7 @@ class AddCrawlForm(CrispyModelForm):
 
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(AddCrawlForm, self).__init__(*args, **kwargs)
         self.set_layout()
 
 
@@ -54,3 +54,4 @@ class AddCrawlModelForm(CrispyModelForm):
     class Meta:
         model = CrawlModel
         fields = ['name', 'model', 'features']
+

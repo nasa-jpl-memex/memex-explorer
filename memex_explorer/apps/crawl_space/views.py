@@ -6,6 +6,7 @@ import json
 import subprocess
 
 from django.views.generic import ListView, DetailView
+from django.views.generic.base import ContextMixin
 from django.views.generic.edit import CreateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
@@ -22,14 +23,14 @@ from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 from apps.crawl_space.utils import touch
 
 
-class ProjectObjectMixin:
+class ProjectObjectMixin(ContextMixin):
 
     def get_project(self):
         return Project.objects.get(slug=self.kwargs['slug'])
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
+        context = super(ProjectObjectMixin, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
         return context
 
@@ -44,7 +45,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
-        return super().form_valid(form)
+        return super(AddCrawlView, self).form_valid(form)
 
 
 class ListCrawlsView(ProjectObjectMixin, ListView):
@@ -58,7 +59,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+        return super(CrawlView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         crawl_model = self.get_object()
@@ -119,7 +120,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
-        return super().form_valid(form)
+        return super(AddCrawlModelView, self).form_valid(form)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
