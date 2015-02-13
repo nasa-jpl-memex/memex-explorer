@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors
 from django.test import TestCase
@@ -16,7 +17,7 @@ class TestAddDataModelView(UnitTestSkeleton):
     def setUpClass(cls):
         super(TestAddDataModelView, cls).setUpClass()
         cls.test_project = Project(
-            name = "Model Test",
+            name = u"Model Test",
             description = "Test Project Description")
         cls.test_project.save()
 
@@ -26,10 +27,10 @@ class TestAddDataModelView(UnitTestSkeleton):
             slug="model-test"))
 
     def get_model_file(self):
-        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')
 
     def get_features_file(self):
-        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n'), 'utf-8')
 
     def test_add_model_page(self):
         response = self.get('base:crawl_space:add_crawl_model', **self.slugs)

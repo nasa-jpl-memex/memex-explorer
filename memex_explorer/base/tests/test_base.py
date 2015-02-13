@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors
 from django.test import TestCase
@@ -93,7 +95,7 @@ class TestForms(TestCase):
 class TestProjectQueries(TestCase):
 
     def setUp(self):
-        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
+        project = Project.objects.create(name=u"Bicycles for sale", description="Project about bicycles")
         self.project = project
 
     def test_project_exists(self):

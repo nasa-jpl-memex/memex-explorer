@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import shutil
 
@@ -57,18 +59,18 @@ class TestViews(UnitTestSkeleton):
 
     @classmethod
     def get_model_file(self):
-        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')
 
     @classmethod
     def get_features_file(self):
-        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n'), 'utf-8')
 
     @classmethod
     def get_seeds(self):
         """Return a new instance of SimpleUploadedFile. This file can only
         be used once."""
 
-        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8'))
+        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
 
 
     @property
@@ -190,7 +192,7 @@ class TestViews(UnitTestSkeleton):
 #        return {'name': 'Cat Crawl',
 #                'description': 'Find all the cats.',
 #                'crawler': 'nutch',
-#                'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8')),
+#                'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8'),
 #                'crawl_model': '',
 #                }
 #
@@ -198,7 +200,7 @@ class TestViews(UnitTestSkeleton):
 #    def file_data(self):
 #        """Provide a dictionary including a seeds_list SimpleUploadedFile.
 #        Django requires files to be passed as a seperate argument."""
-#        seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n', 'utf-8'))
+#        seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
 #        return {'seeds_list': seeds_file}
 #
 #    def test_crawl_form(self):
