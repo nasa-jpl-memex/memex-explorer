@@ -16,3 +16,4 @@ CONFIG_PATH = os.path.join(resources_dir, 'configs')
 # Directory to store seed files temporary. See `Crawl.save()` in
 #   `crawl_space.models`
 SEEDS_TMP_DIR = os.path.join(resources_dir, 'seeds_tmp')
+MODELS_TMP_DIR = os.path.join(resources_dir, 'models_tmp')

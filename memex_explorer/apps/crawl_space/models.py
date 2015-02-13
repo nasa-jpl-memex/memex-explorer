@@ -14,7 +14,8 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR
+from apps.crawl_space.settings import (MODEL_PATH, CRAWL_PATH,
+                                       SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
@@ -36,8 +37,8 @@ class CrawlModel(models.Model):
     """
 
 
-    def get_upload_path(instance, filename):
-        return join('models', instance.name, filename)
+    def get_model_upload_path(instance, filename):
+        return join(MODELS_TMP_DIR, instance.name, filename)
 
     def get_model_path(instance):
         return join(MODEL_PATH, str(instance.pk))
@@ -49,8 +50,10 @@ class CrawlModel(models.Model):
         return model_path
     
     name = models.CharField(max_length=64)
-    model = models.FileField(upload_to=get_upload_path, validators=[validate_model_file])
-    features = models.FileField(upload_to=get_upload_path, validators=[validate_features_file])
+    model = models.FileField(upload_to=get_model_upload_path,
+        validators=[validate_model_file])
+    features = models.FileField(upload_to=get_model_upload_path,
+        validators=[validate_features_file])
     project = models.ForeignKey(Project)
 
     def get_absolute_url(self):
@@ -103,17 +106,16 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
-    def ensure_crawl_path(instance):
-        crawl_path = instance.get_crawl_path()
-        os.makedirs(crawl_path, exist_ok=True)
-        return crawl_path
-
+    def get_seeds_upload_path(instance, filename):
+        return join(SEEDS_TMP_DIR, instance.name, filename)
         
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
 
-    def get_seeds_upload_path(instance, filename):
-        return join(SEEDS_TMP_DIR, filename)
+    def ensure_crawl_path(instance):
+        crawl_path = instance.get_crawl_path()
+        os.makedirs(crawl_path, exist_ok=True)
+        return crawl_path
 
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
