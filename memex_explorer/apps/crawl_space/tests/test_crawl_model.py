@@ -27,10 +27,10 @@ class TestAddDataModelView(UnitTestSkeleton):
             slug="model-test"))
 
     def get_model_file(self):
-        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')
 
     def get_features_file(self):
-        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n', 'utf-8'))
+        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n'), 'utf-8')
 
     def test_add_model_page(self):
         response = self.get('base:crawl_space:add_crawl_model', **self.slugs)

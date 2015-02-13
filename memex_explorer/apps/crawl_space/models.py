@@ -81,7 +81,7 @@ class CrawlModel(models.Model):
             shutil.move(self.features.path, features_dst)
             self.features.name = features_dst
 
-        super().save(*args, **kwargs)
+        super(CrawlModel, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.name
@@ -162,7 +162,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(self.name)
-            super().save(*args, **kwargs)
+            super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
             crawl_path = self.ensure_crawl_path()
@@ -186,7 +186,7 @@ class Crawl(models.Model):
             # Continue saving as normal
 
         self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
+        super(Crawl, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',

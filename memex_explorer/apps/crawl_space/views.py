@@ -45,7 +45,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
-        return super().form_valid(form)
+        return super(AddCrawlView, self).form_valid(form)
 
 
 class ListCrawlsView(ProjectObjectMixin, ListView):
@@ -59,7 +59,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+        return super(CrawlView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         crawl_model = self.get_object()
@@ -120,7 +120,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
-        return super().form_valid(form)
+        return super(AddCrawlModelView, self).form_valid(form)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
