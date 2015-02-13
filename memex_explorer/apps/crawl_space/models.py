@@ -151,7 +151,7 @@ class Crawl(models.Model):
         #    crawl directory.
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
-            self.slug = slugify(self.name)
+            self.slug = slugify(unicode(self.name))
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
@@ -175,7 +175,7 @@ class Crawl(models.Model):
 
             # Continue saving as normal
 
-        self.slug = slugify(self.name)
+        self.slug = slugify(unicode(self.name))
         super(Crawl, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

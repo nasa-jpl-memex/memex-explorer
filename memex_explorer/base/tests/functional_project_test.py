@@ -11,12 +11,12 @@ class TestProject(LiveServerTestCase):
     def setUpClass(cls):
         cls.browser = WebDriver()
         cls.browser.implicitly_wait(1)
-        super().setUpClass()
+        super(TestProject, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
         cls.browser.quit()
-        super().tearDownClass()
+        super(TestProject, cls).tearDownClass()
 
     def test_add_project(self):
 

@@ -39,7 +39,7 @@ class Project(models.Model):
             kwargs=dict(slug=self.slug))
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(unicode(self.name))
         super(Project, self).save(*args, **kwargs)
 
     def __unicode__(self):

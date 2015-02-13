@@ -1,4 +1,5 @@
 from os.path import exists, join
+import shutil
 import pytest
 import tempfile
 
@@ -27,7 +28,7 @@ class TestCrawls(LiveServerTestCase):
     def setUpClass(cls):
         cls.browser = WebDriver()
         cls.browser.implicitly_wait(1)
-        super().setUpClass()
+        super(TestCrawls, cls).setUpClass()
 
 
     def setUp(self):
@@ -40,10 +41,9 @@ class TestCrawls(LiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.browser.quit()
-        super().tearDownClass()
+        super(TestCrawls, cls).tearDownClass()
 
 
-    @pytest.mark.run(order=1)
     def test_add_crawl_model(self):
 
         # Names are super awesome
@@ -79,34 +79,33 @@ class TestCrawls(LiveServerTestCase):
         name.send_keys("Test Crawl Model")
 
         #TODO locate test model and features file
-        assert exists(MODEL_PATH) and exists(FEATURES_PATH)
+        assert exists(TEST_MODEL_PATH) and exists(TEST_FEATURES_PATH)
         model = ff.find_element_by_id("id_model")
-        model.send_keys(MODEL_PATH)
+        model.send_keys(TEST_MODEL_PATH)
 
         features = ff.find_element_by_id("id_features")
-        features.send_keys(FEATURES_PATH)
+        features.send_keys(TEST_FEATURES_PATH)
 
         submit = ff.find_element_by_id('submit-id-submit')
         submit.click()
 
 
-    @pytest.mark.run(order=2)
     def test_add_ache_crawl(self):
 
         ff = self.browser
 
-        model_copy = MODEL_PATH + '.copy'
-        features_copy = FEATURES_PATH + '.copy'
+        model_copy = TEST_MODEL_PATH + '.copy'
+        features_copy = TEST_FEATURES_PATH + '.copy'
 
-        shutil.copyfile(MODEL_PATH, model_copy)
-        shutil.copyfile(MODEL_PATH, model_copy)
+        shutil.copyfile(TEST_MODEL_PATH, model_copy)
+        shutil.copyfile(TEST_FEATURES_PATH, features_copy)
 
-        crawl_model = CrawlModel(
+        test_crawl_model = CrawlModel(
             name = "Test Crawl Model",
             model = model_copy,
             features = features_copy,
             project = self.project)
-        crawl_model.save()
+        test_crawl_model.save()
 
 
         # Navigate to the project page
@@ -128,7 +127,9 @@ class TestCrawls(LiveServerTestCase):
         assert ache_radio.get_attribute("value") == "ache"
         ache_radio.click()
 
-        assert False
+        crawl_model = ff.find_element_by_id("id_crawl_model")
+        crawl_model_select = Select(crawl_model)
+        crawl_model_select.select_by_visible_text(test_crawl_model.name)
 
         seeds_list = ff.find_element_by_id("id_seeds_list")
         with tempfile.NamedTemporaryFile() as f:
@@ -142,7 +143,6 @@ class TestCrawls(LiveServerTestCase):
         assert "projects/potatoes/crawls/test-ache-crawl/" in ff.current_url
 
 
-    @pytest.mark.run(order=3)
     def test_add_nutch_crawl(self):
 
         # Names are awesome
@@ -152,9 +152,12 @@ class TestCrawls(LiveServerTestCase):
         ff.get(self.live_server_url + self.project.get_absolute_url())
         assert "/projects/potatoes" in ff.current_url
 
-        # # Click on "+ Add Crawl" in the sidebar
-        add_crawl = ff.find_element_by_link_text("+ Add Crawl")
-        add_crawl.click()
+        # Click on the Crawl dropdown toggle in the sidebar
+        toggle = ff.find_element_by_id('crawl_toggle').click()
+
+
+        # Click on "+ Add Crawl"
+        add_crawl = ff.find_element_by_link_text("+ Add Crawl").click()
         assert "/projects/potatoes/add_crawl" in ff.current_url
 
         # Click "Submit" on an empty form.
@@ -187,6 +190,7 @@ class TestCrawls(LiveServerTestCase):
             seeds_list.send_keys(f.name)
 
             submit = ff.find_element_by_id('submit-id-submit')
+            assert False
             submit.click()
 
         assert "projects/potatoes/crawls/test-nutch-crawl/" in ff.current_url
