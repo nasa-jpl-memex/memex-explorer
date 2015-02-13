@@ -1,6 +1,6 @@
 [![Build
 Status](https://travis-ci.org/ContinuumIO/blaze.png)](https://travis-ci.org/ContinuumIO/blaze)
-[![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg)](https://coveralls.io/r/ContinuumIO/memex-explorer)
+[![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg?branch=memex-django)](https://coveralls.io/r/ContinuumIO/memex-explorer?branch=memex-django)
 
 # memex-explorer-django
 Memex explorer application re-written in Django 1.7
