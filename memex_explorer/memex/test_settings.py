@@ -16,6 +16,9 @@ MEDIA_URL = '/test_resources/'
 # ============================
 
 # RuntimeWarning:
-#   SQLite received a naive datetime (2012-11-02 11:20:15.156506) while time zone support is active.
-# http://stackoverflow.com/questions/11708821/django-ipython-sqlite-complains-about-naive-datetime
-warnings.filterwarnings("ignore", category=exceptions.RuntimeWarning, module='django.db.backends.sqlite3.base', lineno=63)
+#   SQLite received a naive datetime (2012-11-02 11:20:15.156506)
+#   while time zone support is active.
+# http://stackoverflow.com/questions/11708821/
+#                         django-ipython-sqlite-complains-about-naive-datetime
+warnings.filterwarnings("ignore", category=exceptions.RuntimeWarning,
+                        module='django.db.backends.sqlite3.base', lineno=63)
