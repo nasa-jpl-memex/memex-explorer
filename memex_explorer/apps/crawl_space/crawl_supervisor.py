@@ -17,7 +17,14 @@ import argparse
 import inspect
 
 from apps.crawl_space.crawl_runners import AcheCrawlRunner, NutchCrawlRunner
-from apps.crawl_space.utils import get_crawl
+
+from base.models import Project
+from apps.crawl_space.models import Crawl
+
+def get_crawl(project_slug, crawl_slug):
+    project = Project.objects.get(slug=project_slug)
+    crawl = Crawl.objects.get(project=project, slug=crawl_slug)
+    return crawl
 
 
 def parse_args():
