@@ -41,5 +41,5 @@ class Project(models.Model):
         self.slug = slugify(self.name)
         super(Project, self).save(*args, **kwargs)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name

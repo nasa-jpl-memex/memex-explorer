@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors
 from django.test import TestCase
@@ -16,7 +17,7 @@ class TestAddDataModelView(UnitTestSkeleton):
     def setUpClass(cls):
         super(TestAddDataModelView, cls).setUpClass()
         cls.test_project = Project(
-            name = "Model Test",
+            name = u"Model Test",
             description = "Test Project Description")
         cls.test_project.save()
 

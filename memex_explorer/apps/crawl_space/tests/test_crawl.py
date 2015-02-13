@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import os
 import shutil
 
@@ -30,7 +32,7 @@ class TestViews(UnitTestSkeleton):
         super(TestViews, cls).setUpClass()
 
         cls.test_project = Project(
-            name = "Test",
+            name = u"Test",
             description = "Test Project Description")
         cls.test_project.save()
 

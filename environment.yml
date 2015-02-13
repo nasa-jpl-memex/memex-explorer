@@ -4,7 +4,7 @@ channels:
     - memex
     - quasiben
 dependencies:
-    - python=3.4.2
+    - python=2.7.8
     - nutch
     - ache=0.1.0
     - django=1.7.3

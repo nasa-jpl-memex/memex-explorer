@@ -1,10 +1,10 @@
 """Crawl space url routes.
 
-Each of these url patterns is built off a project URL—
+Each of these url patterns is built off a project URL-
 
     /project/<project_slug>
 
-—and belongs to the "crawl_space" namespace. See `base.urls` for an
+-and belongs to the "crawl_space" namespace. See `base.urls` for an
 explanation of the dynamic route generation.
 
 URLs

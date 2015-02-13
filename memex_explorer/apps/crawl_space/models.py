@@ -70,7 +70,7 @@ class CrawlModel(models.Model):
     def save(self, *args, **kwargs):
 
         if self.pk is None:
-            super().save(*args, **kwargs)
+            super(CrawlModel, self).save(*args, **kwargs)
 
             model_path = self.ensure_model_path()
             model_dst = join(model_path, 'pageclassifier.model')
@@ -83,7 +83,7 @@ class CrawlModel(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -151,7 +151,7 @@ class Crawl(models.Model):
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True, 
         default=None)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def save(self, *args, **kwargs):
