@@ -16,3 +16,17 @@ form{
         border-radius: 0px;
     }
 }
+.list-group-item{
+    button{
+        border:0;
+        background-color:#ffffff;
+        float:right;
+        color:#428BCA;
+        i{
+            font-size:20px;
+            &:hover{
+                color:#2A6496;
+            }
+        }
+    }
+}

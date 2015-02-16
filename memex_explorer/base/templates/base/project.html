@@ -60,8 +60,9 @@
         <ul class="list-group">
           {% for x in project.crawlmodel_set.all %}
           <li class="list-group-item">
-            <i class="fa fa-bar-chart"></i>{{ x.name }}
-            <form><a class="removeButton"><i class="fa fa-close" style="float:right;font-size:20px;"></i></a></form>
+            <i class="fa fa-bar-chart"></i>
+                {{ x.name }}
+            <button class="delete_button" type="submit"><i class="fa fa-close"></i></button>
           </li>
           {% endfor %}
         </ul>
