@@ -62,7 +62,10 @@
           <li class="list-group-item">
             <i class="fa fa-bar-chart"></i>
                 {{ x.name }}
-            <button class="delete_button" type="submit"><i class="fa fa-close"></i></button>
+            <form action="post">
+                {% csrf_token %}
+                <button class="fa fa-close" type="submit"></button>
+            </form>
           </li>
           {% endfor %}
         </ul>
