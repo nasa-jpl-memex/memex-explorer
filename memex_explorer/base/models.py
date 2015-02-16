@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.text import slugify
+from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.core.urlresolvers import reverse
 
@@ -38,7 +39,7 @@ class Project(models.Model):
             kwargs=dict(slug=self.slug))
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(unicode(self.name))
         super(Project, self).save(*args, **kwargs)
 
     def __unicode__(self):
