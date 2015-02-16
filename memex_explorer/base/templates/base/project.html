@@ -13,11 +13,6 @@
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>{{ project.name }}
-      <button title="Delete Project" id="removeButton" class="btn btn-control"
-      data-container="body"
-      data-toggle="tooltip" data-placement="bottom">
-      <span class="fa fa-close"></span>
-    </button>
     <a href="#TODO">
       <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
       data-container="body"
@@ -44,7 +39,7 @@
       <ul class="list-group">
         {%  for w in project.crawl_set.all %}
         <li class="list-group-item">
-          <a href="{{ w.get_absolute_url }}"><i class="fa fa-search"></i>  {{ w.name }}</a>
+          <a href="{{ w.get_absolute_url }}"><i class="fa fa-search"></i>{{ w.name }}</a>
         </li>
         {% endfor %}
       </ul>
@@ -65,7 +60,8 @@
         <ul class="list-group">
           {% for x in project.crawlmodel_set.all %}
           <li class="list-group-item">
-            <i class="fa fa-bar-chart"></i> {{ x.name }}
+            <i class="fa fa-bar-chart"></i>{{ x.name }}
+            <form><a class="removeButton"><i class="fa fa-close" style="float:right;font-size:20px;"></i></a></form>
           </li>
           {% endfor %}
         </ul>
@@ -74,9 +70,10 @@
         {% endif %}
       </div>
     </div>
+
   </div>
-  {# <script type="text/javascript">
-  $('#removeButton').click(function(){
+<script type="text/javascript">
+  $('.removeButton').click(function(){
     swal({
       title: "Are you sure?",
       text: "You will not be able to recover this project!",
@@ -86,7 +83,7 @@
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: "No, cancel!",
       closeOnConfirm: false,
-      closeOnCancel: false
+      closeOnCancel: false,
     },
     function(isConfirm){
       if (isConfirm){
@@ -96,5 +93,5 @@
       }
     });
   });
-</script> #}
+</script>
 {% endblock %}
