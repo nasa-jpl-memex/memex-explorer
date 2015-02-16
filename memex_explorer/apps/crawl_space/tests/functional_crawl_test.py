@@ -112,8 +112,8 @@ class TestCrawls(LiveServerTestCase):
         ff.get(self.live_server_url + self.project.get_absolute_url())
         assert "/projects/potatoes" in ff.current_url
 
-        # Click on "+ Add Crawl" in the sidebar
-        add_crawl = ff.find_element_by_link_text("+ Add Crawl")
+        # Click on "+ Add Crawl"
+        add_crawl = ff.find_element_by_id("link-add-crawl")
         add_crawl.click()
         assert "/projects/potatoes/add_crawl" in ff.current_url
 
@@ -152,12 +152,9 @@ class TestCrawls(LiveServerTestCase):
         ff.get(self.live_server_url + self.project.get_absolute_url())
         assert "/projects/potatoes" in ff.current_url
 
-        # Click on the Crawl dropdown toggle in the sidebar
-        toggle = ff.find_element_by_id('crawl_toggle').click()
-
-
         # Click on "+ Add Crawl"
-        add_crawl = ff.find_element_by_link_text("+ Add Crawl").click()
+        add_crawl = ff.find_element_by_id("link-add-crawl")
+        add_crawl.click()
         assert "/projects/potatoes/add_crawl" in ff.current_url
 
         # Click "Submit" on an empty form.
@@ -190,7 +187,6 @@ class TestCrawls(LiveServerTestCase):
             seeds_list.send_keys(f.name)
 
             submit = ff.find_element_by_id('submit-id-submit')
-            assert False
             submit.click()
 
         assert "projects/potatoes/crawls/test-nutch-crawl/" in ff.current_url

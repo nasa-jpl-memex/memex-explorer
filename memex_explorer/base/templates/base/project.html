@@ -33,10 +33,10 @@
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="col-sm-3">
       <h4>
-        <a href="{% url 'base:crawl_space:crawls' slug=project.slug %}">
+        <a id="link-crawls" href="{% url 'base:crawl_space:crawls' slug=project.slug %}">
           <i class="fa fa-search"> &nbsp; </i>Crawls</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'base:crawl_space:add_crawl' slug=project.slug %}">
+        <a id="link-add-crawl" href="{% url 'base:crawl_space:add_crawl' slug=project.slug %}">
           <i class="fa fa-plus-square"></i></a>
       </h4>
 
@@ -80,7 +80,8 @@
         <a href="#TODO">
           <i class="fa fa-search"> &nbsp; </i>Crawl Models</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{% url 'base:crawl_space:add_crawl_model' slug=project.slug %}">
+        <a id="link-add-crawl-model"
+        href="{% url 'base:crawl_space:add_crawl_model' slug=project.slug %}">
           <i class="fa fa-plus-square"></i></a>
       </h4>
         {% if project.crawlmodel_set.all %}
