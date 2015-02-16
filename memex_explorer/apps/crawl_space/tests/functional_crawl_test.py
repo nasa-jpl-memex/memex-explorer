@@ -36,6 +36,15 @@ class TestCrawls(LiveServerTestCase):
             name="Potatoes",
             description="Why are they?")
         self.project.save()
+        super(TestCrawls, self).setUp()
+
+
+    def tearDown(self):
+        shutil.rmtree(join(TEST_RESOURCES_DIR, 'crawls'),
+                      ignore_errors=True)
+        shutil.rmtree(join(TEST_RESOURCES_DIR, 'models'),
+                      ignore_errors=True)
+        super(TestCrawls, self).tearDown()
 
 
     @classmethod
@@ -117,6 +126,7 @@ class TestCrawls(LiveServerTestCase):
         add_crawl.click()
         assert "/projects/potatoes/add_crawl" in ff.current_url
 
+        # Fill out the form with valid input, and submit
         name = ff.find_element_by_id("id_name")
         name.send_keys("Test ACHE Crawl")
 
@@ -143,7 +153,7 @@ class TestCrawls(LiveServerTestCase):
         assert "projects/potatoes/crawls/test-ache-crawl/" in ff.current_url
 
 
-    def test_add_nutch_crawl(self):
+    def test_add_crawl_errors(self):
 
         # Names are awesome
         ff = self.browser
@@ -157,7 +167,7 @@ class TestCrawls(LiveServerTestCase):
         add_crawl.click()
         assert "/projects/potatoes/add_crawl" in ff.current_url
 
-        # Click "Submit" on an empty form.
+        # Click "Submit" on an empty form
         submit = ff.find_element_by_id('submit-id-submit')
         submit.click()
 
@@ -168,6 +178,21 @@ class TestCrawls(LiveServerTestCase):
         assert description_error.text == "This field is required."
         seeds_error = ff.find_element_by_id('error_1_id_seeds_list')
         assert seeds_error.text == "This field is required."
+
+
+    def test_add_nutch_crawl(self):
+
+        # Names are awesome
+        ff = self.browser
+
+        # Navigate to the project page
+        ff.get(self.live_server_url + self.project.get_absolute_url())
+        assert "/projects/potatoes" in ff.current_url
+
+        # Click on "+ Add Crawl"
+        add_crawl = ff.find_element_by_id("link-add-crawl")
+        add_crawl.click()
+        assert "/projects/potatoes/add_crawl" in ff.current_url
 
         # Fill out the form with valid input, and submit
         name = ff.find_element_by_id("id_name")

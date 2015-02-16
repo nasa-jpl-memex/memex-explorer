@@ -9,7 +9,9 @@ def touch(fname, times=None):
 def ensure_exists(path):
     try: 
         os.makedirs(path)
-    except OSError:
+    except OSError as e:
+        if e.errno == errno.EEXIST: # (path exists)
+            pass
         if not os.path.isdir(path):
             raise
 
