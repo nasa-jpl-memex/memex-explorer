@@ -44,7 +44,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         return self.object.get_absolute_url()
 
     def form_valid(self, form):
-        form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
+        form.instance.project = self.get_project()
         return super(AddCrawlView, self).form_valid(form)
 
 
@@ -109,7 +109,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
     def get_object(self):
         return Crawl.objects.get(
-            project=Project.objects.get(slug=self.kwargs['slug']),
+            project=self.get_project(),
             slug=self.kwargs['crawl_slug'])
 
 
@@ -119,7 +119,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     success_message = "Crawl model %(name)s was added successfully."
 
     def form_valid(self, form):
-        form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
+        form.instance.project = self.get_project()
         return super(AddCrawlModelView, self).form_valid(form)
 
     def get_success_url(self):
@@ -135,6 +135,6 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
     def get_object(self):
         return CrawlModel.objects.get(
-            project=Project.objects.get(slug=self.kwargs['slug']),
+            project=self.get_project(),
             slug=self.kwargs['model_slug'])
 
