@@ -51,6 +51,8 @@ class CrawlModel(models.Model):
 
         return model_path
     
+    name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
+    slug = models.SlugField(max_length=64, unique=True)
     name = models.CharField(max_length=64)
     model = models.FileField(upload_to=get_model_upload_path,
         validators=[validate_model_file])
@@ -77,6 +79,7 @@ class CrawlModel(models.Model):
             shutil.move(self.features.path, features_dst)
             self.features.name = features_dst
 
+        self.slug = slugify(self.name)
         super(CrawlModel, self).save(*args, **kwargs)
 
     def __unicode__(self):

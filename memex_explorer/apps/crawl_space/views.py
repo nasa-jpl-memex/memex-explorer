@@ -7,7 +7,7 @@ import subprocess
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from base.models import Project
-from apps.crawl_space.models import Crawl
+from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
 
 
@@ -44,7 +44,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         return self.object.get_absolute_url()
 
     def form_valid(self, form):
-        form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
+        form.instance.project = self.get_project()
         return super(AddCrawlView, self).form_valid(form)
 
 
@@ -109,7 +109,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
     def get_object(self):
         return Crawl.objects.get(
-            project=Project.objects.get(slug=self.kwargs['slug']),
+            project=self.get_project(),
             slug=self.kwargs['crawl_slug'])
 
 
@@ -119,9 +119,22 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     success_message = "Crawl model %(name)s was added successfully."
 
     def form_valid(self, form):
-        form.instance.project = Project.objects.get(slug=self.kwargs['slug'])
+        form.instance.project = self.get_project()
         return super(AddCrawlModelView, self).form_valid(form)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+    model = CrawlModel
+    success_message = "Crawl model %(name)s was deleted successfully."
+
+    def get_success_url(self):
+        return self.get_project().get_absolute_url()
+
+    def get_object(self):
+        return CrawlModel.objects.get(
+            project=self.get_project(),
+            slug=self.kwargs['model_slug'])
 
