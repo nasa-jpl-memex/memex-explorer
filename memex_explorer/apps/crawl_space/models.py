@@ -1,25 +1,23 @@
 import os
-import errno
 import shutil
 
 from os.path import join
 
 from django.db import models
-from base.models import Project, alphanumeric_validator
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 
-
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import DeferredAttribute
+from base.models import Project, alphanumeric_validator
+from apps.crawl_space.utils import ensure_exists
 
 
 def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR
+from apps.crawl_space.settings import (MODEL_PATH, CRAWL_PATH,
+                                       SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
@@ -41,26 +39,25 @@ class CrawlModel(models.Model):
     """
 
 
-    def get_upload_path(instance, filename):
-        return join('models', instance.name, filename)
+    def get_model_upload_path(instance, filename):
+        return join(MODELS_TMP_DIR, instance.name, filename)
 
     def get_model_path(instance):
         return join(MODEL_PATH, str(instance.pk))
 
     def ensure_model_path(instance):
         model_path = instance.get_model_path()
-        try:
-            os.makedirs(model_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        ensure_exists(model_path)
 
         return model_path
     
     name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
-    model = models.FileField(upload_to=get_upload_path, validators=[validate_model_file])
-    features = models.FileField(upload_to=get_upload_path, validators=[validate_features_file])
+    name = models.CharField(max_length=64)
+    model = models.FileField(upload_to=get_model_upload_path,
+        validators=[validate_model_file])
+    features = models.FileField(upload_to=get_model_upload_path,
+        validators=[validate_features_file])
     project = models.ForeignKey(Project)
 
     def get_absolute_url(self):
@@ -114,22 +111,16 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
-    def ensure_crawl_path(instance):
-        crawl_path = instance.get_crawl_path()
-        try:
-            os.makedirs(crawl_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-
-        return crawl_path
-
+    def get_seeds_upload_path(instance, filename):
+        return join(SEEDS_TMP_DIR, instance.name, filename)
         
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
 
-    def get_seeds_upload_path(instance, filename):
-        return join(SEEDS_TMP_DIR, filename)
+    def ensure_crawl_path(instance):
+        crawl_path = instance.get_crawl_path()
+        ensure_exists(crawl_path)
+        return crawl_path
 
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
@@ -163,7 +154,7 @@ class Crawl(models.Model):
         #    crawl directory.
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
-            self.slug = slugify(self.name)
+            self.slug = slugify(unicode(self.name))
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
@@ -176,7 +167,7 @@ class Crawl(models.Model):
             # Nutch requires a seed directory, not a seed file
             if self.crawler == 'nutch':
                 seed_dir = join(crawl_path, 'seeds')
-                os.mkdir(seed_dir)
+                ensure_exists(seed_dir)
                 dst = join(crawl_path, 'seeds/seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = seed_dir
@@ -187,7 +178,7 @@ class Crawl(models.Model):
 
             # Continue saving as normal
 
-        self.slug = slugify(self.name)
+        self.slug = slugify(unicode(self.name))
         super(Crawl, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

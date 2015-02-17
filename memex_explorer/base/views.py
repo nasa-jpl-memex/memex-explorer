@@ -38,4 +38,3 @@ class AddProjectView(SuccessMessageMixin, CreateView):
 class ProjectView(DetailView):
     model = Project
     template_name = "base/project.html"
-

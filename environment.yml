@@ -11,8 +11,10 @@ dependencies:
     - pytest
     - pip
     - pip:
+        - selenium
         - coverage
         - pytest-cov
         - pytest-django
+        - pytest-ordering
         - django-crispy-forms
         - coveralls

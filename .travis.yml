@@ -7,6 +7,10 @@ branches:
     only:
         - memex-django
 
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
@@ -16,7 +20,7 @@ install:
     - source activate memex
 
 script:
-    - coverage run $(which py.test)
+    - coverage run $(which py.test) --runslow
     - coverage report --show-missing
 
 after_success:
