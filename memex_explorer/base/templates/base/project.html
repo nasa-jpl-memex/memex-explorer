@@ -62,7 +62,7 @@
           <li class="list-group-item">
             <i class="fa fa-bar-chart"></i>
                 {{ x.name }}
-                <form action="{% url 'base:crawl_space:delete_crawl_model' slug=project.slug model_slug=x.slug %}" method="post">
+                <form action="{% url 'base:crawl_space:delete_crawl_model' slug=project.slug model_slug=x.slug %}" method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
                     {% csrf_token %}
                 <button class="fa fa-close" type="submit"></button>
             </form>
@@ -76,26 +76,5 @@
     </div>
 
   </div>
-<script type="text/javascript">
-  $('.removeButton').click(function(){
-    swal({
-      title: "Are you sure?",
-      text: "You will not be able to recover this project!",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: '#DD6B55',
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: "No, cancel!",
-      closeOnConfirm: false,
-      closeOnCancel: false,
-    },
-    function(isConfirm){
-      if (isConfirm){
-        $('<form action="/{{ project.slug }}/delete" method="post"></form>').submit();
-      } else {
-        swal("Cancelled", "You cancelled the delete process", "error");
-      }
-    });
-  });
 </script>
 {% endblock %}
