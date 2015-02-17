@@ -39,7 +39,7 @@
       <ul class="list-group">
         {%  for w in project.crawl_set.all %}
         <li class="list-group-item">
-          <a href="{{ w.get_absolute_url }}"><i class="fa fa-search"></i>{{ w.name }}</a>
+          <a href="{{ w.get_absolute_url }}"><i class="fa fa-search"></i> {{ w.name }}</a>
         </li>
         {% endfor %}
       </ul>
@@ -62,8 +62,8 @@
           <li class="list-group-item">
             <i class="fa fa-bar-chart"></i>
                 {{ x.name }}
-            <form action="post">
-                {% csrf_token %}
+                <form action="{% url 'base:crawl_space:delete_crawl_model' slug=project.slug model_slug=x.slug %}" method="post">
+                    {% csrf_token %}
                 <button class="fa fa-close" type="submit"></button>
             </form>
           </li>
