@@ -48,10 +48,18 @@ class AddCrawlForm(CrispyModelForm):
         )
 
 
+class CrawlSettingsForm(CrispyModelForm):
+
+    class Meta:
+        model = Crawl
+        fields = ['name', 'description', 'seeds_list']
+
+
 class AddCrawlModelForm(CrispyModelForm):
     """Add crawl model form, with an automatic crispy layout."""
 
     class Meta:
         model = CrawlModel
         fields = ['name', 'model', 'features']
+
 
