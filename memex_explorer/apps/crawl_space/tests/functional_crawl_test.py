@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from os.path import exists, join
 import shutil
 import pytest
@@ -110,7 +111,7 @@ class TestCrawls(LiveServerTestCase):
         shutil.copyfile(TEST_FEATURES_PATH, features_copy)
 
         test_crawl_model = CrawlModel(
-            name = "Test Crawl Model",
+            name = u"Test Crawl Model",
             model = model_copy,
             features = features_copy,
             project = self.project)
