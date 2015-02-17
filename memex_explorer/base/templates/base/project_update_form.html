@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Project{% endblock %}
+
+{% block content %}
+
+{% include "base/sidebar.html" %}
+
+<div class='row'>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="center">
+            <h1>Edit Project</h1>
+            {% crispy form %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
