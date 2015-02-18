@@ -30,10 +30,6 @@ class AddProjectForm(CrispyModelForm):
         fields = ['name', 'description']
 
 
-class ProjectSettingsForm(CrispyModelForm):
+class ProjectSettingsForm(AddProjectForm):
     """Change the settings of a project."""
-
-    class Meta:
-        model = Project
-        fields = ['name', 'description']
 
