@@ -11,32 +11,13 @@
     <div id="collapseOne" class="accordion-body collapse accordion-links">
       {% if project.crawl_set.all %}
       {% for w in project.crawl_set.all %}
-      <div class="accordion-inner" style="font-size:18px;">
+      <div class="accordion-inner">
           <a href="{{ w.get_absolute_url }}">{{ w.name }}</a>
       </div>
       {% endfor %}
       {% endif %}
       <div class="accordion-inner">
         <a href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">+ Add Crawl</a>
-      </div>
-    </div>
-  </div>
-  <div class="accordion" id="accordion2">
-    <div class="accordion-group">
-      <div class="accordion-heading sidebar-buttons">
-        Crawl Models
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion3" href="#collapseTwo"  style='float:right;'><i class="fa fa-list"></i></a>
-    </div>
-    <div id="collapseTwo" class="accordion-body collapse accordion-links">
-      {% if project.crawlmodel_set.all %}
-      {% for w in project.crawlmodel_set.all %}
-      <div class="accordion-inner" style="font-size:18px;">
-          {{ w.name }}
-      </div>
-      {% endfor %}
-      {% endif %}
-      <div class="accordion-inner">
-        <a href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">+ Add Crawl Model</a>
       </div>
     </div>
   </div>

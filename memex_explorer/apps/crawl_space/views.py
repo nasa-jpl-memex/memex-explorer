@@ -7,7 +7,7 @@ import subprocess
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
-from django.views.generic.edit import CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
-from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm
+from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 
 
 from apps.crawl_space.utils import touch
@@ -106,6 +106,22 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 kwargs=kwargs,
                 post=request.POST)),
             content_type="application/json")
+
+    def get_object(self):
+        return Crawl.objects.get(
+            project=self.get_project(),
+            slug=self.kwargs['crawl_slug'])
+
+
+class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
+
+    model = Crawl
+    form_class = CrawlSettingsForm
+    success_message = "Crawl %(name)s was edited successfully."
+    template_name_suffix = '_update_form'
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
     def get_object(self):
         return Crawl.objects.get(

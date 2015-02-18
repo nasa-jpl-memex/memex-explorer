@@ -182,6 +182,30 @@ class TestViews(UnitTestSkeleton):
 
         assert crawl.project == self.test_project
 
+    def test_crawl_settings_page(self):
+        response = self.get('base:crawl_space:crawl_settings', **self.crawl_slugs)
+        assert 'crawl_space/crawl_update_form.html' in response.template_name
+
+    def test_crawl_settings_change_name(self):
+        response = self.post('base:crawl_space:crawl_settings',
+            {'name': 'Cat Crawl'}, **self.crawl_slugs)
+        crawl = get_object(response)
+        assert crawl.name == "Cat Crawl"
+
+    def test_crawl_settings_change_description(self):
+        response = self.post('base:crawl_space:crawl_settings',
+            {'description': 'A crawl for information about cats.'},
+            **self.crawl_slugs)
+        crawl = get_object(response)
+        assert crawl.description == "A crawl for information about cats." 
+
+    def test_crawl_settings_change_seeds(self):
+        response = self.post('base:crawl_space:crawl_settings',
+            {'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some different content.\n'), 'utf-8')},
+            **self.crawl_slugs)
+        crawl = get_object(response)
+        assert crawl.seeds_list != self.test_crawl.seeds_list
+
 
 #class TestForms(TestCase):
 #

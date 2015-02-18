@@ -36,6 +36,9 @@ urlpatterns = patterns('',
         name='crawls'),
 
     url(r'^crawls/(?P<crawl_slug>[\w-]+)/$', views.CrawlView.as_view(),
-        name='crawl')
+        name='crawl'),
+
+    url(r'^crawls/(?P<crawl_slug>[\w-]+)/settings/$', views.CrawlSettingsView.as_view(),
+        name='crawl_settings'),
 )
 
