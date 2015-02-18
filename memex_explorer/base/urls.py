@@ -17,7 +17,7 @@ from django.conf.urls import patterns, include, url
 from base import views
 
 
-project_slug = r'^projects/(?P<slug>[\w-]+)/'
+project_slug = r'^projects/(?P<project_slug>[\w-]+)/'
 
 urlpatterns = patterns('',
     url(r'^$', views.IndexView.as_view(), name='index'),

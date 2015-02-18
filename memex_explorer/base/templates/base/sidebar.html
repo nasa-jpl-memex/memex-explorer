@@ -1,9 +1,9 @@
 <div class="col-sm-3 col-md-2 sidebar">
-  <a href="{% url 'base:project' slug=project.slug %}"><h2><br>{{ project.name }}</h2></a>
+  <a href="{% url 'base:project' project_slug=project.slug %}"><h2><br>{{ project.name }}</h2></a>
   <div class="accordion" id="accordion2">
     <div class="accordion-group">
       <div class="accordion-heading sidebar-buttons">
-        <a href="{% url 'base:crawl_space:crawls' slug=project.slug %}">
+        <a href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}">
         Crawls
       </a>
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"  style='float:right;'><i class="fa fa-list"></i></a>
@@ -17,7 +17,7 @@
       {% endfor %}
       {% endif %}
       <div class="accordion-inner">
-        <a href="{% url 'base:crawl_space:add_crawl' slug=project.slug %}">+ Add Crawl</a>
+        <a href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">+ Add Crawl</a>
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@
       {% endfor %}
       {% endif %}
       <div class="accordion-inner">
-        <a href="{% url 'base:crawl_space:add_crawl_model' slug=project.slug %}">+ Add Crawl Model</a>
+        <a href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">+ Add Crawl Model</a>
       </div>
     </div>
   </div>

@@ -24,7 +24,7 @@ class TestAddDataModelView(UnitTestSkeleton):
     @property
     def slugs(self):
         return dict(slugs=dict(
-            slug="model-test"))
+            project_slug="model-test"))
 
     def get_model_file(self):
         return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')

@@ -52,7 +52,7 @@ class TestViews(UnitTestSkeleton):
         self.test_add_project_success()
 
         response = self.get('base:project',
-            slugs=dict(slug="cats"))
+            slugs=dict(project_slug="cats"))
         assert 'base/project.html' in response.template_name
 
 
