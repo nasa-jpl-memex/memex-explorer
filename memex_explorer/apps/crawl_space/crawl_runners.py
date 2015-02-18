@@ -2,6 +2,7 @@
 monitoring."""
 
 import os
+import sys
 import signal
 from os.path import join
 import subprocess
@@ -29,7 +30,7 @@ class AcheException(CrawlException):
 #  CLASSES
 # ==========
 
-class CrawlRunner(metaclass=ABCMeta):
+class CrawlRunner():
     """Abstract base class for crawl runners.
 
     CrawlRunner subclasses are expected to implement these methods:
@@ -55,6 +56,8 @@ class CrawlRunner(metaclass=ABCMeta):
         Path to a sentinel file that indicates a stop has been requested.
 
     """
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, crawl):
         """Initialize common CrawlRunner attributes based on `crawl`."""
@@ -116,7 +119,8 @@ class CrawlRunner(metaclass=ABCMeta):
                 stopped_by_user = True
                 break
 
-            print('.', end="", flush=True)
+            sys.stdout.write(".")
+            sys.stdout.flush()
             time.sleep(5)
 
         if stopped_by_user:
@@ -149,7 +153,7 @@ class AcheCrawlRunner(CrawlRunner):
     def __init__(self, crawl):
         """ACHE specific attributes."""
 
-        super().__init__(crawl)
+        super(AcheCrawlRunner, self).__init__(crawl)
 
         self.config_dir = join(CONFIG_PATH, self.crawl.config)
         self.model_dir = self.crawl.crawl_model.get_model_path()
@@ -173,13 +177,13 @@ class AcheCrawlRunner(CrawlRunner):
         if stderr and b"No such file or directory" not in stderr:
                 raise AcheException(stderr)
 
-        harvest_stats = stdout.decode() 
+        harvest_stats = stdout.decode()
 
         if not harvest_stats:
             return
 
         relevant, crawled = tuple(harvest_stats.split('\t')[:2])
-        self.crawl.harvest_rate = "%.2f" % (float(relevant) / 
+        self.crawl.harvest_rate = "%.2f" % (float(relevant) /
                                                   float(crawled))
         self.crawl.pages_crawled = crawled
         self.crawl.save()
@@ -190,7 +194,7 @@ class NutchCrawlRunner(CrawlRunner):
 
     def __init__(self, crawl):
         """Nutch specific attributes."""
-        super().__init__(crawl)
+        super(NutchCrawlRunner, self).__init__(crawl)
 
 
     @property
