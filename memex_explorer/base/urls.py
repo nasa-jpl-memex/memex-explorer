@@ -47,3 +47,4 @@ inject_urls = [
 ]
 
 urlpatterns += patterns('', *inject_urls)
+
