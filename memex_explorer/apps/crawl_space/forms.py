@@ -1,8 +1,10 @@
 from base.forms import CrispyModelForm
 
-from django.forms import ModelForm, RadioSelect, Select
+from django.forms import ModelForm, RadioSelect, Select, FileInput
 from crispy_forms.layout import Layout, Fieldset, Submit, HTML
 from crispy_forms.bootstrap import InlineRadios, FormActions
+
+from django.utils.translation import ugettext_lazy as _
 
 from apps.crawl_space.models import Crawl, CrawlModel
 
@@ -67,6 +69,10 @@ class CrawlSettingsForm(CrispyModelForm):
     class Meta:
         model = Crawl
         fields = ['name', 'description', 'seeds_list']
+        labels = {
+            'seeds_list': _('Seeds List')
+        }
+        widgets = {'seeds_list': FileInput}
 
 
 class AddCrawlModelForm(CrispyModelForm):
@@ -75,5 +81,4 @@ class AddCrawlModelForm(CrispyModelForm):
     class Meta:
         model = CrawlModel
         fields = ['name', 'model', 'features']
-
 
