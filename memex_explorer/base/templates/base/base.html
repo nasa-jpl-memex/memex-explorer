@@ -57,7 +57,7 @@
             {% if projects %}
           <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
             {% for x in projects %}
-            <a href="{% url 'base:project' slug=x.slug %}"><li>{{ x.name }}</li></a>
+            <a href="{% url 'base:project' project_slug=x.slug %}"><li>{{ x.name }}</li></a>
             {% endfor %}
           </ul>
             {% endif %}

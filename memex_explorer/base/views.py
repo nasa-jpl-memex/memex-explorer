@@ -37,4 +37,5 @@ class AddProjectView(SuccessMessageMixin, CreateView):
 
 class ProjectView(DetailView):
     model = Project
+    slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"

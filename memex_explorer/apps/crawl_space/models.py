@@ -62,7 +62,7 @@ class CrawlModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('base:project',
-            kwargs=dict(slug=self.project.slug))
+            kwargs=dict(project_slug=self.project.slug))
 
 
     def save(self, *args, **kwargs):
@@ -183,5 +183,5 @@ class Crawl(models.Model):
 
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
-            kwargs=dict(slug=self.project.slug, crawl_slug=self.slug))
+            kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
 

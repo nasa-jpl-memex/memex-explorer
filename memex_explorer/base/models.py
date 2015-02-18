@@ -36,7 +36,7 @@ class Project(models.Model):
 
     def get_absolute_url(self):
         return reverse('base:project',
-            kwargs=dict(slug=self.slug))
+            kwargs=dict(project_slug=self.slug))
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
