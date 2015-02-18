@@ -59,7 +59,7 @@ class TestViews(UnitTestSkeleton):
 
     def test_add_project_with_right_slug(self):
         response = self.get('base:project',
-            slugs={'slug': self.test_project.slug})
+            slugs=dict(project_slug="cats"))
         assert 'base/project.html' in response.template_name
 
     def test_project_settings_page(self):

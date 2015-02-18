@@ -89,7 +89,7 @@ class TestViews(UnitTestSkeleton):
         """Return a dictionary with a "test" project slug."""
 
         return dict(slugs=dict(
-            slug="test"))
+            project_slug="test"))
 
     @property
     def crawl_slugs(self):
@@ -97,7 +97,7 @@ class TestViews(UnitTestSkeleton):
         a "test-crawl" crawl slug."""
 
         return dict(slugs=dict(
-            slug="test",
+            project_slug="test",
             crawl_slug="test-crawl"))
 
 

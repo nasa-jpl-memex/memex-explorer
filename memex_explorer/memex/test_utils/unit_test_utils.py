@@ -36,5 +36,6 @@ class UnitTestSkeleton(TestCase):
                 reverse(view_name, kwargs=slugs),
                 *args, follow=True, **kwargs)
         else:
-            return cls.client.post(reverse(view_name),
+            return cls.client.post(
+                reverse(view_name),
                 *args, follow=True, **kwargs)

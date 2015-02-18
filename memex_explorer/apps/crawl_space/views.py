@@ -26,7 +26,7 @@ from apps.crawl_space.utils import touch
 class ProjectObjectMixin(ContextMixin):
 
     def get_project(self):
-        return Project.objects.get(slug=self.kwargs['slug'])
+        return Project.objects.get(slug=self.kwargs['project_slug'])
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -66,7 +66,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Start
         if request.POST['action'] == "start":
-            project_slug = self.kwargs['slug']
+            project_slug = self.kwargs['project_slug']
             crawl_slug = self.kwargs['crawl_slug']
 
             call = ["python",
