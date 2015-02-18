@@ -70,7 +70,7 @@ class CrawlSettingsForm(CrispyModelForm):
         model = Crawl
         fields = ['name', 'description', 'seeds_list']
         labels = {
-            'seeds_list': _('Seeds List')
+            'seeds_list': _('Seeds List (leave blank to keep unchanged)')
         }
         widgets = {'seeds_list': FileInput}
 
