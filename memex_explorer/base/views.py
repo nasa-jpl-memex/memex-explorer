@@ -46,5 +46,6 @@ class ProjectSettingsView(SuccessMessageMixin, UpdateView):
     model = Project
     form_class = ProjectSettingsForm
     success_message = "Project %(name)s was edited successfully."
+    slug_url_kwarg = 'project_slug'
     template_name_suffix = '_update_form'
 

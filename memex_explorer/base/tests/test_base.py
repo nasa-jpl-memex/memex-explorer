@@ -56,26 +56,25 @@ class TestViews(UnitTestSkeleton):
         assert 'base/project.html' in response.template_name
         assert b'CATS' in response.content
 
-
-    def test_add_project_with_right_slug(self):
+    def test_project_page(self):
         response = self.get('base:project',
-            slugs=dict(project_slug="cats"))
+            slugs={'project_slug': self.test_project.slug})
         assert 'base/project.html' in response.template_name
 
     def test_project_settings_page(self):
         response = self.get('base:project_settings', 
-            slugs={'slug': self.test_project.slug})
+            slugs={'project_slug': self.test_project.slug})
         assert 'base/project_update_form.html' in response.template_name
 
     def test_project_settings_change_name(self):
         response = self.post('base:project_settings',
-                {'name': 'Cat Project'}, slugs={'slug': self.test_project.slug}, )
+                {'name': 'Cat Project'}, slugs={'project_slug': self.test_project.slug}, )
         project = get_object(response)
         assert project.name == 'Cat Project'
 
     def test_project_settings_change_description(self):
         response = self.post('base:project_settings',
-                {'description': 'A project for cats!'}, slugs={'slug': self.test_project.slug}, )
+                {'description': 'A project for cats!'}, slugs={'project_slug': self.test_project.slug}, )
         project = get_object(response)
         assert project.description == 'A project for cats!'
 

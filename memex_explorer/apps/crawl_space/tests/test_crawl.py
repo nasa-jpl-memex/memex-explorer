@@ -165,7 +165,7 @@ class TestViews(UnitTestSkeleton):
 
         response = self.post('base:crawl_space:add_crawl',
             self.form_data,
-            **self.slugs)
+            **self.crawl_slugs)
         assert 'crawl_space/crawl.html' in response.template_name
 
 
