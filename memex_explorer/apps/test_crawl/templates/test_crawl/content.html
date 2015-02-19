@@ -1,8 +1,19 @@
-{% extends "base/base.html" %}
-{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ words | truncatewords:10 }}</title>
+</head>
 
-{% block content %}
+<body>
+  <ul>
+    {% for id in link_ids %}
+    <li>
+      <a href="{% url 'base:test_crawl:content' project_slug=project_slug content_id=id %}">{{ id }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</body>
 
 {{ words }}
-
-{% endblock %}
+</html>

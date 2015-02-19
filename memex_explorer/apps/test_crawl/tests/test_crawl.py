@@ -2,31 +2,24 @@ from __future__ import unicode_literals
 
 import os
 import shutil
+from django.core.urlresolvers import reverse
 
-# Test
-from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
-from django.test import TestCase
-from django.core.files.uploadedfile import SimpleUploadedFile
+# # Test
+# from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
+# from django.test import TestCase
+# from django.core.files.uploadedfile import SimpleUploadedFile
 
-# App
-from apps.crawl_space.forms import AddCrawlForm
-from apps.crawl_space.models import Crawl, CrawlModel
-from base.models import Project, alphanumeric_validator
-
-
-def assert_form_errors(response, *errors):
-    """Given a response, assert that only the given `errors`
-    are present in the form response."""
-
-    efe = expected_form_errors = set(errors)
-    assert set(form_errors(response).keys()) - efe == set()
+# # App
+# from apps.crawl_space.forms import AddCrawlForm
+# from apps.crawl_space.models import Crawl, CrawlModel
+# from base.models import Project, alphanumeric_validator
 
 
 class TestViews(UnitTestSkeleton):
 
     @classmethod
     def setUpClass(cls):
-        """Initialize a test project and crawl model,
+        """Initialize a test project and crawl,
         and save them to the test database."""
 
         super(TestViews, cls).setUpClass()
@@ -45,51 +38,25 @@ class TestViews(UnitTestSkeleton):
             project = cls.test_project)
         cls.test_crawl.save()
 
-        cls.test_crawlmodel = CrawlModel(
-            name = "Test Crawl Model",
-            model = cls.get_model_file(),
-            features = cls.get_features_file(),
-            project = cls.test_project,
-        )
-        cls.test_crawlmodel.save()
-
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.test_crawl.get_crawl_path())
-
-    @classmethod
-    def get_model_file(self):
-        return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')
-
-    @classmethod
-    def get_features_file(self):
-        return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n'), 'utf-8')
 
     @classmethod
     def get_seeds(self):
         """Return a new instance of SimpleUploadedFile. This file can only
         be used once."""
 
-        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
+        return SimpleUploadedFile('ht.seeds',
+            bytes(reverse('base:test_crawl:content', content_id=1)), 'utf-8')
 
 
-    @property
-    def form_data(self):
-        """Provide a dictionary of valid form data."""
+    # @property
+    # def slugs(self):
+    #     """Return a dictionary with a "test" project slug."""
 
-        return {'name': 'Cat Crawl',
-                'description': 'Find all the cats.',
-                'crawler': 'ache',
-                'seeds_list': self.get_seeds(),
-                'crawl_model': self.test_crawlmodel.pk,
-                }
-
-    @property
-    def slugs(self):
-        """Return a dictionary with a "test" project slug."""
-
-        return dict(slugs=dict(
-            project_slug="test"))
+    #     return dict(slugs=dict(
+    #         project_slug="test"))
 
     @property
     def crawl_slugs(self):
