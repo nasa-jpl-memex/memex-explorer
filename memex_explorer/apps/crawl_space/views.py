@@ -78,6 +78,9 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
             crawl_model.status = "starting"
             crawl_model.save()
+            return HttpResponse(json.dumps(dict(
+                    status="starting")),
+                content_type="application/json")
 
                 
         # Stop

@@ -78,6 +78,7 @@ class TestViews(UnitTestSkeleton):
         response = self.post('base:crawl_space:crawl', data={'action': 'start'},
             **self.crawl_slugs)
 
-        # import time
-        # time.sleep(100)
-        assert response is 2
+        assert "starting" in response.content
+
+        # assert crawl_is_running
+        assert False
