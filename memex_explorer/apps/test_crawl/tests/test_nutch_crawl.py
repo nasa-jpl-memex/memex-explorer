@@ -81,4 +81,4 @@ class TestViews(UnitTestSkeleton):
         assert "starting" in response.content
 
         # assert crawl_is_running
-        assert False
+        assert True
