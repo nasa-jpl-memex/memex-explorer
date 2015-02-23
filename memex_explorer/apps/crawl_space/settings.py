@@ -1,6 +1,12 @@
 """Crawl settings."""
 
-import os
+import os, sys
+
+sys.path.insert(1, '/'.join(os.path.dirname(__file__).split('/')[:-2]))
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "memex.settings")
+
+import django
 from django.conf import settings
 
 resources_dir = settings.MEDIA_ROOT

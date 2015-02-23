@@ -16,7 +16,7 @@ Example
 import argparse
 import inspect
 
-from apps.crawl_space.crawl_runners import AcheCrawlRunner, NutchCrawlRunner
+from crawl_runners import AcheCrawlRunner, NutchCrawlRunner
 
 from base.models import Project
 from apps.crawl_space.models import Crawl

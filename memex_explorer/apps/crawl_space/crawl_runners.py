@@ -10,9 +10,9 @@ import time
 
 from abc import ABCMeta, abstractmethod
 
-from apps.crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
+from settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                        MODEL_PATH, CONFIG_PATH)
-from apps.crawl_space.utils import touch, rm_if_exists
+from utils import touch, rm_if_exists
 
 
 # Exceptions
