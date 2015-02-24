@@ -20,6 +20,7 @@ class AddCrawlForm(CrispyModelForm):
             raise ValidationError("Incorrect crawler type.")
         if not crawl_model and crawler == 'ache':
             raise ValidationError("Ache Crawls require a crawl model.")
+        return crawl_model
 
     class Meta:
         model = Crawl
@@ -27,11 +28,9 @@ class AddCrawlForm(CrispyModelForm):
                   'crawl_model', 'seeds_list']
         widgets = {'crawl_model': Select}
 
-
     def __init__(self, *args, **kwargs):
         super(AddCrawlForm, self).__init__(*args, **kwargs)
         self.set_layout()
-
 
     def set_layout(self):
         """Called in __init__ to register a custom layout."""

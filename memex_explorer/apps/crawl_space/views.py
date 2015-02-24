@@ -36,6 +36,7 @@ class ProjectObjectMixin(ContextMixin):
 
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
+
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
