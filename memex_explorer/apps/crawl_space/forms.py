@@ -40,6 +40,7 @@ class AddCrawlForm(CrispyModelForm):
             raise ValidationError("Incorrect crawler type.")
         if not crawl_model and crawler == 'ache':
             raise ValidationError("Ache Crawls require a crawl model.")
+        return crawl_model
 
     class Meta:
         model = Crawl

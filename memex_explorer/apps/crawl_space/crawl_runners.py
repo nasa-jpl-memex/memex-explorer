@@ -10,9 +10,9 @@ import time
 
 from abc import ABCMeta, abstractmethod
 
-from apps.crawl_space.settings import (LANG_DETECT_PATH, CRAWL_PATH,
+from settings import (LANG_DETECT_PATH, CRAWL_PATH,
                                        MODEL_PATH, CONFIG_PATH)
-from apps.crawl_space.utils import touch, rm_if_exists
+from utils import touch, rm_if_exists
 
 
 # Exceptions
@@ -30,7 +30,7 @@ class AcheException(CrawlException):
 #  CLASSES
 # ==========
 
-class CrawlRunner():
+class CrawlRunner(object):
     """Abstract base class for crawl runners.
 
     CrawlRunner subclasses are expected to implement these methods:
@@ -189,7 +189,6 @@ class AcheCrawlRunner(CrawlRunner):
         self.crawl.save()
 
 
-
 class NutchCrawlRunner(CrawlRunner):
 
     def __init__(self, crawl):
@@ -216,3 +215,4 @@ class NutchCrawlRunner(CrawlRunner):
 
     def dump_images(self, image_space):
         pass
+

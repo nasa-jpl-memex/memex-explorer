@@ -148,7 +148,6 @@ class Crawl(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-
         # If this is the first time the model is saved, then the seeds
         #    file needs to be moved from SEEDS_TMP_DIR/filename to the
         #    crawl directory.

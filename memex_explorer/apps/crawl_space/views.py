@@ -36,6 +36,7 @@ class ProjectObjectMixin(ContextMixin):
 
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
+
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
@@ -78,6 +79,9 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
             crawl_model.status = "starting"
             crawl_model.save()
+            return HttpResponse(json.dumps(dict(
+                    status="starting")),
+                content_type="application/json")
 
                 
         # Stop

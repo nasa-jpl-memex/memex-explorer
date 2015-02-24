@@ -1,6 +1,23 @@
 """Crawl settings."""
 
-import os
+import os, sys
+
+"""
+Inserts path to project root into sys.path of of crawl_supervisor.
+
+Splits the directory path to this settings file, and cuts off the path up
+to the root of the project directory, allowing crawl_supervisor to import
+modules from other apps.
+"""
+sys.path.insert(1, '/'.join(os.path.dirname(__file__).split('/')[:-2]))
+
+"""
+Ensures that the settings module used by crawl_supervisor is the one
+used by the rest of the apps in the project.
+"""
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "memex.settings")
+
+import django
 from django.conf import settings
 
 resources_dir = settings.MEDIA_ROOT
@@ -17,3 +34,4 @@ CONFIG_PATH = os.path.join(resources_dir, 'configs')
 #   `crawl_space.models`
 SEEDS_TMP_DIR = os.path.join(resources_dir, 'seeds_tmp')
 MODELS_TMP_DIR = os.path.join(resources_dir, 'models_tmp')
+
