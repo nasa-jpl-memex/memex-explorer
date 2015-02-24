@@ -203,15 +203,36 @@ class NutchCrawlRunner(CrawlRunner):
                 self.crawl_dir,
                 "1"]
 
-    # def run(self):
-    #     pass
-    # TODO Help Nutch crawl in rounds
+    def run(self):
+        while True:
+            rm_if_exists(self.stop_file)
 
+            with open(join(self.crawl_dir, 'crawl_proc.log'), 'a') as stdout:
+                self.proc = subprocess.Popen(self.call,
+                    stdout=stdout, stderr=subprocess.STDOUT,
+                    preexec_fn=os.setsid)
+
+            self.crawl.status = "running"
+            self.crawl.save()
+
+            stopped_by_user = False
+            while self.proc.poll() is None:
+                self.log_statistics()
+                if rm_if_exists(self.stop_file):
+                    stopped_by_user = True
+
+                sys.stdout.write(".")
+                sys.stdout.flush()
+                time.sleep(5)
+
+            if stopped_by_user:
+                self.crawl.status = "stopped"
+                self.crawl.save()
+                break
 
     def log_statistics(self):
         pass
         # TODO
-
 
     def dump_images(self, image_space):
         pass
