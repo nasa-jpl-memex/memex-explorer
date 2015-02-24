@@ -220,14 +220,12 @@ class NutchCrawlRunner(CrawlRunner):
                 self.log_statistics()
                 if rm_if_exists(self.stop_file):
                     stopped_by_user = True
-                    break
 
                 sys.stdout.write(".")
                 sys.stdout.flush()
                 time.sleep(5)
 
             if stopped_by_user:
-                os.killpg(self.proc.pid, signal.SIGTERM)
                 self.crawl.status = "stopped"
                 self.crawl.save()
                 break
