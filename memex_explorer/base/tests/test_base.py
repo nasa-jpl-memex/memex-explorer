@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 # Test
-from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors
+from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
 from django.test import TestCase
 from django.db import IntegrityError
 
@@ -12,6 +12,15 @@ from base.models import Project
 
 
 class TestViews(UnitTestSkeleton):
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestViews, cls).setUpClass()
+
+        cls.test_project = Project(
+            name = "Project Test",
+            description = "Test Project Description")
+        cls.test_project.save()
 
     def test_front_page(self):
         response = self.get('base:index')
@@ -47,20 +56,33 @@ class TestViews(UnitTestSkeleton):
         assert 'base/project.html' in response.template_name
         assert b'CATS' in response.content
 
-
-    def test_add_project_with_right_slug(self):
-        self.test_add_project_success()
-
+    def test_project_page(self):
         response = self.get('base:project',
-            slugs=dict(project_slug="cats"))
+            slugs={'project_slug': self.test_project.slug})
         assert 'base/project.html' in response.template_name
+
+    def test_project_settings_page(self):
+        response = self.get('base:project_settings', 
+            slugs={'project_slug': self.test_project.slug})
+        assert 'base/project_update_form.html' in response.template_name
+
+    def test_project_settings_change_name(self):
+        response = self.post('base:project_settings',
+                {'name': 'Cat Project'}, slugs={'project_slug': self.test_project.slug}, )
+        project = get_object(response)
+        assert project.name == 'Cat Project'
+
+    def test_project_settings_change_description(self):
+        response = self.post('base:project_settings',
+                {'description': 'A project for cats!'}, slugs={'project_slug': self.test_project.slug}, )
+        project = get_object(response)
+        assert project.description == 'A project for cats!'
 
 
 class TestForms(TestCase):
 
     def setUp(self):
-        project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
-        self.project = project
+        self.project = Project.objects.create(name="Bicycles for sale", description="Project about bicycles")
 
     def test_project_form(self):
         form_data = {

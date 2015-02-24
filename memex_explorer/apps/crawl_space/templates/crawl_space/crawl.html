@@ -21,14 +21,14 @@
   <div class="col-sm-offset-3 col-md-offset-2 col-sm-7 col-md-8 main">
 
   <!-- Crawl Title -->
-    <h1>{{ crawl.name }} <small>({{ crawl.crawler }})
+  <h1>{{ crawl.name }} <small>({{ crawl.crawler }})</small>
     <!-- Crawl Settings -->
-    <a id="settings"
-       href="#TODO"
-       data-container="body"
-       data-toggle="tooltip" data-placement="top">
-      <span class="fa fa-cogs text-muted"></span>
-    </a></small>
+    <a href="{% url 'base:crawl_space:crawl_settings' project_slug=project.slug crawl_slug=crawl.slug %}">
+      <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
+      data-container="body"
+      data-toggle="tooltip" data-placement="bottom">
+      <i class="fa fa-gears" style="font-size:24px;"></i>
+    </button></a>
     </h1>
 
   <!-- Crawl Status -->
@@ -130,3 +130,4 @@
   </div>
 </div>
 {% endblock content %}
+

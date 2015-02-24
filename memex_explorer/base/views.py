@@ -3,11 +3,11 @@
 from django.shortcuts import render
 from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 
 from base.models import Project
-from base.forms import AddProjectForm
+from base.forms import AddProjectForm, ProjectSettingsForm
 
 
 def project_context_processor(request):
@@ -39,3 +39,12 @@ class ProjectView(DetailView):
     model = Project
     slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"
+
+
+class ProjectSettingsView(SuccessMessageMixin, UpdateView):
+    model = Project
+    slug_url_kwarg = 'project_slug'
+    form_class = ProjectSettingsForm
+    success_message = "Project %(name)s was edited successfully."
+    template_name_suffix = '_update_form'
+

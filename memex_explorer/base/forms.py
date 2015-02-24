@@ -17,7 +17,7 @@ class CrispyModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         """Initialize with a FormHelper and default submit action."""
 
-        super(ModelForm, self).__init__(*args, **kwargs)
+        super(CrispyModelForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.layout.append(
             FormActions(Submit('submit', "Submit")))
@@ -29,3 +29,10 @@ class AddProjectForm(CrispyModelForm):
         model = Project
         fields = ['name', 'description']
 
+<<<<<<< HEAD
+=======
+
+class ProjectSettingsForm(AddProjectForm):
+    """Change the settings of a project."""
+
+>>>>>>> 504db77a6276b2ebfecde1031f5f3dd8af50ca63

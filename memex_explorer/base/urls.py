@@ -28,7 +28,10 @@ urlpatterns = patterns('',
         name='add_project'),
     
     url(project_slug + r'$', views.ProjectView.as_view(),
-        name='project')
+        name='project'),
+
+    url(project_slug + r'settings/$', views.ProjectSettingsView.as_view(),
+        name='project_settings'),
 )
 
 
@@ -44,3 +47,4 @@ inject_urls = [
 ]
 
 urlpatterns += patterns('', *inject_urls)
+
