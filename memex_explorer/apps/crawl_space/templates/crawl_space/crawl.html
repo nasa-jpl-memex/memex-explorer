@@ -45,8 +45,12 @@
     <div class='col-xs-4'>
       <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
         data-container="body"
-        {% if crawl.status == "running" or crawl.status == "stopped" %}
-        disabled
+        {% if crawl.status == "running" %}
+            disabled
+        {% else %}
+            {% if crawl.status == "stopped" and crawl.crawler == "ache" %}
+                disabled
+            {% endif %}
         {% endif %}
         data-toggle="tooltip" data-placement="bottom">
         <span class="fa fa-play"></span>
