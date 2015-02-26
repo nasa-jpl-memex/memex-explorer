@@ -43,12 +43,6 @@ class TestViews(UnitTestSkeleton):
         assert 'This field is required.' in form_errors(response)['name']
 
 
-    def test_add_project_no_description(self):
-        response = self.post('base:add_project',
-            {'name': 'CATS'})
-        assert 'This field is required.' in form_errors(response)['description']
-
-
     def test_add_project_success(self):
         response = self.post('base:add_project',
             {'name': 'CATS',
@@ -97,13 +91,6 @@ class TestForms(TestCase):
         form = AddProjectForm(data=form_data)
         assert form.is_valid() is False
         assert 'This field is required.' in form.errors['name']
-
-    def test_project_form_no_description(self):
-        form_data = {
-            'name': 'CATS'}
-        form = AddProjectForm(data=form_data)
-        assert form.is_valid() is False
-        assert 'This field is required.' in form.errors['description']
 
     def test_existing_project_error(self):
         form_data = {

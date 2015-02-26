@@ -32,7 +32,7 @@ class Project(models.Model):
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
     def get_absolute_url(self):
         return reverse('base:project',

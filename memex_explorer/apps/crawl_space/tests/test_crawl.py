@@ -117,22 +117,6 @@ class TestViews(UnitTestSkeleton):
         assert_form_errors(response, *self.form_data.keys())
 
 
-    def test_add_crawl_missing_field(self):
-        """Remove one field at a time from the post request,
-        and assert that the missing field alone prompts an error."""
-
-        for field in self.form_data.keys():
-            form_data = self.form_data
-            form_data.pop(field)
-
-            response = self.post('base:crawl_space:add_crawl',
-                form_data, **self.slugs)
-            if field == 'crawler':
-                assert_form_errors(response, 'crawler', 'crawl_model')
-            else:
-                assert_form_errors(response, field)
-
-
     def test_add_crawl_bad_name(self):
         """Post with a non-alphanumeric name."""
 
@@ -198,13 +182,6 @@ class TestViews(UnitTestSkeleton):
             **self.crawl_slugs)
         crawl = get_object(response)
         assert crawl.description == "A crawl for information about cats." 
-
-    def test_crawl_settings_change_seeds(self):
-        response = self.post('base:crawl_space:crawl_settings',
-            {'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some different content.\n'), 'utf-8')},
-            **self.crawl_slugs)
-        crawl = get_object(response)
-        assert crawl.seeds_list != self.test_crawl.seeds_list
 
 
 #class TestForms(TestCase):
