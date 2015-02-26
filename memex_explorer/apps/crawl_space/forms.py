@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from apps.crawl_space.models import Crawl, CrawlModel
 
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 
 class AddCrawlForm(CrispyModelForm):
@@ -46,6 +47,7 @@ class AddCrawlForm(CrispyModelForm):
         name = self.cleaned_data['name']
         if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
             raise ValidationError("Please provide a unique name.")
+        return name
 
     class Meta:
         model = Crawl
@@ -75,6 +77,7 @@ class CrawlSettingsForm(CrispyModelForm):
         name = self.cleaned_data['name']
         if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
             raise ValidationError("Please provide a unique name.")
+        return name
 
     class Meta:
         model = Crawl
