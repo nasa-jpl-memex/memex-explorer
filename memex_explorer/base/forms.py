@@ -44,7 +44,8 @@ class ProjectSettingsForm(AddProjectForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if slugify(unicode(name)) in [x.slug for x in Project.objects.all()]:
+        slugs = [x.slug for x in Project.objects.exclude(slug=slugify(unicode(name)))]
+        if slugify(unicode(name)) in slugs:
             raise ValidationError("Project with this Name already exists.")
         return name
 
