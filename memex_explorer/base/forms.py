@@ -42,3 +42,9 @@ class AddProjectForm(CrispyModelForm):
 class ProjectSettingsForm(AddProjectForm):
     """Change the settings of a project."""
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Project.objects.all()]:
+            raise ValidationError("Project with this Name already exists.")
+        return name
+
