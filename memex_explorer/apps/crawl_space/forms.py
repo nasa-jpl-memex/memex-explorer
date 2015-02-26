@@ -42,6 +42,11 @@ class AddCrawlForm(CrispyModelForm):
             raise ValidationError("Ache Crawls require a crawl model.")
         return crawl_model
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
+            raise ValidationError("Please provide a unique name.")
+
     class Meta:
         model = Crawl
         fields = ['name', 'description', 'crawler',
@@ -65,6 +70,11 @@ class CrawlSettingsForm(CrispyModelForm):
                 FormActions(Submit('submit', "Submit"))
             )
         )
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
+            raise ValidationError("Please provide a unique name.")
 
     class Meta:
         model = Crawl
