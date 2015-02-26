@@ -87,11 +87,13 @@
     href="#TODO">
     Download Relevant Pages</a>
     {% endif %}
+   <!-- 
     {% if crawl.crawler == 'nutch' %}
     <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
       <a>Get Images</a>
     </button>
     {% endif %}
+   --> 
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="col-sm-6">
@@ -107,21 +109,29 @@
   </div>
 </div>
 <div class='row'>
-  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
   <h3>Summary Statistics</h3>
 <!--   <div class='row'>
   <div class="col-sm-12 col-md-5">
  -->  <table data-toggle="table">
     <thead>
       <tr>
+    {% if crawl.crawler == "ache" %}
         <th>Pages Crawled</th>
         <th>Harvest Rate</th>
+    {% else %}
+        <th>Pages Crawled</th>
+    {% endif %}
       </tr>
     </thead>
     <tbody>
       <tr>
+    {% if crawl.crawler == "ache" %}
         <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
         <td><span id="stats-harvest">{{ crawl.harvest_rate }}</span></td>
+    {% else %}
+        <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
+    {% endif %}
       </tr>
     </tbody>
   </table>
