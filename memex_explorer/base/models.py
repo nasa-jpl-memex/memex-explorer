@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 
 
 def alphanumeric_validator():
-    return RegexValidator(r'^[a-zA-Z0-9 ]+$',
-        'Only numbers, letters, and spaces are allowed.')
+    return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
+        'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
 
 class Project(models.Model):

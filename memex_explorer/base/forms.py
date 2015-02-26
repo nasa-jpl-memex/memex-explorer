@@ -3,6 +3,8 @@
 The `AddProjectForm` form represents the simplest instance."""
 
 from django.forms import ModelForm
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -25,6 +27,12 @@ class CrispyModelForm(ModelForm):
 
 class AddProjectForm(CrispyModelForm):
     """Add Project crispy model form."""
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Project.objects.all()]:
+            raise ValidationError("Please provide a unique name.")
+
     class Meta:
         model = Project
         fields = ['name', 'description']
