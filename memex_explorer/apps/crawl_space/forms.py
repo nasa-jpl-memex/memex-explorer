@@ -62,18 +62,13 @@ class CrawlSettingsForm(CrispyModelForm):
             Fieldset(None,
                 'name',
                 'description',
-                'seeds_list',
                 FormActions(Submit('submit', "Submit"))
             )
         )
 
     class Meta:
         model = Crawl
-        fields = ['name', 'description', 'seeds_list']
-        labels = {
-            'seeds_list': _('Seeds List (leave blank to keep unchanged)')
-        }
-        widgets = {'seeds_list': FileInput}
+        fields = ['name', 'description']
 
 
 class AddCrawlModelForm(CrispyModelForm):
