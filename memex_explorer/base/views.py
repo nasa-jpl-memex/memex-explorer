@@ -5,6 +5,8 @@ from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
@@ -47,4 +49,14 @@ class ProjectSettingsView(SuccessMessageMixin, UpdateView):
     form_class = ProjectSettingsForm
     success_message = "Project %(name)s was edited successfully."
     template_name_suffix = '_update_form'
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectSettingsView, self).__init__(*args, **kwargs)
+
+    def clean_name(self):
+        project_slug = slugify(unicode(self.project_slug))
+        slugs = [x.slug for x in Project.objects.exclude(slug=project_slug)]
+        if project_slug in slugs:
+            raise ValidationError("Project with this Name already exists.")
+        return self.cleaned_data['name']
 
