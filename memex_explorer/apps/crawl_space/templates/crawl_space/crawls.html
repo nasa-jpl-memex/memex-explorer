@@ -9,7 +9,7 @@
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1>Crawls</h1>
     </div>
-    {% for crawl in object_list %}
+    {% for crawl in project.crawl_set.all %}
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <a href="{{ crawl.get_absolute_url }}">
             <p>{{ crawl.name }}</p>
@@ -19,16 +19,12 @@
         {% if crawl.crawler == 'nutch' %}
         <table class="table table-striped">
             <tr>
-                <th>Images</th>
                 <th>Pages Crawled</th>
             </tr>
             <tr>
                 {% if crawl.image_space %}
 
-                    <td>None</td>
                     {#TODO <td>{{ crawl.image_space.images.all() | length }}</td> #}
-                {% else %}
-                    <td>None</td>
                 {% endif %}
                 <td>{{ crawl.pages_crawled }}</td>
             </tr>
