@@ -50,5 +50,5 @@ class ProjectSettingsForm(AddProjectForm):
         slugs = [x.slug for x in Project.objects.exclude(slug=project_slug)]
         if project_slug in slugs:
             raise ValidationError("Project with this Name already exists.")
-        return project_slug
+        return self.cleaned_data['name']
 
