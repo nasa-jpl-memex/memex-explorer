@@ -50,13 +50,3 @@ class ProjectSettingsView(SuccessMessageMixin, UpdateView):
     success_message = "Project %(name)s was edited successfully."
     template_name_suffix = '_update_form'
 
-    def __init__(self, *args, **kwargs):
-        super(ProjectSettingsView, self).__init__(*args, **kwargs)
-
-    def clean_name(self):
-        project_slug = slugify(unicode(self.project_slug))
-        slugs = [x.slug for x in Project.objects.exclude(slug=project_slug)]
-        if project_slug in slugs:
-            raise ValidationError("Project with this Name already exists.")
-        return self.cleaned_data['name']
-

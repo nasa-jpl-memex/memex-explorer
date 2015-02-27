@@ -59,6 +59,7 @@ class AddCrawlForm(CrispyModelForm):
 class CrawlSettingsForm(CrispyModelForm):
 
     def __init__(self, *args, **kwargs):
+        self.crawl_instance = kwargs["instance"]
         super(CrawlSettingsForm, self).__init__(*args, **kwargs)
         self.set_layout()
 
@@ -74,10 +75,12 @@ class CrawlSettingsForm(CrispyModelForm):
         )
 
     def clean_name(self):
-        name = self.cleaned_data['name']
-        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
-            raise ValidationError("Please provide a unique name.")
-        return name
+        new_slug = slugify(unicode(self.cleaned_data["name"]))
+        instance_slug = self.crawl_instance.slug
+        slugs = [x.slug for x in Crawl.objects.exclude(slug=instance_slug)]
+        if new_slug in slugs:
+            raise ValidationError("Crawl with this Name already exists.")
+        return self.cleaned_data["name"]
 
     class Meta:
         model = Crawl
