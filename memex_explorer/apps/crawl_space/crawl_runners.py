@@ -220,6 +220,8 @@ class NutchCrawlRunner(CrawlRunner):
             while self.proc.poll() is None:
                 if rm_if_exists(self.stop_file):
                     stopped_by_user = True
+                    self.crawl.status = "stopping"
+                    self.crawl.save()
 
                 sys.stdout.write(".")
                 sys.stdout.flush()
