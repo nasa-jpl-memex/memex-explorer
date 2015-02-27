@@ -17,7 +17,7 @@ $( document ).ready(function() {
           failure: function() {
             $( '#status' ).text( "Error (could not start crawl)" );
           }
-        });
+    });
   });
 
 
@@ -52,6 +52,7 @@ $( document ).ready(function() {
         $( '#stats-harvest' ).text(response.harvest_rate);
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
+          $('#playButton').removeAttr("disabled");
         }
       }
     });
