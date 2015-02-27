@@ -7,6 +7,7 @@ import signal
 from os.path import join
 import subprocess
 import time
+import shlex
 
 from abc import ABCMeta, abstractmethod
 
@@ -217,13 +218,13 @@ class NutchCrawlRunner(CrawlRunner):
 
             stopped_by_user = False
             while self.proc.poll() is None:
-                self.log_statistics()
                 if rm_if_exists(self.stop_file):
                     stopped_by_user = True
 
                 sys.stdout.write(".")
                 sys.stdout.flush()
                 time.sleep(5)
+                self.log_statistics()
 
             if stopped_by_user:
                 self.crawl.status = "stopped"
@@ -231,8 +232,26 @@ class NutchCrawlRunner(CrawlRunner):
                 break
 
     def log_statistics(self):
-        pass
-        # TODO
+        crawl_db_dir = join(self.crawl_dir, 'crawldb')
+        if not os.path.exists(crawl_db_dir):
+            self.crawl.pages_crawled = 0
+            self.crawl.save()
+            return
+        stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
+        self.stats_proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE)
+
+        stdout, stderr = self.stats_proc.communicate()
+
+        if stderr:
+            raise NutchException(stderr)
+
+        nutch_stats = stdout.decode()
+
+        for line in stdout.split('\n'):
+            if 'db_fetched' in line:
+                self.crawl.pages_crawled = int(line.split('\t')[-1])
+                self.crawl.save()
 
     def dump_images(self, image_space):
         pass
