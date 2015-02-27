@@ -175,8 +175,6 @@ class TestCrawls(LiveServerTestCase):
         # Verify that errors appear as expected
         name_error = ff.find_element_by_id('error_1_id_name')
         assert name_error.text == "This field is required."
-        description_error = ff.find_element_by_id('error_1_id_description')
-        assert description_error.text == "This field is required."
         seeds_error = ff.find_element_by_id('error_1_id_seeds_list')
         assert seeds_error.text == "This field is required."
 

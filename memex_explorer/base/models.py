@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 
 
 def alphanumeric_validator():
-    return RegexValidator(r'^[a-zA-Z0-9 ]+$',
-        'Only numbers, letters, and spaces are allowed.')
+    return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
+        'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
 
 class Project(models.Model):
@@ -32,7 +32,7 @@ class Project(models.Model):
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
     def get_absolute_url(self):
         return reverse('base:project',
@@ -44,3 +44,4 @@ class Project(models.Model):
 
     def __unicode__(self):
         return self.name
+

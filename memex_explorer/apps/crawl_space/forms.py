@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from apps.crawl_space.models import Crawl, CrawlModel
 
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 
 class AddCrawlForm(CrispyModelForm):
@@ -42,6 +43,12 @@ class AddCrawlForm(CrispyModelForm):
             raise ValidationError("Ache Crawls require a crawl model.")
         return crawl_model
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
+            raise ValidationError("Please provide a unique name.")
+        return name
+
     class Meta:
         model = Crawl
         fields = ['name', 'description', 'crawler',
@@ -62,18 +69,19 @@ class CrawlSettingsForm(CrispyModelForm):
             Fieldset(None,
                 'name',
                 'description',
-                'seeds_list',
                 FormActions(Submit('submit', "Submit"))
             )
         )
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
+            raise ValidationError("Please provide a unique name.")
+        return name
+
     class Meta:
         model = Crawl
-        fields = ['name', 'description', 'seeds_list']
-        labels = {
-            'seeds_list': _('Seeds List (leave blank to keep unchanged)')
-        }
-        widgets = {'seeds_list': FileInput}
+        fields = ['name', 'description']
 
 
 class AddCrawlModelForm(CrispyModelForm):

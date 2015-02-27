@@ -129,7 +129,7 @@ class Crawl(models.Model):
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     crawler = models.CharField(max_length=64,
         choices=CRAWLER_CHOICES,
         default='nutch')
