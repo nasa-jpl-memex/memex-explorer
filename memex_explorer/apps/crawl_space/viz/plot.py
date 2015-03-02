@@ -2,15 +2,9 @@ from abc import ABCMeta, abstractmethod
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import Document, Session
 
+from harvest import Harvest
+from domain import Domain
 
-class PlotManager(object):
-    __metaclass__ = ABCMeta
+class AcheDashboard(object):
+    pass
 
-    @abstractmethod
-    def __init__(self, plot):
-        self.doc_name = '%d_%s' % (plot.id, plot.name)
-        self.plot = plot
-
-    @abstractmethod
-    def create(self):
-        pass

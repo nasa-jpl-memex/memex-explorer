@@ -116,6 +116,11 @@ class CrawlView(ProjectObjectMixin, DetailView):
             project=self.get_project(),
             slug=self.kwargs['crawl_slug'])
 
+    def get_context_data(self, **kwargs):
+        context = super(CrawlView, self).get_context_data(**kwargs)
+        context['project'] = self.get_project()
+        return context
+
 
 class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 

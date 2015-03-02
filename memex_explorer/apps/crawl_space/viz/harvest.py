@@ -17,9 +17,7 @@ from bokeh.resources import CDN
 import subprocess
 import shlex
 
-from plot import PlotManager
-
-from apps.crawl_space import settings
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 GREEN = "#47a838"
@@ -27,18 +25,15 @@ DARK_GRAY = "#2e2e2e"
 LIGHT_GRAY = "#6e6e6e"
 
 
-class Harvest(PlotManager):
+class Harvest(object):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
-    def __init__(self, crawl, datasource, plot):
-        self.harvest_data = os.path.join(settings.CRAWL_PATH, str(crawl.id), datasource.data_uri)
-        super(Harvest, self).__init__(plot)
+    def __init__(self, crawl):
+        self.harvest_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/harvestinfo.csv')
 
     def update_source(self):
-        proc = subprocess.Popen(shlex.split("tail -n 800 %s" % self.harvest_data),
-                                stdout=subprocess.PIPE)
 
-        df = pd.read_csv(proc.stdout, delimiter='\t',
+        df = pd.read_csv(self.harvest_data, delimiter='\t',
             names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
 
@@ -70,9 +65,6 @@ class Harvest(PlotManager):
         p.legend.orientation = "top_left"
 
         # Save ColumnDataSource model id to database model 
-        self.plot.source_id = self.source._id
-        db.session.flush()
-        db.session.commit()
 
         script, div = components(p, INLINE)
 
