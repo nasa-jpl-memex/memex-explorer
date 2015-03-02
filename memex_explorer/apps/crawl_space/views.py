@@ -19,8 +19,9 @@ from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 
-
 from apps.crawl_space.utils import touch
+
+from apps.crawl_space.viz.plot import AchePlots
 
 
 class ProjectObjectMixin(ContextMixin):
