@@ -13,6 +13,7 @@ dependencies:
     - pytest
     - pip
     - pip:
+        - tld
         - selenium
         - coverage
         - pytest-cov

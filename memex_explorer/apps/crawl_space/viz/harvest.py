@@ -32,9 +32,8 @@ class Harvest(object):
         self.harvest_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/harvestinfo.csv')
 
     def update_source(self):
-
         df = pd.read_csv(self.harvest_data, delimiter='\t',
-            names=['relevant_pages', 'downloaded_pages', 'timestamp'])
+            names=['relevant_pages', 'downloaded_pages', 'timestamp']).tail(n=800)
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
 
         source = into(ColumnDataSource, df)

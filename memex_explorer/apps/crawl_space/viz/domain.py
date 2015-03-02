@@ -4,7 +4,7 @@ Generate a bar chart of number of pages crawled in each domain.
 from __future__ import division
 
 import pandas as pd
-from blaze import into
+from blaze import *
 from bokeh.plotting import *
 from bokeh.embed import components
 from bokeh.resources import INLINE
@@ -14,9 +14,7 @@ import traceback
 import subprocess
 import shlex
 
-from app import db
-from plot import PlotManager
-from ..config import CRAWLS_PATH
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 GREEN = "#47a838"
@@ -33,31 +31,26 @@ def extract_tld(url):
         print "\n\nInvalid url: %s" % url
         return url
 
-class Domain(PlotManager):
+class Domain(object):
 
-    def __init__(self, crawl, datasources, plot, sort='crawled'):
+    def __init__(self, crawl, sort='crawled'):
         # TODO Retrieve plot datasources from db
-        self.crawled_data = os.path.join(CRAWLS_PATH, str(crawl.id), datasources['crawled'].data_uri)
-        self.relevant_data = os.path.join(CRAWLS_PATH, str(crawl.id), datasources['relevant'].data_uri)
+        self.crawled_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/crawledpages.csv')
+        self.relevant_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/relevantpages.csv')
 
         self.sort = sort
-
-        super(Domain, self).__init__(plot)
-
 
     def update_source(self):
 
         # Relevant
-        relevant_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (TAIL_LENGTH, self.relevant_data)),
-                                stdout=subprocess.PIPE)
-        df = pd.read_csv(relevant_proc.stdout, delimiter='\t', header=None, names=['url', 'timestamp'])
+        df = pd.read_csv(self.relevant_data, delimiter='\t', header=None,
+                         names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
         df['domain'] = df['url'].apply(extract_tld)
         df1 = df.groupby(['domain']).size()
 
         # Crawled
-        crawled_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (TAIL_LENGTH, self.crawled_data)),
-                                stdout=subprocess.PIPE)
-        df = pd.read_csv(crawled_proc.stdout, delimiter='\t', header=None, names=['url', 'timestamp'])
+        df = pd.read_csv(self.crawled_data, delimiter='\t', header=None,
+                         names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
         df['domain'] = df['url'].apply(extract_tld)
         df2 = df.groupby(['domain']).size()
 
@@ -94,11 +87,6 @@ class Domain(PlotManager):
         p.xgrid.grid_line_color = '#8592A0'
         p.axis.major_label_text_font_size = "8pt"
 
-        # Save ColumnDataSource model id to database model 
-        self.plot.source_id = self.source._id
-        db.session.flush()
-        db.session.commit()
-        
         script, div = components(p, INLINE)
 
         return (script, div)
