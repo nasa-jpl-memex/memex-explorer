@@ -5,6 +5,8 @@ from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
