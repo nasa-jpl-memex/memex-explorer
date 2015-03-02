@@ -1,0 +1,33 @@
+language: python
+
+python:
+    - "3.4"
+
+branches:
+    only:
+        - memex-django
+
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
+install:
+    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda config --set always_yes yes
+    - conda env create -n memex -f environment.yml
+    - source activate memex
+
+script:
+    - coverage run $(which py.test) --runslow
+    - coverage report --show-missing
+
+after_success:
+    - coveralls
+
+notifications:
+    email: false
+    flowdock: "8736cc7601ed0761f6c9339ec747ded6"
+    on_success: "change"
+    on_failure: "always"

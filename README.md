@@ -1,65 +1,43 @@
-memex-explorer
-============
+[![Build Status](https://travis-ci.org/ContinuumIO/memex-explorer.svg?branch=memex-django)](https://travis-ci.org/ContinuumIO/memex-explorer)
+[![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg?branch=memex-django)](https://coveralls.io/r/ContinuumIO/memex-explorer?branch=memex-django)
 
-# Install
-
+# memex-explorer-django
+Memex explorer application re-written in Django 1.7
+* To setup the environment, do the following:
 ```
-git clone https://github.com/ContinuumIO/memex-explorer.git
-bash home_install.sh
+$ wget http://bit.ly/miniconda
+$ bash Miniconda-latest-Linux-x86_64.sh
+$ bash install.sh
+$ conda env create -n memex -f environment.yml
+$ source activate memex
 ```
-# Usage
- 
+* To setup the application, in an environment with Django 1.7 and Python 3 installed, run this command in the `memex_explorer` folder. This will create the database for the application using the migration scripts provided in the source code:
 ```
-usage: run.py [-h] [-s]
-
-MEMEX Explorer
-
-optional arguments:
-  -h, --help  show this help message and exit
-  -s, --show  Auto-raise app in a browser window
+$ cd memex_explorer
+$ python manage.py migrate
 ```
-# Testing
-
-`python run_tests.py`
-
-
-# Deploying on EC2
-
-Everything should **just work** by running:
-
-```bash
-./deploy.sh
+* Then, in the same folder run this command to launch the application as a local server:
 ```
-
-## Deploy Setup
-
- - conda bootstrap: conda.sh .  Everything is pushed into `install.sh` and `environment.yml` file for conda and env setupd
- - debian.sh: git, supervisor, make, JAVA
- - supervisor_ec2.sh: moves conf files and calls supervisor -- conf file is hard-coded to use env setup in `environment.yml` 
-
-## Docker Instructions
-
-### OSX
+$ python manage.py runserver
 ```
-boot2docker init
-boot2docker start
-$(boot2docker shellinit)
+* To set up superuser access to the administrative panel, run this command and provide a username, email, and password:
 ```
-
-### Build
+$ python manage.py createsuperuser
 ```
-docker build -t memex_explorer .
-docker run -p 80:5000 memex_explorer
+* To access the administration panel navigate to http://localhost:8000/admin after running `python manage.py runserver`. Here you will be able to view and make manual changes to the database.
+* To run the tests, run the command:
 ```
-
-## DockerHub
-
+$ py.test
 ```
-docker pull continuumio/memex_explorer
-docker run -p 80:5000 memex_explorer
-
+# Installing Compass
+If you need to make changes to the .scss stylesheets, [Compass](http://compass-style.org/) is a useful tool. The following are instructions on how to install compass without using `sudo`.
+* For mac users, add this line to your `~/.bash_profile`:
 ```
-
-Point browser at `DOCKER_HOST` -- for example: `http://192.168.59.103`
-To update an existing Docker, use the above 2 commands to pull the
-latest version.
+export PATH=/Users/<username>/.gem/ruby/<ruby version>/bin:$PATH
+```
+Then run `$ gem install compass --user-install`. This will install Compass on your system.
+* To make changes to the stylesheets, do:
+```
+$ cd ../
+$ compass watch
+```

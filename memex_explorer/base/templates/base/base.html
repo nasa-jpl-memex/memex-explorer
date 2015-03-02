@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {% load staticfiles %}
+    <link href="{% static "base/images/favicon.ico" %}" rel="icon">
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <title>{% block title %}Memex Explorer{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'base/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/dataTables.css' %}" rel="stylesheet">
+
+    <link href="{% static 'base/css/sweet-alert.css' %}" rel="stylesheet" type="text/css" >
+
+    <link href="{% static 'base/css/font-awesome.min.css' %}" rel="stylesheet">
+    <script src="{% static 'base/js/jquery.min.js' %}"></script>
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'base/css/custom.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/dashboard.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/forms.css' %}" rel="stylesheet">
+    {% block extrahead %}{% endblock %}
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="/">MEMEX-EXPLORER</a>
+        </div>
+        <!-- <div class="navbar-collapse collapse">
+          <a class='navbar-brand right' href="#">Projects</a>
+          <a class='navbar-brand right' href="#">Apps</a>
+          <ul class="nav navbar-nav navbar-right nav-pills">
+            <li class="reset"><a href="/reset">Reset Demo</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div> -->
+      <div class="dropdown">
+          <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false" class="navbar-brand right projects">
+            Projects
+            <span class="caret"></span>
+          </button>
+            {% if projects %}
+          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            {% for x in projects %}
+            <a href="{% url 'base:project' project_slug=x.slug %}"><li>{{ x.name }}</li></a>
+            {% endfor %}
+          </ul>
+            {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12 main">
+          <div class="container">
+              <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                  {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ message }}</div>
+                    {% endfor %}
+                  {% endif %}
+               </div>
+              </div>
+              </div>
+
+        {% block content %}
+        {% endblock content %}
+        </div>
+      </div>
+    </div>
+    <footer>
+<!--       <ul class="list-inline text-center">
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="http://continuum.io/careers">Careers</a></li>
+          <li><a href="http://continuum.io/blog/">Blog</a></li>
+      </ul>
+      <a href="http://continuum.io" class="continuum">Powered By</a> -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{% static 'base/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'base/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'base/js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'base/js/sweet-alert.min.js' %}"></script>
+
+    <script src="{% static 'base/js/underscore-min.js' %}"></script>
+    <script src="{% static 'base/js/backbone-min.js' %}"></script>
+    {% block extrafooter %}{% endblock %}
+
+  </body>
+</html>

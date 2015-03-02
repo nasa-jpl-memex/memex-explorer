@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Crawl{% endblock %}
+
+{% block content %}
+
+{% include "base/sidebar.html" %}
+
+<div class='row'>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="center">
+            <h1>Add Crawl</h1>
+            {% crispy form %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% load staticfiles %}
+{% block extrafooter %}
+<script src="{% static 'base/js/crawl_form.js' %}"></script>
+{% endblock %}
