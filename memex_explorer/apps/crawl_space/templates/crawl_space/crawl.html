@@ -74,7 +74,7 @@
 
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    {% if divs %}
+    {% if divs.0 and divs.1 %}
 
         {% for div in divs %}
         {% if div %}
@@ -85,7 +85,7 @@
         {% endfor %}
     {% else %}
         <div class='col-sm-6'>
-            <p>Waiting for plots...</p>
+            <h2>Waiting for plots...</h2>
         </div>
     {% endif %}
   </div>
