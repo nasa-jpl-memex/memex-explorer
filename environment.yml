@@ -5,7 +5,7 @@ channels:
     - quasiben
 dependencies:
     - bokeh=0.7.0
-    - blaze=0.6.5
+    - blaze=0.7.0
     - python=2.7.8
     - nutch
     - ache=0.1.0
