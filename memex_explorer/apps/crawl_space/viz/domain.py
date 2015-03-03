@@ -23,13 +23,6 @@ LIGHT_GRAY = "#6e6e6e"
 TAIL_LENGTH = 10000
 
 
-def extract_tld(url):
-    try:
-        return get_tld(url, fail_silently=True)
-    except:
-        traceback.print_exc()
-        print "\n\nInvalid url: %s" % url
-        return url
 
 class Domain(object):
 
@@ -40,18 +33,26 @@ class Domain(object):
 
         self.sort = sort
 
+    def extract_tld(self, url):
+        try:
+            return get_tld(url)
+        except:
+            traceback.print_exc()
+            print "\n\nInvalid url: %s" % url
+            return url
+
     def update_source(self):
 
         # Relevant
         df = pd.read_csv(self.relevant_data, delimiter='\t', header=None,
                          names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
-        df['domain'] = df['url'].apply(extract_tld)
+        df['domain'] = df['url'].apply(self.extract_tld)
         df1 = df.groupby(['domain']).size()
 
         # Crawled
         df = pd.read_csv(self.crawled_data, delimiter='\t', header=None,
                          names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
-        df['domain'] = df['url'].apply(extract_tld)
+        df['domain'] = df['url'].apply(self.extract_tld)
         df2 = df.groupby(['domain']).size()
 
         df = pd.concat((df1, df2), axis=1)
@@ -64,6 +65,8 @@ class Domain(object):
 
         df.reset_index(inplace=True)
 
+        df.rename(columns={'index':'domain'}, inplace=True)
+
         source = into(ColumnDataSource, df)
         return source
 
@@ -75,12 +78,12 @@ class Domain(object):
 
         p = figure(plot_width=400, plot_height=400,
             title="Domains Sorted by %s" % self.sort, x_range = xdr,
-            y_range = FactorRange(factors=self.source.data['index']),
+            y_range = FactorRange(factors=self.source.data['domain']),
             tools='reset, resize, save')
 
-        p.rect(y='index', x='crawled_half', height=0.75, width='crawled',
+        p.rect(y='domain', x='crawled_half', height=0.75, width='crawled',
                color=DARK_GRAY, source = self.source, legend="crawled")
-        p.rect(y='index', x='relevant_half', height=0.75, width='relevant',
+        p.rect(y='domain', x='relevant_half', height=0.75, width='relevant',
                color=GREEN, source = self.source, legend="relevant")
 
         p.ygrid.grid_line_color = None
