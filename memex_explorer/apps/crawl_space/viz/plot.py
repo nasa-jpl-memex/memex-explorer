@@ -10,7 +10,7 @@ class PlotsNotReadyException(Exception):
     pass 
 
 
-class AchePlots(object):
+class AcheDashboard(object):
 
     def __init__(self, crawl):
         if crawl.crawler != "ache":
@@ -36,7 +36,7 @@ class AchePlots(object):
         harvest_plot = self.get_harvest_plot()
         domain_plot = self.get_domain_plot()
         return {
-            'scripts': [harvest_plot[0], domain_plot[0]],
-            'divs': [harvest_plot[1], domain_plot[1]],
+            'scripts': [domain_plot[0], harvest_plot[0]],
+            'divs': [domain_plot[1], harvest_plot[1]],
         }
 

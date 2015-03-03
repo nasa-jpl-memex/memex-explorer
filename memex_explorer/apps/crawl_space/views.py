@@ -21,7 +21,7 @@ from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSetting
 
 from apps.crawl_space.utils import touch
 
-from apps.crawl_space.viz.plot import AchePlots
+from apps.crawl_space.viz.plot import AcheDashboard
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -120,6 +120,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(CrawlView, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
+        if self.get_object().crawler == "ache":
+            plots = AcheDashboard(self.get_object()).get_plots()
+            context['scripts'] = plots['scripts']
+            context['divs'] = plots['divs']
         return context
 
 
