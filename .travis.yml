@@ -5,7 +5,7 @@ python:
 
 branches:
     only:
-        - memex-django
+        - master
 
 before_install:
   - "export DISPLAY=:99.0"
