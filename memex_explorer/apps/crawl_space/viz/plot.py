@@ -1,4 +1,6 @@
 import os
+from StringIO import StringIO
+
 from abc import ABCMeta, abstractmethod
 
 from bokeh.models import ColumnDataSource
@@ -39,10 +41,13 @@ class AcheDashboard(object):
         return [script, div]
 
     def write_relevant_seeds(self):
-        urls = pd.read_csv(self.relevant_data, delimiter='\t', header=None,
-                         names=['url', 'timestamp'])['url']
-        return urls.to_csv(os.path.join(CRAWL_PATH, str(self.crawl.id), 'relevant_seeds.txt'),
-                           index=False)
+        # Converts stdout to StringIO to allow pandas to read it as a file
+        urls = pd.read_csv(StringIO(self.domain.get_relevant_data()),
+                           delimiter='\t', header=None,
+                           names=['url', 'timestamp'])['url']
+
+        urls.to_csv(os.path.join(CRAWL_PATH, str(self.crawl.id),
+                    'relevant_seeds.txt'), index=False)
 
     def get_plots(self):
         harvest_plot = self.get_harvest_plot()

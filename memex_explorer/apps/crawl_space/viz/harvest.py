@@ -16,6 +16,7 @@ from bokeh.embed import components
 from bokeh.resources import CDN
 import subprocess
 import shlex
+from StringIO import StringIO
 
 from apps.crawl_space.settings import CRAWL_PATH
 
@@ -32,8 +33,15 @@ class Harvest(object):
         self.harvest_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/harvestinfo.csv')
 
     def update_source(self):
-        df = pd.read_csv(self.harvest_data, delimiter='\t',
-            names=['relevant_pages', 'downloaded_pages', 'timestamp']).tail(n=800)
+        proc = subprocess.Popen(shlex.split("tail -n 800 %s" % self.harvest_data),
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        stdout, stderr = proc.communicate()
+
+        # Converts stdout to StringIO to allow pandas to read it as a file
+
+        df = pd.read_csv(StringIO(stdout), delimiter='\t',
+            names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
 
         source = into(ColumnDataSource, df)
