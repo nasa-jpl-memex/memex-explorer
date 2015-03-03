@@ -1,4 +1,4 @@
-name: memex-explorer
+name: memex
 channels:
     - blaze
     - memex

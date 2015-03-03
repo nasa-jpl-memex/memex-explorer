@@ -77,10 +77,16 @@
     {% if divs %}
 
         {% for div in divs %}
+        {% if div %}
         <div class='col-sm-6'>
-          {{ div | safe }}
+            {{ div | safe }}
         </div>
+        {% endif %}
         {% endfor %}
+    {% else %}
+        <div class='col-sm-6'>
+            <p>Waiting for plots...</p>
+        </div>
     {% endif %}
   </div>
 </div>
@@ -99,7 +105,7 @@
     {% endif %}
    --> 
   </div>
-  {% if crawl.description or crawl.crawler == "ache" %}
+  {% if crawl.descreiption or crawl.crawler == "ache" %}
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     {% if crawl.description %}
     <div class="col-sm-6">

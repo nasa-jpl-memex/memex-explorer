@@ -21,15 +21,15 @@ class AcheDashboard(object):
     def get_harvest_plot(self):
         try:
             script, div = self.harvest.create()
-        except Exception:
-            raise PlotsNotReadyException("Harvest plot sources are not yet intiialized.")
+        except:
+            return [None, None]
         return [script, div]
 
     def get_domain_plot(self):
         try:
             script, div = self.domain.create()
         except Exception:
-            raise PlotsNotReadyException("Domain plot sources are not yet intiialized.")
+            return [None, None]
         return [script, div]
 
     def get_plots(self):
