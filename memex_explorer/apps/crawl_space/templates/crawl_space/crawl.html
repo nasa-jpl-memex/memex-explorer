@@ -45,20 +45,21 @@
 <div class='row'>
   <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
 
-    <!-- Crawl actions (Start, Stop) -->
+    <!-- Crawl actions (Start, Stop[, Restart]) -->
     <div class='col-xs-4'>
       <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
         data-container="body"
         {% if crawl.status == "running" %}
             disabled
         {% else %}
-            {% if crawl.status == "stopped" and crawl.crawler == "ache" %}
+            {% if crawl.status == "stopped" %}
                 disabled
             {% endif %}
         {% endif %}
         data-toggle="tooltip" data-placement="bottom">
         <span class="fa fa-play"></span>
       </button>
+
       <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
         data-container="body"
         {% if crawl.status != "running" %}
@@ -67,6 +68,17 @@
         data-toggle="tooltip" data-placement="bottom">
         <span class="fa fa-stop"></span>
       </button>
+
+      {% if crawl.crawler == 'nutch' %}
+      <button id="restartButton" title="Restart Crawl" type="button" class="btn btn-control"
+        data-container="body"
+        {% if crawl.status != "stopped" %}
+          disabled
+        {% endif %}
+        data-toggle="tooltip" data-placement="bottom">
+        <span class="fa fa-refresh"></span>
+      </button>
+      {% endif %}
     </div>
 
   </div>
