@@ -38,6 +38,9 @@ class Harvest(object):
 
         stdout, stderr = proc.communicate()
 
+        if stderr or not stdout:
+            raise ValueError("harvestinfo.csv is empty")
+
         # Converts stdout to StringIO to allow pandas to read it as a file
 
         df = pd.read_csv(StringIO(stdout), delimiter='\t',
@@ -71,7 +74,7 @@ class Harvest(object):
 
         p.legend.orientation = "top_left"
 
-        # Save ColumnDataSource model id to database model 
+        # Save ColumnDataSource model id to database model
 
         script, div = components(p, INLINE)
 

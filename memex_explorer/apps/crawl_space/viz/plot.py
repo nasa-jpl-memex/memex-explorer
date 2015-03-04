@@ -13,7 +13,7 @@ from apps.crawl_space.settings import CRAWL_PATH
 
 
 class PlotsNotReadyException(Exception):
-    pass 
+    pass
 
 
 class AcheDashboard(object):

@@ -55,6 +55,9 @@ class Domain(object):
 
         stdout, stderr = crawled_proc.communicate()
 
+        if stderr or not stdout:
+            raise ValueError("domain plot sources are empty")
+
         # Converts stdout to StringIO to allow pandas to read it as a file
 
         df = pd.read_csv(StringIO(stdout), delimiter='\t', header=None, names=['url', 'timestamp'])

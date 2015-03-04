@@ -105,16 +105,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     )),
                 content_type="application/json")
 
-        # Get Relevant Seeds File
-        elif request.POST['action'] == "seeds":
-            seeds = self.get_ache_dashboard().get_relevant_seeds()
-            response = HttpResponse(content_type='text/plain')
-            response['Content-Disposition'] = 'attachement; filename="relevant_seeds.txt"'
-            writer = csv.writer(response)
-            for x in seeds:
-                writer.writerow(x)
-            return response
-
 
         # TESTING reflect POST request
         return HttpResponse(json.dumps(dict(
@@ -122,6 +112,20 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 kwargs=kwargs,
                 post=request.POST)),
             content_type="application/json")
+
+
+    def get(self, request, *args, **kwargs):
+        # Get Relevant Seeds File
+        if not request.GET:
+            # no url parameters, return regular response
+            return super(CrawlView, self).get(request, *args, **kwargs)
+
+        elif 'resource' in request.GET and request.GET['resource'] == "seeds":
+            seeds = self.get_ache_dashboard().get_relevant_seeds()
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=relevant_seeds.txt'
+            response.write('\n'.join(seeds))
+            return response
 
     def get_object(self):
         return Crawl.objects.get(
