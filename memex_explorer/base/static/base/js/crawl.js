@@ -1,5 +1,8 @@
 $( document ).ready(function() {
 
+  $( document ).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
 
   $('#playButton').on('click', function() {
 
