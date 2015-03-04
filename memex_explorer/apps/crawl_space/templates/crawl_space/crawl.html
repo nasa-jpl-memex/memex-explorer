@@ -74,7 +74,7 @@
 
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    {% if divs.0 and divs.1 %}
+    {% if divs.0 or divs.1 %}
 
         {% for div in divs %}
         {% if div %}
@@ -93,7 +93,7 @@
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     {% if crawl.crawler == 'ache' and divs %}
-    <a class="btn btn-default btn-padded center"
+    <a id="getSeeds" class="btn btn-default btn-padded center"
     href="#TODO">
     Download Relevant Pages</a>
     {% endif %}

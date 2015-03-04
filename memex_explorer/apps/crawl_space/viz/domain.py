@@ -77,8 +77,9 @@ class Domain(object):
         return source
 
     def get_relevant_data(self, tail_length=TAIL_LENGTH):
-        relevant_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (tail_length, self.relevant_data)),
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        relevant_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (tail_length,
+                                         self.relevant_data)),
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = relevant_proc.communicate()
         return stdout
 

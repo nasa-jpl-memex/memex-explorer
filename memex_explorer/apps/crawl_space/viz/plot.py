@@ -24,7 +24,6 @@ class AcheDashboard(object):
             raise ValueError("Crawl must be using the Ache crawler.")
         self.harvest = Harvest(crawl)
         self.domain = Domain(crawl)
-        self.relevant_data = self.domain.relevant_data
 
     def get_harvest_plot(self):
         try:
@@ -40,14 +39,12 @@ class AcheDashboard(object):
             return [None, None]
         return [script, div]
 
-    def write_relevant_seeds(self):
+    def get_relevant_seeds(self):
         # Converts stdout to StringIO to allow pandas to read it as a file
-        urls = pd.read_csv(StringIO(self.domain.get_relevant_data()),
+        seeds = pd.read_csv(StringIO(self.domain.get_relevant_data()),
                            delimiter='\t', header=None,
-                           names=['url', 'timestamp'])['url']
-
-        urls.to_csv(os.path.join(CRAWL_PATH, str(self.crawl.id),
-                    'relevant_seeds.txt'), index=False)
+                           names=['url', 'timestamp'])
+        return seeds['url'].to_dict().values()
 
     def get_plots(self):
         harvest_plot = self.get_harvest_plot()
