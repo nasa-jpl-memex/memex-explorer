@@ -106,8 +106,8 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 content_type="application/json")
 
         # Get Relevant Seeds File
-        elif request.post['action'] == "seeds":
-            seeds = get_ache_dashboard().get_relevant_seeds()
+        elif request.POST['action'] == "seeds":
+            seeds = self.get_ache_dashboard().get_relevant_seeds()
             response = HttpResponse(content_type='text/plain')
             response['Content-Disposition'] = 'attachement; filename="relevant_seeds.txt"'
             writer = csv.writer(response)
