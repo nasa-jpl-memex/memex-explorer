@@ -72,7 +72,9 @@ $( document ).ready(function() {
         $( '#stats-harvest' ).text(response.harvest_rate);
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
-          $('#playButton').removeAttr("disabled");
+          $('#restartButton').removeAttr("disabled");
+        } else if (response.status == "running") {
+          $('#stopButton').removeAttr("disabled");
         }
       }
     });
