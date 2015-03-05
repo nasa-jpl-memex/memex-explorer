@@ -2,6 +2,7 @@ import os
 from os.path import join
 import sys
 import json
+import csv
 
 import subprocess
 
@@ -116,10 +117,27 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 post=request.POST)),
             content_type="application/json")
 
+
+    def get(self, request, *args, **kwargs):
+        # Get Relevant Seeds File
+        if not request.GET:
+            # no url parameters, return regular response
+            return super(CrawlView, self).get(request, *args, **kwargs)
+
+        elif 'resource' in request.GET and request.GET['resource'] == "seeds":
+            seeds = self.get_ache_dashboard().get_relevant_seeds()
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=relevant_seeds.txt'
+            response.write('\n'.join(seeds))
+            return response
+
     def get_object(self):
         return Crawl.objects.get(
             project=self.get_project(),
             slug=self.kwargs['crawl_slug'])
+
+    def get_ache_dashboard(self):
+        return AcheDashboard(self.get_object())
 
     def get_context_data(self, **kwargs):
         context = super(CrawlView, self).get_context_data(**kwargs)

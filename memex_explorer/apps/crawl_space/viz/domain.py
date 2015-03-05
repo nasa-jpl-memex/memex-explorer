@@ -13,6 +13,7 @@ from tld import get_tld
 import traceback
 import subprocess
 import shlex
+from StringIO import StringIO
 
 from apps.crawl_space.settings import CRAWL_PATH
 
@@ -42,16 +43,24 @@ class Domain(object):
             return url
 
     def update_source(self):
-
         # Relevant
-        df = pd.read_csv(self.relevant_data, delimiter='\t', header=None,
-                         names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
+
+        df = pd.read_csv(StringIO(self.get_relevant_data()), delimiter='\t', header=None, names=['url', 'timestamp'])
         df['domain'] = df['url'].apply(self.extract_tld)
         df1 = df.groupby(['domain']).size()
 
         # Crawled
-        df = pd.read_csv(self.crawled_data, delimiter='\t', header=None,
-                         names=['url', 'timestamp']).tail(n=TAIL_LENGTH)
+        crawled_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (TAIL_LENGTH, self.crawled_data)),
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        stdout, stderr = crawled_proc.communicate()
+
+        if stderr or not stdout:
+            raise ValueError("domain plot sources are empty")
+
+        # Converts stdout to StringIO to allow pandas to read it as a file
+
+        df = pd.read_csv(StringIO(stdout), delimiter='\t', header=None, names=['url', 'timestamp'])
         df['domain'] = df['url'].apply(self.extract_tld)
         df2 = df.groupby(['domain']).size()
 
@@ -69,6 +78,13 @@ class Domain(object):
 
         source = into(ColumnDataSource, df)
         return source
+
+    def get_relevant_data(self, tail_length=TAIL_LENGTH):
+        relevant_proc = subprocess.Popen(shlex.split("tail -n %d %s" % (tail_length,
+                                         self.relevant_data)),
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = relevant_proc.communicate()
+        return stdout
 
     def create(self):
 

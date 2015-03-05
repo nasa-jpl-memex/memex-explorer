@@ -11,13 +11,13 @@
     <script src="{% static 'base/js/crawl.js' %}"></script>
 {% endblock %}
 
-
 {% block content %}
 {% if scripts %}
     {% for script in scripts %}
         {{ script | safe }}
     {% endfor %}
 {% endif %}
+
 {% include "base/sidebar.html" %}
 
   <!-- Crawl Header -->
@@ -76,13 +76,13 @@
       </button>
       {% endif %}
     </div>
-
   </div>
 </div>
 
+{% if crawl.crawler == "ache" %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    {% if divs.0 and divs.1 %}
+    {% if divs.0 or divs.1 %}
 
         {% for div in divs %}
         {% if div %}
@@ -98,13 +98,20 @@
     {% endif %}
   </div>
 </div>
+
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    {% if crawl.crawler == 'ache' and divs %}
-    <a class="btn btn-default btn-padded center"
-    href="#TODO">
-    Download Relevant Pages</a>
-    {% endif %}
+    <form method="get">
+    <input type="hidden" name="resource" value="seeds" />
+      <button id="getSeeds" class="btn btn-default btn-padded center"
+        data-container="body" data-toggle="tooltip" data-placement="bottom"
+        {% if not divs.0 or not divs.1 %}
+          disabled
+        {% endif %}
+        >
+          Download Relevant Pages
+        </button>
+      </form>
    <!-- 
     {% if crawl.crawler == 'nutch' %}
     <button id="imageDump" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
@@ -113,7 +120,11 @@
     {% endif %}
    --> 
   </div>
-  {% if crawl.descreiption or crawl.crawler == "ache" %}
+</div>
+{% endif %}
+
+{% if crawl.description or crawl.crawler == "ache" %}
+<div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     {% if crawl.description %}
     <div class="col-sm-6">
@@ -128,8 +139,9 @@
     </div>
     {% endif %}
   </div>
-  {% endif %}
 </div>
+{% endif %}
+
 <div class='row'>
   <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
   <h3>Summary Statistics</h3>
@@ -166,4 +178,3 @@
   </div>
 </div>
 {% endblock content %}
-
