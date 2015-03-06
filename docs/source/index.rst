@@ -20,4 +20,3 @@ Contents:
    user_guide
    .. dev_guide
    .. api
-
