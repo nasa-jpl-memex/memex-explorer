@@ -69,6 +69,9 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Start
         if request.POST['action'] == "start":
+            crawl_model.status = "starting"
+            crawl_model.save()
+
             project_slug = self.kwargs['project_slug']
             crawl_slug = self.kwargs['crawl_slug']
 
@@ -79,8 +82,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
             subprocess.Popen(call)
 
-            crawl_model.status = "starting"
-            crawl_model.save()
             return HttpResponse(json.dumps(dict(
                     status="starting")),
                 content_type="application/json")
@@ -88,8 +89,11 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 
         # Stop
         elif request.POST['action'] == "stop":
-            # TODO use crawl_model.status as a stop flag
+            crawl_model.status = 'stopping'
+            crawl_model.save()
+
             crawl_path = crawl_model.get_crawl_path()
+            # TODO use crawl_model.status as a stop flag
             touch(join(crawl_path, 'stop'))
             return HttpResponse(json.dumps(dict(
                     status="stopping")),

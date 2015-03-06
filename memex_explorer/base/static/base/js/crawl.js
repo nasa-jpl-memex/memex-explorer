@@ -1,5 +1,8 @@
 $( document ).ready(function() {
 
+  $( document ).ready(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
 
   $('#playButton').on('click', function() {
 
@@ -41,6 +44,23 @@ $( document ).ready(function() {
   });
 
 
+  $('#restartButton').on('click', function() {
+
+    $( '#status' ).text( "restarting" );
+    this.disabled = true;
+
+    $.ajax({
+      type: "POST",
+      data: {"action": "start"},
+      success: function(response) {
+        console.log(response);
+        if (response.status != "error") $( '#status' ).text(response.status);
+        else console.log(response)},
+          failure: function() {
+            $( '#status' ).text( "Error (could not restart crawl)" );
+          }
+        });
+  });
 
   setInterval(function(){
     $.ajax({
@@ -57,7 +77,9 @@ $( document ).ready(function() {
         }
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
-          $('#playButton').removeAttr("disabled");
+          $('#restartButton').removeAttr("disabled");
+        } else if (response.status == "running") {
+          $('#stopButton').removeAttr("disabled");
         }
       }
     });
