@@ -1,17 +1,22 @@
-name: memex-explorer
+name: memex
 channels:
     - blaze
     - memex
     - quasiben
 dependencies:
+    - bokeh=0.7.0
+    - blaze=0.7.0
     - python=2.7.8
     - nutch
     - ache=0.1.0
     - django=1.7.3
     - solr=4.10.2
+    - gunicorn
     - pytest
     - pip
+    - sphinx
     - pip:
+        - tld
         - selenium
         - coverage
         - pytest-cov
@@ -19,3 +24,4 @@ dependencies:
         - pytest-ordering
         - django-crispy-forms
         - coveralls
+        - sphinx-rtd-theme

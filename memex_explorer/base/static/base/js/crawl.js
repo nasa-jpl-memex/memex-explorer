@@ -49,7 +49,12 @@ $( document ).ready(function() {
       success: function(response){
         $( '#status' ).text(response.status);
         $( '#stats-pages' ).text(response.pages_crawled);
-        $( '#stats-harvest' ).text(response.harvest_rate);
+        if ('harvest_rate' in response) {
+          $( '#stats-harvest' ).text(response.harvest_rate);
+          if (response.harvest_rate > 0) {
+            $('#getSeeds').removeAttr("disabled");
+          }
+        }
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
           $('#playButton').removeAttr("disabled");
