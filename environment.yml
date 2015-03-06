@@ -13,6 +13,7 @@ dependencies:
     - gunicorn
     - pytest
     - pip
+    - sphinx
     - pip:
         - tld
         - selenium
@@ -22,3 +23,4 @@ dependencies:
         - pytest-ordering
         - django-crispy-forms
         - coveralls
+        - sphinx-rtd-theme
