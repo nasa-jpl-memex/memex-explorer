@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ContinuumIO/memex-explorer.svg?branch=memex-django)](https://travis-ci.org/ContinuumIO/memex-explorer)
+[![Build Status](https://travis-ci.org/memex-explorer/memex-explorer.svg?branch=master)](https://travis-ci.org/memex-explorer/memex-explorer)
 [![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg?branch=memex-django)](https://coveralls.io/r/ContinuumIO/memex-explorer?branch=memex-django)
 
 # memex-explorer-django
