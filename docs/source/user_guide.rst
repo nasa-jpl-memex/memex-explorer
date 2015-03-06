@@ -1,10 +1,10 @@
 User's Guide to Memex Explorer
-----------------------------
+------------------------------
 
 *NOTE: Memex Explorer is still under active development, and this guide is
-constantly evolving as a result. For documentation requests, please
+constantly evolving as a result. For documentation requests, please*
 `file an issue <https://github.com/memex-explorer/memex-explorer/issues>`_
-and we will endeavor to address it as soon as possible.*
+*and we will endeavor to address it as soon as possible.*
 
 Application Structure
 =====================
@@ -72,5 +72,7 @@ For Nutch crawls, you will need to provide a name, a description, and a seeds
 list text file containing newline-delimited URLs.
 
 For ACHE crawls, you will need to provide the same inputs as above, and
-furthermore select a Crawl Model.
+further select a Crawl Model.
+
+
 
