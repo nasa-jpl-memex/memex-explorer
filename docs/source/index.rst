@@ -1,16 +1,22 @@
-Welcome to memex-explorer's documentation.
-========================================
+Memex Explorer
+==============
 
-The goal of the memex-explorer project is to provide users with an easy-to-use, fully-featured web interface to use for gathering, analyzing, and graphing web crawl data. 
+Memex Explorer is a web application that provides easy-to-use interfaces for
+gathering, analyzing, and graphing web crawl data.
 
-To get started, read our `user's guide <user_guide.html>`_. For more in-depth information about the project, refer to our `developer's guide <dev_guide.html>`_ and our `API guide <api.html>`_.
+For usage instructions, please refer to the `User's Guide <user_guide.html>`_.
 
-memex-explorer is built by `Continuum Analytics <http://continuum.io/>`_, with grants and support from the `NASA Jet Propulsion Laboratory <http://www.jpl.nasa.gov/>`_, `Kitware <http://www.kitware.com/>`_, and the `NYU Polytechnic School of Engineering <http://engineering.nyu.edu/>`_
+.. For more information about the project architecture, please refer to our `Developer's Guide <dev_guide.html>`_ and `API Guide <api.html>`_.
+
+Memex Explorer is built by `Continuum Analytics <http://continuum.io/>`_,
+with grants and support from the
+`NASA Jet Propulsion Laboratory <http://www.jpl.nasa.gov/>`_,
+`Kitware <http://www.kitware.com/>`_,
+and the `NYU Polytechnic School of Engineering <http://engineering.nyu.edu/>`_.
 
 Contents:
 
 .. toctree::
    user_guide
-   dev_guide
-   api
-
+   .. dev_guide
+   .. api
