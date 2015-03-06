@@ -35,3 +35,5 @@ CONFIG_PATH = os.path.join(resources_dir, 'configs')
 SEEDS_TMP_DIR = os.path.join(resources_dir, 'seeds_tmp')
 MODELS_TMP_DIR = os.path.join(resources_dir, 'models_tmp')
 
+#Location of SOLR instance
+SOLR_URL = "http://localhost:8983/solr/"

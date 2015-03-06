@@ -122,6 +122,9 @@ class Crawl(models.Model):
         ensure_exists(crawl_path)
         return crawl_path
 
+    def get_solr_url(instance):
+        return SOLR_URL
+
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
         ('ache', "ACHE"))

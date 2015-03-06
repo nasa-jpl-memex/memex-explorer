@@ -10,6 +10,7 @@ dependencies:
     - nutch
     - ache=0.1.0
     - django=1.7.3
+    - solr=4.10.2
     - gunicorn
     - pytest
     - pip

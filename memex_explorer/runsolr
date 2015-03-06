@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#Runscript for starting Solr
+STR="solr -d `python -c 'import sys; print(sys.prefix)'`/solr_pkg"
+echo "Starting Solr:" $STR
+$STR
+echo "Web interface available at: http://localhost:8983/solr/#/"

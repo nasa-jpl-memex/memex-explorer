@@ -67,6 +67,7 @@ class CrawlRunner(object):
         self.crawl_dir = crawl.get_crawl_path()
         self.seeds_path = crawl.seeds_list.path
         self.stop_file = join(self.crawl_dir, 'stop')
+        self.solr_url = "http://localhost:8983/solr/"  #TODO - Move to Crawl
 
     @property
     @abstractmethod
@@ -202,6 +203,7 @@ class NutchCrawlRunner(CrawlRunner):
         return ["crawl",
                 self.seeds_path,
                 self.crawl_dir,
+                self.solr_url,
                 "1"]
 
     def run(self):
