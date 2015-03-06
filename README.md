@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/memex-explorer/memex-explorer.svg?branch=master)](https://travis-ci.org/memex-explorer/memex-explorer)
 [![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg?branch=memex-django)](https://coveralls.io/r/ContinuumIO/memex-explorer?branch=memex-django)
 
-# memex-explorer-django
-Memex explorer application re-written in Django 1.7
+# memex-explorer
+Memex explorer application written in Django 1.7
 * To setup the environment, do the following:
 ```
 $ wget http://bit.ly/miniconda
