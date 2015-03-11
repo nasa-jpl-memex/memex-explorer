@@ -1,15 +1,19 @@
 """Base views."""
+import json
 
 from django.shortcuts import render
 from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
+from django.http import HttpResponse
 
 from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
+
+from apps.crawl_space.models import Crawl
 
 
 def project_context_processor(request):
@@ -25,7 +29,7 @@ class IndexView(ListView):
 
 class AboutView(TemplateView):
     template_name = "base/about.html"
-    
+
 
 class AddProjectView(SuccessMessageMixin, CreateView):
     model = Project
@@ -49,4 +53,16 @@ class ProjectSettingsView(SuccessMessageMixin, UpdateView):
     form_class = ProjectSettingsForm
     success_message = "Project %(name)s was edited successfully."
     template_name_suffix = '_update_form'
+
+
+class DeleteProjectView(SuccessMessageMixin, DeleteView):
+    model = Project
+    success_message = "Project %(name)s was deleted successfully."
+    success_url = "/"
+
+    def delete(self, request, *args, **kwargs):
+        return super(DeleteProjectView, self).delete(request, *args, **kwargs)
+
+    def get_object(self):
+        return Project.objects.get(slug=self.kwargs['project_slug'])
 

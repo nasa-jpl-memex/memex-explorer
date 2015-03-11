@@ -64,7 +64,7 @@
                 {{ x.name }}
                 <form action="{% url 'base:crawl_space:delete_crawl_model' project_slug=project.slug model_slug=x.slug %}" method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
                     {% csrf_token %}
-                <button class="fa fa-close" type="submit"></button>
+                <button class="fa fa-trash-o" type="submit"></button>
             </form>
           </li>
           {% endfor %}

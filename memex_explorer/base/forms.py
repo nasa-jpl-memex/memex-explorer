@@ -14,7 +14,7 @@ from base.models import Project
 
 
 class CrispyModelForm(ModelForm):
-    """Make Django model forms "crispy", a la django-crispy-forms."""
+    """Make Django model forms 'crispy', a la django-crispy-forms."""
     
     def __init__(self, *args, **kwargs):
         """Initialize with a FormHelper and default submit action."""

@@ -32,6 +32,9 @@ urlpatterns = patterns('',
 
     url(project_slug + r'settings/$', views.ProjectSettingsView.as_view(),
         name='project_settings'),
+
+    url(project_slug + r'settings/delete/$', views.DeleteProjectView.as_view(),
+        name='delete_project'),
 )
 
 
