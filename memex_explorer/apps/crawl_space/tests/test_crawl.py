@@ -183,6 +183,10 @@ class TestViews(UnitTestSkeleton):
         crawl = get_object(response)
         assert crawl.description == "A crawl for information about cats." 
 
+    def test_crawl_delete(self):
+        response = self.post('base:crawl_space:delete_crawl',
+            **self.crawl_slugs)
+        assert 'base/project.html' in response.template_name
 
 #class TestForms(TestCase):
 #

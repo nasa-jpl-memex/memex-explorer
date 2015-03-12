@@ -64,9 +64,10 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
-        for crawl in self.get_crawls():
-            shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
-            crawl.delete()
+        """Remove crawls and folders for crawls."""
+        # for crawl in self.get_crawls():
+        #     shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
+        #     crawl.delete()
         return super(DeleteProjectView, self).delete(request, *args, **kwargs)
 
     def get_object(self):

@@ -183,7 +183,8 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     success_message = "Crawl %(name)s was deleted successfully."
 
     def delete(self, request, *args, **kwargs):
-        shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
+        """ Remove crawl folder """
+        # shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
