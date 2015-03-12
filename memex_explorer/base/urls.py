@@ -21,17 +21,15 @@ project_slug = r'^projects/(?P<project_slug>[\w-]+)/'
 
 urlpatterns = patterns('',
     url(r'^$', views.IndexView.as_view(), name='index'),
-
     url(r'^about/$', views.AboutView.as_view(), name='about'),
-
     url(r'^add_project/$', views.AddProjectView.as_view(),
         name='add_project'),
-    
     url(project_slug + r'$', views.ProjectView.as_view(),
         name='project'),
-
     url(project_slug + r'settings/$', views.ProjectSettingsView.as_view(),
         name='project_settings'),
+    url(project_slug + r'settings/delete/$', views.DeleteProjectView.as_view(),
+        name='delete_project'),
 )
 
 

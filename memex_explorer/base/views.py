@@ -1,15 +1,22 @@
 """Base views."""
+import json
+import shutil
+import os
 
 from django.shortcuts import render
 from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
+from django.http import HttpResponse
 
 from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
+
+from apps.crawl_space.models import Crawl
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 def project_context_processor(request):
@@ -25,7 +32,7 @@ class IndexView(ListView):
 
 class AboutView(TemplateView):
     template_name = "base/about.html"
-    
+
 
 class AddProjectView(SuccessMessageMixin, CreateView):
     model = Project
@@ -49,4 +56,23 @@ class ProjectSettingsView(SuccessMessageMixin, UpdateView):
     form_class = ProjectSettingsForm
     success_message = "Project %(name)s was edited successfully."
     template_name_suffix = '_update_form'
+
+
+class DeleteProjectView(SuccessMessageMixin, DeleteView):
+    model = Project
+    success_message = "Project %(name)s was deleted successfully."
+    success_url = "/"
+
+    def delete(self, request, *args, **kwargs):
+        """Remove crawls and folders for crawls."""
+        # for crawl in self.get_crawls():
+        #     shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
+        #     crawl.delete()
+        return super(DeleteProjectView, self).delete(request, *args, **kwargs)
+
+    def get_object(self):
+        return Project.objects.get(slug=self.kwargs['project_slug'])
+
+    def get_crawls(self):
+        return Crawl.objects.filter(project=self.get_object())
 

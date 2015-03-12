@@ -72,6 +72,9 @@ class TestViews(UnitTestSkeleton):
         project = get_object(response)
         assert project.description == 'A project for cats!'
 
+    def test_project_settings_change_description(self):
+        response = self.post('base:delete_project', slugs={'project_slug': self.test_project.slug})
+        assert 'base/index.html' in response.template_name
 
 class TestForms(TestCase):
 
