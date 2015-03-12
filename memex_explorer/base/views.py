@@ -1,5 +1,7 @@
 """Base views."""
 import json
+import shutil
+import os
 
 from django.shortcuts import render
 from django.views import generic
@@ -14,6 +16,7 @@ from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
 
 from apps.crawl_space.models import Crawl
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 def project_context_processor(request):
@@ -61,8 +64,14 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
+        for crawl in self.get_crawls():
+            shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
+            crawl.delete()
         return super(DeleteProjectView, self).delete(request, *args, **kwargs)
 
     def get_object(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
+
+    def get_crawls(self):
+        return Crawl.objects.filter(project=self.get_object())
 
