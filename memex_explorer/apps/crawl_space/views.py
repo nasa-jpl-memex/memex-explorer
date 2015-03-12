@@ -3,8 +3,8 @@ from os.path import join
 import sys
 import json
 import csv
-
 import subprocess
+import shutil
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
@@ -17,12 +17,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from base.models import Project
+
 from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
-
 from apps.crawl_space.utils import touch
-
 from apps.crawl_space.viz.plot import AcheDashboard
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -176,6 +176,22 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+    model = Crawl
+    success_message = "Crawl %(name)s was deleted successfully."
+
+    def delete(self, request, *args, **kwargs):
+        shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
+        return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return self.get_project().get_absolute_url()
+
+    def get_object(self):
+        return Crawl.objects.get(project=self.get_project(),
+                                 slug=self.kwargs['crawl_slug'])
 
 
 class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):

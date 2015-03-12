@@ -25,20 +25,17 @@ from apps.crawl_space import views
 urlpatterns = patterns('',
     url(r'^add_crawl/$', views.AddCrawlView.as_view(),
         name='add_crawl'),
-
     url(r'^add_crawl_model/$', views.AddCrawlModelView.as_view(),
         name='add_crawl_model'),
-
     url(r'^(?P<model_slug>[\w-]+)/delete/$', views.DeleteCrawlModelView.as_view(),
         name='delete_crawl_model'),
-
     url(r'^crawls/$', views.ListCrawlsView.as_view(),
         name='crawls'),
-
     url(r'^crawls/(?P<crawl_slug>[\w-]+)/$', views.CrawlView.as_view(),
         name='crawl'),
-
     url(r'^crawls/(?P<crawl_slug>[\w-]+)/settings/$', views.CrawlSettingsView.as_view(),
         name='crawl_settings'),
+    url(r'^crawls/(?P<crawl_slug>[\w-]+)/settings/delete/$', views.DeleteCrawlView.as_view(),
+        name='delete_crawl'),
 )
 
