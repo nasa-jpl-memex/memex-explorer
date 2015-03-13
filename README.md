@@ -6,8 +6,7 @@ Memex explorer application written in Django 1.7
 * To setup the environment, do the following:
 ```
 $ wget http://bit.ly/miniconda
-$ bash Miniconda-latest-Linux-x86_64.sh
-$ bash install.sh
+$ bash miniconda
 $ conda env create -n memex -f environment.yml
 $ source activate memex
 ```
