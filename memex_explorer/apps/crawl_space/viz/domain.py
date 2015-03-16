@@ -24,7 +24,6 @@ LIGHT_GRAY = "#6e6e6e"
 TAIL_LENGTH = 10000
 
 
-
 class Domain(object):
 
     def __init__(self, crawl, sort='crawled'):

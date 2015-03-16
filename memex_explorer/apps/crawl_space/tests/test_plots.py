@@ -66,3 +66,6 @@ class TestPlots(UnitTestSkeleton):
 
         return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
 
+    def pass(self):
+        pass
+
