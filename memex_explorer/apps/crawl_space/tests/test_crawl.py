@@ -72,7 +72,6 @@ class TestViews(UnitTestSkeleton):
 
         return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
 
-
     @property
     def form_data(self):
         """Provide a dictionary of valid form data."""
@@ -100,7 +99,6 @@ class TestViews(UnitTestSkeleton):
             project_slug="test",
             crawl_slug="test-crawl"))
 
-
     def test_add_crawl_page(self):
         """Get the add_crawl page with **self.slugs and assert that
         the right template is returned."""
@@ -108,14 +106,12 @@ class TestViews(UnitTestSkeleton):
         response = self.get('base:crawl_space:add_crawl', **self.slugs)
         assert 'crawl_space/add_crawl.html' in response.template_name
 
-
     def test_add_crawl_no_data(self):
         """Post with an empty form, assert that each of the missings fields
         prompts an error."""
 
         response = self.post('base:crawl_space:add_crawl', **self.slugs)
         assert_form_errors(response, *self.form_data.keys())
-
 
     def test_add_crawl_bad_name(self):
         """Post with a non-alphanumeric name."""
@@ -131,7 +127,6 @@ class TestViews(UnitTestSkeleton):
             form_data, **self.slugs)
         assert_form_errors(response, 'name')
 
-
     def test_add_crawl_bad_crawler(self):
         """Post with an invalid crawler."""
 
@@ -142,7 +137,6 @@ class TestViews(UnitTestSkeleton):
             form_data, **self.slugs)
         assert_form_errors(response, 'crawl_model', 'crawler')
 
-
     def test_add_crawl_success(self):
         """Post with a valid form payload, and assert that
         the client is redirected to the appropriate crawl page."""
@@ -151,7 +145,6 @@ class TestViews(UnitTestSkeleton):
             self.form_data,
             **self.slugs)
         assert 'crawl_space/crawl.html' in response.template_name
-
 
     def test_crawl_page(self):
         """Get the test crawl page, and assert that the
@@ -187,6 +180,7 @@ class TestViews(UnitTestSkeleton):
         response = self.post('base:crawl_space:delete_crawl',
             **self.crawl_slugs)
         assert 'base/project.html' in response.template_name
+
 
 #class TestForms(TestCase):
 #

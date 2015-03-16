@@ -13,7 +13,9 @@ from apps.crawl_space.models import Crawl, CrawlModel
 from base.models import Project, alphanumeric_validator
 
 from apps.crawl_space.models import Crawl
-from apps.crawl_space.viz.domain import Domain
+from apps.crawl_space.viz.plot import AcheDashboard
+
+from apps.memex.test_settings import TEST_CRAWL_DATA
 
 
 class TestPlots(UnitTestSkeleton):
@@ -30,15 +32,6 @@ class TestPlots(UnitTestSkeleton):
             description = "Test Project Description")
         cls.test_project.save()
 
-        cls.test_crawl = Crawl(
-            name = "Test Crawl",
-            description = "Test Crawl Description",
-            crawler = "nutch",
-            config = "config_default",
-            seeds_list = cls.get_seeds(),
-            project = cls.test_project)
-        cls.test_crawl.save()
-
         cls.test_crawlmodel = CrawlModel(
             name = "Test Crawl Model",
             model = cls.get_model_file(),
@@ -46,6 +39,19 @@ class TestPlots(UnitTestSkeleton):
             project = cls.test_project,
         )
         cls.test_crawlmodel.save()
+
+        cls.test_crawl = Crawl(
+            name = "Test Crawl",
+            description = "Test Crawl Description",
+            crawler = "ache",
+            config = "config_default",
+            seeds_list = cls.get_seeds(),
+            project = cls.test_project
+            crawl_model = cls.test_crawlmodel
+        )
+        cls.test_crawl.save()
+        cls.dashboard = AcheDashboard(cls.test_crawl)
+
 
     @classmethod
     def tearDownClass(cls):
@@ -67,5 +73,5 @@ class TestPlots(UnitTestSkeleton):
         return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
 
     def pass(self):
-        pass
+        assert 0
 
