@@ -25,16 +25,16 @@
         <div class="col-lg-3 col-md-4 project-tab">
             <div class="panel panel-project">
                 <div class="panel-heading">
+                <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">
                     <div class="row">
                         <div class="col-xs-3">
-                            <p>{{ project.name }}</p>
+                            <p style="color:white;">{{ project.name }}</p>
                         </div>
                         <!--div class="col-xs-9 text-right">
                             <i class="fa {{project.icon}} fa-3x"></i>
                         </div-->
                     </div>
                 </div>
-                <a href="{% url 'base:project' project_slug=project.slug %}">
                     <div class="panel-footer">
                         <p>{{ project.description }}</p>
                  

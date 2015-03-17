@@ -13,7 +13,9 @@ from apps.crawl_space.models import Crawl, CrawlModel
 from base.models import Project, alphanumeric_validator
 
 from apps.crawl_space.models import Crawl
-from apps.crawl_space.viz.domain import Domain
+from apps.crawl_space.viz.plot import AcheDashboard
+
+from memex.test_settings import TEST_CRAWL_DATA
 
 
 class TestPlots(UnitTestSkeleton):
@@ -23,29 +25,35 @@ class TestPlots(UnitTestSkeleton):
         """Initialize a test project and crawl model,
         and save them to the test database."""
 
-        super(TestViews, cls).setUpClass()
+        super(TestPlots, cls).setUpClass()
 
         cls.test_project = Project(
-            name = "Test",
+            name = "Test Project",
             description = "Test Project Description")
         cls.test_project.save()
 
-        cls.test_crawl = Crawl(
-            name = "Test Crawl",
-            description = "Test Crawl Description",
-            crawler = "nutch",
-            config = "config_default",
-            seeds_list = cls.get_seeds(),
-            project = cls.test_project)
-        cls.test_crawl.save()
-
         cls.test_crawlmodel = CrawlModel(
-            name = "Test Crawl Model",
+            name = "Test Model",
             model = cls.get_model_file(),
             features = cls.get_features_file(),
             project = cls.test_project,
         )
         cls.test_crawlmodel.save()
+
+        cls.test_crawl = Crawl(
+            name = "Test Crawl Plots",
+            description = "Test Crawl Description",
+            crawler = "ache",
+            config = "config_default",
+            seeds_list = cls.get_seeds(),
+            project = cls.test_project,
+            crawl_model = cls.test_crawlmodel,
+        )
+        cls.test_crawl.save()
+        cls.dashboard = AcheDashboard(cls.test_crawl)
+        cls.dashboard.domain.crawled_data = os.path.join(TEST_CRAWL_DATA, "crawledpages.csv")
+        cls.dashboard.domain.relevant_data = os.path.join(TEST_CRAWL_DATA, "relevantpages.csv")
+        cls.dashboard.harvest.harvest_data = os.path.join(TEST_CRAWL_DATA, "harvestinfo.csv")
 
     @classmethod
     def tearDownClass(cls):
@@ -65,4 +73,14 @@ class TestPlots(UnitTestSkeleton):
         be used once."""
 
         return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
+
+    def test_domain(self):
+        domain = self.dashboard.get_domain_plot()
+        for x in domain:
+            assert x
+
+    def test_harvest(self):
+        harvest = self.dashboard.get_harvest_plot()
+        for x in harvest:
+            assert x
 
