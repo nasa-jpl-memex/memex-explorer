@@ -65,7 +65,6 @@
         <span class="fa fa-stop"></span>
       </button>
 
-      {% if crawl.crawler == 'ache' %}
       <button id="restartButton" title="Restart Crawl" type="button" class="btn btn-control"
         data-container="body"
         {% if crawl.status != "stopped" %}
@@ -74,7 +73,6 @@
         data-toggle="tooltip" data-placement="bottom">
         <span class="fa fa-refresh"></span>
       </button>
-      {% endif %}
     </div>
   </div>
 </div>
