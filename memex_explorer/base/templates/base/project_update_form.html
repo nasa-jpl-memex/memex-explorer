@@ -1,0 +1,61 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Project{% endblock %}
+
+{% block content %}
+
+{% include "base/sidebar.html" %}
+
+<div class='row'>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="col-sm-6">
+            <h1>Edit Project</h1> 
+        </div>
+        <div class="col-sm-6">
+            <button id="deleteProjectButton" title="Edit Project" type="button" 
+            class="btn btn-control" data-container="body" data-toggle="tooltip"
+            data-placement="bottom" style="float:right;margin-top:20px;">
+                <i class="fa fa-trash-o" style="font-size:28px;"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
+        <div class="center">
+            {% crispy form %}
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#deleteProjectButton').click(function(){
+        swal({
+            title: "Are you sure?",
+            text: "This will delete the project and all crawls associated with the project.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function(isConfirm){
+            if (isConfirm){
+                $("<form action='{% url 'base:delete_project' project_slug=project.slug %}' method='post'>{% csrf_token %}</form>").submit();
+            } else {
+                swal("Cancelled", "You cancelled the delete process", "error");
+            }
+        })
+    });
+});
+</script>
+
+{% endblock %}
+
+{% load staticfiles %}
+
+{% block extrahead %}
+    <link href="{% static 'base/css/update.css' %}" rel="stylesheet">
+{% endblock %}

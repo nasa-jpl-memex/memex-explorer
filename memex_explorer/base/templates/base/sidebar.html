@@ -1,0 +1,26 @@
+<div class="col-sm-3 col-md-2 sidebar">
+  <a href="{% url 'base:project' project_slug=project.slug %}"><h2><br>{{ project.name }}</h2></a>
+  <div class="accordion" id="accordion2">
+    <div class="accordion-group">
+      <div class="accordion-heading sidebar-buttons">
+        <a href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}">
+        Crawls
+      </a>
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"  style='float:right;'><i class="fa fa-list"></i></a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse accordion-links">
+      {% if project.crawl_set.all %}
+      {% for w in project.crawl_set.all %}
+      <div class="accordion-inner">
+          <a href="{{ w.get_absolute_url }}">{{ w.name }}</a>
+      </div>
+      {% endfor %}
+      {% endif %}
+      <div class="accordion-inner">
+        <a href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">+ Add Crawl</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>

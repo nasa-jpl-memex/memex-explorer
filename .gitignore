@@ -1,9 +1,11 @@
-# pycharm
-.idea
+# Memex Explorer project
+resources/
+test_resources/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+.sass-cache/
 
 # C extensions
 *.so
@@ -47,8 +49,9 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
+# Django stuff
 *.log
+db.sqlite3
 
 # Sphinx documentation
 docs/_build/
@@ -56,16 +59,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# App-generated files and folders
-app.db
-db_repository/
-data_monitor/
-data_preprocessed/
-seeds/
-models/
-crawls/
-image_space
-
-# Third-party ui/ux
-*.sass-cache
-node-modules/
+# OSX
+.DS_Store
