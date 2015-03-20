@@ -98,14 +98,17 @@ $( document ).ready(function() {
     });
 
     $("#dumpImages").on('click', function(){
+        $("#nutchButtons").append('<i id="imageSpinner" class="fa fa-refresh fa-spin" style="font-size:20;"></i>')
         $.ajax({
             type: "POST",
             data: {"action": "dump"},
             success: function(response) {
                 sweetAlert("Success", "Images have been successfully dumped!", "success");
+                $("#imageSpinner").remove()
             },
             failure: function() {
                 sweetAlert("Error", "Image dump has failed.", "error");
+                $("#imageSpinner").remove()
             }
         });
     });
