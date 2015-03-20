@@ -12,7 +12,7 @@ import shlex
 from abc import ABCMeta, abstractmethod
 
 from settings import (LANG_DETECT_PATH, CRAWL_PATH,
-                                       MODEL_PATH, CONFIG_PATH)
+                      MODEL_PATH, CONFIG_PATH, IMAGES_PATH)
 from utils import touch, rm_if_exists
 
 
@@ -256,7 +256,4 @@ class NutchCrawlRunner(CrawlRunner):
             if 'db_fetched' in line:
                 self.crawl.pages_crawled = int(line.split('\t')[-1])
                 self.crawl.save()
-
-    def dump_images(self, image_space):
-        pass
 

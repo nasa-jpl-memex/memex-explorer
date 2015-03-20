@@ -4,6 +4,8 @@ $( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
 
+  $("#dumpImages").attr("disabled", true);
+
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "starting" );
@@ -78,6 +80,7 @@ $( document ).ready(function() {
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
+          $('#dumpImages').removeAttr("disabled");
         } else if (response.status == "running") {
           $('#stopButton').removeAttr("disabled");
         }
@@ -93,5 +96,22 @@ $( document ).ready(function() {
         }
         window.open(solr_url, '_blank');
     });
+
+    $("#dumpImages").on('click', function(){
+        $("#nutchButtons").append('<i id="imageSpinner" class="fa fa-refresh fa-spin" style="font-size:20;"></i>')
+        $.ajax({
+            type: "POST",
+            data: {"action": "dump"},
+            success: function(response) {
+                sweetAlert("Success", "Images have been successfully dumped!", "success");
+                $("#imageSpinner").remove()
+            },
+            failure: function() {
+                sweetAlert("Error", "Image dump has failed.", "error");
+                $("#imageSpinner").remove()
+            }
+        });
+    });
+
 });
 

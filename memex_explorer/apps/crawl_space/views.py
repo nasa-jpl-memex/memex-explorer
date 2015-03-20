@@ -22,7 +22,7 @@ from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard
-from apps.crawl_space.settings import CRAWL_PATH
+from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -99,6 +99,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     status="stopping")),
                 content_type="application/json")
 
+        # Dump Images
+        elif request.POST['action'] == "dump":
+            self.dump_images()
+            return HttpResponse("Success")
 
         # Update status, statistics
         elif request.POST['action'] == "status":
@@ -117,6 +121,17 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 post=request.POST)),
             content_type="application/json")
 
+    def dump_images(self):
+        self.img_dir = os.path.join(IMAGES_PATH, self.get_object().slug)
+        if os.path.exists(self.img_dir):
+            shutil.rmtree(self.img_dir)
+        else:
+            os.makedirs(self.img_dir)
+
+        img_dump_proc = subprocess.Popen(["nutch", "dump", "-outputDir", self.img_dir, "-segment",
+                                         os.path.join(self.get_object().get_crawl_path(), 'segments'),"-mimetype",
+                                         "image/jpeg", "image/png"]).wait()
+        return "Dumping images"
 
     def get(self, request, *args, **kwargs):
         # Get Relevant Seeds File
