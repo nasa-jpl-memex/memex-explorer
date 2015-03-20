@@ -257,15 +257,3 @@ class NutchCrawlRunner(CrawlRunner):
                 self.crawl.pages_crawled = int(line.split('\t')[-1])
                 self.crawl.save()
 
-    def dump_images(self):
-        self.img_dir = os.path.join(IMAGES_PATH, str(self.crawl.name))
-        try:
-            os.makedirs(self.img_dir)
-        except OSError:
-            raise
-
-        img_dump_proc = subprocess.Popen(["nutch", "dump", "-outputDir", self.img_dir, "-segment",
-                               os.path.join(self.crawl_dir, 'segments'),"-mimetype", "image/jpeg", "image/png"]).wait()
-
-        return "Dumping images"
-

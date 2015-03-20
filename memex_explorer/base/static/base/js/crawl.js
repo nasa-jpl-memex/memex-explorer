@@ -4,6 +4,8 @@ $( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
 
+  $("#dumpImages").attr("disabled", true);
+
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "starting" );
@@ -78,6 +80,7 @@ $( document ).ready(function() {
         if (response.status == "stopped") {
           $('#stopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
+          $('#dumpImages').removeAttr("disabled");
         } else if (response.status == "running") {
           $('#stopButton').removeAttr("disabled");
         }
@@ -93,5 +96,19 @@ $( document ).ready(function() {
         }
         window.open(solr_url, '_blank');
     });
+
+    $("#dumpImages").on('click', function(){
+        $.ajax({
+            type: "POST",
+            data: {"action": "dump"},
+            success: function(response) {
+                console.log(response);
+            },
+            failure: function() {
+                console.log("Dump has failed.");
+            }
+        });
+    });
+
 });
 
