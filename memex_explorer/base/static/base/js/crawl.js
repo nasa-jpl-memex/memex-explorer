@@ -102,10 +102,10 @@ $( document ).ready(function() {
             type: "POST",
             data: {"action": "dump"},
             success: function(response) {
-                console.log(response);
+                sweetAlert("Success", "Images have been successfully dumped!", "success");
             },
             failure: function() {
-                console.log("Dump has failed.");
+                sweetAlert("Error", "Image dump has failed.", "error");
             }
         });
     });
