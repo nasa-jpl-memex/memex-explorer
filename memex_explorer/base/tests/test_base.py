@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import urllib2
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -8,7 +9,6 @@ from django.db import IntegrityError
 # App
 from base.forms import AddProjectForm
 from base.models import Project
-
 
 
 class TestViews(UnitTestSkeleton):
@@ -31,6 +31,9 @@ class TestViews(UnitTestSkeleton):
         response = self.get('base:about')
         assert 'base/about.html' in response.template_name
 
+    def test_documentation(self):
+        response = urllib2.urlopen("http://memex-explorer.readthedocs.org/en/latest/")
+        assert response.code == 200
 
     def test_add_project_page(self):
         response = self.get('base:add_project')
