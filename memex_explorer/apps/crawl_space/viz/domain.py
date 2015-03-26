@@ -101,5 +101,6 @@ class Domain(object):
 
         script, div = components(p, INLINE)
 
-        return (script, div)
+        if os.path.exists(self.crawled_data) and os.path.exists(self.relevant_data):
+            return (script, div)
 
