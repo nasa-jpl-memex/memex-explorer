@@ -146,6 +146,12 @@ class CrawlView(ProjectObjectMixin, DetailView):
             response.write('\n'.join(seeds))
             return response
 
+        elif 'resource' in request.GET and request.GET['resource'] == "initial_seeds":
+            seeds = self.get_seeds()
+
+    def get_initial_seeds():
+        pass
+
     def get_object(self):
         return Crawl.objects.get(
             project=self.get_project(),
@@ -181,6 +187,7 @@ class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
 
 class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
+
     form_class = AddCrawlModelForm
     template_name = "crawl_space/add_crawl_model.html"
     success_message = "Crawl model %(name)s was added successfully."
@@ -194,6 +201,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
 
 class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+
     model = Crawl
     success_message = "Crawl %(name)s was deleted successfully."
 
@@ -211,6 +219,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
 
 class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+
     model = CrawlModel
     success_message = "Crawl model %(name)s was deleted successfully."
 

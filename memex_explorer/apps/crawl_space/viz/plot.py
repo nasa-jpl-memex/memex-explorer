@@ -46,6 +46,13 @@ class AcheDashboard(object):
                            names=['url', 'timestamp'])
         return seeds['url'].to_dict().values()
 
+    def get_initial_seeds():
+        if self.crawl.crawler == "nutch":
+            seeds_file = open(os.path.join(self.crawl.seeds_list.path, "seeds"))
+        else:
+            seeds_file = open(self.crawl.seeds_list.path)
+        return seeds_file.readlines() 
+
     def get_plots(self):
         harvest_plot = self.get_harvest_plot()
         domain_plot = self.get_domain_plot()
