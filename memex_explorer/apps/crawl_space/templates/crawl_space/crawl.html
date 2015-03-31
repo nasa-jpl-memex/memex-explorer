@@ -152,9 +152,6 @@
 
 <div class='row'>
   <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
-    {% for x in seeds %}
-    {{x}}
-    {% endfor %}
   <h3>Summary Statistics</h3>
 <!--   <div class='row'>
   <div class="col-sm-12 col-md-5">
@@ -184,4 +181,16 @@
   </div>
  -->  </div>
 </div>
+<div class='row'>
+    <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
+        <h3>Seeds List Head</h3>
+        <ul class="list-group">
+            {% for seed in seeds %}
+            <li class="list-group-item" style="padding-top:3px;padding-bottom:3px;">{{ seed }}</li>
+            {% endfor %}
+        </ul>
+        </table>
+    </div>
+</div>
 {% endblock content %}
+

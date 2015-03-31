@@ -5,6 +5,7 @@ import json
 import csv
 import subprocess
 import shutil
+import itertools
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
@@ -165,7 +166,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
     def get_seeds_list(self, lines=None):
         with open(self.get_seeds_path()) as f:
             if lines:
-                seeds_list = [next(f) for x in range(lines)]
+                seeds_list = list(itertools.islice(f, lines))
             else:
                 seeds_list = f.readlines()
             return seeds_list
