@@ -162,13 +162,13 @@ class CrawlView(ProjectObjectMixin, DetailView):
             seeds_path = ""
         return seeds_path
 
-    def get_seeds_list(self):
+    def get_seeds_list(self, lines=None):
         with open(self.get_seeds_path()) as f:
-            seeds_list = f.readlines()
+            if lines:
+                seeds_list = [next(f) for x in range(lines)]
+            else:
+                seeds_list = f.readlines()
             return seeds_list
-
-    def get_seeds_head(self):
-        return self.get_seeds_list()[:10]
 
     def get_object(self):
         return Crawl.objects.get(
@@ -181,7 +181,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(CrawlView, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
-        context['seeds'] = self.get_seeds_head()
+        context['seeds'] = self.get_seeds_list(10)
         if self.get_object().crawler == "ache":
             plots = AcheDashboard(self.get_object()).get_plots()
             context['scripts'] = plots['scripts']
