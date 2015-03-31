@@ -147,13 +147,13 @@ class CrawlView(ProjectObjectMixin, DetailView):
             return response
 
         elif 'resource' in request.GET and request.GET['resource'] == "initial_seeds":
-            seeds = self.get_initial_seeds()
+            seeds = self.get_seeds_list()
             response = HttpResponse(content_type='text/plain')
-            response['Content-Disposition'] = 'attachment; filename=initial_seeds.txt'
+            response['Content-Disposition'] = 'attachment; filename=seeds.txt'
             response.write(''.join(seeds))
             return response
 
-    def get_initial_seeds(self):
+    def get_seeds_list(self):
         if self.get_object().crawler == "nutch":
             seeds_file = open(os.path.join(self.get_object().seeds_list.path, "seeds"))
         else:
