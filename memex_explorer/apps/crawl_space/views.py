@@ -153,12 +153,22 @@ class CrawlView(ProjectObjectMixin, DetailView):
             response.write(''.join(seeds))
             return response
 
-    def get_seeds_list(self):
+    def get_seeds_path(self):
         if self.get_object().crawler == "nutch":
-            seeds_file = open(os.path.join(self.get_object().seeds_list.path, "seeds"))
+            seeds_path = os.path.join(self.get_object().seeds_list.path, "seeds")
+        elif self.get_object().crawler == "ache":
+            seeds_path = self.get_object().seeds_list.path
         else:
-            seeds_file = open(self.get_object().seeds_list.path)
-        return seeds_file.readlines() 
+            seeds_path = ""
+        return seeds_path
+
+    def get_seeds_list(self):
+        with open(self.get_seeds_path()) as f:
+            seeds_list = f.readlines()
+            return seeds_list
+
+    def get_seeds_head(self):
+        return self.get_seeds_list()[:10]
 
     def get_object(self):
         return Crawl.objects.get(
@@ -171,6 +181,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(CrawlView, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
+        context['seeds'] = self.get_seeds_head()
         if self.get_object().crawler == "ache":
             plots = AcheDashboard(self.get_object()).get_plots()
             context['scripts'] = plots['scripts']
