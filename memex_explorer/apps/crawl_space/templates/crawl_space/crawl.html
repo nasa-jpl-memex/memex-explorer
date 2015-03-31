@@ -19,7 +19,7 @@
 
   <!-- Crawl Header -->
 <div class='row'>
-  <div class="col-sm-offset-3 col-md-offset-2 col-sm-7 col-md-8 main">
+  <div class="col-sm-offset-4 col-md-offset-2 col-sm-7 col-md-8 main">
 
   <!-- Crawl Title -->
   <h1>{{ crawl.name }} <small>({{ crawl.crawler }})</small>
@@ -41,9 +41,8 @@
 <!-- Buttons -->
 <div class='row'>
   <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
-
     <!-- Crawl actions (Start, Stop[, Restart]) -->
-    <div class='col-xs-4'>
+    <div class='col-xs-2'>
       <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
         data-container="body"
         {% if crawl.status != "Not started" %}
@@ -71,9 +70,18 @@
         <span class="fa fa-refresh"></span>
       </button>
     </div>
+    <div class="col-sm-3" style="padding-left:0px;">
+        <form method="get">
+            <input type="hidden" name="resource" value="initial_seeds">
+            <button title="Get Seeds List" id="getInitialSeeds" class="btn btn-control"
+            data-container="body" data-toggle="tooltip" data-placement="bottom"
+            style="height:40px;width:auto;">
+            Get Seeds List
+            </button>
+        </form>
+    </div>
   </div>
 </div>
-
 {% if crawl.crawler == "ache" %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -174,7 +182,15 @@
  -->  </div>
 </div>
 <div class='row'>
-  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-  </div>
+    <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
+        <h3>Seeds List Head</h3>
+        <ul class="list-group">
+            {% for seed in seeds %}
+            <li class="list-group-item" style="padding-top:3px;padding-bottom:3px;">{{ seed }}</li>
+            {% endfor %}
+        </ul>
+        </table>
+    </div>
 </div>
 {% endblock content %}
+

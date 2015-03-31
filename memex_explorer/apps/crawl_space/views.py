@@ -5,6 +5,7 @@ import json
 import csv
 import subprocess
 import shutil
+import itertools
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
@@ -146,6 +147,30 @@ class CrawlView(ProjectObjectMixin, DetailView):
             response.write('\n'.join(seeds))
             return response
 
+        elif 'resource' in request.GET and request.GET['resource'] == "initial_seeds":
+            seeds = self.get_seeds_list()
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=seeds.txt'
+            response.write(''.join(seeds))
+            return response
+
+    def get_seeds_path(self):
+        if self.get_object().crawler == "nutch":
+            seeds_path = os.path.join(self.get_object().seeds_list.path, "seeds")
+        elif self.get_object().crawler == "ache":
+            seeds_path = self.get_object().seeds_list.path
+        else:
+            seeds_path = ""
+        return seeds_path
+
+    def get_seeds_list(self, lines=None):
+        with open(self.get_seeds_path()) as f:
+            if lines:
+                seeds_list = list(itertools.islice(f, lines))
+            else:
+                seeds_list = f.readlines()
+            return seeds_list
+
     def get_object(self):
         return Crawl.objects.get(
             project=self.get_project(),
@@ -157,6 +182,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(CrawlView, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
+        context['seeds'] = self.get_seeds_list(10)
         if self.get_object().crawler == "ache":
             plots = AcheDashboard(self.get_object()).get_plots()
             context['scripts'] = plots['scripts']
@@ -181,6 +207,7 @@ class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
 
 class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
+
     form_class = AddCrawlModelForm
     template_name = "crawl_space/add_crawl_model.html"
     success_message = "Crawl model %(name)s was added successfully."
@@ -194,6 +221,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
 
 class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+
     model = Crawl
     success_message = "Crawl %(name)s was deleted successfully."
 
@@ -211,6 +239,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
 
 class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
+
     model = CrawlModel
     success_message = "Crawl model %(name)s was deleted successfully."
 

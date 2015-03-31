@@ -53,7 +53,6 @@ class CrawlModel(models.Model):
     
     name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
-    name = models.CharField(max_length=64)
     model = models.FileField(upload_to=get_model_upload_path,
         validators=[validate_model_file])
     features = models.FileField(upload_to=get_model_upload_path,
