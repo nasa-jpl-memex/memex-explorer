@@ -10,7 +10,7 @@ $ bash miniconda
 $ conda env create -n memex -f environment.yml
 $ source activate memex
 ```
-* To setup the application, in an environment with Django 1.7 and Python 3 installed, run this command in the `memex_explorer` folder. This will create the database for the application using the migration scripts provided in the source code:
+* To setup the application, in an environment with Django 1.7 and Python 3 installed, run this command in the `source` folder. This will create the database for the application using the migration scripts provided in the source code:
 ```
 $ cd memex_explorer
 $ python manage.py migrate
