@@ -70,13 +70,26 @@
         <span class="fa fa-refresh"></span>
       </button>
     </div>
-    <div class="col-sm-3" style="padding-left:0px;">
+    <div class="col-sm-1" style="padding-left:0px;">
         <form method="get">
             <input type="hidden" name="resource" value="initial_seeds">
             <button title="Get Seeds List" id="getInitialSeeds" class="btn btn-control"
             data-container="body" data-toggle="tooltip" data-placement="bottom"
             style="height:40px;width:auto;">
             Get Seeds List
+            </button>
+        </form>
+    </div>
+    <div class="col-sm-1" style="padding-left:15px;">
+        <form method="get">
+            <input type="hidden" name="resource" value="crawl_log">
+            <button title="Get Crawl Log" id="getCrawlLog" class="btn btn-control"
+            {% if crawl.status == "Not started" %}
+            disabled
+            {% endif %}
+            data-container="body" data-toggle="tooltip" data-placement="bottom"
+            style="height:40px;width:auto;">
+            Get Crawl Log
             </button>
         </form>
     </div>

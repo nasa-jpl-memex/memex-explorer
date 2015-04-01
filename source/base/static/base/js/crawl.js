@@ -16,6 +16,7 @@ $( document ).ready(function() {
       type: "POST",
       data: {"action": "start"},
       success: function(response) {
+        $('#getCrawlLog').removeAttr("disabled");
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
         else console.log(response)},
