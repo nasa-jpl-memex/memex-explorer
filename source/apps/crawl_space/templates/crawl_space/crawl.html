@@ -84,6 +84,9 @@
         <form method="get">
             <input type="hidden" name="resource" value="crawl_log">
             <button title="Get Crawl Log" id="getCrawlLog" class="btn btn-control"
+            {% if crawl.status == "Not started" %}
+            disabled
+            {% endif %}
             data-container="body" data-toggle="tooltip" data-placement="bottom"
             style="height:40px;width:auto;">
             Get Crawl Log
