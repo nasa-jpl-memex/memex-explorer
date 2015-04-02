@@ -157,7 +157,7 @@ class AcheCrawlRunner(CrawlRunner):
 
         super(AcheCrawlRunner, self).__init__(crawl)
 
-        self.config_dir = join(CONFIG_PATH, self.crawl.config)
+        self.config_dir = join(self.crawl.config)
         self.model_dir = self.crawl.crawl_model.get_model_path()
 
 
