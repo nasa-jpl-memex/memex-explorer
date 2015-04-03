@@ -76,12 +76,13 @@ class TestViews(UnitTestSkeleton):
     def form_data(self):
         """Provide a dictionary of valid form data."""
 
-        return {'name': 'Cat Crawl',
-                'description': 'Find all the cats.',
-                'crawler': 'ache',
-                'seeds_list': self.get_seeds(),
-                'crawl_model': self.test_crawlmodel.pk,
-                }
+        return {
+            'name': 'Cat Crawl',
+            'description': 'Find all the cats.',
+            'crawler': 'ache',
+            'seeds_list': self.get_seeds(),
+            'crawl_model': self.test_crawlmodel.pk,
+        }
 
     @property
     def slugs(self):
@@ -140,7 +141,6 @@ class TestViews(UnitTestSkeleton):
     def test_add_crawl_success(self):
         """Post with a valid form payload, and assert that
         the client is redirected to the appropriate crawl page."""
-
         response = self.post('base:crawl_space:add_crawl',
             self.form_data,
             **self.slugs)
@@ -150,7 +150,6 @@ class TestViews(UnitTestSkeleton):
         """Get the test crawl page, and assert that the
         crawl slug is generated properly and the project
         is linked correctly."""
-
         response = self.get('base:crawl_space:crawl', **self.crawl_slugs)
         assert 'crawl_space/crawl.html' in response.template_name
 
@@ -180,30 +179,4 @@ class TestViews(UnitTestSkeleton):
         response = self.post('base:crawl_space:delete_crawl',
             **self.crawl_slugs)
         assert 'base/project.html' in response.template_name
-
-
-#class TestForms(TestCase):
-#
-#    @property
-#    def form_data(self):
-#        """Provide a dictionary of valid form data."""
-#
-#        return {'name': 'Cat Crawl',
-#                'description': 'Find all the cats.',
-#                'crawler': 'nutch',
-#                'seeds_list': SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8'),
-#                'crawl_model': '',
-#                }
-#
-#    @property
-#    def file_data(self):
-#        """Provide a dictionary including a seeds_list SimpleUploadedFile.
-#        Django requires files to be passed as a seperate argument."""
-#        seeds_file = SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
-#        return {'seeds_list': seeds_file}
-#
-#    def test_crawl_form(self):
-#        """Test the project form with valid form data."""
-#        form = AddCrawlForm(self.form_data, self.file_data)
-#        assert form.is_valid()
 

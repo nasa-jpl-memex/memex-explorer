@@ -116,10 +116,17 @@ class Crawl(models.Model):
     def get_crawl_path(instance):
         return join(CRAWL_PATH, str(instance.pk))
 
+    def get_config_path(instance):
+        return os.path.join(instance.get_crawl_path(), "config")
+
     def ensure_crawl_path(instance):
         crawl_path = instance.get_crawl_path()
         ensure_exists(crawl_path)
         return crawl_path
+
+    def get_default_config(instance):
+        resources_path = os.path.dirname(os.path.dirname(instance.get_crawl_path()))
+        return os.path.join(resources_path, "configs", "config_default")
 
     def get_solr_url(instance):
         return SOLR_URL
@@ -176,6 +183,12 @@ class Crawl(models.Model):
                 dst = join(crawl_path, 'seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = dst
+                # Create unique configs for every ache crawl.
+                if os.path.exists(self.get_config_path()):
+                    shutil.rmtree(self.get_config_path())
+                shutil.copytree(self.get_default_config(), self.get_config_path())
+                self.config = self.get_config_path()
+
 
             # Continue saving as normal
 
