@@ -183,6 +183,9 @@ class Crawl(models.Model):
                 dst = join(crawl_path, 'seeds')
                 shutil.move(self.seeds_list.path, dst)
                 self.seeds_list.name = dst
+                # Create unique configs for every ache crawl.
+                if os.path.exists(self.get_config_path()):
+                    shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
 
