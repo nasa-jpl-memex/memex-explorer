@@ -31,20 +31,24 @@ For the purposes of memex-explorer, the extenstion and name of your seeds list d
 *****
 Nutch
 *****
-Nutch is developed by...
+`Nutch <http://nutch.apache.org/>`_ is developed by Apache, and has 
 
-Nutch Crawler Interface
+Nutch Dashboard
 =======================
-Potato
+
+.. image:: _static/img/nutch_dashboard.png
 
 ****
 Ache
 ****
 Ache is developed by...
 
-Ache Crawler Interface
+Ache Dashboard
 ======================
-Potato2
+
+.. image:: _static/img/ache_dashboard1.png
+
+.. image:: _static/img/ache_dashboard2.png
 
 Building a Crawl Model
 ======================
