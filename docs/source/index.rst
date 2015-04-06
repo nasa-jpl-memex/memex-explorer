@@ -18,5 +18,5 @@ Contents:
 
 .. toctree::
    user_guide
-   .. dev_guide
-   .. api
+   crawler_guide
+   dev_guide
