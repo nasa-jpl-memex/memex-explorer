@@ -65,30 +65,45 @@ The crawl settings page allows you to delete the crawl, as well as change the na
 *****
 Nutch
 *****
-`Nutch <http://nutch.apache.org/>`_ is developed by Apache, and has
+`Nutch <http://nutch.apache.org/>`_ is developed by Apache, and has interfaces with both Solr and Elasticsearch, and it allows Memex Explorer to offer different crawling functionality from Ache.
+
+The Nutch crawler runs in a different way than Ache. Nutch runs in uninterruptible rounds of crawling. Nutch will run indefinitely until asked to stop. By viewing the crawl log, it is possible to see how many pages are left to crawl in the current round.
+
+The number of pages left to crawl in a Nutch round increases significantly after each round. With Nutch, you could pass it a seeds list of 100 pages to crawl, and it could find over 1000 pages to crawl the next round. Because of this, Nutch is a much easier crawler to get running.
 
 Nutch Dashboard
 =======================
 .. image:: _static/img/nutch_dashboard.png
 
+Statistics
+    Our implementation of Nutch will give you an overview of how many pages it has crawled after the end of the round.
+
 Nutch Specific Buttons
-======================
+    Nutch has two buttons which are unique to its implementation.
+
+    The first button is a link to a Solr instance, which you can use to search the results of the crawls, using the standard Solr interface.
 
 ****
 Ache
 ****
-Ache is developed by...
+`Ache <https://github.com/ViDA-NYU/ache>`_ is developed by NYU. Ache is different from Nutch because it requires a crawl model to be created before you can run a crawl (see `Building a Crawl Model`_)
 
 Ache Dashboard
 ======================
 .. image:: _static/img/ache_dashboard1.png
 
+.. image:: _static/img/ache_stats.png
 
-.. image:: _static/img/ache_dashboard2.png
+Plots
+    Memex Explorer uses `Bokeh <http://bokeh.pydata.org/en/latest/>`
 
 Statistics
-    Like Nutch, ache also collects statistics for its crawls, and allows you to see the head of the seeds list.
+    Like Nutch, Ache also collects statistics for its crawls, and allows you to see the head of the seeds list.
+
     Harvest rate reflects the relevance to the model of the pages crawled. In this case, 58% of the pages crawled were relevant according to the model.
+
+Ache Specific Buttons
+    Ache has a "Download Relevant Pages" button, which will allow you download which pages Ache has found to be relevant to your seeds list and your crawl model.
 
 Building a Crawl Model
 ======================
