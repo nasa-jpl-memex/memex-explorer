@@ -17,6 +17,8 @@ and the `NYU Polytechnic School of Engineering <http://engineering.nyu.edu/>`_.
 Contents:
 
 .. toctree::
+   :maxdepth: 2
+
    user_guide
    crawler_guide
    dev_guide

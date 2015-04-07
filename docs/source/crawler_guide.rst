@@ -28,6 +28,37 @@ Simply put, the seeds list should contain pages that are relevant to the topics 
 
 For the purposes of memex-explorer, the extenstion and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler.
 
+Crawler Control Buttons
+=======================
+Here's an overview of the buttons available to each crawler for controlling the crawlers. The buttons behaves diffirently depending on which crawler you are using.
+
+.. image:: _static/img/crawler_control.png
+
+Options Button
+    Symbolized by the "gears" icon. This allows you to change various settings on the crawl. See `Crawl Settings`_.
+
+Start Button
+   Symbolized by the "play" button. This will start the crawler for you, and will display the status as "starting" immediatley after pressing it, and "running" after the crawl has been started.
+
+Stop Button
+    Symbolized by the "stop" button. Stops the crawl.
+
+    In the case of Ache, the crawler stops immediatley. In the case of Nutch, the crawler stops after it has finished the current round. This is in order to prevent data corruption which can occur when killing the Nutch process.
+
+Restart Button
+    Symbolized by the "refresh" icon. Restarts the current crawl. This button is only available after the crawl has stopped.
+
+    With Ache, it will immediatley start a brand new Ache crawl, deleting all of the previous crawl information. With Nutch, it will start a new crawler round, using the previous information gathered by the crawl.
+
+Get Seeds List
+    This button will let you download the list of seeds that the crawler is currently using.
+
+Get Crawl Log
+    This button will let you download the log of the current running crawl. This allows you to see the progress of the crawl and any errors that may be occuring during the crawl.
+
+Crawl Settings
+==============
+
 *****
 Nutch
 *****
@@ -35,7 +66,6 @@ Nutch
 
 Nutch Dashboard
 =======================
-
 .. image:: _static/img/nutch_dashboard.png
 
 ****
@@ -45,10 +75,13 @@ Ache is developed by...
 
 Ache Dashboard
 ======================
-
 .. image:: _static/img/ache_dashboard1.png
 
+Like Nutch, ache also collects statistics for its crawls, and allows you to see the head of the seeds list.
+
 .. image:: _static/img/ache_dashboard2.png
+
+Harvest rate reflects the relevance to the model of the pages crawled. In this case, 58% of the pages crawled were relevant according to the model.
 
 Building a Crawl Model
 ======================
