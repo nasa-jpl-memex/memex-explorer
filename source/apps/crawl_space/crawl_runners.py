@@ -256,4 +256,3 @@ class NutchCrawlRunner(CrawlRunner):
             if 'db_fetched' in line:
                 self.crawl.pages_crawled = int(line.split('\t')[-1])
                 self.crawl.save()
-
