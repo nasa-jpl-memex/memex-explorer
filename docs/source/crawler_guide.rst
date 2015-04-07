@@ -1,7 +1,7 @@
 #############
 Crawler Guide
 #############
-Memex Explorer uses two crawlers, Ache and Nutch.
+Memex Explorer uses two crawlers, :ref:`ache-section` and :ref:`nutch-section`.
 
 ****************
 Crawler Overview
@@ -62,6 +62,8 @@ The crawl settings page allows you to delete the crawl, as well as change the na
 
 .. image: _static/img/crawl_settings.png
 
+.. _nutch-section:
+
 *****
 Nutch
 *****
@@ -83,10 +85,12 @@ Nutch Specific Buttons
 
     The first button is a link to a Solr instance, which you can use to search the results of the crawls, using the standard Solr interface.
 
+.. _ache-section:
+
 ****
 Ache
 ****
-`Ache <https://github.com/ViDA-NYU/ache>`_ is developed by NYU. Ache is different from Nutch because it requires a crawl model to be created before you can run a crawl (see `Building a Crawl Model`_)
+`Ache <https://github.com/ViDA-NYU/ache>`_ is developed by NYU. Ache is different from Nutch because it requires a crawl model to be created before you can run a crawl (see `Building a Crawl Model`_). Unlike Nutch, Ache can be stopped at any time. However, if you restart an Ache crawl, it will erase all the data from the previous crawl.
 
 Ache Dashboard
 ======================
@@ -95,7 +99,11 @@ Ache Dashboard
 .. image:: _static/img/ache_stats.png
 
 Plots
-    Memex Explorer uses `Bokeh <http://bokeh.pydata.org/en/latest/>`
+    Memex Explorer uses `Bokeh <http://bokeh.pydata.org/en/latest/>` for its plots. There are two plots available for analyzing Ache crawls, Domain Relevance and Harvest Rate.
+
+    The Domain Relevance plots sorts domains by most pages crawled, and adds information for relevancy of that domain to your crawl model. This plot helps you understand how well your model fits the pages the crawler crawled.
+
+    The Harvest Rate plot shows the overall performance of the crawl in terms how many pages were relevant out of the total pages crawled.
 
 Statistics
     Like Nutch, Ache also collects statistics for its crawls, and allows you to see the head of the seeds list.
@@ -107,4 +115,6 @@ Ache Specific Buttons
 
 Building a Crawl Model
 ======================
-This is how you build a crawl model.
+Ache requires a crawl model to run. For information on how to build crawl models, see the `Ache readme <https://github.com/ViDA-NYU/ache/blob/master/README.md>`_.
+
+For more detailed information on Ache, head to the `Ache Wiki <https://github.com/ViDA-NYU/ache/wiki>`_.
