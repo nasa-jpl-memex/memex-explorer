@@ -87,7 +87,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     status="starting")),
                 content_type="application/json")
 
-                
+
         # Stop
         elif request.POST['action'] == "stop":
             crawl_model.status = 'stopping'
@@ -240,7 +240,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """ Remove crawl folder """
-        # shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
+        shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -263,4 +263,3 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         return CrawlModel.objects.get(
             project=self.get_project(),
             slug=self.kwargs['model_slug'])
-
