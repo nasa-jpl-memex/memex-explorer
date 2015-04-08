@@ -95,7 +95,11 @@ Nutch Specific Buttons
 ----------------------
     Nutch has two buttons which are unique to its implementation.
 
-    The first button is a link to a Solr instance, which you can use to search the results of the crawls using the standard Solr interface.
+    View results in Solr
+        The first button is a link to a Solr instance, which you can use to search the results of the crawls using the standard Solr interface.
+
+    Dump Images
+        This button will download all of the images discovered during the crawl. The images are dumped to a folder on the filesystem. Image Space will use these images as part of its application.
 
 .. _ache-section:
 
