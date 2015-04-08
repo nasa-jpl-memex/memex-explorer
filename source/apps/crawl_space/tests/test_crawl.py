@@ -7,6 +7,7 @@ import shutil
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+import pytest
 
 # App
 from apps.crawl_space.forms import AddCrawlForm
@@ -42,7 +43,8 @@ class TestViews(UnitTestSkeleton):
             crawler = "nutch",
             config = "config_default",
             seeds_list = cls.get_seeds(),
-            project = cls.test_project)
+            project = cls.test_project
+        )
         cls.test_crawl.save()
 
         cls.test_crawlmodel = CrawlModel(
@@ -52,10 +54,6 @@ class TestViews(UnitTestSkeleton):
             project = cls.test_project,
         )
         cls.test_crawlmodel.save()
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.test_crawl.get_crawl_path())
 
     @classmethod
     def get_model_file(self):
@@ -75,7 +73,6 @@ class TestViews(UnitTestSkeleton):
     @property
     def form_data(self):
         """Provide a dictionary of valid form data."""
-
         return {
             'name': 'Cat Crawl',
             'description': 'Find all the cats.',
@@ -100,6 +97,15 @@ class TestViews(UnitTestSkeleton):
             project_slug="test",
             crawl_slug="test-crawl"))
 
+    @property
+    def cat_slugs(self):
+        """Return a dictionary with a "test" project slug and
+        a "test-crawl" crawl slug."""
+
+        return dict(slugs=dict(
+            project_slug="test",
+            crawl_slug="cat-crawl"))
+
     def test_add_crawl_page(self):
         """Get the add_crawl page with **self.slugs and assert that
         the right template is returned."""
@@ -120,7 +126,7 @@ class TestViews(UnitTestSkeleton):
         import re
 
         form_data = self.form_data
-        form_data['name'] = bad_name = "lEe7$|>EE|<"
+        form_data['name'] = bad_name = "lEe8$|>EE|<"
         validator = alphanumeric_validator()
         assert re.match(validator.regex, bad_name) is None
 
@@ -146,10 +152,11 @@ class TestViews(UnitTestSkeleton):
             **self.slugs)
         assert 'crawl_space/crawl.html' in response.template_name
 
+    @pytest.mark.xfail
     def test_crawl_page(self):
-        """Get the test crawl page, and assert that the
-        crawl slug is generated properly and the project
-        is linked correctly."""
+        # Get the test crawl page, and assert that the
+        # crawl slug is generated properly and the project
+        # is linked correctly.
         response = self.get('base:crawl_space:crawl', **self.crawl_slugs)
         assert 'crawl_space/crawl.html' in response.template_name
 
@@ -162,9 +169,11 @@ class TestViews(UnitTestSkeleton):
         response = self.get('base:crawl_space:crawl_settings', **self.crawl_slugs)
         assert 'crawl_space/crawl_update_form.html' in response.template_name
 
+    @pytest.mark.xfail
     def test_crawl_settings_change_name(self):
         response = self.post('base:crawl_space:crawl_settings',
-            {'name': 'Cat Crawl'}, **self.crawl_slugs)
+            {'name': 'Dog Crawl'}, **self.crawl_slugs)
+        import ipdb
         crawl = get_object(response)
         assert crawl.name == "Cat Crawl"
 
