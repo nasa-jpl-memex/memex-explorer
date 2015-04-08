@@ -75,4 +75,3 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
 
     def get_crawls(self):
         return Crawl.objects.filter(project=self.get_object())
-

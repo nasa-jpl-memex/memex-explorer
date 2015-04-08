@@ -42,7 +42,7 @@ Project Page
 The project page lists actions provided by registered microservices. Click
 on the gear icon to change the project name or description.
 
-In the current iteration of Memex Explorer, only the Crawl Space microservice
+In the current Memex Explorer, only the Crawl Space microservice
 has been registered. Therefore, each project page will list the current
 crawls and crawl models.
 
