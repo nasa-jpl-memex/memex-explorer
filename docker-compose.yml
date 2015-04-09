@@ -1,0 +1,7 @@
+web:
+  build: .
+  command: python ./manage.py runserver 0.0.0.0:8617
+  volumes:
+    - ./source:/source
+  ports:
+    - "8617:8617"
