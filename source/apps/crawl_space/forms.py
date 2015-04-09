@@ -68,7 +68,6 @@ class CrawlSettingsForm(CrispyModelForm):
 
         self.helper.layout = Layout(
             Fieldset(None,
-                'name',
                 'description',
                 FormActions(Submit('submit', "Submit"))
             )
@@ -84,7 +83,7 @@ class CrawlSettingsForm(CrispyModelForm):
 
     class Meta:
         model = Crawl
-        fields = ['name', 'description']
+        fields = ['description']
 
 
 class AddCrawlModelForm(CrispyModelForm):

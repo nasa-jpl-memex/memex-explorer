@@ -203,7 +203,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         return context
 
 
-class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
+class CrawlSettingsView(ProjectObjectMixin, UpdateView):
 
     model = Crawl
     form_class = CrawlSettingsForm
@@ -240,7 +240,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """ Remove crawl folder """
-        shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
+        shutil.rmtree(self.get_object().get_crawl_path())
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):

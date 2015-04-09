@@ -30,7 +30,7 @@ class Harvest(object):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
     def __init__(self, crawl):
-        self.harvest_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/harvestinfo.csv')
+        self.harvest_data = os.path.join(crawl.get_crawl_path(), 'data_monitor/harvestinfo.csv')
 
     def update_source(self):
         proc = subprocess.Popen(shlex.split("tail -n 800 %s" % self.harvest_data),
