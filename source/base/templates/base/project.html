@@ -32,7 +32,6 @@
         <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}">
           <i class="fa fa-search"> &nbsp; </i>Crawls</a>
         &nbsp;&nbsp;&nbsp;
-        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" style="float:right;" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
       </h4>
 
       {% if project.crawl_set.all %}
@@ -46,13 +45,13 @@
       {% else %}
       <p>No Crawls Registered.</p>
       {% endif %}
+        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
     </div>
 
     <div class="col-sm-4">
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
         &nbsp;&nbsp;&nbsp;
-      <a class="btn btn-default btn-duo center link-button" style="float:right;" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
       </h4>
         {% if project.crawlmodel_set.all %}
         <ul class="list-group">
@@ -70,6 +69,7 @@
         {% else %}
         <p>No Crawl Models Registered.</p>
         {% endif %}
+      <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
       </div>
     </div>
 

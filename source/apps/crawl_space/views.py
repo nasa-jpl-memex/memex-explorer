@@ -203,7 +203,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         return context
 
 
-class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
+class CrawlSettingsView(ProjectObjectMixin, UpdateView):
 
     model = Crawl
     form_class = CrawlSettingsForm
