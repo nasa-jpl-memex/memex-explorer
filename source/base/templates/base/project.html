@@ -40,10 +40,6 @@
         {%  for w in project.crawl_set.all %}
         <li class="list-group-item">
           <a href="{{ w.get_absolute_url }}"><i class="fa fa-search"></i>{{ w.name }}</a>
-                <form action="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}" method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
-                    {% csrf_token %}
-                <button class="fa fa-trash-o" type="submit"></button>
-            </form>
         </li>
         {% endfor %}
        </ul>
