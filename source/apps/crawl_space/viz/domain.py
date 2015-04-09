@@ -28,8 +28,8 @@ class Domain(object):
 
     def __init__(self, crawl, sort='crawled'):
         # TODO Retrieve plot datasources from db
-        self.crawled_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/crawledpages.csv')
-        self.relevant_data = os.path.join(CRAWL_PATH, str(crawl.id), 'data_monitor/relevantpages.csv')
+        self.crawled_data = os.path.join(crawl.get_crawl_path(), 'data_monitor/crawledpages.csv')
+        self.relevant_data = os.path.join(crawl.get_crawl_path(), 'data_monitor/relevantpages.csv')
 
         self.sort = sort
 
