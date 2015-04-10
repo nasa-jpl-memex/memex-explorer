@@ -21,7 +21,6 @@ class AddCrawlForm(CrispyModelForm):
 
     def set_layout(self):
         """Called in __init__ to register a custom layout."""
-
         self.helper.layout = Layout(
             Fieldset(None,
                 'name',
@@ -67,9 +66,11 @@ class CrawlSettingsForm(CrispyModelForm):
         """Called in __init__ to register a custom layout."""
 
         self.helper.layout = Layout(
-            Fieldset(None,
+            Fieldset(
+                None,
+                'name',
                 'description',
-                FormActions(Submit('submit', "Submit"))
+                FormActions(Submit('submit', "Submit")),
             )
         )
 
@@ -83,7 +84,7 @@ class CrawlSettingsForm(CrispyModelForm):
 
     class Meta:
         model = Crawl
-        fields = ['description']
+        fields = ['name', 'description']
 
 
 class AddCrawlModelForm(CrispyModelForm):

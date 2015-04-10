@@ -203,7 +203,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         return context
 
 
-class CrawlSettingsView(ProjectObjectMixin, UpdateView):
+class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
     model = Crawl
     form_class = CrawlSettingsForm
@@ -263,3 +263,4 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         return CrawlModel.objects.get(
             project=self.get_project(),
             slug=self.kwargs['model_slug'])
+
