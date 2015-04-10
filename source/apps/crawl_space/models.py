@@ -114,7 +114,7 @@ class Crawl(models.Model):
         return join(SEEDS_TMP_DIR, self.name, filename)
         
     def get_crawl_path(self):
-        return join(CRAWL_PATH, self.project.slug, self.slug)
+        return join(CRAWL_PATH, self.location)
 
     def get_config_path(self):
         return os.path.join(self.get_crawl_path(), "config")
@@ -152,6 +152,7 @@ class Crawl(models.Model):
     project = models.ForeignKey(Project)
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True, 
         default=None)
+    location = models.CharField(max_length=64, default="location")
 
     def __unicode__(self):
         return self.name
@@ -163,6 +164,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
+            self.location = os.path.join(self.project.slug, self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
