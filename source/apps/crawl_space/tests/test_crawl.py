@@ -176,7 +176,6 @@ class TestViews(UnitTestSkeleton):
         crawl = get_object(response)
         assert crawl.name == "Cat Crawl"
 
-    @pytest.mark.xfail
     def test_crawl_settings_change_description(self):
         response = self.post('base:crawl_space:crawl_settings',
             {'description': 'A crawl for information about cats.'},
