@@ -1,0 +1,21 @@
+server {
+    listen 80;
+    server_name {{ hostname }};
+
+    location / {
+        proxy_pass http://0.0.0.0:{{ root_port }}/;
+    }
+}
+
+{% for project in projects %}
+    {% for app in apps %}
+server {
+    listen 80;
+    server_name {{ project.slug }}_{{ app.name }}.{{ hostname }};
+
+    location / {
+        proxy_pass http://0.0.0.0:????/;
+    }
+}
+{% endfor %}
+{% endfor %}
