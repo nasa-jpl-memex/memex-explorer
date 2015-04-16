@@ -1,0 +1,137 @@
+[{
+    "AppArmorProfile": "",
+    "Args": [
+        "-f",
+        "-V",
+        "-d",
+        "/opt/conda/solr_pkg"
+    ],
+    "Config": {
+        "AttachStderr": true,
+        "AttachStdin": false,
+        "AttachStdout": true,
+        "Cmd": [
+            "solr",
+            "-f",
+            "-V",
+            "-d",
+            "/opt/conda/solr_pkg"
+        ],
+        "CpuShares": 0,
+        "Cpuset": "",
+        "Domainname": "",
+        "Entrypoint": null,
+        "Env": [
+            "HOME=/",
+            "PATH=/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "ExposedPorts": {
+            "8983/tcp": {}
+        },
+        "Hostname": "b8210abe578b",
+        "Image": "continuumio/solr:latest",
+        "MacAddress": "",
+        "Memory": 0,
+        "MemorySwap": 0,
+        "NetworkDisabled": false,
+        "OnBuild": null,
+        "OpenStdin": false,
+        "PortSpecs": null,
+        "StdinOnce": false,
+        "Tty": false,
+        "User": "",
+        "Volumes": {
+            "/opt/conda/solr_pkg/solr/collection1/data": {}
+        },
+        "WorkingDir": ""
+    },
+    "Created": "2015-04-10T08:07:42.953326627Z",
+    "Driver": "aufs",
+    "ExecDriver": "native-0.2",
+    "ExecIDs": [
+        "afb432774eaf7125c824f3b992b76ca5bef17ac2b6d8a402010a8276821d36ea"
+    ],
+    "HostConfig": {
+        "Binds": [
+            "/opt/solr_data_1:/opt/conda/solr_pkg/solr/collection1/data:rw"
+        ],
+        "CapAdd": null,
+        "CapDrop": null,
+        "ContainerIDFile": "",
+        "Devices": null,
+        "Dns": null,
+        "DnsSearch": null,
+        "ExtraHosts": null,
+        "IpcMode": "",
+        "Links": null,
+        "LxcConf": null,
+        "NetworkMode": "bridge",
+        "PidMode": "",
+        "PortBindings": {
+            "8983/tcp": [
+                {
+                    "HostIp": "",
+                    "HostPort": "8985"
+                }
+            ]
+        },
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyRootfs": false,
+        "RestartPolicy": {
+            "MaximumRetryCount": 0,
+            "Name": ""
+        },
+        "SecurityOpt": null,
+        "VolumesFrom": []
+    },
+    "HostnamePath": "/var/lib/docker/containers/b8210abe578be7ec8234f96f74f2b69eb6d49a3cf71b7ca8c613124c4db3efcb/hostname",
+    "HostsPath": "/var/lib/docker/containers/b8210abe578be7ec8234f96f74f2b69eb6d49a3cf71b7ca8c613124c4db3efcb/hosts",
+    "Id": "b8210abe578be7ec8234f96f74f2b69eb6d49a3cf71b7ca8c613124c4db3efcb",
+    "Image": "1fb84f11c68e118f0b83f1d03cf148e95861bc9d15f0ce7ba48676f919f2cdda",
+    "MountLabel": "",
+    "Name": "/dockerlinkedapp_solrapp_1",
+    "NetworkSettings": {
+        "Bridge": "docker0",
+        "Gateway": "172.17.42.1",
+        "GlobalIPv6Address": "",
+        "GlobalIPv6PrefixLen": 0,
+        "IPAddress": "172.17.1.85",
+        "IPPrefixLen": 16,
+        "IPv6Gateway": "",
+        "LinkLocalIPv6Address": "fe80::42:acff:fe11:155",
+        "LinkLocalIPv6PrefixLen": 64,
+        "MacAddress": "02:42:ac:11:01:55",
+        "PortMapping": null,
+        "Ports": {
+            "8983/tcp": [
+                {
+                    "HostIp": "0.0.0.0",
+                    "HostPort": "8985"
+                }
+            ]
+        }
+    },
+    "Path": "solr",
+    "ProcessLabel": "",
+    "ResolvConfPath": "/var/lib/docker/containers/b8210abe578be7ec8234f96f74f2b69eb6d49a3cf71b7ca8c613124c4db3efcb/resolv.conf",
+    "RestartCount": 0,
+    "State": {
+        "Error": "",
+        "ExitCode": 0,
+        "FinishedAt": "0001-01-01T00:00:00Z",
+        "OOMKilled": false,
+        "Paused": false,
+        "Pid": 7872,
+        "Restarting": false,
+        "Running": true,
+        "StartedAt": "2015-04-10T08:07:43.085736347Z"
+    },
+    "Volumes": {
+        "/opt/conda/solr_pkg/solr/collection1/data": "/opt/solr_data_1"
+    },
+    "VolumesRW": {
+        "/opt/conda/solr_pkg/solr/collection1/data": true
+    }
+}
+]
