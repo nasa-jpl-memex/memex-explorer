@@ -8,7 +8,7 @@ server {
 }
 
 {% for project in projects %}
-    {% for app in apps %}
+    {% for app in project.apps %}
 server {
     listen 80;
     server_name {{ project.slug }}_{{ app.name }}.{{ hostname }};

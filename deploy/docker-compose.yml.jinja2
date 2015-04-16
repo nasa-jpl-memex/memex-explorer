@@ -1,6 +1,6 @@
 {% for project in projects %}
     {% for app in apps %}
-{{ project.slug }}_{{ app.name }}:
+{{ project.slug }}{{ app.name }}:
     build: {{ app.dockerfile }}
     command: {{ app.command }}
     {% if app.volumes %}
@@ -11,7 +11,7 @@
     {% endif %}
     expose:
     {% for port in app.expose %}
-      - {{ port }}
+      - "{{ port }}"
     {% endfor %}
   {% endfor %}
 {% endfor %}
