@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import subprocess
 import os
+import shlex
 
 from celery import shared_task, Task
 
@@ -14,8 +15,24 @@ class NutchTask(Task):
     abstract = True
 
 
+def nutch_log_statistics(crawl):
+    crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
+    stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
+    proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+
+    stdout, stderr = proc.communicate()
+
+    nutch_stats = stdout.decode()
+
+    for line in stdout.split('\n'):
+        if 'db_fetched' in line:
+            crawl.pages_crawled = int(line.split('\t')[-1])
+            crawl.save()
+
+
 @shared_task(bind=True, base=NutchTask)
-def nutch(self, crawl, rounds, *args, **kwargs):
+def nutch(self, crawl, rounds="1", *args, **kwargs):
     call = [
         "crawl",
         crawl.seeds_list.path,
@@ -28,6 +45,7 @@ def nutch(self, crawl, rounds, *args, **kwargs):
     task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
     task.save()
     stdout, stderr = proc.communicate()
+    nutch_log_statistics(crawl)
     return "FINISHED"
 
 
