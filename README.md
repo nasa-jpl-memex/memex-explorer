@@ -28,6 +28,14 @@ $ python manage.py createsuperuser
 ```
 $ py.test
 ```
+
+# Starting Celery
+* Memex Explorer relies on both redis and Celery to manage tasks. To start the celery worker, run these two commands from the source directory:
+```
+$ redis-server
+$ celery -A memex worker -l info
+```
+
 # Installing Compass
 If you need to make changes to the .scss stylesheets, [Compass](http://compass-style.org/) is a useful tool. The following are instructions on how to install compass without using `sudo`.
 * For mac users, add this line to your `~/.bash_profile`:
