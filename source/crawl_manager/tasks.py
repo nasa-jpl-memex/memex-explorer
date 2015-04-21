@@ -2,31 +2,46 @@ from __future__ import absolute_import
 
 import subprocess
 
-from celery import shared_task, Task, uuid
+from celery import shared_task
 
 from crawl_manager.models import CeleryTask
 
 
-def db_register_task(pid):
-    task = CeleryTask(pid=pid)
-    task.save()
-    return "success"
+class NutchTask(Task):
+    abstract = True
 
 
-def repeat(uuid):
-    print(uuid)
-
-
-@shared_task()
-def nutch(crawl, rounds, *args, **kwargs):
-    call = ["crawl", crawl.seeds_list, crawl.get_crawl_path(), rounds]
+@shared_task(bind=True, base=NutchTask)
+def nutch(self, crawl, rounds, *args, **kwargs):
+    call = [
+        "crawl",
+        crawl.seeds_list.path,
+        crawl.get_crawl_path(),
+        rounds,
+    ]
     proc = subprocess.Popen(call, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    db_register_task(proc.pid, crawl)
+    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+    task.save()
     stdout, stderr = proc.communicate()
     return "FINISHED"
 
-@shared_task(bind=True)
-def add(self, x, y):
-    print(self.request.id)
-    return x + y
+
+class AcheTask(Task):
+    abstract = True
+
+
+@shared_task(bind=True, base=AcheTask)
+def ache(self, crawl, *args, **kwargs):
+    call = [
+        "ache",
+        "startCrawl",
+        crawl.get_crawl_path(),
+        crawl.get_config_path(),
+        crawl.crawl_model.get_model_path(),
+    ]
+    proc = subprocess.Popen(call, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+    task.save()
+    stdout, stderr = proc.communicate()
+    return "FINISHED"
 
