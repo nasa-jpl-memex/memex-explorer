@@ -11,6 +11,18 @@ from crawl_manager.models import CeleryTask
 from apps.crawl_space.settings import LANG_DETECT_PATH
 
 
+class CrawlException(Exception):
+    pass
+
+
+class NutchException(CrawlException):
+    pass
+
+
+class AcheException(CrawlException):
+    pass
+
+
 class NutchTask(Task):
     abstract = True
 
@@ -51,6 +63,25 @@ def nutch(self, crawl, rounds="1", *args, **kwargs):
 
 class AcheTask(Task):
     abstract = True
+
+
+def ache_log_statistics(crawl):
+    harvest_path = os.path.join(crawl.get_crawl_path(), 'data_monitor/harvestinfo.csv')
+    proc = subprocess.Popen(["tail", "-n", "1", harvest_path],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    if stderr and b"No such file or directory" not in stderr:
+        raise AcheException(stderr)
+
+    harvest_stats = stdout.decode()
+
+    if not harvest_stats:
+        return
+
+    relevant, crawled = tuple(harvest_stats.split('\t')[:2])
+    crawl.harvest_rate = "%.2f" % (float(relevant) / float(crawled))
+    crawl.pages_crawled = crawled
+    crawl.save()
 
 
 @shared_task(bind=True, base=AcheTask)
