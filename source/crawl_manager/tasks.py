@@ -58,7 +58,7 @@ def nutch(self, crawl, rounds="1", *args, **kwargs):
     task.save()
     stdout, stderr = proc.communicate()
     nutch_log_statistics(crawl)
-    return "FINISHED"
+    return "Finished"
 
 
 class AcheTask(Task):
@@ -101,5 +101,5 @@ def ache(self, crawl, *args, **kwargs):
     task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
     task.save()
     stdout, stderr = proc.communicate()
-    return "FINISHED"
+    return "Finished"
 

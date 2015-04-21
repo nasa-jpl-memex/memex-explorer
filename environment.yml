@@ -25,3 +25,5 @@ dependencies:
         - django-crispy-forms
         - coveralls
         - sphinx-rtd-theme
+        - celery
+        - flower
