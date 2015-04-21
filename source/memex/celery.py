@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 
 import subprocess
-import time
-import json
 import os
 
 from celery import Celery

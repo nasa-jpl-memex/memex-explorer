@@ -6,6 +6,7 @@ python:
 branches:
     only:
         - master
+        - 0.3.0
 
 before_install:
   - "export DISPLAY=:99.0"
