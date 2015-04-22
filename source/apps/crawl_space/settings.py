@@ -20,13 +20,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "memex.settings")
 import django
 from django.conf import settings
 
-resources_dir = settings.MEDIA_ROOT
+resources_dir = settings.PROJECT_PATH
 
 # ACHE language detection files.
 # TODO Investigate using conda-installed ACHE resources.
 LANG_DETECT_PATH = os.path.join(resources_dir, 'profiles')
 
-CRAWL_PATH = os.path.join(resources_dir, 'crawls')
+CRAWL_PATH = resources_dir
 MODEL_PATH = os.path.join(resources_dir, 'models')
 CONFIG_PATH = os.path.join(resources_dir, 'configs')
 IMAGES_PATH = os.path.join(resources_dir, 'images')

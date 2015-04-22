@@ -10,6 +10,8 @@ from django.core.urlresolvers import reverse
 
 from django.conf import settings
 
+from task_manager.file_tasks import unzip
+
 
 def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
@@ -37,15 +39,19 @@ class Project(models.Model):
 
     """
 
-    def get_project_data_path(self, filename):
+    def get_zipped_data_path(self, filename):
         return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
+
+    def get_dumped_data_path(self):
+        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
 
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    uploaded_data = models.FileField(upload_to=get_project_data_path,
+    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
         null=True, blank=True, default=None, validators=[zipped_file_validator()])
+    data_folder = models.TextField(blank=True)
 
     def get_absolute_url(self):
         return reverse('base:project',
@@ -53,6 +59,8 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
+        unzip.delay(self.uploaded_data.file, self.get_dumped_data_path())
+        self.data_folder = self.get_dumped_data_path()
         super(Project, self).save(*args, **kwargs)
 
     def __unicode__(self):

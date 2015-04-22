@@ -164,7 +164,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(self.project.slug, self.slug)
+            self.location = os.path.join(self.project.slug, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
