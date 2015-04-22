@@ -6,7 +6,7 @@ import shlex
 
 from celery import shared_task, Task
 
-from crawl_manager.models import CeleryTask
+from task_manager.models import CeleryTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH
 

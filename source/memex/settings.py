@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crispy_forms',
     'base',
-    'crawl_manager',
+    'task_manager',
 )
 
 EXPLORER_APPS = (
