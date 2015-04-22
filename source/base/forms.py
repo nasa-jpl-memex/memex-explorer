@@ -36,7 +36,7 @@ class AddProjectForm(CrispyModelForm):
 
     class Meta:
         model = Project
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'uploaded_data']
 
 
 class ProjectSettingsForm(AddProjectForm):

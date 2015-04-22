@@ -108,6 +108,8 @@ MEDIA_URL = '/resources/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
+PROJECT_PATH = os.path.join(MEDIA_ROOT, "projects")
+
 # Logging
 import logging
 
