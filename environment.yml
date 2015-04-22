@@ -15,6 +15,7 @@ dependencies:
     - pytest
     - pip
     - sphinx
+    - redis
     - pip:
         - tld
         - selenium
@@ -25,3 +26,4 @@ dependencies:
         - django-crispy-forms
         - coveralls
         - sphinx-rtd-theme
+        - celery
