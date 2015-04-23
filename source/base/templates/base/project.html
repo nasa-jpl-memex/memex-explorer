@@ -1,6 +1,13 @@
 {% extends "base/base.html" %}
 
 {% block title %}{{project.name}}{% endblock %}
+
+{% load static %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/project.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <script>
@@ -8,6 +15,7 @@
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>
+
 
 {% include "base/sidebar.html" %}
 
@@ -48,7 +56,7 @@
         <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-8">
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
         &nbsp;&nbsp;&nbsp;
@@ -71,6 +79,14 @@
         {% endif %}
       <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
       </div>
+        <div class="col-sm-4" style="margin-top:40px;">
+        {% if project.data_folder %}
+        <p>If you have uploaded PDF data and would like to analyze the data using Elastic Search, click this button.</p>
+        <button id="createIndex" type="button" title="Create ElasticsearchIndex" class="btn btn-default btn-duo center" style="float:left;">
+            <a>Create Index</a>
+        </button>
+        {% endif %}
+        </div>
     </div>
 
   </div>
