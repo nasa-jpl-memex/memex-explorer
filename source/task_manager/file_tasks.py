@@ -22,5 +22,4 @@ def unzip(input_zip, output_folder):
             with source, target:
                 shutil.copyfileobj(source, target)
     return "success"
-    
 
