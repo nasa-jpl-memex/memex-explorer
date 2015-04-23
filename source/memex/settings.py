@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'crispy_forms',
     'base',
-    'crawl_manager',
+    'task_manager',
 )
 
 EXPLORER_APPS = (
@@ -107,6 +107,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
 MEDIA_URL = '/resources/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+PROJECT_PATH = os.path.join(MEDIA_ROOT, "projects")
 
 # Logging
 import logging

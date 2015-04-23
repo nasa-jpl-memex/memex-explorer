@@ -16,7 +16,7 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (MODEL_PATH, CRAWL_PATH,
+from apps.crawl_space.settings import (resources_dir, MODEL_PATH, CRAWL_PATH,
                                        SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
@@ -125,8 +125,7 @@ class Crawl(models.Model):
         return crawl_path
 
     def get_default_config(self):
-        resources_path = os.path.dirname(os.path.dirname(os.path.dirname(self.get_crawl_path())))
-        return os.path.join(resources_path, "configs", "config_default")
+        return os.path.join(resources_dir, "configs", "config_default")
 
     def get_solr_url(self):
         return SOLR_URL
@@ -164,7 +163,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(self.project.slug, self.slug)
+            self.location = os.path.join(self.project.slug, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
