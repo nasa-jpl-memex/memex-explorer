@@ -16,6 +16,7 @@ dependencies:
     - pip
     - sphinx
     - redis
+    - redis-py
     - pip:
         - tld
         - selenium
