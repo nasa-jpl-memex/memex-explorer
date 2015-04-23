@@ -52,7 +52,7 @@ def process_content(content_str, stopwords):
 
 
 @shared_task()
-def ingest_files(project):
+def create_index(project):
     es = Elasticsearch([ELASTICSEARCH_HOST])
     files = [os.path.join(project.data_folder, x) for x in os.listdir(project.data_folder)]
     if es.indices.exists(project.slug):

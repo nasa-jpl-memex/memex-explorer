@@ -25,6 +25,8 @@ from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
+from task_manager.tika_tasks import create_index
+
 
 class ProjectObjectMixin(ContextMixin):
 
