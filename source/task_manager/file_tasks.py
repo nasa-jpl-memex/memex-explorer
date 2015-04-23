@@ -6,6 +6,10 @@ from celery import shared_task, Task, task
 
 @shared_task()
 def unzip(input_zip, output_folder):
+    """
+    Celery task which unzips files in a .zip archive and ignores folder
+    structure, taking each file to the top level of the output folder.
+    """
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     with zipfile.ZipFile(input_zip) as archive:

@@ -22,7 +22,7 @@ class TestViews(UnitTestSkeleton):
         and save them to the test database."""
 
         super(TestViews, cls).setUpClass()
-        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 'crawls'))
+        # shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 'projects'))
 
         cls.test_project = Project(
             name = "Crawl Operation",
@@ -70,7 +70,7 @@ class TestViews(UnitTestSkeleton):
         is linked correctly."""
 
         response = self.get('base:crawl_space:crawl', **self.crawl_slugs)
-        
+
         assert 'crawl_space/crawl.html' in response.template_name
         crawl = get_object(response)
         assert crawl.project == self.test_project

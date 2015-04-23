@@ -60,7 +60,9 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         if self.uploaded_data:
-            unzip.delay(self.uploaded_data.file, self.get_dumped_data_path())
+            super(Project, self).save(*args, **kwargs)
+            unzip.delay(self.get_zipped_data_path(self.uploaded_data.name),
+                    self.get_dumped_data_path())
             self.data_folder = self.get_dumped_data_path()
         super(Project, self).save(*args, **kwargs)
 
