@@ -8,13 +8,12 @@ import json
 import re
 import os
 
-from celery import shared_task
+from celery import shared_task, task
+
+from base.models import Project
 
 TIKA_ENDPOINT="http://ec2-54-237-89-165.compute-1.amazonaws.com:9998/"
 ELASTICSEARCH_HOST="http://ec2-54-237-89-165.compute-1.amazonaws.com:9200/"
-ELASTICSEARCH_INDEX="sample"
-
-FILE=[os.path.join("sampledocs", x) for x in os.listdir("sampledocs")]
 
 from elasticsearch import Elasticsearch
 from tika import parse1 as parse
@@ -47,17 +46,18 @@ def process_content(content_str, stopwords):
             keyword_phrase = last_token + ' ' + token
             if keyword_phrase in features.keys():
                 features[keyword_phrase] = 1
-                print keyword_phrase, '1'
             last_token = token
     content_str = " ".join(cleaned)
     return content_str, features
 
 
 @shared_task()
-def ingest_files(files, es, tika_parse):
-    if es.indices.exists(ELASTICSEARCH_INDEX):
-        print("Deleting '%s' index" % ELASTICSEARCH_INDEX)
-        res = es.indices.delete(index=ELASTICSEARCH_INDEX)
+def ingest_files(project):
+    es = Elasticsearch([ELASTICSEARCH_HOST])
+    files = [os.path.join(project.data_folder, x) for x in os.listdir(project.data_folder)]
+    if es.indices.exists(project.slug):
+        print("Deleting '%s' index" % project.slug)
+        res = es.indices.delete(index=project.slug)
         print("  response: '%s'" % res)
 
     stopwords = []
@@ -77,7 +77,7 @@ def ingest_files(files, es, tika_parse):
             for kw, val in features.items():
                 parsed["has_" + re.sub(' ', '_', kw)] = val
             #parsed["authors"] = process_authors(parsed["X-TIKA:content"])
-            es.index(index=ELASTICSEARCH_INDEX,
+            es.index(index=project.slug,
                      doc_type="autonomy",
                      body = parsed,
                      )
@@ -86,10 +86,4 @@ def ingest_files(files, es, tika_parse):
             #Just move on to the next document
             print e
             pass
-
-
-es = Elasticsearch([ELASTICSEARCH_HOST])
-files = FILE
-
-ingest_files(files, es, parse)
 
