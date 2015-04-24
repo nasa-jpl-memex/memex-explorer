@@ -12,11 +12,16 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.http import HttpResponse
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from base.models import Project
 from base.forms import AddProjectForm, ProjectSettingsForm
 
 from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
+
+from task_manager.tika_tasks import create_index
 
 
 def project_context_processor(request):
@@ -48,6 +53,25 @@ class ProjectView(DetailView):
     model = Project
     slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+
+        if request.POST['action'] == "create_index":
+            create_index.delay(self.get_object())
+            return HttpResponse("Success")
+
+        return HttpResponse(json.dumps(dict(
+                args=args,
+                kwargs=kwargs,
+                post=request.POST)),
+            content_type="application/json")
+
+    def get_object(self):
+        return Project.objects.get(slug=self.kwargs['project_slug'])
 
 
 class ProjectSettingsView(SuccessMessageMixin, UpdateView):

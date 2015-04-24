@@ -16,7 +16,7 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (MODEL_PATH, CRAWL_PATH,
+from apps.crawl_space.settings import (resources_dir, MODEL_PATH, CRAWL_PATH,
                                        SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
@@ -39,14 +39,14 @@ class CrawlModel(models.Model):
     """
 
 
-    def get_model_upload_path(instance, filename):
-        return join(MODELS_TMP_DIR, instance.name, filename)
+    def get_model_upload_path(self, filename):
+        return join(MODELS_TMP_DIR, self.name, filename)
 
-    def get_model_path(instance):
-        return join(MODEL_PATH, str(instance.pk))
+    def get_model_path(self):
+        return join(MODEL_PATH, str(self.pk))
 
-    def ensure_model_path(instance):
-        model_path = instance.get_model_path()
+    def ensure_model_path(self):
+        model_path = self.get_model_path()
         ensure_exists(model_path)
 
         return model_path
@@ -110,25 +110,24 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
-    def get_seeds_upload_path(instance, filename):
-        return join(SEEDS_TMP_DIR, instance.name, filename)
+    def get_seeds_upload_path(self, filename):
+        return join(SEEDS_TMP_DIR, self.name, filename)
         
-    def get_crawl_path(instance):
-        return join(CRAWL_PATH, str(instance.pk))
+    def get_crawl_path(self):
+        return join(CRAWL_PATH, self.location)
 
-    def get_config_path(instance):
-        return os.path.join(instance.get_crawl_path(), "config")
+    def get_config_path(self):
+        return os.path.join(self.get_crawl_path(), "config")
 
-    def ensure_crawl_path(instance):
-        crawl_path = instance.get_crawl_path()
+    def ensure_crawl_path(self):
+        crawl_path = self.get_crawl_path()
         ensure_exists(crawl_path)
         return crawl_path
 
-    def get_default_config(instance):
-        resources_path = os.path.dirname(os.path.dirname(instance.get_crawl_path()))
-        return os.path.join(resources_path, "configs", "config_default")
+    def get_default_config(self):
+        return os.path.join(resources_dir, "configs", "config_default")
 
-    def get_solr_url(instance):
+    def get_solr_url(self):
         return SOLR_URL
 
     CRAWLER_CHOICES = (
@@ -152,6 +151,7 @@ class Crawl(models.Model):
     project = models.ForeignKey(Project)
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True, 
         default=None)
+    location = models.CharField(max_length=64, default="location")
 
     def __unicode__(self):
         return self.name
@@ -163,6 +163,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
+            self.location = os.path.join(self.project.slug, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists

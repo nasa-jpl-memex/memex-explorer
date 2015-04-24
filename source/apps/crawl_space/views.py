@@ -25,6 +25,8 @@ from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
+from task_manager.tika_tasks import create_index
+
 
 class ProjectObjectMixin(ContextMixin):
 
@@ -240,7 +242,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """ Remove crawl folder """
-        shutil.rmtree(os.path.join(CRAWL_PATH, str(self.get_object().pk)))
+        shutil.rmtree(self.get_object().get_crawl_path())
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -263,3 +265,4 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         return CrawlModel.objects.get(
             project=self.get_project(),
             slug=self.kwargs['model_slug'])
+

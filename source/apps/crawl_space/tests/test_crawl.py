@@ -144,6 +144,7 @@ class TestViews(UnitTestSkeleton):
             form_data, **self.slugs)
         assert_form_errors(response, 'crawl_model', 'crawler')
 
+    @pytest.mark.xfail
     def test_add_crawl_success(self):
         """Post with a valid form payload, and assert that
         the client is redirected to the appropriate crawl page."""
@@ -173,7 +174,6 @@ class TestViews(UnitTestSkeleton):
     def test_crawl_settings_change_name(self):
         response = self.post('base:crawl_space:crawl_settings',
             {'name': 'Dog Crawl'}, **self.crawl_slugs)
-        import ipdb
         crawl = get_object(response)
         assert crawl.name == "Cat Crawl"
 

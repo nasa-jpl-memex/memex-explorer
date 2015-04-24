@@ -1,5 +1,7 @@
 """Base models."""
 
+import os
+
 from django.db import models
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
@@ -8,6 +10,10 @@ from django.core.urlresolvers import reverse
 
 from jinja2 import Template
 from jinja2.runtime import Context
+
+from django.conf import settings
+
+from task_manager.file_tasks import unzip
 
 
 def alphanumeric_validator():
@@ -68,6 +74,11 @@ def generate_nginx_config(new_slug):
         f.write(nginx_config)
         f.flush()
 
+def zipped_file_validator():
+    return RegexValidator(r'.*\.(ZIP|zip)$',
+        'Only compressed archive (.zip) files are allowed.')
+
+
 class Project(models.Model):
     """Project model.
 
@@ -84,11 +95,19 @@ class Project(models.Model):
     description : textfield
 
     """
-
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
+    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+        null=True, blank=True, default=None, validators=[zipped_file_validator()])
+    data_folder = models.TextField(blank=True)
+
+    def get_zipped_data_path(self, filename):
+        return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
+
+    def get_dumped_data_path(self):
+        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
 
     def get_absolute_url(self):
         return reverse('base:project',
@@ -96,6 +115,7 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
+
         ports = {
 
         }
@@ -110,6 +130,13 @@ class Project(models.Model):
         #restart nginx
 
         #fill it in with each project's 
+
+        if self.uploaded_data:
+            super(Project, self).save(*args, **kwargs)
+            unzip.delay(self.get_zipped_data_path(self.uploaded_data.name),
+                    self.get_dumped_data_path())
+            self.data_folder = self.get_dumped_data_path()
+
         super(Project, self).save(*args, **kwargs)
 
     def __unicode__(self):
