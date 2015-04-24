@@ -1,0 +1,20 @@
+{% for container in containers %}
+{{ container.slug }}:
+    {% if container.image %}
+    image: {{ container.app.image }}
+    {% else %}
+    build: {{ container.app.dockerfile }}
+    {% endif %}
+    command: {{ container.app.command }}
+    {% if container.app.volumes %}
+    volumes:
+        {% for volume in container.app.volumes %}
+      - {{ volume.located_at }}:{{ volume.mounted_at }}
+        {% endfor %}
+    {% endif %}
+    expose:
+    {% if container.app.port_expose %}
+      - "{{ container.app.port_expose }}"
+    {% endif %}
+{% endfor %}
+
