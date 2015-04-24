@@ -45,8 +45,8 @@ def generate_docker_compose(new_slug, project_app_ports={}):
         for app in APPS:
             projects[-1]['apps'].append({
                 'name': app['name'],
-                'port': project_app_ports["{}{}".format(slug, app['name']),
-            }
+                'port': project_app_ports["{}{}".format(slug, app['name'])],
+            })
     context = {
         'hostname' : 'structureandinterperetation.com',
         'root_port' : 8617,
@@ -78,6 +78,82 @@ def zipped_file_validator():
     return RegexValidator(r'.*\.(ZIP|zip)$',
         'Only compressed archive (.zip) files are allowed.')
 
+class VolumeMount(models.Model):
+    """
+    When creating this app, where to mount it in the container.
+
+    TODO: More thinking required
+    """
+    app = models.ForeignKey(App)
+    mounted_at = models.TextField(max_length=254)
+    located_at = models.TextField(max_length=254)
+
+class App(models.Model):
+    """
+    Represents information about starting an application in a container.
+    """
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
+    index_url = models.URLField()
+    command = models.TextField(max_length=254)
+    port_expose = models.IntegerField()
+
+class Container(models.Model):
+    NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
+    DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')
+    NGINX_CONFIG_DESTINATION_PATH = '/etc/nginx/sites-enabled/memex-reverse-proxy.conf'
+    DOCKER_COMPOSE_DESTINATION_PATH = os.path.join(settings.BASE_DIR, 'base/docker-compose.yml')
+
+    app = models.ForeignKey(App)
+    project = models.ForeignKey(Project)
+    "What type of app should the container be running?"
+    high_port = models.IntegerField(null=True, blank=True)
+    "If the app exposes a port, what high port does it end up exposing it on?"
+    public_path_base = models.TextField(null=True, blank=True)
+    "If the app is supposed to be served to the outside world and has a base url different than /project.name/app.name, what is it?"
+    expose_publicly = models.Boolean(default=False)
+    "Should the app be exposed publicly?"
+    running = models.BooleanField(default=False)
+    "Should the container be running?"
+
+    def slug(self):
+        return "{}{}".format(self.project.name, self.app.name)
+
+    def public_urlbase(self):
+        if not self.expose_publicly:
+            return None
+        elif self.public_path_base:
+            return self.public_path_base
+        else:
+            return "{}/{}".format(self.project.name, self.app.name)
+
+    @classmethod
+    def map_public_ports(self):
+        """
+        Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
+        Then, restart nginx.
+        """
+        nginx_template = Template(open(Container.NGINX_CONFIG_TEMPLATE_PATH, 'r').read(),
+                                    trim_blocks = True, lstrip_blocks = True)
+        nginx_config = nginx_template.render(**context)
+        with open(Container.NGINX_CONFIG_DESTINATION_PATH, 'w') as f:
+            f.write(nginx_config)
+            f.flush()
+
+    @classmethod
+    def create_containers(self):
+        """
+        Create a new docker compose file with an entry for every container that is supposed to be running.
+        Then, restart nginx.
+        """
+        nginx_template = Template(open(Container.DOCKER_COMPOSE_TEMPLATE_PATH, 'r').read(),
+                                    trim_blocks = True, lstrip_blocks = True)
+        nginx_config = nginx_template.render(**context)
+        with open(Container.DOCKER_COMPOSE_DESTINATION_PATH, 'w') as f:
+            f.write(nginx_config)
+            f.flush()
+        pass
+
 
 class Project(models.Model):
     """Project model.
@@ -95,6 +171,12 @@ class Project(models.Model):
     description : textfield
 
     """
+
+    def get_zipped_data_path(self, filename):
+        return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
+
+    def get_dumped_data_path(self):
+        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
@@ -102,12 +184,6 @@ class Project(models.Model):
     uploaded_data = models.FileField(upload_to=get_zipped_data_path,
         null=True, blank=True, default=None, validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
-
-    def get_zipped_data_path(self, filename):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
-
-    def get_dumped_data_path(self):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
 
     def get_absolute_url(self):
         return reverse('base:project',
@@ -141,12 +217,3 @@ class Project(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class App(models.Model):
-    """
-    
-
-    """
-    name = models.CharField(max_length=64, unique=True,
-        validators=[alphanumeric_validator()])
-    index_url = models.URLField()
