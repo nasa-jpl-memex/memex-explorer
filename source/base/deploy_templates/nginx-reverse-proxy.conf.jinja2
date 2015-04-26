@@ -1,21 +1,19 @@
 server {
     listen 80;
-    server_name {{ hostname }};
+    server_name {{ hostname }} {{ ip_addr }};
 
     location / {
         proxy_pass http://0.0.0.0:{{ root_port }}/;
     }
 }
 
-{% for project in projects %}
-    {% for app in project.apps %}
+{% for container in containers %}
 server {
     listen 80;
-    server_name {{ project.slug }}_{{ app.name }}.{{ hostname }};
+    server_name {{ hostname }};
 
     location / {
-        proxy_pass http://0.0.0.0:????/;
+        proxy_pass http://0.0.0.0:{{ container.high_port }}/;
     }
 }
-{% endfor %}
 {% endfor %}
