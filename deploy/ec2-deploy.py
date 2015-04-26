@@ -2,12 +2,14 @@
 import os
 import boto.exception
 import boto.ec2
+import datetime
 import time
 
 from fabric.api import (
     env,
     settings,
     sudo,
+    prefix,
     run,
 )
 
@@ -56,7 +58,7 @@ def create_box():
     machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',])
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     #It is utterly inefficient and stupid to run through all of these.
-    print new_instance.id
+    print(new_instance.id)
     while new_instance.state != u'running':
         time.sleep(3)
         new_instance.update()
@@ -67,6 +69,9 @@ def create_box():
     print(new_instance.public_dns_name)
     return new_instance
 
+def old_box(public_dns_name):
+    return [i for i in ec2.get_only_instances() if i.public_dns_name == public_dns_name][0]
+
 def create_keypair(source = AMI_ID+'-amfarrell'):
     try:
         kp = ec2.delete_key_pair(source)
@@ -74,7 +79,7 @@ def create_keypair(source = AMI_ID+'-amfarrell'):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', '/Users/afarrell/projects/memex-explorer/deploy/ec2.key')
+    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
     kfile = open(filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
@@ -126,38 +131,41 @@ def install_miniconda():
     url = 'http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
     run("wget {}".format(url))
     run("chmod +x ./Miniconda-latest-Linux-x86_64.sh")
-    run("./Miniconda-latest-Linux-x86_64.sh")
-    run("source .profile")
+    run("./Miniconda-latest-Linux-x86_64.sh -b")
+    run("echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc")
+    run("source ~/.bashrc")
 
 def install_repo():
     url = 'https://github.com/memex-explorer/memex-explorer/'
-    run("git clone {}".format(url))
-    run("cd memex-explorer")
     if os.environ.get('GIT_BRANCH'):
-        with settings(warn_only=True):
-            run("git checkout {}".format(os.environ.get('GIT_BRANCH')))
-    run("source ~/.profile")
-    run("conda env create")
-    run("source activate memex")
+        run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
+    else:
+        run("git clone {}".format(url))
+    run("~/miniconda/bin/conda env create --file ~/memex-explorer/environment.yml")
+    with prefix('source ~/miniconda/bin/activate memex'):
+        run("python ~/memex-explorer/source/manage.py migrate")
 
 MEMEX_APP_PORT = 8000
 def start_nginx(instance):
-    run("cd ~/memex-explorer/deploy")
-    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python generate_initial_nginx.py {template} {destination}".format(
-        source = "../source/base/deploy_templates/nginx-reverse-proxy-conf.jinja2", destination="./initial_nginx.conf",
-        ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
-    sudo("cp ./initial_nginx.conf /etc/nginx/sites-enabled/default")
-    sudo("service nginx restart")
+    with prefix('source ~/miniconda/bin/activate memex'):
+        run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
+            source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy-conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
+            ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
+        sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
+        sudo("service nginx restart")
 
 def start_server_running(instance):
-    run("cd ~/memex-explorer")
-    run("python source/manage.py migrate")
-    run("python source/manage.py runserver {}:{} && disown".format(instance.ip_address, MEMEX_APP_PORT))
+    with prefix('source ~/miniconda/bin/activate memex'):
+        run("python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
 
 
 
-key_filename = create_keypair()
-instance = create_box()
+if os.environ.get('DNS_NAME'):
+    key_filename = os.environ.get('EC2_KEY_PATH', '/Users/afarrell/projects/memex-explorer/deploy/ec2.key')
+    instance = old_box(os.environ.get('DNS_NAME'))
+else:
+    key_filename = create_keypair()
+    instance = create_box()
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
 try:
@@ -168,8 +176,8 @@ try:
     fix_sshd_config()
 except Exception, e:
     import pdb;pdb.set_trace()
-    print instance.public_dns_name
-    print e
+    print(instance.public_dns_name)
+    print(e)
     ec2.terminate_instances([instance.id])
     raise e
 #with open("~/.aliases", 'a') as f:
@@ -179,8 +187,10 @@ except Exception, e:
 try:
     install_miniconda()
     install_repo()
-    start_server_running(instance)
+    start_nginx(instance)
     print(instance.public_dns_name)
+    print(ssh_command)
+    start_server_running(instance)
 except Exception, e:
     print(ssh_command)
     print(mosh_command)
