@@ -138,9 +138,9 @@ def install_miniconda():
 def install_docker():
     run("chmod +x ~/memex-explorer/install-docker.sh")
     run("~/memex-explorer/install-docker.sh")
-    run("docker pull dockerfile/elasticsearch")
-    run("docker pull continuumio/tika")
-    run("docker pull continuumio/kibana")
+    sudo("docker pull dockerfile/elasticsearch")
+    sudo("docker pull continuumio/tika")
+    sudo("docker pull continuumio/kibana")
 
 def install_repo():
     url = 'https://github.com/memex-explorer/memex-explorer/'
