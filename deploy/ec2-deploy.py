@@ -149,21 +149,21 @@ def install_repo():
     else:
         run("git clone {}".format(url))
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("python ~/memex-explorer/source/manage.py migrate")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
 MEMEX_APP_PORT = 8000
 def start_nginx(instance):
-    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
+    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' ~/miniconda/bin/python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
         source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
         ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
     sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
     sudo("service nginx restart")
 
 def conventience_aliases(instance):
-    run("echo 'alias dj=\"python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
+    run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
 
 
 
