@@ -40,8 +40,7 @@ def generate_docker_compose(new_slug, project_app_ports={}):
     project_slugs = list(Project.objects.values('slug')) + [{'slug': new_slug}],
     projects = []
     for slug in project_slugs:
-       projects.append({'name': slug, apps:[]})
-        projects[-1]
+        projects.append({'name': slug, apps:[]})
         for app in APPS:
             projects[-1]['apps'].append({
                 'name': app['name'],
@@ -154,18 +153,34 @@ class App(models.Model):
     build = models.TextField(max_length=265, blank=True, null=True)
     command = models.TextField(max_length=256)
 
+    expose_publicly = models.BooleanField(default=False)
+
     def create_container(self, project):
-        pass
+        container = Container.objects.create(
+            app = self,
+            project = project,
+            high_port = None,
+            public_path_base = "{}/{}".format(project.name, self.name)
+            running = True
+        )
+        Container.create_containers()
+        #find the high port
+        container.high_port = 0
+        import pdb;pdb.set_trace()
+        print("TODO: figure out how to get the high port")
+        container.save()
+        if container.app.expose_publicly:
+            Container.map_public_ports()
+
 
 
 
 class AppLink(models.Model):
     from_app = models.ForeignKey(App)
-    to_app = models.foreignkey(App)
+    to_app = models.ForeignKey(App)
     alias = models.TextField(App)
 
 class AppPort(models.Model):
-    app = models.ForeignKey(App, related_name=port_exposures)
     internal_port = models.IntegerField(null=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 
@@ -186,10 +201,10 @@ class VolumeMount(models.Model):
     """Where on the host is the directory?"""
     read_only = models.BooleanField(default=False)
 
-class EnvVar(modelx.Model):
+class EnvVar(models.Model):
     app = models.ForeignKey(App)
     name = models.TextField(max_length=64)
-    value = modelx.TextField(max_length=256, default='')
+    value = models.TextField(max_length=256, default='')
 
 
 class Container(models.Model):
@@ -205,8 +220,6 @@ class Container(models.Model):
     "If the app exposes a port, what high port does it end up exposing it on?"
     public_path_base = models.TextField(null=True, blank=True)
     "If the app is supposed to be served to the outside world and has a base url different than /project.name/app.name, what is it?"
-    expose_publicly = models.BooleanField(default=False)
-    "Should the app be exposed publicly?"
     running = models.BooleanField(default=False)
     "Should the container be running?"
 
@@ -214,7 +227,7 @@ class Container(models.Model):
         return "{}{}".format(self.project.name, self.app.name)
 
     def public_urlbase(self):
-        if not self.expose_publicly:
+        if not self.app.expose_publicly:
             return None
         elif self.public_path_base:
             return self.public_path_base
@@ -244,7 +257,7 @@ class Container(models.Model):
 
     @classmethod
     def generate_nginx_context(cls):
-        containers = cls.objects.filter(expose_publicly == True).filter(running == True).select_related('app', 'project').all()
+        containers = cls.objects.filter(app__expose_publicly == True).filter(running == True).select_related('app', 'project').all()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', '')
         ip_addr = os.environ.get('IP_ADDR', '')
