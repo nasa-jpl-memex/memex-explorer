@@ -160,8 +160,8 @@ class App(models.Model):
             app = self,
             project = project,
             high_port = None,
-            public_path_base = "{}/{}".format(project.name, self.name)
-            running = True
+            public_path_base = "{}/{}".format(project.name, self.name),
+            running = True,
         )
         Container.create_containers()
         #find the high port
