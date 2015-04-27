@@ -5,8 +5,10 @@
     {% else %}
     build: {{ container.build }}
     {% endif %}
-    command: {{ container.app.command }}
-    {% if container.app.volumes %}
+    {% if container.command %}
+    command: {{ container.command }}
+    {% endif %}
+    {% if container.volumes %}
     volumes:
     {% for volume in container.volumes %}
       - {{ volume.located_at }}:{{ volume.mounted_at }}
@@ -14,14 +16,14 @@
     {% endif %}
     {% if container.ports %}
     ports:
-    {% for port in container.app.ports %}
+    {% for port in container.ports %}
       - "{{ port }}"
     {% endfor %}
     {% endif %}
     {% if container.links %}
     links:
     {% for link in container.links %}
-      - {{ link.to_app__name }}:{{ link.alias }}
+      - {{ link.name }}:{{ link.alias }}
     {% endfor %}
     {% endif %}
     {% if container.environment_variables %}
