@@ -50,8 +50,10 @@ class Project(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+    uploaded_data = models.FileField(
         null=True, blank=True, default=None, validators=[zipped_file_validator()])
+    #uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+    #    null=True, blank=True, default=None, validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
 
     def get_absolute_url(self):
@@ -114,10 +116,6 @@ class AppPort(models.Model):
     internal_port = models.IntegerField(null=False, blank=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 
-    @property
-    def internal_port(self):
-        return self.app_port.internal_port
-
 class VolumeMount(models.Model):
     """
     When creating this app, where to mount it in the container.
@@ -173,10 +171,29 @@ class Container(models.Model):
         print("TODO: figure out how to get the high port")
         container.save()
 
+    def context_dict(self):
+        #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
+        result = {
+            'slug':self.slug(),
+            'command': self.app.command or '',
+            'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
+            'ports': [port[0] for port in AppPort.objects.filter(app=self.app).values_list('internal_port')],
+            'links': [{'name': link.to_app.name, 'alias': link.alias or ''} for link in
+                        AppLink.objects.filter(from_app = self.app)],
+            'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
+        }
+        if self.app.image:
+            result['image'] = self.app.image
+        elif self.app.build:
+            result['build'] = self.app.build
+        else:
+            raise ValueError("container {} has neither an image not a build.".format(self.slug()))
+        return result
+
     @classmethod
     def fill_template(cls, source, destination, context_dict):
         template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
-        result = template.render(Context(**context_dict))
+        result = template.render(context_dict)
         with open(destination, 'w') as f:
             f.write(result)
             f.flush()
@@ -184,7 +201,7 @@ class Container(models.Model):
     @classmethod
     def generate_container_context(cls):
         containers = Container.objects.filter(running = True).select_related('app', 'project').all()
-        return {'containers': containers}
+        return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
 
     @classmethod
     def create_containers(cls):

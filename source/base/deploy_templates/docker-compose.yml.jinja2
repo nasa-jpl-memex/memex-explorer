@@ -1,35 +1,35 @@
 {% for container in containers %}
 {{ container.slug }}:
     {% if container.image %}
-    image: {{ container.app.image }}
+    image: {{ container.image }}
     {% else %}
-    build: {{ container.app.build }}
+    build: {{ container.build }}
     {% endif %}
-    command: {{ container.app.command }}
-    {% if container.app.volumes %}
+    {% if container.command %}
+    command: {{ container.command }}
+    {% endif %}
+    {% if container.volumes %}
     volumes:
-    {% for volume in container.app.volumes %}
+    {% for volume in container.volumes %}
       - {{ volume.located_at }}:{{ volume.mounted_at }}
     {% endfor %}
     {% endif %}
-    {% if container.app.ports %}
+    {% if container.ports %}
     ports:
-    {% for port in container.app.ports %}
-      - "{{ port.internal_port }}"
+    {% for port in container.ports %}
+      - "{{ port }}"
     {% endfor %}
     {% endif %}
-    {% if container.app.external_links %}
+    {% if container.links %}
     links:
-    {% for link in container.app.links %}
-      - {{ to_app.name }}:{{ alias }}
+    {% for link in container.links %}
+      - {{ link.name }}:{{ link.alias }}
     {% endfor %}
     {% endif %}
-    {% if container.app.environment_variables %}
+    {% if container.environment_variables %}
     environment:
-    {% for var in container.app.environment_variables %}
+    {% for var in container.environment_variables %}
       - {{ var.name }}={{ var.value}}
     {% endfor %}
     {% endif %}
-
 {% endfor %}
-

@@ -1,5 +1,8 @@
 from __future__ import unicode_literals
 import urllib2
+import yaml
+import pytest
+from yaml import load, dump
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -123,7 +126,6 @@ class TestProjectQueries(TestCase):
     def test_get_by_slug(self):
         assert 'bicycles-for-sale' == self.project.slug
 
-import pytest
 
 #run this with cd ~/memex-explorer && py.test --pdb -s -m docker
 @pytest.mark.docker
@@ -171,7 +173,8 @@ class TestDockerSetup(TestCase):
         )
         AppLink.objects.create(
             from_app = kibana,
-            to_app = elasticsearch
+            to_app = elasticsearch,
+            alias = 'es'
         )
         project = Project.objects.create(
             name='test1',
@@ -183,6 +186,48 @@ class TestDockerSetup(TestCase):
         context = Container.generate_container_context()
         Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, context)
         container_yml = open(Container.DOCKER_COMPOSE_DESTINATION_PATH, 'r').read()
+        print(container_yml)
+        from yaml import Loader, SafeLoader
+
+        def construct_yaml_str(self, node):
+            # Override the default string handling function 
+            # to always return unicode objects
+            return self.construct_scalar(node)
+        Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+        SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
         self.assertIn('KIBANA_SECURE=false', container_yml)
+        data = load(container_yml)
+        self.maxDiff = None
+        correct_data = {
+            'test1tika': {
+                'image': 'continuumio/tika',
+                'ports': [
+                    '9998',
+                ]
+            },
+            'test1elasticsearch': {
+                'image': 'dockerfile/elasticsearch',
+                'volumes': [
+                    '/home/ubuntu/elasticsearch/data:/data',
+                ],
+                'ports': [
+                    '9200',
+                    '9300',
+                ],
+            },
+            'test1kibana':{
+                'image': 'continuumio/kibana',
+                'ports': [
+                    '9999',
+                ],
+                'links': [
+                    'elasticsearch:es',
+                ],
+                'environment':[
+                    'KIBANA_SECURE=false',
+                ],
+            },
+        }
+        self.assertEqual(data, correct_data)
 
 
