@@ -173,10 +173,29 @@ class Container(models.Model):
         print("TODO: figure out how to get the high port")
         container.save()
 
+    def context_dict(self):
+        #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
+        result = {
+            'slug':self.slug(),
+            'command': self.app.command or '',
+            'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
+            'ports': list(AppPort.objects.filter(app=self.app).values_list('internal_port')),
+            'links': [{'name': link.to_app.name, 'alias': link.alias or ''} for link in
+                        AppLink.filter(from_app = self.app)],
+            'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
+        }
+        if self.image:
+            result['image'] = self.image
+        elif self.build:
+            result['build'] = self.image
+        else:
+            raise ValueError("container {} has neither an image not a build.".format(self.slug()))
+        return result
+
     @classmethod
     def fill_template(cls, source, destination, context_dict):
         template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
-        result = template.render(Context(**context_dict))
+        result = template.render(context_dict)
         with open(destination, 'w') as f:
             f.write(result)
             f.flush()
@@ -184,7 +203,7 @@ class Container(models.Model):
     @classmethod
     def generate_container_context(cls):
         containers = Container.objects.filter(running = True).select_related('app', 'project').all()
-        return {'containers': containers}
+        return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
 
     @classmethod
     def create_containers(cls):
