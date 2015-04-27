@@ -48,7 +48,7 @@ if 'xxx' == os.environ.get('AWS_SECRET').lower():
 ec2 = boto.ec2.connect_to_region('us-east-1', 
         aws_access_key_id = os.environ.get('AWS_ID'),
         aws_secret_access_key = os.environ.get('AWS_SECRET'))
-env.use_ssh_config = True
+env.use_ssh_jonfig = True
 env.disable_known_hosts = True
 env.connection_attempts = True
 env.timeout = 40
@@ -149,7 +149,7 @@ MEMEX_APP_PORT = 8000
 def start_nginx(instance):
     with prefix('source ~/miniconda/bin/activate memex'):
         run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
-            source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy-conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
+            source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
             ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
         sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
         sudo("service nginx restart")
