@@ -154,6 +154,9 @@ def start_nginx(instance):
         sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
         sudo("service nginx restart")
 
+def conventience_aliases(instance):
+    run("echo 'alias dj=\"python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
+
 def start_server_running(instance):
     with prefix('source ~/miniconda/bin/activate memex'):
         run("python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
