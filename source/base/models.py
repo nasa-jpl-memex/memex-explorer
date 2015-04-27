@@ -20,59 +20,6 @@ def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
-APPS = [
-    {
-        'name': 'web',
-        'dockerfile' : ".",
-        'command' : "python ./manage.py runserver 0.0.0.0:8000",
-        'volumes': [("./source", "./source")],
-        'expose' : [8000],
-    }, {
-        'name': 'solr',
-        'dockerfile' : "./solr",
-        'command' : "/workdir/solr_entry.sh",
-        'volumes': [("./solr", "/workdir")],
-        'expose': [8983, 5005,]
-    }
-]
-
-def generate_docker_compose(new_slug, project_app_ports={}):
-    project_slugs = list(Project.objects.values('slug')) + [{'slug': new_slug}],
-    projects = []
-    for slug in project_slugs:
-        projects.append({'name': slug, apps:[]})
-        for app in APPS:
-            projects[-1]['apps'].append({
-                'name': app['name'],
-                'port': project_app_ports["{}{}".format(slug, app['name'])],
-            })
-    context = {
-        'hostname' : 'structureandinterperetation.com',
-        'root_port' : 8617,
-        'projects' : projects,
-    }
-    compose_template = Template(open('/home/ubuntu/memex-explorer/deploy/docker-compose.yml.jinja2', 'r').read(),
-                                trim_blocks = True, lstrip_blocks = True)
-    compose_config = compose_template.render(trim_blocks = True, lstrip_blocks = True, **context)
-    with open('/home/ubuntu/memex-explorer/docker-compose.yml', 'w') as f:
-        f.write(compose_config)
-        f.flush()
-    return 'memexexplorer_{name}_run_{iteration}'
-
-def generate_nginx_config(new_slug):
-    context = {
-        'hostname' : 'structureandinterperetation.com',
-        'root_port' : 8617,
-        'projects' : list(Project.objects.values('slug')) + [{'slug': new_slug}],
-        'apps' : APPS
-    }
-    nginx_template = Template(open('/home/ubuntu/memex-explorer/deploy/nginx-reverse-proxy.conf.jinja2', 'r').read(),
-                                trim_blocks = True, lstrip_blocks = True)
-    nginx_config = nginx_template.render(**context)
-    with open('/home/ubuntu/memex-explorer/nginx-reverse-proxy.conf', 'w') as f:
-        f.write(nginx_config)
-        f.flush()
-
 def zipped_file_validator():
     return RegexValidator(r'.*\.(ZIP|zip)$',
         'Only compressed archive (.zip) files are allowed.')
@@ -114,18 +61,7 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
 
-        ports = {
-
-        }
-
         ### This entire part might be best done asynchronously
-
-        image_name_template = generate_docker_compose(self.slug)
-        #run docker-compose up -p --no-recreate
-        #for each of the image names, run docker port and get the host port
-        project_app_ports = {}
-        generate_nginx_config(self.slug, project_app_ports)
-        #restart nginx
 
         #fill it in with each project's 
 
@@ -155,7 +91,7 @@ class App(models.Model):
 
     expose_publicly = models.BooleanField(default=False)
 
-    def container_entries(self, project):
+    def create_container_entry(self, project):
         container = Container.objects.create(
             app = self,
             project = project,
@@ -247,7 +183,7 @@ class Container(models.Model):
 
     @classmethod
     def generate_container_context(cls):
-        containers = Container.objects.filter(running == True).select_related('app', 'project').all()
+        containers = Container.objects.filter(running = True).select_related('app', 'project').all()
         return {'containers': containers}
 
     @classmethod
@@ -260,7 +196,7 @@ class Container(models.Model):
 
     @classmethod
     def generate_nginx_context(cls):
-        containers = cls.objects.filter(app__expose_publicly == True).filter(running == True).select_related('app', 'project').all()
+        containers = cls.objects.filter(app__expose_publicly = True).filter(running = True).select_related('app', 'project').all()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', '')
         ip_addr = os.environ.get('IP_ADDR', '')
