@@ -8,7 +8,7 @@ from jinja2.runtime import Context
 context = {
     'ip_addr': os.environ.get('IP_ADDR', ''),
     'hostname': os.environ.get('AWS_DOMAIN', ''),
-    'root_port': os.environ.get('ROOT_PORT', '') 
+    'root_port': os.environ.get('ROOT_PORT', ''),
     'containers': []
 }
 with open(sys.argv[1], 'r') as f:
