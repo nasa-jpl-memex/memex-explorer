@@ -40,7 +40,7 @@ def generate_docker_compose(new_slug, project_app_ports={}):
     project_slugs = list(Project.objects.values('slug')) + [{'slug': new_slug}],
     projects = []
     for slug in project_slugs:
-        projects.append({'name': slug, apps:[]})
+       projects.append({'name': slug, apps:[]})
         projects[-1]
         for app in APPS:
             projects[-1]['apps'].append({
@@ -151,6 +151,9 @@ class App(models.Model):
     command = models.TextField(max_length=254)
     port_expose = models.IntegerField()
 
+    def create_container(self, project):
+        pass
+
 class VolumeMount(models.Model):
     """
     When creating this app, where to mount it in the container.
@@ -191,29 +194,39 @@ class Container(models.Model):
             return "{}/{}".format(self.project.name, self.app.name)
 
     @classmethod
-    def map_public_ports(self):
-        """
-        Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
-        Then, restart nginx.
-        """
-        nginx_template = Template(open(Container.NGINX_CONFIG_TEMPLATE_PATH, 'r').read(),
-                                    trim_blocks = True, lstrip_blocks = True)
-        nginx_config = nginx_template.render(**context)
-        with open(Container.NGINX_CONFIG_DESTINATION_PATH, 'w') as f:
-            f.write(nginx_config)
+    def fill_template(cls, source, destination, context_dict):
+        template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
+        result = template.render(Context(**context_dict))
+        with open(destination, 'w') as f:
+            f.write(result)
             f.flush()
 
     @classmethod
-    def create_containers(self):
+    def generate_container_context(cls):
+        containers = Container.objects.filter(running == True).select_related('app', 'project').all()
+        return {'containers': containers}
+
+    @classmethod
+    def create_containers(cls):
         """
         Create a new docker compose file with an entry for every container that is supposed to be running.
         Then, restart nginx.
         """
-        nginx_template = Template(open(Container.DOCKER_COMPOSE_TEMPLATE_PATH, 'r').read(),
-                                    trim_blocks = True, lstrip_blocks = True)
-        nginx_config = nginx_template.render(**context)
-        with open(Container.DOCKER_COMPOSE_DESTINATION_PATH, 'w') as f:
-            f.write(nginx_config)
-            f.flush()
-        pass
+        cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
+
+    @classmethod
+    def generate_nginx_context(cls):
+        containers = cls.objects.filter(expose_publicly == True).filter(running == True).select_related('app', 'project').all()
+        root_port = os.environ.get('ROOT_PORT', '8000')
+        hostname = os.environ.get('HOST_NAME', '')
+        ip_addr = os.environ.get('IP_ADDR', '')
+        return {'containers': containers, 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
+
+    @classmethod
+    def map_public_ports(cls):
+        """
+        Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
+        Then, restart nginx.
+        """
+        cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
 
