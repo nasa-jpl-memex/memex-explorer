@@ -135,31 +135,35 @@ def install_miniconda():
     run("echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc")
     run("source ~/.bashrc")
 
+def install_docker():
+    run("chmod +x ~/memex-explorer/install-docker.sh")
+    run("~/memex-explorer/install-docker.sh")
+    run("docker pull dockerfile/elasticsearch")
+    run("docker pull continuumio/tika")
+    run("docker pull continuumio/kibana")
+
 def install_repo():
     url = 'https://github.com/memex-explorer/memex-explorer/'
     if os.environ.get('GIT_BRANCH'):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
-    run("~/miniconda/bin/conda env create --file ~/memex-explorer/environment.yml")
-    with prefix('source ~/miniconda/bin/activate memex'):
-        run("python ~/memex-explorer/source/manage.py migrate")
+    run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
+    run("python ~/memex-explorer/source/manage.py migrate")
 
 MEMEX_APP_PORT = 8000
 def start_nginx(instance):
-    with prefix('source ~/miniconda/bin/activate memex'):
-        run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
-            source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
-            ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
-        sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
-        sudo("service nginx restart")
+    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
+        source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
+        ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
+    sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
+    sudo("service nginx restart")
 
 def conventience_aliases(instance):
     run("echo 'alias dj=\"python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    with prefix('source ~/miniconda/bin/activate memex'):
-        run("python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
+    run("python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
 
 
 
@@ -191,6 +195,7 @@ try:
     install_miniconda()
     install_repo()
     start_nginx(instance)
+    install_docker()
     print(instance.public_dns_name)
     print(ssh_command)
     start_server_running(instance)
