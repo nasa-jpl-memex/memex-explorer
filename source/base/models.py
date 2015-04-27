@@ -155,33 +155,27 @@ class App(models.Model):
 
     expose_publicly = models.BooleanField(default=False)
 
-    def create_container(self, project):
+    def container_entries(self, project):
         container = Container.objects.create(
             app = self,
             project = project,
             high_port = None,
-            public_path_base = "{}/{}".format(project.name, self.name)
+            public_path_base = "{}/{}".format(project.name, self.name),
             running = True
         )
-        Container.create_containers()
-        #find the high port
-        container.high_port = 0
-        import pdb;pdb.set_trace()
-        print("TODO: figure out how to get the high port")
-        container.save()
-        if container.app.expose_publicly:
-            Container.map_public_ports()
 
 
 
 
 class AppLink(models.Model):
-    from_app = models.ForeignKey(App)
+    from_app = models.ForeignKey(App, related_name='links')
     to_app = models.ForeignKey(App)
-    alias = models.TextField(App)
+    alias = models.TextField(max_length=64, null=True, blank=True)
+    external = models.BooleanField(default=False)
 
 class AppPort(models.Model):
-    internal_port = models.IntegerField(null=False)
+    app = models.ForeignKey(App, related_name='ports')
+    internal_port = models.IntegerField(null=False, blank=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 
     @property
@@ -202,12 +196,15 @@ class VolumeMount(models.Model):
     read_only = models.BooleanField(default=False)
 
 class EnvVar(models.Model):
-    app = models.ForeignKey(App)
+    app = models.ForeignKey(App, related_name='environment_variables')
     name = models.TextField(max_length=64)
     value = models.TextField(max_length=256, default='')
 
 
 class Container(models.Model):
+    """
+
+    """
     NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
     DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')
     NGINX_CONFIG_DESTINATION_PATH = '/etc/nginx/sites-enabled/memex-reverse-proxy.conf'
@@ -233,6 +230,12 @@ class Container(models.Model):
             return self.public_path_base
         else:
             return "{}/{}".format(self.project.name, self.app.name)
+
+    def find_high_port(self):
+        #find the high port
+        container.high_port = 0
+        print("TODO: figure out how to get the high port")
+        container.save()
 
     @classmethod
     def fill_template(cls, source, destination, context_dict):
@@ -277,6 +280,6 @@ class ContainerPort(models.Model):
     """
     After a container is created, for each of the ports that container exposes, we find what high port is exposed on and save it here.
     """
-    container = models.ForeignKey(Container)
+    container = models.ForeignKey(Container, related_name='mapped_ports')
     app_port = models.ForeignKey(AppPort)
     external_port = models.IntegerField()
