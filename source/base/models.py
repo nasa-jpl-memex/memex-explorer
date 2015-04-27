@@ -40,8 +40,7 @@ def generate_docker_compose(new_slug, project_app_ports={}):
     project_slugs = list(Project.objects.values('slug')) + [{'slug': new_slug}],
     projects = []
     for slug in project_slugs:
-       projects.append({'name': slug, apps:[]})
-        projects[-1]
+        projects.append({'name': slug, apps:[]})
         for app in APPS:
             projects[-1]['apps'].append({
                 'name': app['name'],
@@ -161,11 +160,10 @@ class App(models.Model):
 
 class AppLink(models.Model):
     from_app = models.ForeignKey(App)
-    to_app = models.foreignkey(App)
+    to_app = models.ForeignKey(App)
     alias = models.TextField(App)
 
 class AppPort(models.Model):
-    app = models.ForeignKey(App, related_name=port_exposures)
     internal_port = models.IntegerField(null=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 
@@ -186,10 +184,10 @@ class VolumeMount(models.Model):
     """Where on the host is the directory?"""
     read_only = models.BooleanField(default=False)
 
-class EnvVar(modelx.Model):
+class EnvVar(models.Model):
     app = models.ForeignKey(App)
     name = models.TextField(max_length=64)
-    value = modelx.TextField(max_length=256, default='')
+    value = models.TextField(max_length=256, default='')
 
 
 class Container(models.Model):
