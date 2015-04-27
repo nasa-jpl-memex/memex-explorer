@@ -148,11 +148,29 @@ class App(models.Model):
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     index_url = models.URLField()
-    command = models.TextField(max_length=254)
-    port_expose = models.IntegerField()
+
+    #Only one of the following can be non-blank. This is not enforced yet.
+    image = models.TextField(max_length=256, blank=True, null=True)
+    build = models.TextField(max_length=265, blank=True, null=True)
+    command = models.TextField(max_length=256)
 
     def create_container(self, project):
         pass
+
+
+class AppLink(models.Model):
+    from_app = models.ForeignKey(App)
+    to_app = models.foreignkey(App)
+    alias = models.TextField(App)
+
+class AppPort(models.Model):
+    app = models.ForeignKey(App)
+    internal_port = models.IntegerField(null=False)
+    service_name = models.TextField(max_length=64, null=True, blank=True)
+
+    @property
+    def internal_port(self):
+        return self.app_port.internal_port
 
 class VolumeMount(models.Model):
     """
@@ -162,7 +180,16 @@ class VolumeMount(models.Model):
     """
     app = models.ForeignKey(App)
     mounted_at = models.TextField(max_length=254)
+    """Where within the container is it mounted?"""
     located_at = models.TextField(max_length=254)
+    """Where on the host is the directory?"""
+    read_only = models.BooleanField(default=False)
+
+class EnvVar(modelx.Model):
+    app = models.ForeignKey(App)
+    name = models.TextField(max_length=64)
+    value = modelx.TextField(max_length=256, default='')
+
 
 class Container(models.Model):
     NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
@@ -230,3 +257,12 @@ class Container(models.Model):
         """
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
 
+
+
+class ContainerPort(models.Model):
+    """
+    After a container is created, for each of the ports that container exposes, we find what high port is exposed on and save it here.
+    """
+    container = models.ForeignKey(Container)
+    app_port = models.ForeignKey(AppPort)
+    external_port = models.IntegerField()
