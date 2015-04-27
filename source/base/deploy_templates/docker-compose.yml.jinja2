@@ -3,20 +3,33 @@
     {% if container.image %}
     image: {{ container.app.image }}
     {% else %}
-    build: {{ container.app.dockerfile }}
+    build: {{ container.app.build }}
     {% endif %}
     command: {{ container.app.command }}
     {% if container.app.volumes %}
     volumes:
-        {% for volume in container.app.volumes %}
+    {% for volume in container.app.volumes %}
       - {{ volume.located_at }}:{{ volume.mounted_at }}
-        {% endfor %}
+    {% endfor %}
     {% endif %}
-    ports:
     {% if container.app.ports %}
-    {% for port in container.app.port_exposures %}
+    ports:
+    {% for port in container.app.ports %}
       - "{{ port.internal_port }}"
     {% endfor %}
     {% endif %}
+    {% if container.app.external_links %}
+    links:
+    {% for link in container.app.links %}
+      - {{ to_app.name }}:{{ alias }}
+    {% endfor %}
+    {% endif %}
+    {% if container.app.environment_variables %}
+    environment:
+    {% for var in container.app.environment_variables %}
+      - {{ var.name }}={{ var.value}}
+    {% endfor %}
+    {% endif %}
+
 {% endfor %}
 

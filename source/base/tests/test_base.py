@@ -11,6 +11,52 @@ from base.forms import AddProjectForm
 from base.models import Project
 
 
+        tika=App.objects.create(name='tika'
+            index_url='http://example.com',
+            image='continuumio/tika',
+        )
+        AppPort.objects.create(
+            app = tika,
+            internal_port = 9998
+        )
+        elasticsearch = App.objects.create(name='elasticsearch',
+            index_url='http://example.com',
+            image='dockerfile/elasticsearch'
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9200
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9300
+        )
+        VolumeMount.objects.create(
+            app = elasticsearch,
+            mounted_at = '/data',
+            located_at = '/home/ubuntu/elasticsearch/data',
+        )
+        kibana = App.objects.create(
+            name = 'kibana',
+            image = 'continuumio/kibana',
+            expose_publicly = True,
+        )
+        AppPort.objects.create(
+            app = kibana,
+            internal_port = 9999
+        )
+        EnvVar.objects.create(
+            app = kibana,
+            name='KIBANA_SECURE'
+            value='false'
+        )
+        AppLink.objects.create(
+            from_app = kibana,
+            to_app = elasticsearch
+        )
+        context = Container.generate_container_context()
+
+
 class TestViews(UnitTestSkeleton):
 
     @classmethod
@@ -122,4 +168,63 @@ class TestProjectQueries(TestCase):
 
     def test_get_by_slug(self):
         assert 'bicycles-for-sale' == self.project.slug
+
+class TestDockerSetup(TestCase):
+
+    def test_generate_docker_compose(self):
+        tika=App.objects.create(name='tika'
+            index_url='http://example.com',
+            image='continuumio/tika',
+        )
+        AppPort.objects.create(
+            app = tika,
+            internal_port = 9998
+        )
+        elasticsearch = App.objects.create(name='elasticsearch',
+            index_url='http://example.com',
+            image='dockerfile/elasticsearch'
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9200
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9300
+        )
+        VolumeMount.objects.create(
+            app = elasticsearch,
+            mounted_at = '/data',
+            located_at = '/home/ubuntu/elasticsearch/data',
+        )
+        kibana = App.objects.create(
+            name = 'kibana',
+            image = 'continuumio/kibana',
+            expose_publicly = True,
+        )
+        AppPort.objects.create(
+            app = kibana,
+            internal_port = 9999
+        )
+        EnvVar.objects.create(
+            app = kibana,
+            name='KIBANA_SECURE'
+            value='false'
+        )
+        AppLink.objects.create(
+            from_app = kibana,
+            to_app = elasticsearch
+        )
+        project = Project.objects.create(
+            'name' = 'test1'
+            'slug'='test1_slug'
+        )
+        tika_container = tika.create_container(project)
+        es_container = elasticsearch.create_container(project)
+        kibana_container = kibana.create_container(project)
+        context = Container.generate_container_context()
+        Container.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, context)
+        container_yml = open(cls.DOCKER_COMPOSE_DESTINATION_PATH, 'r').read()
+        self.assertIn('KIBANA_SECURE=false', container_yml)
+
 
