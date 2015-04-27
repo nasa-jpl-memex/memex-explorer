@@ -23,10 +23,6 @@ class AcheException(CrawlException):
     pass
 
 
-class NutchTask(Task):
-    abstract = True
-
-
 def nutch_log_statistics(crawl):
     crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
     stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
@@ -43,13 +39,13 @@ def nutch_log_statistics(crawl):
             crawl.save()
 
 
-@shared_task(bind=True, base=NutchTask)
-def nutch(self, crawl, rounds="1", *args, **kwargs):
+@shared_task()
+def nutch(crawl, rounds=1, *args, **kwargs):
     call = [
         "crawl",
         crawl.seeds_list.path,
         crawl.get_crawl_path(),
-        rounds,
+        str(rounds),
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
@@ -59,10 +55,6 @@ def nutch(self, crawl, rounds="1", *args, **kwargs):
     stdout, stderr = proc.communicate()
     nutch_log_statistics(crawl)
     return "Finished"
-
-
-class AcheTask(Task):
-    abstract = True
 
 
 def ache_log_statistics(crawl):
@@ -84,8 +76,8 @@ def ache_log_statistics(crawl):
     crawl.save()
 
 
-@shared_task(bind=True, base=AcheTask)
-def ache(self, crawl, *args, **kwargs):
+@shared_task()
+def ache(crawl, *args, **kwargs):
     call = [
         "ache",
         "startCrawl",
