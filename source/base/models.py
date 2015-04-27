@@ -158,13 +158,14 @@ class App(models.Model):
         pass
 
 
+
 class AppLink(models.Model):
     from_app = models.ForeignKey(App)
     to_app = models.foreignkey(App)
     alias = models.TextField(App)
 
 class AppPort(models.Model):
-    app = models.ForeignKey(App)
+    app = models.ForeignKey(App, related_name=port_exposures)
     internal_port = models.IntegerField(null=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 

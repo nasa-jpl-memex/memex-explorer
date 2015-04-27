@@ -12,9 +12,11 @@
       - {{ volume.located_at }}:{{ volume.mounted_at }}
         {% endfor %}
     {% endif %}
-    expose:
-    {% if container.app.port_expose %}
-      - "{{ container.app.port_expose }}"
+    ports:
+    {% if container.app.ports %}
+    {% for port in container.app.port_exposures %}
+      - "{{ port.internal_port }}"
+    {% endfor %}
     {% endif %}
 {% endfor %}
 
