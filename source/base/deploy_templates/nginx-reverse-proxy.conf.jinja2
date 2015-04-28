@@ -5,12 +5,8 @@ server {
     location / {
         proxy_pass http://0.0.0.0:{{ root_port }}/;
     }
-}
 
 {% for container in containers %}
-server {
-    listen 80;
-    server_name {{ hostname }} {{ ip_addr }};
 
     location {{ container.public_urlbase }} {
         rewrite {{ container.public_urlbase }}/(.*) /$1 break;
@@ -18,5 +14,5 @@ server {
         proxy_redirect      off;
         proxy_set_header    Host $host;
     }
-}
 {% endfor %}
+}

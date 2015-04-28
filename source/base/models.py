@@ -93,8 +93,8 @@ class Project(models.Model):
             containers.append(app.create_container_entry(self))
         Container.create_containers()
         for container in containers:
-            if container.expose_publicly:
-                container.find_high_port()
+            if container.app.expose_publicly:
+                container.find_high_ports()
         Container.map_public_ports()
 
 
@@ -121,7 +121,6 @@ class App(models.Model):
             app = self,
             project = project,
             high_port = None,
-            public_path_base = "{}/{}".format(project.name, self.name),
             running = True
         )
         return container
@@ -188,25 +187,26 @@ class Container(models.Model):
     def public_urlbase(self):
         if not self.app.expose_publicly:
             return None
-        elif self.public_path_base:
-            return self.public_path_base
+        #elif self.public_path_base:
+        #    return self.public_path_base
         else:
-            return "{}/{}".format(self.project.name, self.app.name)
+            return "/{}/{}".format(self.project.name, self.app.name)
 
     def docker_name(self):
         composefile_dir_name = os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH))
-        return "{}_{}_1".format(composefile_self.slug())
+        return "{}_{}_1".format(composefile_dir_name, self.slug())
 
     def find_high_ports(self):
         #find the high port
         port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
         mapping_dict = {}
         for mapping in port_mappings.split('\n'):
-            internal, external = port_mapping.split('/tcp -> 0.0.0.0:')
-            mapping_dict[internal] = external
-            app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
-            self.high_port = int(external)
-            ContainerPort.objects.create(container = self, app_port = app_port, external_port = external)
+            if '/tcp -> 0.0.0.0:' in mapping:
+                internal, external = mapping.split('/tcp -> 0.0.0.0:')
+                mapping_dict[internal] = external
+                app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
+                self.high_port = int(external)
+                ContainerPort.objects.create(container = self, app_port = app_port, external_port = external)
         self.save()
         return mapping_dict
 
@@ -256,9 +256,8 @@ class Container(models.Model):
         #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
         compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
         for container in Container.objects \
-                .filter(expose_publicly = True).filter(high_port = None).filter(running = True).all():
-
-            container.find_high_port()
+                .filter(app__expose_publicly = True).filter(running = True).all():
+            container.find_high_ports()
 
 
     @classmethod
@@ -267,7 +266,7 @@ class Container(models.Model):
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
         ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
-        return {'containers': [{'high_port': container.high_port, 'path_base': container.public_urlbase()}
+        return {'containers': [{'high_port': container.high_port, 'public_urlbase': container.public_urlbase()}
                                     for container in containers]
                 , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
 
@@ -278,8 +277,8 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
-        subprocess.check_output("sudo cp {} {}".format(cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH))
-        subprocess.check_output("sudo service nginx restart")
+        subprocess.check_output(["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH])
+        return subprocess.check_output(["sudo","service","nginx","restart"])
 
 
 
