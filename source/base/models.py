@@ -21,9 +21,21 @@ def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
+
 def zipped_file_validator():
     return RegexValidator(r'.*\.(ZIP|zip)$',
         'Only compressed archive (.zip) files are allowed.')
+
+
+def get_zipped_data_path(instance, filename):
+    """
+    This method must stay outside of the class definition because django
+    cannot serialize unbound methods in Python 2:
+
+    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
+    """
+    return os.path.join(settings.PROJECT_PATH, instance.slug, "zipped_data", filename)
+
 
 class Project(models.Model):
     """Project model.
@@ -42,11 +54,10 @@ class Project(models.Model):
 
     """
 
-    def get_zipped_data_path(self, filename):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
 
-    def get_dumped_data_path(self):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
+    def get_dumped_data_path(instance):
+        return os.path.join(settings.PROJECT_PATH, instance.slug, "data")
+
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
@@ -70,7 +81,7 @@ class Project(models.Model):
 
         if self.uploaded_data:
             super(Project, self).save(*args, **kwargs)
-            unzip.delay(self.get_zipped_data_path(self.uploaded_data.name),
+            unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
                     self.get_dumped_data_path())
             self.data_folder = self.get_dumped_data_path()
 
