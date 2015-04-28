@@ -183,7 +183,7 @@ class Container(models.Model):
     "Should the container be running?"
 
     def slug(self):
-        Container.slug(self.project, self.app)
+        return Container.__slug(self.project, self.app)
 
     def public_urlbase(self):
         if not self.app.expose_publicly:
@@ -217,7 +217,7 @@ class Container(models.Model):
             'command': self.app.command or '',
             'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
             'ports': [port[0] for port in AppPort.objects.filter(app=self.app).values_list('internal_port')],
-            'links': [{'name': Container.slug(self.project, link.to_app), 'alias': link.alias or ''} for link in
+            'links': [{'name': Container.__slug(self.project, link.to_app), 'alias': link.alias or ''} for link in
                         AppLink.objects.filter(from_app = self.app)],
             'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
         }
@@ -230,7 +230,7 @@ class Container(models.Model):
         return result
 
     @classmethod
-    def slug(cls, project, app):
+    def __slug(cls, project, app):
         return "{}{}".format(project.name, app.name)
 
     @classmethod
