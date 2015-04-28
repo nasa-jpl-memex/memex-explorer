@@ -10,10 +10,13 @@ server {
 {% for container in containers %}
 server {
     listen 80;
-    server_name {{ hostname }};
+    server_name {{ hostname }} {{ ip_addr }};
 
-    location / {
-        proxy_pass http://0.0.0.0:{{ container.high_port }}/;
+    location {{ container.public_urlbase }} {
+        rewrite {{ container.public_urlbase }}/(.*) /$1 break;
+        proxy_pass          http://0.0.0.0:{{ container.high_port }}/;
+        proxy_redirect      off;
+        proxy_set_header    Host $host;
     }
 }
 {% endfor %}

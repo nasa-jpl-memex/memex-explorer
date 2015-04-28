@@ -22,6 +22,10 @@ from fabric.contrib.files import (
 )
 
 import logging
+
+MEMEX_APP_PORT = 8000
+SETTINGS_FILENAME = '/home/ubuntu/memex-explorer/source/memex/local_settings.py'
+
 #based on https://github.com/ContinuumIO/wakari-deploy/blob/master/ami_creation/fabfile.py
 
 log = logging.getLogger(__name__)
@@ -72,14 +76,14 @@ def create_box():
 def old_box(public_dns_name):
     return [i for i in ec2.get_only_instances() if i.public_dns_name == public_dns_name][0]
 
-def create_keypair(source = AMI_ID+'-amfarrell'):
+def create_keypair(instance, source = AMI_ID+'-amfarrell'):
     try:
         kp = ec2.delete_key_pair(source)
     except (boto.exception.EC2ResponseError):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
+    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(instance.public_dns_name))
     kfile = open(filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
@@ -107,7 +111,7 @@ def test_ssh(instance, key_file):
     run('pwd')
 
 
-def apt_installs():
+def apt_installs(instance):
     log.info("installing packages with apt-get")
     sudo("add-apt-repository -y ppa:keithw/mosh")
     sudo("apt-get update -y")
@@ -121,13 +125,13 @@ def apt_installs():
         'tig']
     sudo("apt-get install -y {}".format(' '.join(packages)))
 
-def fix_sshd_config():
+def fix_sshd_config(instance):
     '''root needs an actual shell, so fix the sshd_config.'''
     config_file = '/etc/ssh/sshd_config'
     uncomment(config_file, r'^.*PermitRootLogin yes', use_sudo=True)
     comment(config_file, r'^PermitRootLogin forced-commands-only', use_sudo=True)
 
-def install_miniconda():
+def install_miniconda(instance):
     url = 'http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
     run("wget {}".format(url))
     run("chmod +x ./Miniconda-latest-Linux-x86_64.sh")
@@ -135,23 +139,25 @@ def install_miniconda():
     run("echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc")
     run("source ~/.bashrc")
 
-def install_docker():
+def install_docker(instance):
     run("chmod +x ~/memex-explorer/install-docker.sh")
     run("~/memex-explorer/install-docker.sh")
     sudo("docker pull dockerfile/elasticsearch")
     sudo("docker pull continuumio/tika")
     sudo("docker pull continuumio/kibana")
 
-def install_repo():
+def install_repo(instance):
     url = 'https://github.com/memex-explorer/memex-explorer/'
     if os.environ.get('GIT_BRANCH'):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
+    run("echo 'HOSTNAME = {}' >> {}".format(instance.public_DNS_NAME, SETTINGS_FILENAME)
+    run("echo 'ROOT_PORT = {}' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME)
+    run("echo 'IP_ADDR = {}' >> {}".format(instance.ip_address, SETTINGS_FILENAME)
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
-MEMEX_APP_PORT = 8000
 def start_nginx(instance):
     run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' ~/miniconda/bin/python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
         source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
@@ -167,12 +173,8 @@ def start_server_running(instance):
 
 
 
-if os.environ.get('DNS_NAME'):
-    key_filename = os.environ.get('EC2_KEY_PATH', '/Users/afarrell/projects/memex-explorer/deploy/ec2.key')
-    instance = old_box(os.environ.get('DNS_NAME'))
-else:
-    key_filename = create_keypair()
-    instance = create_box()
+instance = create_box()
+key_filename = create_keypair(instance)
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
 try:

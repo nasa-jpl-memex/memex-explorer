@@ -1,6 +1,7 @@
 """Base models."""
 
 import os
+import subprocess
 
 from django.db import models
 from django.utils.text import slugify
@@ -20,62 +21,21 @@ def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
         'Only numbers, letters, underscores, dashes and spaces are allowed.')
 
-APPS = [
-    {
-        'name': 'web',
-        'dockerfile' : ".",
-        'command' : "python ./manage.py runserver 0.0.0.0:8000",
-        'volumes': [("./source", "./source")],
-        'expose' : [8000],
-    }, {
-        'name': 'solr',
-        'dockerfile' : "./solr",
-        'command' : "/workdir/solr_entry.sh",
-        'volumes': [("./solr", "/workdir")],
-        'expose': [8983, 5005,]
-    }
-]
-
-def generate_docker_compose(new_slug, project_app_ports={}):
-    project_slugs = list(Project.objects.values('slug')) + [{'slug': new_slug}],
-    projects = []
-    for slug in project_slugs:
-        projects.append({'name': slug, apps:[]})
-        for app in APPS:
-            projects[-1]['apps'].append({
-                'name': app['name'],
-                'port': project_app_ports["{}{}".format(slug, app['name'])],
-            })
-    context = {
-        'hostname' : 'structureandinterperetation.com',
-        'root_port' : 8617,
-        'projects' : projects,
-    }
-    compose_template = Template(open('/home/ubuntu/memex-explorer/deploy/docker-compose.yml.jinja2', 'r').read(),
-                                trim_blocks = True, lstrip_blocks = True)
-    compose_config = compose_template.render(trim_blocks = True, lstrip_blocks = True, **context)
-    with open('/home/ubuntu/memex-explorer/docker-compose.yml', 'w') as f:
-        f.write(compose_config)
-        f.flush()
-    return 'memexexplorer_{name}_run_{iteration}'
-
-def generate_nginx_config(new_slug):
-    context = {
-        'hostname' : 'structureandinterperetation.com',
-        'root_port' : 8617,
-        'projects' : list(Project.objects.values('slug')) + [{'slug': new_slug}],
-        'apps' : APPS
-    }
-    nginx_template = Template(open('/home/ubuntu/memex-explorer/deploy/nginx-reverse-proxy.conf.jinja2', 'r').read(),
-                                trim_blocks = True, lstrip_blocks = True)
-    nginx_config = nginx_template.render(**context)
-    with open('/home/ubuntu/memex-explorer/nginx-reverse-proxy.conf', 'w') as f:
-        f.write(nginx_config)
-        f.flush()
 
 def zipped_file_validator():
     return RegexValidator(r'.*\.(ZIP|zip)$',
         'Only compressed archive (.zip) files are allowed.')
+
+
+def get_zipped_data_path(instance, filename):
+    """
+    This method must stay outside of the class definition because django
+    cannot serialize unbound methods in Python 2:
+
+    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
+    """
+    return os.path.join(settings.PROJECT_PATH, instance.slug, "zipped_data", filename)
+
 
 class Project(models.Model):
     """Project model.
@@ -94,17 +54,18 @@ class Project(models.Model):
 
     """
 
-    def get_zipped_data_path(self, filename):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "zipped_data", filename)
 
-    def get_dumped_data_path(self):
-        return os.path.join(settings.PROJECT_PATH, self.slug, "data")
+    def get_dumped_data_path(instance):
+        return os.path.join(settings.PROJECT_PATH, instance.slug, "data")
+
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+    uploaded_data = models.FileField(
         null=True, blank=True, default=None, validators=[zipped_file_validator()])
+    #uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+    #    null=True, blank=True, default=None, validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
 
     def get_absolute_url(self):
@@ -114,28 +75,28 @@ class Project(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
 
-        ports = {
-
-        }
-
         ### This entire part might be best done asynchronously
-
-        image_name_template = generate_docker_compose(self.slug)
-        #run docker-compose up -p --no-recreate
-        #for each of the image names, run docker port and get the host port
-        project_app_ports = {}
-        generate_nginx_config(self.slug, project_app_ports)
-        #restart nginx
 
         #fill it in with each project's 
 
         if self.uploaded_data:
             super(Project, self).save(*args, **kwargs)
-            unzip.delay(self.get_zipped_data_path(self.uploaded_data.name),
+            unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
                     self.get_dumped_data_path())
             self.data_folder = self.get_dumped_data_path()
 
         super(Project, self).save(*args, **kwargs)
+
+    def start_containers(self, app_names = ['tika', 'elasticsearch', 'kibana']):
+        containers = []
+        for app in App.objects.filter(name__in = app_names).all():
+            containers.append(app.create_container_entry(self))
+        Container.create_containers()
+        for container in containers:
+            if container.expose_publicly:
+                container.find_high_port()
+        Container.map_public_ports()
+
 
     def __unicode__(self):
         return self.name
@@ -155,7 +116,7 @@ class App(models.Model):
 
     expose_publicly = models.BooleanField(default=False)
 
-    def container_entries(self, project):
+    def create_container_entry(self, project):
         container = Container.objects.create(
             app = self,
             project = project,
@@ -163,6 +124,10 @@ class App(models.Model):
             public_path_base = "{}/{}".format(project.name, self.name),
             running = True
         )
+        return container
+
+    def __unicode__(self):
+        return "{} running {}".format(self.name, self.image or self.build)
 
 
 
@@ -177,10 +142,6 @@ class AppPort(models.Model):
     app = models.ForeignKey(App, related_name='ports')
     internal_port = models.IntegerField(null=False, blank=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
-
-    @property
-    def internal_port(self):
-        return self.app_port.internal_port
 
 class VolumeMount(models.Model):
     """
@@ -207,7 +168,8 @@ class Container(models.Model):
     """
     NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
     DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')
-    NGINX_CONFIG_DESTINATION_PATH = '/etc/nginx/sites-enabled/memex-reverse-proxy.conf'
+    NGINX_CONFIG_DESTINATION_PATH =  os.path.join(settings.BASE_DIR, 'base/nginx-reverse-proxy.conf')
+    NGINX_CONFIG_COPY_PATH = '/etc/nginx/sites-enabled/default'
     DOCKER_COMPOSE_DESTINATION_PATH = os.path.join(settings.BASE_DIR, 'base/docker-compose.yml')
 
     app = models.ForeignKey(App)
@@ -221,7 +183,7 @@ class Container(models.Model):
     "Should the container be running?"
 
     def slug(self):
-        return "{}{}".format(self.project.name, self.app.name)
+        return Container.__slug(self.project, self.app)
 
     def public_urlbase(self):
         if not self.app.expose_publicly:
@@ -231,24 +193,58 @@ class Container(models.Model):
         else:
             return "{}/{}".format(self.project.name, self.app.name)
 
-    def find_high_port(self):
+    def docker_name(self):
+        composefile_dir_name = os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH))
+        return "{}_{}_1".format(composefile_self.slug())
+
+    def find_high_ports(self):
         #find the high port
-        container.high_port = 0
-        print("TODO: figure out how to get the high port")
-        container.save()
+        port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
+        mapping_dict = {}
+        for mapping in port_mappings.split('\n'):
+            internal, external = port_mapping.split('/tcp -> 0.0.0.0:')
+            mapping_dict[internal] = external
+            app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
+            self.high_port = int(external)
+            ContainerPort.objects.create(container = self, app_port = app_port, external_port = external)
+        self.save()
+        return mapping_dict
+
+    def context_dict(self):
+        #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
+        result = {
+            'slug':self.slug(),
+            'command': self.app.command or '',
+            'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
+            'ports': [port[0] for port in AppPort.objects.filter(app=self.app).values_list('internal_port')],
+            'links': [{'name': Container.__slug(self.project, link.to_app), 'alias': link.alias or ''} for link in
+                        AppLink.objects.filter(from_app = self.app)],
+            'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
+        }
+        if self.app.image:
+            result['image'] = self.app.image
+        elif self.app.build:
+            result['build'] = self.app.build
+        else:
+            raise ValueError("container {} has neither an image not a build.".format(self.slug()))
+        return result
+
+    @classmethod
+    def __slug(cls, project, app):
+        return "{}{}".format(project.name, app.name)
 
     @classmethod
     def fill_template(cls, source, destination, context_dict):
         template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
-        result = template.render(Context(**context_dict))
+        result = template.render(context_dict)
         with open(destination, 'w') as f:
             f.write(result)
             f.flush()
 
     @classmethod
     def generate_container_context(cls):
-        containers = Container.objects.filter(running == True).select_related('app', 'project').all()
-        return {'containers': containers}
+        containers = Container.objects.filter(running = True).select_related('app', 'project').all()
+        return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
 
     @classmethod
     def create_containers(cls):
@@ -257,14 +253,23 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
+        #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
+        compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        for container in Container.objects \
+                .filter(expose_publicly = True).filter(high_port = None).filter(running = True).all():
+
+            container.find_high_port()
+
 
     @classmethod
     def generate_nginx_context(cls):
-        containers = cls.objects.filter(app__expose_publicly == True).filter(running == True).select_related('app', 'project').all()
+        containers = cls.objects.filter(app__expose_publicly = True).filter(running = True).select_related('app', 'project').all()
         root_port = os.environ.get('ROOT_PORT', '8000')
-        hostname = os.environ.get('HOST_NAME', '')
-        ip_addr = os.environ.get('IP_ADDR', '')
-        return {'containers': containers, 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
+        hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
+        ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
+        return {'containers': [{'high_port': container.high_port, 'path_base': container.public_urlbase()}
+                                    for container in containers]
+                , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
 
     @classmethod
     def map_public_ports(cls):
@@ -273,6 +278,8 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
+        subprocess.check_output("sudo cp {} {}".format(cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH))
+        subprocess.check_output("sudo service nginx restart")
 
 
 
