@@ -23,7 +23,7 @@
     {% if container.links %}
     links:
     {% for link in container.links %}
-      - {{ link.name }}:{{ link.alias }}
+     - {{ link.name }}:{{ link.alias }}
     {% endfor %}
     {% endif %}
     {% if container.environment_variables %}

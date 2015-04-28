@@ -183,7 +183,7 @@ class Container(models.Model):
     "Should the container be running?"
 
     def slug(self):
-        return "{}{}".format(self.project.name, self.app.name)
+        Container.slug(self.project, self.app)
 
     def public_urlbase(self):
         if not self.app.expose_publicly:
@@ -217,7 +217,7 @@ class Container(models.Model):
             'command': self.app.command or '',
             'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
             'ports': [port[0] for port in AppPort.objects.filter(app=self.app).values_list('internal_port')],
-            'links': [{'name': link.to_app.name, 'alias': link.alias or ''} for link in
+            'links': [{'name': Container.slug(self.project, link.to_app), 'alias': link.alias or ''} for link in
                         AppLink.objects.filter(from_app = self.app)],
             'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
         }
@@ -228,6 +228,10 @@ class Container(models.Model):
         else:
             raise ValueError("container {} has neither an image not a build.".format(self.slug()))
         return result
+
+    @classmethod
+    def slug(cls, project, app):
+        return "{}{}".format(project.name, app.name)
 
     @classmethod
     def fill_template(cls, source, destination, context_dict):
@@ -255,7 +259,6 @@ class Container(models.Model):
                 .filter(expose_publicly = True).filter(high_port = None).filter(running = True).all():
 
             container.find_high_port()
-
 
 
     @classmethod
