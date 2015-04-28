@@ -153,9 +153,9 @@ def install_repo(instance):
     else:
         run("git clone {}".format(url))
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("echo 'HOSTNAME = {}' >> {}".format(instance.public_DNS_NAME, SETTINGS_FILENAME)
-    run("echo 'ROOT_PORT = {}' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME)
-    run("echo 'IP_ADDR = {}' >> {}".format(instance.ip_address, SETTINGS_FILENAME)
+    run("echo 'HOSTNAME = {}' >> {}".format(instance.public_DNS_NAME, SETTINGS_FILENAME))
+    run("echo 'ROOT_PORT = {}' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
+    run("echo 'IP_ADDR = {}' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
 def start_nginx(instance):
