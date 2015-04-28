@@ -63,10 +63,8 @@ class Project(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    uploaded_data = models.FileField(
+    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
         null=True, blank=True, default=None, validators=[zipped_file_validator()])
-    #uploaded_data = models.FileField(upload_to=get_zipped_data_path,
-    #    null=True, blank=True, default=None, validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
 
     def get_absolute_url(self):
@@ -88,6 +86,8 @@ class Project(models.Model):
 
         super(Project, self).save(*args, **kwargs)
 
+    def kibana_url(self):
+        return '/{}/kibana/'.format(self.name)
 
     def __unicode__(self):
         return self.name
