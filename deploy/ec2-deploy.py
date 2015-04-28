@@ -4,6 +4,7 @@ import boto.exception
 import boto.ec2
 import datetime
 import time
+import subprocess
 
 from fabric.api import (
     env,
@@ -76,14 +77,14 @@ def create_box():
 def old_box(public_dns_name):
     return [i for i in ec2.get_only_instances() if i.public_dns_name == public_dns_name][0]
 
-def create_keypair(instance, source = AMI_ID+'-amfarrell'):
+def create_keypair(source = AMI_ID+'-amfarrell'):
     try:
         kp = ec2.delete_key_pair(source)
     except (boto.exception.EC2ResponseError):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(instance.public_dns_name))
+    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
     kfile = open(filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
@@ -173,16 +174,18 @@ def start_server_running(instance):
 
 
 
+key_filename = create_keypair()
 instance = create_box()
-key_filename = create_keypair(instance)
+subprocess.check_output(['cp', key_filename, 
+                         os.path.join(os.path.dirname(key_filename), 'ec2-{}.key'.format(instance.ip_address))])
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
 try:
     test_ssh(instance, key_filename)
     print(ssh_command)
-    apt_installs()
+    apt_installs(instance)
     print(mosh_command)
-    fix_sshd_config()
+    fix_sshd_config(instance)
 except Exception, e:
     import pdb;pdb.set_trace()
     print(instance.public_dns_name)
@@ -194,8 +197,8 @@ except Exception, e:
 #  f.write("alias mosh_memex='{}'\n".format(mosh_command))
 #  f.flush()
 try:
-    install_miniconda()
-    install_repo()
+    install_miniconda(instance)
+    install_repo(instance)
     start_nginx(instance)
     install_docker()
     print(instance.public_dns_name)
