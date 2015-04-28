@@ -1,6 +1,7 @@
 """Base models."""
 
 import os
+import subprocess
 
 from django.db import models
 from django.utils.text import slugify
@@ -75,6 +76,17 @@ class Project(models.Model):
 
         super(Project, self).save(*args, **kwargs)
 
+    def start_containers(self, app_names = ['tika', 'elasticsearch', 'kibana']):
+        containers = []
+        for app in App.objects.filter(name__in = app_names).all():
+            containers.append(app.create_container_entry(self))
+        Container.create_containers()
+        for container in containers:
+            if container.expose_publicly:
+                container.find_high_port()
+        Container.map_public_ports()
+
+
     def __unicode__(self):
         return self.name
 
@@ -101,6 +113,10 @@ class App(models.Model):
             public_path_base = "{}/{}".format(project.name, self.name),
             running = True
         )
+        return container
+
+    def __unicode__(self):
+        return "{} running {}".format(self.name, self.image or self.build)
 
 
 
@@ -141,7 +157,8 @@ class Container(models.Model):
     """
     NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
     DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')
-    NGINX_CONFIG_DESTINATION_PATH = '/etc/nginx/sites-enabled/memex-reverse-proxy.conf'
+    NGINX_CONFIG_DESTINATION_PATH =  os.path.join(settings.BASE_DIR, 'base/nginx-reverse-proxy.conf')
+    NGINX_CONFIG_COPY_PATH = '/etc/nginx/sites-enabled/default'
     DOCKER_COMPOSE_DESTINATION_PATH = os.path.join(settings.BASE_DIR, 'base/docker-compose.yml')
 
     app = models.ForeignKey(App)
@@ -165,11 +182,22 @@ class Container(models.Model):
         else:
             return "{}/{}".format(self.project.name, self.app.name)
 
-    def find_high_port(self):
+    def docker_name(self):
+        composefile_dir_name = os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH))
+        return "{}_{}_1".format(composefile_self.slug())
+
+    def find_high_ports(self):
         #find the high port
-        container.high_port = 0
-        print("TODO: figure out how to get the high port")
-        container.save()
+        port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
+        mapping_dict = {}
+        for mapping in port_mappings.split('\n'):
+            internal, external = port_mapping.split('/tcp -> 0.0.0.0:')
+            mapping_dict[internal] = external
+            app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
+            self.high_port = int(external)
+            ContainerPort.objects.create(container = self, app_port = app_port, external_port = external)
+        self.save()
+        return mapping_dict
 
     def context_dict(self):
         #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
@@ -210,14 +238,24 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
+        #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
+        compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        for container in Container.objects \
+                .filter(expose_publicly = True).filter(high_port = None).filter(running = True).all():
+
+            container.find_high_port()
+
+
 
     @classmethod
     def generate_nginx_context(cls):
         containers = cls.objects.filter(app__expose_publicly = True).filter(running = True).select_related('app', 'project').all()
         root_port = os.environ.get('ROOT_PORT', '8000')
-        hostname = os.environ.get('HOST_NAME', '')
-        ip_addr = os.environ.get('IP_ADDR', '')
-        return {'containers': containers, 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
+        hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
+        ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
+        return {'containers': [{'high_port': container.high_port, 'path_base': container.public_urlbase()}
+                                    for container in containers]
+                , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
 
     @classmethod
     def map_public_ports(cls):
@@ -226,6 +264,8 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
+        subprocess.check_output("sudo cp {} {}".format(cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH))
+        subprocess.check_output("sudo service nginx restart")
 
 
 

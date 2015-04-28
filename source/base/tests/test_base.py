@@ -2,7 +2,17 @@ from __future__ import unicode_literals
 import urllib2
 import yaml
 import pytest
-from yaml import load, dump
+from yaml import load as yaml_load
+from yaml import Loader, SafeLoader
+
+from django.conf import settings
+
+def construct_yaml_str(self, node):
+    # Override the default string handling function 
+    # to always return unicode objects
+    return self.construct_scalar(node)
+Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -131,7 +141,17 @@ class TestProjectQueries(TestCase):
 @pytest.mark.docker
 class TestDockerSetup(TestCase):
 
-    def test_generate_docker_compose(self):
+    @classmethod(cls):
+    def teardown_class(cls):
+        AppPort.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
+        VolumeMount.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
+        EnvVar.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
+        AppLink.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
+        App.objects.filter(name in ['tika', 'elasticsearch', 'kibana']).delete()
+
+
+    @classmethod
+    def setup_class(cls):
         tika=App.objects.create(name='tika',
             index_url='http://example.com',
             image='continuumio/tika'
@@ -180,23 +200,24 @@ class TestDockerSetup(TestCase):
             name='test1',
             slug='test1_slug'
         )
-        tika_container = tika.create_container_entry(project)
-        es_container = elasticsearch.create_container_entry(project)
-        kibana_container = kibana.create_container_entry(project)
+        cls.tika_container = tika.create_container_entry(project)
+        cls.es_container = elasticsearch.create_container_entry(project)
+        cls.kibana_container = kibana.create_container_entry(project)
+        cls.tika_app = tika
+        cls.es_app = elasticsearch
+        cls.kibana_app = kibana
+        cls.kibana_container.high_port = 46666
+        cls.kibana_container.save()
+
+
+    def test_generate_docker_compose(self):
         context = Container.generate_container_context()
         Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, context)
         container_yml = open(Container.DOCKER_COMPOSE_DESTINATION_PATH, 'r').read()
         print(container_yml)
-        from yaml import Loader, SafeLoader
 
-        def construct_yaml_str(self, node):
-            # Override the default string handling function 
-            # to always return unicode objects
-            return self.construct_scalar(node)
-        Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
-        SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
         self.assertIn('KIBANA_SECURE=false', container_yml)
-        data = load(container_yml)
+        data = yaml_load(container_yml)
         self.maxDiff = None
         correct_data = {
             'test1tika': {
@@ -230,4 +251,62 @@ class TestDockerSetup(TestCase):
         }
         self.assertEqual(data, correct_data)
 
+    def test_generate_nginx_config_by_parsing(self):
+        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
+        data = '\n'+ open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read()
+        correct_data = """
+server {
+    listen 80;
+    server_name aws-hostname-example 54.158.41.187;
 
+    location / {
+        proxy_pass http://0.0.0.0:8000/;
+    }
+}
+
+server {
+    listen 80;
+    server_name aws-hostname-example 54.158.41.187;
+
+    location  {
+        rewrite /(.*) /$1 break;
+        proxy_pass          http://0.0.0.0:46666/;
+        proxy_redirect      off;
+        proxy_set_header    Host $host;
+    }
+}
+"""
+        self.assertEqual(data, correct_data)
+
+
+#    def test_generate_nginx_config_by_parsing(self):
+#        self.kibana_container.high_port = 46666
+#        self.kibana_container.save()
+#        context = Container.generate_nginx_context()
+#        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
+#        from nginxparser import load as nginx_load
+#        data = nginx_load(open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r'))
+#        print('\n')
+#        print(open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read())
+#        #problem1: this is unicode, not strings.
+#        #problem2: It doesn't have any bearing on what nginx does.
+#        correct_data = [
+#                [['server'], [
+#                ['listen', '80'],
+#                ['server_name', settings.IP_ADDR, settings.HOSTNAME],
+#                ['location', '/'], [
+#                    ['proxy_pass', 'http://0.0.0.0:{}'.format(settings.ROOT_PORT)],
+#                ]
+#            ]],
+#            [['server'], [
+#                ['listen', '80'],
+#                ['server_name', settings.IP_ADDR, settings.HOSTNAME],
+#                ['location', self.kibana_container.public_urlbase()], [
+#                    ['rewrite', '{}/(.*)'.format(self.kibana_container.public_urlbase()), '/$1', 'break'],
+#                    ['proxy_pass', 'http://0.0.0.0:{}'.format(self.kibana_container.high_port)],
+#                    ['proxy_redirect', 'off'],
+#                    ['proxy_set_header', 'Host', '$host'],
+#                ]
+#            ]]
+#        ]
+#        self.assertEqual(data, correct_data)
