@@ -8,6 +8,7 @@ from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.core.urlresolvers import reverse
+from django.db.models.signals import post_save
 
 from jinja2 import Template
 from jinja2.runtime import Context
@@ -87,19 +88,10 @@ class Project(models.Model):
 
         super(Project, self).save(*args, **kwargs)
 
-    def start_containers(self, app_names = ['tika', 'elasticsearch', 'kibana']):
-        containers = []
-        for app in App.objects.filter(name__in = app_names).all():
-            containers.append(app.create_container_entry(self))
-        Container.create_containers()
-        for container in containers:
-            if container.app.expose_publicly:
-                container.find_high_ports()
-        Container.map_public_ports()
-
 
     def __unicode__(self):
         return self.name
+
 
 class App(models.Model):
     """
@@ -141,6 +133,9 @@ class AppPort(models.Model):
     app = models.ForeignKey(App, related_name='ports')
     internal_port = models.IntegerField(null=False, blank=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
+
+    def __unicode__(self):
+        return "{} is running on port {}".format(self.app.name, self.internal_port)
 
 class VolumeMount(models.Model):
     """
@@ -201,6 +196,7 @@ class Container(models.Model):
         port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
         mapping_dict = {}
         for mapping in port_mappings.split('\n'):
+            print mapping
             if '/tcp -> 0.0.0.0:' in mapping:
                 internal, external = mapping.split('/tcp -> 0.0.0.0:')
                 mapping_dict[internal] = external
@@ -254,10 +250,11 @@ class Container(models.Model):
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
         #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
-        compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        out = compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
         for container in Container.objects \
                 .filter(app__expose_publicly = True).filter(running = True).all():
             container.find_high_ports()
+        return out
 
 
     @classmethod
@@ -289,3 +286,13 @@ class ContainerPort(models.Model):
     container = models.ForeignKey(Container, related_name='mapped_ports')
     app_port = models.ForeignKey(AppPort)
     external_port = models.IntegerField()
+
+
+
+from task_manager.docker_tasks import start_containers
+
+def start_container_celery(sender, instance, **kwargs):
+    start_containers.delay(instance)
+
+
+post_save.connect(start_container_celery, sender = Project)
