@@ -92,7 +92,6 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
-
 class App(models.Model):
     """
     Represents information about starting an application in a container.
@@ -161,7 +160,6 @@ class EnvVar(models.Model):
     name = models.TextField(max_length=64)
     value = models.TextField(max_length=256, default='')
 
-
 class Container(models.Model):
     """
 
@@ -186,33 +184,13 @@ class Container(models.Model):
         return Container.__slug(self.project, self.app)
 
     def public_urlbase(self):
-        if not self.app.expose_publicly:
-            return None
-        #elif self.public_path_base:
-        #    return self.public_path_base
-        else:
-            return "/{}/{}".format(self.project.name, self.app.name)
+        if self.public_path_base:
+            return self.public_path_base
+        return "/{}/{}".format(self.project.name, self.app.name)
 
     def docker_name(self):
         composefile_dir_name = os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH))
         return "{}_{}_1".format(composefile_dir_name, self.slug())
-
-    def find_high_ports(self):
-        #find the high port
-        port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
-        mapping_dict = {}
-        to_expose = AppPort.objects.filter(app_id = self.app_id, expose_publicly = True).values_list('internal_port', flat=True)
-        if to_expose:
-            for mapping in port_mappings.split('\n'):
-                print(mapping)
-                if '/tcp -> 0.0.0.0:' in mapping:
-                    internal, external = mapping.split('/tcp -> 0.0.0.0:')
-                    if internal in to_expose:
-                      mapping_dict[internal] = external
-                    app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
-                    self.high_port = int(external)
-          self.save()
-        return mapping_dict
 
     def context_dict(self):
         #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
@@ -259,29 +237,45 @@ class Container(models.Model):
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
         #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
         out = compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
-        for container in Container.objects \
-                .filter(app__expose_publicly = True).filter(running = True).all():
-            container.find_high_ports()
+
+        app_ids = AppPort.objects.filter(expose_publicly = True).values_list('app_id', flat=True)
         return out
 
     @classmethod
-    def generate_nginx_context(cls):
-        port_exposures = ContainerPort.filter(app_port__expose_publicly = True).filter(container__running = True).select_related
-        containers = cls.objects.filter(app__expose_publicly = True).filter(running = True).select_related('app', 'project').all()
+    def get_port_mappings(cls):
+        app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
+        port_mappings = []
+        for container in Container.objects.filter(app_id__in = ports.values()).filter(running = True).all():
+            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
+            for raw_mapping in docker_port_output.split('\n'):
+                print(mapping)
+                if '/tcp -> 0.0.0.0:' in raw_mapping:
+                    if internal == app_ports[container.app_id]:
+                        internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
+                        container.high_port = int(external)
+                        container.save()
+                        mappings.append((container.public_urlbase(), self.high_port))
+        return mappings
+
+    @classmethod
+    def generate_nginx_context(cls, port_mappings=[]):
+        if port_mappings is None:
+          port_mappings = cls.get_port_mappings()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
         ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
-        return {'containers': [{'high_port': container.high_port, 'public_urlbase': container.public_urlbase()}
-                                    for container in containers]
+        return {
+            'containers': [{'high_port': mapping[1], 'public_urlbase': mapping[0]}
+                                    for mapping in port_mappings]
                 , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
 
     @classmethod
-    def map_public_ports(cls):
+    def map_public_ports(cls, port_mappings=None):
         """
         Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
         Then, restart nginx.
         """
-        cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
+        cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context(port_mappings))
         subprocess.check_output(["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH])
         return subprocess.check_output(["sudo","service","nginx","restart"])
 
