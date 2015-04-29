@@ -106,7 +106,6 @@ class App(models.Model):
     build = models.TextField(max_length=265, blank=True, null=True)
     command = models.TextField(max_length=256)
 
-    expose_publicly = models.BooleanField(default=False)
 
     def create_container_entry(self, project):
         container = Container.objects.create(
@@ -120,9 +119,6 @@ class App(models.Model):
     def __unicode__(self):
         return "{} running {}".format(self.name, self.image or self.build)
 
-
-
-
 class AppLink(models.Model):
     from_app = models.ForeignKey(App, related_name='links')
     to_app = models.ForeignKey(App)
@@ -130,12 +126,22 @@ class AppLink(models.Model):
     external = models.BooleanField(default=False)
 
 class AppPort(models.Model):
+    expose_publicly = models.BooleanField(default=False)
     app = models.ForeignKey(App, related_name='ports')
     internal_port = models.IntegerField(null=False, blank=False)
     service_name = models.TextField(max_length=64, null=True, blank=True)
 
+    def clean(self, *args, **kwargs):
+        if AppPort.objects.filter(app = self.app).filter(expose_publicly = True).exists():
+            raise ValidationError("An application can only expose one port publicly. {} already exposes port {}".filter(
+              self.app.name, AppPort.objects.filter(app = self.app).filter(expose_publicly = True).get().internal_port
+              ))
+
     def __unicode__(self):
         return "{} is running on port {}".format(self.app.name, self.internal_port)
+
+    class Meta:
+        unique_together = ('app_id', 'internal_port')
 
 class VolumeMount(models.Model):
     """
@@ -195,15 +201,17 @@ class Container(models.Model):
         #find the high port
         port_mappings = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
         mapping_dict = {}
-        for mapping in port_mappings.split('\n'):
-            print mapping
-            if '/tcp -> 0.0.0.0:' in mapping:
-                internal, external = mapping.split('/tcp -> 0.0.0.0:')
-                mapping_dict[internal] = external
-                app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
-                self.high_port = int(external)
-                ContainerPort.objects.create(container = self, app_port = app_port, external_port = external)
-        self.save()
+        to_expose = AppPort.objects.filter(app_id = self.app_id, expose_publicly = True).values_list('internal_port', flat=True)
+        if to_expose:
+            for mapping in port_mappings.split('\n'):
+                print(mapping)
+                if '/tcp -> 0.0.0.0:' in mapping:
+                    internal, external = mapping.split('/tcp -> 0.0.0.0:')
+                    if internal in to_expose:
+                      mapping_dict[internal] = external
+                    app_port = AppPort.objects.get(internal_port = internal, app_id = self.app_id)
+                    self.high_port = int(external)
+          self.save()
         return mapping_dict
 
     def context_dict(self):
@@ -256,9 +264,9 @@ class Container(models.Model):
             container.find_high_ports()
         return out
 
-
     @classmethod
     def generate_nginx_context(cls):
+        port_exposures = ContainerPort.filter(app_port__expose_publicly = True).filter(container__running = True).select_related
         containers = cls.objects.filter(app__expose_publicly = True).filter(running = True).select_related('app', 'project').all()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
@@ -276,17 +284,6 @@ class Container(models.Model):
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context())
         subprocess.check_output(["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH])
         return subprocess.check_output(["sudo","service","nginx","restart"])
-
-
-
-class ContainerPort(models.Model):
-    """
-    After a container is created, for each of the ports that container exposes, we find what high port is exposed on and save it here.
-    """
-    container = models.ForeignKey(Container, related_name='mapped_ports')
-    app_port = models.ForeignKey(AppPort)
-    external_port = models.IntegerField()
-
 
 
 from task_manager.docker_tasks import start_containers
