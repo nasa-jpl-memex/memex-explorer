@@ -60,7 +60,7 @@ env.timeout = 40
 
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
-    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',])
+    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',], instance_type='t2.medium')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     #It is utterly inefficient and stupid to run through all of these.
     print(new_instance.id)
