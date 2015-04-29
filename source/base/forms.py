@@ -10,12 +10,12 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
 
-from base.models import Project
+from base.models import Project, Index
 
 
 class CrispyModelForm(ModelForm):
     """Make Django model forms 'crispy', a la django-crispy-forms."""
-    
+
     def __init__(self, *args, **kwargs):
         """Initialize with a FormHelper and default submit action."""
 
@@ -36,7 +36,7 @@ class AddProjectForm(CrispyModelForm):
 
     class Meta:
         model = Project
-        fields = ['name', 'description', 'uploaded_data']
+        fields = ['name', 'description']
 
 
 class ProjectSettingsForm(AddProjectForm):
@@ -57,7 +57,27 @@ class ProjectSettingsForm(AddProjectForm):
 
 class AddIndexForm(CrispyModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(AddIndexForm, self).__init__(*args, **kwargs)
+        self.set_layout()
+
+    def set_layout(self):
+        """Called in __init__ to register a custom layout."""
+        self.helper.layout = Layout(
+            Fieldset(None,
+                'name',
+                'uploaded_data',
+                FormActions(Submit('submit', "Submit"))
+            )
+        )
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in Index.objects.all()]:
+            raise ValidationError("Index with this Name already exists.")
+        return name
+
     class Meta:
-        model = Project
-        fields = ['namei', 'uploaded_data']
+        model = Index
+        fields = ['name', 'uploaded_data']
 

@@ -15,8 +15,8 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-from base.models import Project
-from base.forms import AddProjectForm, ProjectSettingsForm
+from base.models import Project, Index
+from base.forms import AddProjectForm, ProjectSettingsForm, AddIndexForm
 
 from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
@@ -95,4 +95,14 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
 
     def get_crawls(self):
         return Crawl.objects.filter(project=self.get_object())
+
+
+class AddIndexView(SuccessMessageMixin, CreateView):
+    model = Index
+    form_class = AddIndexForm
+    template_name = "base/add_index.html"
+    success_message = "Index %(name)s was added successfully."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 

@@ -30,6 +30,8 @@ urlpatterns = patterns('',
         name='project_settings'),
     url(project_slug + r'settings/delete/$', views.DeleteProjectView.as_view(),
         name='delete_project'),
+    url(project_slug + r'add_index/$', views.AddIndexView.as_view(),
+        name='add_index'),
 )
 
 
