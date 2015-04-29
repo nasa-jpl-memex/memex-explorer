@@ -140,7 +140,7 @@ class AppPort(models.Model):
         return "{} is running on port {}".format(self.app.name, self.internal_port)
 
     class Meta:
-        unique_together = ('app_id', 'internal_port')
+        unique_together = ('app', 'internal_port')
 
 class VolumeMount(models.Model):
     """
