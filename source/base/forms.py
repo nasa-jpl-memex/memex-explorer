@@ -54,3 +54,10 @@ class ProjectSettingsForm(AddProjectForm):
             raise ValidationError("Project with this Name already exists.")
         return self.cleaned_data["name"]
 
+
+class AddIndexForm(CrispyModelForm):
+
+    class Meta:
+        model = Project
+        fields = ['namei', 'uploaded_data']
+

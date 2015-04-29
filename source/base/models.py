@@ -28,16 +28,6 @@ def zipped_file_validator():
         'Only compressed archive (.zip) files are allowed.')
 
 
-def get_zipped_data_path(instance, filename):
-    """
-    This method must stay outside of the class definition because django
-    cannot serialize unbound methods in Python 2:
-
-    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
-    """
-    return os.path.join(settings.PROJECT_PATH, instance.slug, "zipped_data", filename)
-
-
 class Project(models.Model):
     """Project model.
 
@@ -56,35 +46,14 @@ class Project(models.Model):
     """
 
 
-    def get_dumped_data_path(instance):
-        return os.path.join(settings.PROJECT_PATH, instance.slug, "data")
-
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
-        null=True, blank=True, default=None, validators=[zipped_file_validator()])
-    data_folder = models.TextField(blank=True)
 
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.slug))
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(unicode(self.name))
-
-        ### This entire part might be best done asynchronously
-
-        #fill it in with each project's 
-
-        if self.uploaded_data:
-            super(Project, self).save(*args, **kwargs)
-            unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
-                    self.get_dumped_data_path())
-            self.data_folder = self.get_dumped_data_path()
-
-        super(Project, self).save(*args, **kwargs)
 
     def kibana_url(self):
         return '/{}/kibana/'.format(self.name)
@@ -295,4 +264,55 @@ def start_container_celery(sender, instance, **kwargs):
     start_containers.delay(instance)
 
 
-post_save.connect(start_container_celery, sender = Project)
+if settings.DEPLOYMENT:
+    post_save.connect(start_container_celery, sender = Project)
+
+
+def get_zipped_data_path(instance, filename):
+    """
+    This method must stay outside of the class definition because django
+    cannot serialize unbound methods in Python 2:
+
+    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
+    """
+    return os.path.join(settings.PROJECT_PATH, instance.project.slug, instance.slug, "zipped_data", filename)
+
+
+class Index(models.Model):
+    """Index model.
+
+    The index model keeps track of indices that are made and what files are
+    contained within them.
+
+    Model Fields
+    ------------
+
+    name : str, 64 characters max
+    description : textfield
+    uploaded_data : Django FileField
+    data_dolder : textfield
+    project : fk to base.Project
+
+    """
+
+    def get_dumped_data_path(instance):
+        return os.path.join(settings.PROJECT_PATH, instance.slug, "data")
+
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
+    slug = models.SlugField(max_length=64, unique=True)
+    uploaded_data = models.FileField(upload_to=get_zipped_data_path,
+        null=True, blank=True, default=None, validators=[zipped_file_validator()])
+    data_folder = models.TextField(blank=True)
+    project = models.ForeignKey(Project)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.name))
+        if self.uploaded_data:
+            super(Index, self).save(*args, **kwargs)
+            unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
+                    self.get_dumped_data_path())
+            self.data_folder = self.get_dumped_data_path()
+
+        super(Project, self).save(*args, **kwargs)
+
