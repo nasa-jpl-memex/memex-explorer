@@ -32,6 +32,8 @@ urlpatterns = patterns('',
         name='delete_project'),
     url(project_slug + r'add_index/$', views.AddIndexView.as_view(),
         name='add_index'),
+    url(project_slug + r'indices/$', views.ListIndicesView.as_view(),
+        name='indices'),
 )
 
 

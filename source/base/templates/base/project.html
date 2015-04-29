@@ -82,7 +82,9 @@
       </div>
     <div class="col-sm-4">
       <h4 style="line-height:2em;">
+        <a href="{% url 'base:indices' project_slug=project.slug %}">
           <i class="fa fa-archive"> &nbsp; </i>Indices
+        </a>
       </h4>
 
       {% if project.index_set.all %}

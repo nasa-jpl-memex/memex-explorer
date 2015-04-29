@@ -86,6 +86,11 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
         return Crawl.objects.filter(project=self.get_object())
 
 
+class ListIndicesView(ProjectObjectMixin, ListView):
+    model = Index
+    template_name = "base/indices.html"
+
+
 class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     model = Index
     form_class = AddIndexForm
