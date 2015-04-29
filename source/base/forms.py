@@ -12,6 +12,8 @@ from crispy_forms.bootstrap import FormActions
 
 from base.models import Project, Index
 
+from crispy_forms.layout import Layout, Fieldset, Submit, HTML
+
 
 class CrispyModelForm(ModelForm):
     """Make Django model forms 'crispy', a la django-crispy-forms."""
@@ -80,4 +82,3 @@ class AddIndexForm(CrispyModelForm):
     class Meta:
         model = Index
         fields = ['name', 'uploaded_data']
-

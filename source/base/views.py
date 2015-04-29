@@ -20,6 +20,7 @@ from base.forms import AddProjectForm, ProjectSettingsForm, AddIndexForm
 
 from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
+from apps.crawl_space.views import ProjectObjectMixin
 
 from task_manager.tika_tasks import create_index
 
@@ -54,18 +55,6 @@ class ProjectView(DetailView):
     slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"
 
-    def post(self, request, *args, **kwargs):
-
-        if request.POST['action'] == "create_index":
-            create_index.delay(self.get_object())
-            return HttpResponse("Success")
-
-        return HttpResponse(json.dumps(dict(
-                args=args,
-                kwargs=kwargs,
-                post=request.POST)),
-            content_type="application/json")
-
     def get_object(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
 
@@ -97,7 +86,7 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
         return Crawl.objects.filter(project=self.get_object())
 
 
-class AddIndexView(SuccessMessageMixin, CreateView):
+class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     model = Index
     form_class = AddIndexForm
     template_name = "base/add_index.html"
@@ -105,4 +94,8 @@ class AddIndexView(SuccessMessageMixin, CreateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+    def form_valid(self, form):
+        form.instance.project = self.get_project()
+        return super(AddIndexView, self).form_valid(form)
 

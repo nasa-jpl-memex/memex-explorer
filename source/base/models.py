@@ -16,6 +16,7 @@ from jinja2.runtime import Context
 from django.conf import settings
 
 from task_manager.file_tasks import unzip
+from task_manager.tika_tasks import create_index
 
 
 def alphanumeric_validator():
@@ -45,11 +46,14 @@ class Project(models.Model):
 
     """
 
-
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.name))
+        super(Project, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:project',
@@ -275,7 +279,7 @@ def get_zipped_data_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return os.path.join(settings.PROJECT_PATH, instance.project.slug, instance.slug, "zipped_data", filename)
+    return os.path.join(settings.PROJECT_PATH, "indices", instance.slug, "zipped_data", filename)
 
 
 class Index(models.Model):
@@ -294,15 +298,19 @@ class Index(models.Model):
     project : fk to base.Project
 
     """
-
     def get_dumped_data_path(instance):
-        return os.path.join(settings.PROJECT_PATH, instance.slug, "data")
+        return os.path.join(
+            settings.PROJECT_PATH,
+            "indices",
+            instance.slug,
+            "data"
+        )
 
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     uploaded_data = models.FileField(upload_to=get_zipped_data_path,
-        null=True, blank=True, default=None, validators=[zipped_file_validator()])
+        validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
     project = models.ForeignKey(Project)
 
@@ -311,10 +319,11 @@ class Index(models.Model):
         if self.uploaded_data:
             super(Index, self).save(*args, **kwargs)
             unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
-                    self.get_dumped_data_path())
+                self.get_dumped_data_path())
             self.data_folder = self.get_dumped_data_path()
-
-        super(Project, self).save(*args, **kwargs)
+            if settings.DEPLOYMENT:
+                create_index.delay(self)
+        super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:project',
