@@ -330,16 +330,14 @@ class Index(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         if self.uploaded_data:
-            zipped_data = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
-            if os.path.exists(zipped_data):
-                delete_folder_contents(zipped_data)
+            zipped_data_path = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
+            if os.path.isdir(zipped_data_path):
+                delete_folder_contents(zipped_data_path)
             super(Index, self).save(*args, **kwargs)
             self.data_folder = self.get_dumped_data_path()
-            if os.path.exists(zipped_data):
-                delete_folder_contents(zipped_data)
             if os.path.isdir(self.data_folder):
                 delete_folder_contents(self.data_folder)
-            unzip.delay(zipped_data, self.data_folder)
+            unzip.delay(self.uploaded_data.name, self.data_folder)
             if settings.DEPLOYMENT:
                 create_index.delay(self)
         super(Index, self).save(*args, **kwargs)
