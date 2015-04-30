@@ -117,7 +117,7 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
     template_name_suffix = '_update_form'
 
     def get_success_url(self):
-        return self.object.get_absolute_url()
+        return self.get_object().get_absolute_url()
 
     def get_object(self):
         return Index.objects.get(
@@ -129,23 +129,20 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         context["name"] = self.get_object().name
         return context
 
-class DeleteIndexView(SuccessMessageMixin, DeleteView):
+class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = Index
-    success_message = "Index %(name)s was deleted successfully."
+    success_message = "Index was deleted successfully."
     success_url = ""
 
     def delete(self, request, *args, **kwargs):
-        self.success_url = self.get_absolute_url()
+        self.success_url = self.get_object().get_absolute_url()
+        shutil.rmtree(os.path.dirname(self.get_object().data_folder))
         return super(DeleteIndexView, self).delete(request, *args, **kwargs)
 
     def get_object(self):
         return Index.objects.get(
             project=self.get_project(),
             slug=self.kwargs['index_slug'])
-
-    def get_success_url(self):
-        return reverse('base:project',
-            kwargs=dict(project_slug=self.project.slug))
 
     def get_context_data(self, **kwargs):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
