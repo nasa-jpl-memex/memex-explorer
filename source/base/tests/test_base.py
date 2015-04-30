@@ -162,7 +162,7 @@ class TestDockerSetup(TestCase):
         )
         elasticsearch = App.objects.create(name='elasticsearch',
             index_url='http://example.com',
-            image='dockerfile/elasticsearch'
+            image='elasticsearch'
         )
         AppPort.objects.create(
             app = elasticsearch,
@@ -227,7 +227,7 @@ class TestDockerSetup(TestCase):
                 ]
             },
             'test1elasticsearch': {
-                'image': 'dockerfile/elasticsearch',
+                'image': 'elasticsearch',
                 'volumes': [
                     '/home/ubuntu/elasticsearch/data:/data',
                 ],

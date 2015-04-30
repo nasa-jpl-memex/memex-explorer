@@ -163,8 +163,8 @@ def start_nginx(instance):
 
 def install_docker(instance):
     run("chmod +x ~/memex-explorer/install-docker.sh")
-    run("~/memex-explorer/install-docker.sh")
-    sudo("docker pull dockerfile/elasticsearch")
+    run("~/memex-explorer/deploy/install-docker.sh")
+    sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
     sudo("docker pull continuumio/kibana")
 
