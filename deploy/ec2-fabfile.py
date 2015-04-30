@@ -60,7 +60,9 @@ env.timeout = 40
 
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
-    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',], instance_type='t2.medium')
+    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',],
+        instance_type='m3.2xlarge')
+    #    instance_type='m3.medium')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     #It is utterly inefficient and stupid to run through all of these.
     print(new_instance.id)
@@ -140,13 +142,6 @@ def install_miniconda(instance):
     run("echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc")
     run("source ~/.bashrc")
 
-def install_docker(instance):
-    run("chmod +x ~/memex-explorer/install-docker.sh")
-    run("~/memex-explorer/install-docker.sh")
-    sudo("docker pull dockerfile/elasticsearch")
-    sudo("docker pull continuumio/tika")
-    sudo("docker pull continuumio/kibana")
-
 def install_repo(instance):
     url = 'https://github.com/memex-explorer/memex-explorer/'
     if os.environ.get('GIT_BRANCH'):
@@ -154,9 +149,9 @@ def install_repo(instance):
     else:
         run("git clone {}".format(url))
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("echo 'HOSTNAME = {}' >> {}".format(instance.public_DNS_NAME, SETTINGS_FILENAME))
-    run("echo 'ROOT_PORT = {}' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
-    run("echo 'IP_ADDR = {}' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
+    run("echo 'HOSTNAME = \"{}\"' >> {}".format(instance.public_dns_name, SETTINGS_FILENAME))
+    run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
+    run("echo 'IP_ADDR = \"{}\"' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
 def start_nginx(instance):
@@ -165,6 +160,13 @@ def start_nginx(instance):
         ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
     sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
     sudo("service nginx restart")
+
+def install_docker(instance):
+    run("chmod +x ~/memex-explorer/install-docker.sh")
+    run("~/memex-explorer/install-docker.sh")
+    sudo("docker pull dockerfile/elasticsearch")
+    sudo("docker pull continuumio/tika")
+    sudo("docker pull continuumio/kibana")
 
 def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
@@ -187,22 +189,14 @@ try:
     print(mosh_command)
     fix_sshd_config(instance)
 except Exception, e:
-    import pdb;pdb.set_trace()
-    print(instance.public_dns_name)
-    print(e)
+    print("{} failed!".format(instance.public_dns_name))
     ec2.terminate_instances([instance.id])
     raise e
-#with open("~/.aliases", 'a') as f:
-#  f.write("alias memex='{}'\n".format(ssh_command))
-#  f.write("alias mosh_memex='{}'\n".format(mosh_command))
-#  f.flush()
 try:
     install_miniconda(instance)
     install_repo(instance)
     start_nginx(instance)
-    install_docker()
-    print(instance.public_dns_name)
-    print(ssh_command)
+    install_docker(instance)
     start_server_running(instance)
 except Exception, e:
     print(ssh_command)
