@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import shutil
 
 from django.db import models
 from django.utils.text import slugify
@@ -27,6 +28,18 @@ def alphanumeric_validator():
 def zipped_file_validator():
     return RegexValidator(r'.*\.(ZIP|zip)$',
         'Only compressed archive (.zip) files are allowed.')
+
+
+def delete_folder_contents(folder):
+    for file in os.listdir(folder):
+        file_path = os.path.join(folder, file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shitul.rmtree(file_path)
+        except Exception, e:
+            print(e)
 
 
 class Project(models.Model):
@@ -279,7 +292,7 @@ def get_zipped_data_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return os.path.join(settings.PROJECT_PATH, "indices", instance.slug, "zipped_data", filename)
+    return os.path.join(settings.MEDIA_ROOT, "indices", instance.slug, "zipped_data", filename)
 
 
 class Index(models.Model):
@@ -300,7 +313,7 @@ class Index(models.Model):
     """
     def get_dumped_data_path(instance):
         return os.path.join(
-            settings.PROJECT_PATH,
+            settings.MEDIA_ROOT,
             "indices",
             instance.slug,
             "data"
@@ -317,10 +330,16 @@ class Index(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         if self.uploaded_data:
+            zipped_data = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
+            if os.path.exists(zipped_data):
+                delete_folder_contents(zipped_data)
             super(Index, self).save(*args, **kwargs)
-            unzip.delay(get_zipped_data_path(self, self.uploaded_data.name),
-                self.get_dumped_data_path())
             self.data_folder = self.get_dumped_data_path()
+            if os.path.exists(zipped_data):
+                delete_folder_contents(zipped_data)
+            if os.path.isdir(self.data_folder):
+                delete_folder_contents(self.data_folder)
+            unzip.delay(zipped_data, self.data_folder)
             if settings.DEPLOYMENT:
                 create_index.delay(self)
         super(Index, self).save(*args, **kwargs)

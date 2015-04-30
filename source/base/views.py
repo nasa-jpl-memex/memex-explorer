@@ -1,4 +1,6 @@
 """Base views."""
+from __future__ import absolute_import
+
 import json
 import shutil
 import os
@@ -11,12 +13,14 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.http import HttpResponse
+from django.core.urlresolvers import reverse
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from base.models import Project, Index
-from base.forms import AddProjectForm, ProjectSettingsForm, AddIndexForm
+from base.forms import (AddProjectForm, ProjectSettingsForm, AddIndexForm,
+    IndexSettingsForm)
 
 from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
@@ -103,4 +107,48 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     def form_valid(self, form):
         form.instance.project = self.get_project()
         return super(AddIndexView, self).form_valid(form)
+
+
+class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
+    model = Index
+    slug_url_kwarg = 'index_slug'
+    form_class = IndexSettingsForm
+    success_message = "Index was edited successfully."
+    template_name_suffix = '_update_form'
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+    def get_object(self):
+        return Index.objects.get(
+            project=self.get_project(),
+            slug=self.kwargs['index_slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexSettingsView, self).get_context_data(**kwargs)
+        context["name"] = self.get_object().name
+        return context
+
+class DeleteIndexView(SuccessMessageMixin, DeleteView):
+    model = Index
+    success_message = "Index %(name)s was deleted successfully."
+    success_url = ""
+
+    def delete(self, request, *args, **kwargs):
+        self.success_url = self.get_absolute_url()
+        return super(DeleteIndexView, self).delete(request, *args, **kwargs)
+
+    def get_object(self):
+        return Index.objects.get(
+            project=self.get_project(),
+            slug=self.kwargs['index_slug'])
+
+    def get_success_url(self):
+        return reverse('base:project',
+            kwargs=dict(project_slug=self.project.slug))
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexSettingsView, self).get_context_data(**kwargs)
+        context["name"] = self.get_object().name
+        return context
 

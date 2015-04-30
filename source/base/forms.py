@@ -82,3 +82,16 @@ class AddIndexForm(CrispyModelForm):
     class Meta:
         model = Index
         fields = ['name', 'uploaded_data']
+
+
+class IndexSettingsForm(AddIndexForm):
+    """Change the settings of a project."""
+
+    def __init__(self, *args, **kwargs):
+        self.index_instance = kwargs["instance"]
+        super(IndexSettingsForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Index
+        fields = ['uploaded_data']
+
