@@ -20,6 +20,8 @@ install:
     - conda env create -n memex -f environment.yml
     - source activate memex
     - cp source/memex/settings_files/dev_settings.py source/memex/settings.py
+    - redis-server &
+    - celery -A memex worker -l info &
 
 script:
     - coverage run $(which py.test) --runslow
