@@ -58,7 +58,7 @@ class Command(BaseCommand):
         )
         AppPort.objects.create(
             app = kibana,
-            internal_port = 80
+            internal_port = 80,
             expose_publicly = True,
         )
         EnvVar.objects.create(
