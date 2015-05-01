@@ -184,6 +184,7 @@ subprocess.check_output(['cp', key_filename,
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
 if 'quitafterec2spinup' in sys.argv:
+    print(ssh_command)
     quit()
 try:
     test_ssh(instance, key_filename)
@@ -191,17 +192,17 @@ try:
     apt_installs(instance)
     print(mosh_command)
     fix_sshd_config(instance)
-except Exception, e:
+except Exception:
     print("{} failed!".format(instance.public_dns_name))
     ec2.terminate_instances([instance.id])
-    raise e
+    raise
 try:
     install_miniconda(instance)
     install_repo(instance)
     start_nginx(instance)
     install_docker(instance)
     start_server_running(instance)
-except Exception, e:
+except Exception:
     print(ssh_command)
     print(mosh_command)
-    raise e
+    raise
