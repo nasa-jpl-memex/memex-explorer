@@ -48,7 +48,7 @@ class Command(BaseCommand):
         VolumeMount.objects.create(
             app = elasticsearch,
             mounted_at = '/data',
-            located_at = '/home/ubuntu/elasticsearch/data',
+            located_at = os.path.join(settings.BASE_DIR, 'container_volumes/elasticsearch/data'),
         )
 
 
