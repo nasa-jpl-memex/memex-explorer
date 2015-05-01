@@ -55,11 +55,11 @@ class Command(BaseCommand):
         kibana = App.objects.create(
             name = 'kibana',
             image = 'continuumio/kibana',
-            expose_publicly = True,
         )
         AppPort.objects.create(
             app = kibana,
             internal_port = 80
+            expose_publicly = True,
         )
         EnvVar.objects.create(
             app = kibana,

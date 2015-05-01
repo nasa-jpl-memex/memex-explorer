@@ -152,16 +152,16 @@ class TestDockerSetup(TestCase):
 
     @classmethod
     def setup_class(cls):
-        tika=App.objects.create(name='tika',
-            index_url='http://example.com',
+        tika=App.objects.create(
+            name='tika',
             image='continuumio/tika'
         )
         AppPort.objects.create(
             app = tika,
             internal_port = 9998
         )
-        elasticsearch = App.objects.create(name='elasticsearch',
-            index_url='http://example.com',
+        elasticsearch = App.objects.create(
+            name='elasticsearch',
             image='elasticsearch'
         )
         AppPort.objects.create(
@@ -180,11 +180,11 @@ class TestDockerSetup(TestCase):
         kibana = App.objects.create(
             name = 'kibana',
             image = 'continuumio/kibana',
-            expose_publicly = True,
         )
         AppPort.objects.create(
             app = kibana,
             internal_port = 9999
+            expose_publicly = True,
         )
         EnvVar.objects.create(
             app = kibana,
