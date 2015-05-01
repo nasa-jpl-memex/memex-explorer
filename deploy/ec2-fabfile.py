@@ -154,6 +154,7 @@ def install_repo(instance):
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
 
 def start_nginx(instance):
     sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
