@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import boto.exception
 import boto.ec2
 import datetime
@@ -155,14 +156,10 @@ def install_repo(instance):
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
 def start_nginx(instance):
-    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' ~/miniconda/bin/python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
-        source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
-        ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
-    sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
-    sudo("service nginx restart")
+    sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
 
 def install_docker(instance):
-    run("chmod +x ~/memex-explorer/install-docker.sh")
+    run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
     sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
@@ -172,7 +169,9 @@ def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
+    run("redis-server")
+    with cd("~/memex-explorer/source"):
+        run("celery -A memex worker && ~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{} && disown".format(MEMEX_APP_PORT))
 
 
 
@@ -182,23 +181,26 @@ subprocess.check_output(['cp', key_filename,
                          os.path.join(os.path.dirname(key_filename), 'ec2-{}.key'.format(instance.ip_address))])
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
+if 'quitafterec2spinup' in sys.argv:
+    print(ssh_command)
+    quit()
 try:
     test_ssh(instance, key_filename)
     print(ssh_command)
     apt_installs(instance)
     print(mosh_command)
     fix_sshd_config(instance)
-except Exception, e:
+except Exception:
     print("{} failed!".format(instance.public_dns_name))
     ec2.terminate_instances([instance.id])
-    raise e
+    raise
 try:
     install_miniconda(instance)
     install_repo(instance)
     start_nginx(instance)
     install_docker(instance)
     start_server_running(instance)
-except Exception, e:
+except Exception:
     print(ssh_command)
     print(mosh_command)
-    raise e
+    raise

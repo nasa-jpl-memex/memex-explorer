@@ -48,18 +48,18 @@ class Command(BaseCommand):
         VolumeMount.objects.create(
             app = elasticsearch,
             mounted_at = '/data',
-            located_at = '/home/ubuntu/elasticsearch/data',
+            located_at = os.path.join(settings.BASE_DIR, 'container_volumes/elasticsearch/data'),
         )
 
 
         kibana = App.objects.create(
             name = 'kibana',
             image = 'continuumio/kibana',
-            expose_publicly = True,
         )
         AppPort.objects.create(
             app = kibana,
             internal_port = 80
+            expose_publicly = True,
         )
         EnvVar.objects.create(
             app = kibana,
