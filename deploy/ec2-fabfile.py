@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import boto.exception
 import boto.ec2
 import datetime
@@ -162,7 +163,7 @@ def start_nginx(instance):
     sudo("service nginx restart")
 
 def install_docker(instance):
-    run("chmod +x ~/memex-explorer/install-docker.sh")
+    run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
     sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
@@ -182,6 +183,8 @@ subprocess.check_output(['cp', key_filename,
                          os.path.join(os.path.dirname(key_filename), 'ec2-{}.key'.format(instance.ip_address))])
 ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
 mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
+if 'quitafterec2spinup' in sys.argv:
+    quit()
 try:
     test_ssh(instance, key_filename)
     print(ssh_command)
