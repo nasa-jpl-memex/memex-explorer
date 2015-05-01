@@ -1,5 +1,0 @@
-docker
-nginx
-docker-compose
-
-docker-pull elasticsearch needs to be run as root
