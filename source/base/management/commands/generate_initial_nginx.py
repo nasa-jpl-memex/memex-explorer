@@ -14,7 +14,6 @@ class Command(BaseCommand):
         parser.add_argument('destination', nargs=1)
 
     def handle(self, *args, **options):
-        raise NotImplementedError
         context = {
             'ip_addr': os.environ.get('IP_ADDR', ''),
             'hostname': os.environ.get('HOSTNAME', ''),
