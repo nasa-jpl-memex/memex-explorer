@@ -5,7 +5,6 @@ from jinja2 import Template
 from jinja2.runtime import Context
 
 from django.core.management.base import BaseCommand, CommandError
-from polls.models import Poll
 
 class Command(BaseCommand):
     help = 'Generate initial nginx config'
