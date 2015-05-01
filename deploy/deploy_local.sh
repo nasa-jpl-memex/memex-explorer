@@ -16,12 +16,7 @@ source ~/.bashrc
 ~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate
 
-#TODO might fail here.
-~/miniconda/bin/python ~/memex-explorer/source/manage.py generate_initial_nginx  "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2" "~/memex-explorer/deploy/initial_nginx.conf"
-
-
-sudo cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default
-sudo service nginx restart
+~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx
 
 chmod +x ~/memex-explorer/deploy/install-docker.sh
 ~/memex-explorer/deploy/install-docker.sh

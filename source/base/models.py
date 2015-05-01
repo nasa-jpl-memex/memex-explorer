@@ -232,7 +232,6 @@ class Container(models.Model):
     def create_containers(cls):
         """
         Create a new docker compose file with an entry for every container that is supposed to be running.
-        Then, restart nginx.
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
         #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
