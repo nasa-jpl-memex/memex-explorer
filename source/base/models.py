@@ -244,17 +244,17 @@ class Container(models.Model):
     def get_port_mappings(cls):
         app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
         port_mappings = []
-        for container in Container.objects.filter(app_id__in = ports.values()).filter(running = True).all():
+        for container in Container.objects.filter(app_id__in = app_ports.values()).filter(running = True).all():
             docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
             for raw_mapping in docker_port_output.split('\n'):
-                print(mapping)
+                print(raw_mapping)
                 if '/tcp -> 0.0.0.0:' in raw_mapping:
                     if internal == app_ports[container.app_id]:
                         internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
                         container.high_port = int(external)
                         container.save()
-                        mappings.append((container.public_urlbase(), self.high_port))
-        return mappings
+                        port_mappings.append((container.public_urlbase(), self.high_port))
+        return port_mappings
 
     @classmethod
     def generate_nginx_context(cls, port_mappings=[]):
