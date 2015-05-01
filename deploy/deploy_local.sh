@@ -26,7 +26,6 @@ echo "HOSTNAME = '$HOSTNAME'" >> $LOCAL_SETTINGS_PATH
 sudo cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default
 sudo service nginx restart
 
-def install_docker(instance):
 chmod +x ~/memex-explorer/install-docker.sh
 ~/memex-explorer/install-docker.sh
 sudo docker pull elasticsearch
