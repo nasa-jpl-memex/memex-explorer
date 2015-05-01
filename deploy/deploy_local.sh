@@ -10,9 +10,9 @@ sudo apt-get install nginx docker git silversearcher-ag python-software-properti
 wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
 chmod +x ./Miniconda-latest-Linux-x86_64.sh
 ./Miniconda-latest-Linux-x86_64.sh -b
-echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc
+export PATH="~/miniconda/bin:/usr/bin:\$PATH"
+echo 'export PATH="~/miniconda/bin:/usr/bin:\$PATH"' >> ~/.bashrc
 source ~/.bashrc
-git clone https://github.com/memex-explorer/memex-explorer/ --branch dockerize-stable
 ~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml
 echo "ROOT_PORT = '$ROOT_MEMEX_PORT'" >> $LOCAL_SETTINGS_PATH
 echo "IP_ADDR = '$IP_ADDR'" >> $LOCAL_SETTINGS_PATH
@@ -34,3 +34,4 @@ sudo docker pull continuumio/tika
 sudo docker pull continuumio/kibana
 
 echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc
+redis-server && celery -A ~/memex-explorer/source/memex worker && dj runserver 0.0.0.0:$ROOT_PORT
