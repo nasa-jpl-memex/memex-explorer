@@ -21,6 +21,7 @@ source ~/.bashrc
 
 chmod +x ~/memex-explorer/deploy/install-docker.sh
 ~/memex-explorer/deploy/install-docker.sh
+sudo ln -s ~/miniconda/bin/docker-compose /bin/docker-compose
 sudo docker pull elasticsearch
 sudo docker pull continuumio/tika
 sudo docker pull continuumio/kibana
