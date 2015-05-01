@@ -26,11 +26,11 @@ echo "HOSTNAME = '$HOSTNAME'" >> $LOCAL_SETTINGS_PATH
 sudo cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default
 sudo service nginx restart
 
-chmod +x ~/memex-explorer/install-docker.sh
-~/memex-explorer/install-docker.sh
+chmod +x ~/memex-explorer/deploy/install-docker.sh
+~/memex-explorer/deploy/install-docker.sh
 sudo docker pull elasticsearch
 sudo docker pull continuumio/tika
 sudo docker pull continuumio/kibana
 
-echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc
+echo 'alias dj="~/miniconda/bin/python ~/memex-explorer/source/manage.py"' >> ~/.bashrc
 redis-server && celery -A ~/memex-explorer/source/memex worker && dj runserver 0.0.0.0:$ROOT_PORT
