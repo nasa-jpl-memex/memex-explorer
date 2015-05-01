@@ -10,7 +10,7 @@ sudo apt-get install nginx docker git silversearcher-ag python-software-properti
 wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
 chmod +x ./Miniconda-latest-Linux-x86_64.sh
 ./Miniconda-latest-Linux-x86_64.sh -b
-export PATH="~/miniconda/bin:/usr/bin:\$PATH"
+export PATH="~/miniconda/bin:/usr/bin:$PATH"
 echo 'export PATH="~/miniconda/bin:/usr/bin:\$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml
