@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -61,6 +62,11 @@ class ProjectView(DetailView):
 
     def get_object(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectView, self).get_context_data(**kwargs)
+        context["deployment"] = settings.DEPLOYMENT
+        return context
 
 
 class ProjectSettingsView(SuccessMessageMixin, UpdateView):
@@ -128,6 +134,7 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = Index
