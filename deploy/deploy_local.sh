@@ -5,7 +5,7 @@ export LOCAL_SETTINGS_PATH='~/memex-explorer/source/memex/local_settings.py'
 
 sudo add-apt-repository -y ppa:keithw/mosh
 sudo apt-get update -y
-sudo apt-get install nginx docker git silversearcher-ag python-software-properties mosh tig
+sudo apt-get install -y nginx docker git silversearcher-ag python-software-properties mosh tig
 
 wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
 chmod +x ./Miniconda-latest-Linux-x86_64.sh

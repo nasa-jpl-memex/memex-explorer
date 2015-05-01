@@ -10,8 +10,8 @@ class Command(BaseCommand):
     help = 'Generate initial nginx config'
 
     def add_arguments(self, parser):
-        parser.add_argument('source_template', nargs='+')
-        parser.add_argument('nginx destination', nargs='+')
+        parser.add_argument('source', nargs=1)
+        parser.add_argument('destination', nargs=1)
 
     def handle(self, *args, **options):
         raise NotImplementedError
