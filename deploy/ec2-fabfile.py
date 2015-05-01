@@ -156,11 +156,7 @@ def install_repo(instance):
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
 
 def start_nginx(instance):
-    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' ~/miniconda/bin/python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
-        source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
-        ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
-    sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
-    sudo("service nginx restart")
+    sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
 
 def install_docker(instance):
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
@@ -173,7 +169,9 @@ def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
+    run("redis-server")
+    with cd("~/memex-explorer/source"):
+        run("celery -A memex worker && ~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{} && disown".format(MEMEX_APP_PORT))
 
 
 

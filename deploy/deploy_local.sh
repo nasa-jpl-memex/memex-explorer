@@ -17,6 +17,7 @@ source ~/.bashrc
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate
 
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx
+~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana
 
 chmod +x ~/memex-explorer/deploy/install-docker.sh
 ~/memex-explorer/deploy/install-docker.sh
@@ -25,4 +26,6 @@ sudo docker pull continuumio/tika
 sudo docker pull continuumio/kibana
 
 echo 'alias dj="~/miniconda/bin/python ~/memex-explorer/source/manage.py"' >> ~/.bashrc
-redis-server && celery -A ~/memex-explorer/source/memex worker && dj runserver 0.0.0.0:$ROOT_PORT
+
+cd ~/memex-explorer/source/
+redis-server && celery -A memex worker && ~/miniconda/bin/python ./manage.py runserver 0.0.0.0:$ROOT_PORT
