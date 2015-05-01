@@ -21,6 +21,7 @@ install:
     - source activate memex
     - cp source/memex/settings_files/dev_settings.py source/memex/settings.py
     - redis-server &
+    - cd source
     - celery -A memex worker -l info &
 
 script:
