@@ -14,9 +14,6 @@ export PATH="~/miniconda/bin:/usr/bin:$PATH"
 echo 'export PATH="~/miniconda/bin:/usr/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml
-echo "ROOT_PORT = '$ROOT_MEMEX_PORT'" >> $LOCAL_SETTINGS_PATH
-echo "IP_ADDR = '$IP_ADDR'" >> $LOCAL_SETTINGS_PATH
-echo "HOSTNAME = '$HOSTNAME'" >> $LOCAL_SETTINGS_PATH
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate
 
 #TODO might fail here.
