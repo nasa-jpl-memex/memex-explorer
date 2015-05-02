@@ -12,6 +12,7 @@ from fabric.api import (
     settings,
     sudo,
     prefix,
+    cd,
     run,
 )
 
@@ -171,9 +172,11 @@ def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("redis-server")
-    with cd("~/memex-explorer/source"):
-        run("celery -A memex worker && ~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{} && disown".format(MEMEX_APP_PORT))
+    run("redis-server &")
+    run("disown")
+    run("celery --workdir=\"$HOME/memex-explorer/source\" -A memex worker &")
+    run("disown")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{}".format(MEMEX_APP_PORT))
 
 
 
