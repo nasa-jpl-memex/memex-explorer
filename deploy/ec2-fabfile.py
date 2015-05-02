@@ -12,6 +12,7 @@ from fabric.api import (
     settings,
     sudo,
     prefix,
+    cd,
     run,
 )
 
@@ -154,6 +155,8 @@ def install_repo(instance):
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
+    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
 def start_nginx(instance):
     sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
@@ -169,9 +172,11 @@ def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("redis-server")
-    with cd("~/memex-explorer/source"):
-        run("celery -A memex worker && ~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{} && disown".format(MEMEX_APP_PORT))
+    run("redis-server &")
+    run("disown")
+    run("celery --workdir=\"$HOME/memex-explorer/source\" -A memex worker &")
+    run("disown")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{}".format(MEMEX_APP_PORT))
 
 
 

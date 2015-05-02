@@ -21,6 +21,7 @@ source ~/.bashrc
 
 chmod +x ~/memex-explorer/deploy/install-docker.sh
 ~/memex-explorer/deploy/install-docker.sh
+sudo ln -s ~/miniconda/bin/docker-compose /bin/docker-compose
 sudo docker pull elasticsearch
 sudo docker pull continuumio/tika
 sudo docker pull continuumio/kibana
@@ -28,4 +29,8 @@ sudo docker pull continuumio/kibana
 echo 'alias dj="~/miniconda/bin/python ~/memex-explorer/source/manage.py"' >> ~/.bashrc
 
 cd ~/memex-explorer/source/
-redis-server && celery -A memex worker && ~/miniconda/bin/python ./manage.py runserver 0.0.0.0:$ROOT_PORT
+redis-server &
+disown
+celery --workdir="$HOME/memex-explorer/source" -A memex worker &
+disown
+~/miniconda/bin/python ./manage.py runserver 0.0.0.0:8000
