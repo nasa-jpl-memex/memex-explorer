@@ -6,6 +6,10 @@ server {
         proxy_pass http://0.0.0.0:{{ root_port }}/;
     }
 
+    location /static/ {
+        root {{ static_root }}/;
+    }
+
 {% for container in containers %}
 
     location {{ container.public_urlbase }} {
