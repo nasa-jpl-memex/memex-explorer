@@ -182,7 +182,7 @@ def install_docker():
 def conventience_aliases():
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
-def start_server_running(instance):
+def start_server_running():
     run("~/memex-explorer/deploy/ec2_gunicorn_start.sh")
 
 
@@ -197,7 +197,7 @@ if os.environ.get('MEMEX_IP_ADDR'):
             run("git pull origin {}".format(os.environ.get('GIT_BRANCH')))
         else:
             run("git pull origin master")
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
+    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
     start_server_running()
 else:
     key_filename = create_keypair()
