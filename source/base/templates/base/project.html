@@ -38,6 +38,32 @@
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="col-sm-4">
       <h4 style="line-height:2em;">
+        <a href="{% url 'base:indices' project_slug=project.slug %}">
+          <i class="fa fa-archive"> &nbsp; </i>Indices
+        </a>
+        <button style="float:right;" id="gotoKibana" title="Goto Kibana" type="button" class="btn btn-control"
+            data-container="body"
+            disabled
+            data-toggle="tooltip" data-placement="bottom">
+        Goto Kibana</button>
+      </h4>
+
+      {% if project.index_set.all %}
+      <ul class="list-group">
+        {%  for w in project.index_set.all %}
+        <li class="list-group-item">
+        <a id="link-crawls" href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
+          <i class="fa fa-archive"></i>&nbsp{{ w.name }}
+        </li>
+        {% endfor %}
+       </ul>
+      {% else %}
+      <p>No Indices Registered.</p>
+      {% endif %}
+        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Index</a>
+    </div>
+    <div class="col-sm-4">
+      <h4 style="line-height:2em;">
         <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}">
           <i class="fa fa-search"> &nbsp; </i>Crawls</a>
         &nbsp;&nbsp;&nbsp;
@@ -81,32 +107,6 @@
         {% endif %}
       <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
       </div>
-    <div class="col-sm-4">
-      <h4 style="line-height:2em;">
-        <a href="{% url 'base:indices' project_slug=project.slug %}">
-          <i class="fa fa-archive"> &nbsp; </i>Indices
-        </a>
-        <button style="float:right;" id="gotoKibana" title="Goto Kibana" type="button" class="btn btn-control"
-            data-container="body"
-            disabled
-            data-toggle="tooltip" data-placement="bottom">
-        Goto Kibana</button>
-      </h4>
-
-      {% if project.index_set.all %}
-      <ul class="list-group">
-        {%  for w in project.index_set.all %}
-        <li class="list-group-item">
-        <a id="link-crawls" href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
-          <i class="fa fa-archive"></i>&nbsp{{ w.name }}
-        </li>
-        {% endfor %}
-       </ul>
-      {% else %}
-      <p>No Indices Registered.</p>
-      {% endif %}
-        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Index</a>
-    </div>
     </div>
 
   </div>
