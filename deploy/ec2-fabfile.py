@@ -160,6 +160,7 @@ def install_repo(public_dns_name, ip_address):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
+    sudo("ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
