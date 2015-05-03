@@ -172,11 +172,7 @@ def conventience_aliases(instance):
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running(instance):
-    run("redis-server &")
-    run("disown")
-    run("celery --workdir=\"$HOME/memex-explorer/source\" -A memex worker &")
-    run("disown")
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{}".format(MEMEX_APP_PORT))
+    run("~/memex-explorer/deploy/ec2_gunicorn_start.sh")
 
 
 
