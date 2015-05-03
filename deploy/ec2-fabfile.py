@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import boto.exception
 import boto.ec2
 import datetime
@@ -11,6 +12,7 @@ from fabric.api import (
     settings,
     sudo,
     prefix,
+    cd,
     run,
 )
 
@@ -53,14 +55,16 @@ if 'xxx' == os.environ.get('AWS_SECRET').lower():
 ec2 = boto.ec2.connect_to_region('us-east-1', 
         aws_access_key_id = os.environ.get('AWS_ID'),
         aws_secret_access_key = os.environ.get('AWS_SECRET'))
-env.use_ssh_jonfig = True
+env.use_ssh_config = True
 env.disable_known_hosts = True
 env.connection_attempts = True
 env.timeout = 40
 
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
-    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',])
+    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',],
+        instance_type='m3.2xlarge')
+    #    instance_type='m3.medium')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     #It is utterly inefficient and stupid to run through all of these.
     print(new_instance.id)
@@ -74,8 +78,6 @@ def create_box():
     print(new_instance.public_dns_name)
     return new_instance
 
-def old_box(public_dns_name):
-    return [i for i in ec2.get_only_instances() if i.public_dns_name == public_dns_name][0]
 
 def create_keypair(source = AMI_ID+'-amfarrell'):
     try:
@@ -84,7 +86,7 @@ def create_keypair(source = AMI_ID+'-amfarrell'):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.key'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
+    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
     kfile = open(filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
@@ -111,8 +113,20 @@ def test_ssh(instance, key_file):
     log.debug('Trying to connect...')
     run('pwd')
 
+def connect_to_existing_machine(ip, key_file_path):
+    env.user = 'ubuntu'
+    env.hosts = ['{}@{}'.format(env.user, ip)]
+    env.host = '{}@{}'.format(env.user, ip)
+    env.host_string = '{}@{}'.format(env.user, ip)
+    env.key_file = key_file_path
+    env.key_filename = key_file_path
+    env.forward_agent = True
+    log.info('Key file: %s' % (key_file_path))
+    log.debug('Trying to connect...')
+    run('pwd')
 
-def apt_installs(instance):
+
+def apt_installs():
     log.info("installing packages with apt-get")
     sudo("add-apt-repository -y ppa:keithw/mosh")
     sudo("apt-get update -y")
@@ -126,13 +140,13 @@ def apt_installs(instance):
         'tig']
     sudo("apt-get install -y {}".format(' '.join(packages)))
 
-def fix_sshd_config(instance):
+def fix_sshd_config():
     '''root needs an actual shell, so fix the sshd_config.'''
     config_file = '/etc/ssh/sshd_config'
     uncomment(config_file, r'^.*PermitRootLogin yes', use_sudo=True)
     comment(config_file, r'^PermitRootLogin forced-commands-only', use_sudo=True)
 
-def install_miniconda(instance):
+def install_miniconda():
     url = 'http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh'
     run("wget {}".format(url))
     run("chmod +x ./Miniconda-latest-Linux-x86_64.sh")
@@ -140,71 +154,76 @@ def install_miniconda(instance):
     run("echo 'export PATH=/home/ubuntu/miniconda/bin:\$PATH' >> ~/.bashrc")
     run("source ~/.bashrc")
 
-def install_docker(instance):
-    run("chmod +x ~/memex-explorer/install-docker.sh")
-    run("~/memex-explorer/install-docker.sh")
-    sudo("docker pull dockerfile/elasticsearch")
-    sudo("docker pull continuumio/tika")
-    sudo("docker pull continuumio/kibana")
-
-def install_repo(instance):
+def install_repo(public_dns_name, ip_address):
     url = 'https://github.com/memex-explorer/memex-explorer/'
     if os.environ.get('GIT_BRANCH'):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("echo 'HOSTNAME = {}' >> {}".format(instance.public_DNS_NAME, SETTINGS_FILENAME))
-    run("echo 'ROOT_PORT = {}' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
-    run("echo 'IP_ADDR = {}' >> {}".format(instance.ip_address, SETTINGS_FILENAME))
+    run("cp ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
+    run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
+    run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
+    run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
+    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
-def start_nginx(instance):
-    run("IP_ADDR='{ip}' AWS_DOMAIN='{domain}' ROOT_PORT='{port}' ~/miniconda/bin/python ~/memex-explorer/deploy/generate_initial_nginx.py {source} {destination}".format(
-        source = "~/memex-explorer/source/base/deploy_templates/nginx-reverse-proxy.conf.jinja2", destination="~/memex-explorer/deploy/initial_nginx.conf",
-        ip=instance.ip_address, domain=instance.public_dns_name, port=MEMEX_APP_PORT))
-    sudo("cp ~/memex-explorer/deploy/initial_nginx.conf /etc/nginx/sites-enabled/default")
-    sudo("service nginx restart")
+def start_nginx():
+    sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
 
-def conventience_aliases(instance):
+def install_docker():
+    run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
+    run("~/memex-explorer/deploy/install-docker.sh")
+    sudo("docker pull elasticsearch")
+    sudo("docker pull continuumio/tika")
+    sudo("docker pull continuumio/kibana")
+
+def conventience_aliases():
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
-def start_server_running(instance):
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 127.0.0.1:{} && disown".format(MEMEX_APP_PORT))
+def start_server_running():
+    run("redis-server & disown")
+    run("celery --workdir=\"$HOME/memex-explorer/source\" -A memex worker & disown")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{}".format(MEMEX_APP_PORT))
 
 
 
-key_filename = create_keypair()
-instance = create_box()
-subprocess.check_output(['cp', key_filename, 
-                         os.path.join(os.path.dirname(key_filename), 'ec2-{}.key'.format(instance.ip_address))])
-ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=instance.ip_address, key=key_filename)
-mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=instance.ip_address, key=key_filename)
-try:
+if os.environ.get('MEMEX_IP_ADDR'):
+    ip_address = os.environ.get('MEMEX_IP_ADDR')
+    key_filename = os.path.abspath('./ec2-{}.pem'.format(ip_address))
+    public_dns_name = 'ec2-{}.compute-1.amazonaws.com'.format(ip_address.replace('.','-'))
+    connect_to_existing_machine(ip_address, key_filename)
+else:
+    key_filename = create_keypair()
+    instance = create_box()
+    subprocess.check_output(['cp', key_filename, 
+                             os.path.join(os.path.dirname(key_filename), 'ec2-{}.pem'.format(instance.ip_address))])
+    public_dns_name = instance.public_dns_name
+    ip_address = instance.ip_address
     test_ssh(instance, key_filename)
+ssh_command = 'ssh -i {key} ubuntu@{ip} "'.format(ip=ip_address, key=key_filename)
+mosh_command = 'mosh ubuntu@{ip} --ssh="ssh -i {key}"'.format(ip=ip_address, key=key_filename)
+if 'quitafterec2spinup' in sys.argv:
     print(ssh_command)
-    apt_installs(instance)
-    print(mosh_command)
-    fix_sshd_config(instance)
-except Exception, e:
-    import pdb;pdb.set_trace()
-    print(instance.public_dns_name)
-    print(e)
-    ec2.terminate_instances([instance.id])
-    raise e
-#with open("~/.aliases", 'a') as f:
-#  f.write("alias memex='{}'\n".format(ssh_command))
-#  f.write("alias mosh_memex='{}'\n".format(mosh_command))
-#  f.flush()
+    quit()
 try:
-    install_miniconda(instance)
-    install_repo(instance)
-    start_nginx(instance)
-    install_docker()
-    print(instance.public_dns_name)
     print(ssh_command)
-    start_server_running(instance)
-except Exception, e:
+    apt_installs()
+    print(mosh_command)
+    fix_sshd_config()
+except Exception:
+    print("{} failed!".format(public_dns_name))
+    if not os.environ.get('MEMEX_IP_ADDR'):
+        ec2.terminate_instances([instance.id])
+    raise
+try:
+    install_miniconda()
+    install_repo(public_dns_name, ip_address)
+    start_nginx()
+    install_docker()
+    start_server_running()
+except Exception:
     print(ssh_command)
     print(mosh_command)
-    raise e
+    raise
