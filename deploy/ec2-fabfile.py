@@ -218,7 +218,7 @@ except Exception:
     raise
 try:
     install_miniconda()
-    install_repo()
+    install_repo(public_dns_name, ip_address)
     start_nginx()
     install_docker()
     start_server_running()
