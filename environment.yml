@@ -16,6 +16,7 @@ dependencies:
     - sphinx
     - jinja2
     - redis
+    - requests=2.5
     - redis-py
     - pip:
         - tld
