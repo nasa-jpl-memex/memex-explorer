@@ -171,7 +171,7 @@ def install_repo(public_dns_name, ip_address):
     sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
 def start_nginx():
-    sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
 
 def install_docker():
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
