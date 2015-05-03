@@ -17,7 +17,7 @@ source ~/.bashrc
 ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate
 
-~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic
+echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana
 

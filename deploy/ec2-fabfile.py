@@ -166,7 +166,7 @@ def install_repo(public_dns_name, ip_address):
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
+    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
     sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
