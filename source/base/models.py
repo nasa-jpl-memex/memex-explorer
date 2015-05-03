@@ -264,6 +264,7 @@ class Container(models.Model):
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
         ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
         return {
+            'static_root': settings.STATIC_ROOT,
             'containers': [{'high_port': mapping[1], 'public_urlbase': mapping[0]}
                                     for mapping in port_mappings]
                 , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
