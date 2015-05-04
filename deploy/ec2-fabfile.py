@@ -175,10 +175,8 @@ def start_nginx():
 def install_docker():
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
-    run("pip install requests=2.5") #in case docker-compose looks outside the conda environment when run under sudo
-    run("pip install docker-compose")
-    sudo("pip install requests=2.5") #in case docker-compose looks outside the conda environment when run under sudo
-    sudo("pip install docker-compose")
+    run("~/miniconda/bin/pip install requests=2.5") #in case docker-compose looks outside the conda environment when run under sudo
+    run("~/miniconda/bin/pip install docker-compose")
     sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
     sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
