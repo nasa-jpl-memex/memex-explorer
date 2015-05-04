@@ -165,6 +165,7 @@ def install_repo(public_dns_name, ip_address):
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
+    run("echo 'DOCKER_COMPOSE_PATH = \"{}\"' >> {}".format("/home/ubuntu/miniconda/bin/docker-compose", SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
     run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
@@ -175,7 +176,7 @@ def start_nginx():
 def install_docker():
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
-    run("~/miniconda/bin/pip install requests=2.5") #in case docker-compose looks outside the conda environment when run under sudo
+    run("~/miniconda/bin/pip install requests==2.5") #in case docker-compose looks outside the conda environment when run under sudo
     run("~/miniconda/bin/pip install docker-compose")
     sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
     sudo("docker pull elasticsearch")

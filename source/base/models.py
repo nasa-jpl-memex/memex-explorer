@@ -220,8 +220,8 @@ class Container(models.Model):
         Create a new docker compose file with an entry for every container that is supposed to be running.
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
-        #["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
-        out = compose_output = subprocess.check_output(["sudo","docker-compose","-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        docker_compose_path = settings.get('DOCKER_COMPOSE_PATH', os.path.expanduser('~/miniconda/bin/docker-compose'))
+        out = compose_output = subprocess.check_output(["sudo",docker_compose_path,"-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
 
         app_ids = AppPort.objects.filter(expose_publicly = True).values_list('app_id', flat=True)
         return out
