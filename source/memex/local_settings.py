@@ -1,4 +1,4 @@
 #should store variables specific to a server. This is * imported into settings.py
-HOSTNAME='example.com'
-IP_ADDR='0.0.0.0'
+HOSTNAME='aws-hostname-example'
+IP_ADDR='54.158.41.187'
 ROOT_MEMEX_PORT='8000'

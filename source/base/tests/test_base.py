@@ -141,13 +141,15 @@ class TestProjectQueries(TestCase):
 @pytest.mark.docker
 class TestDockerSetup(TestCase):
 
+    maxDiff = None
+
     @classmethod
     def tearDownClass(cls):
-        AppPort.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
-        VolumeMount.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
-        EnvVar.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
-        AppLink.objects.filter(app__name in ['tika', 'elasticsearch', 'kibana']).delete()
-        App.objects.filter(name in ['tika', 'elasticsearch', 'kibana']).delete()
+        AppPort.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        VolumeMount.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        EnvVar.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        AppLink.objects.filter(to_app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        App.objects.filter(name__in=['tika', 'elasticsearch', 'kibana']).delete()
 
 
     @classmethod
@@ -218,7 +220,6 @@ class TestDockerSetup(TestCase):
 
         self.assertIn('KIBANA_SECURE=false', container_yml)
         data = yaml_load(container_yml)
-        self.maxDiff = None
         correct_data = {
             'test1tika': {
                 'image': 'continuumio/tika',
@@ -242,7 +243,7 @@ class TestDockerSetup(TestCase):
                     '9999',
                 ],
                 'links': [
-                    'elasticsearch:es',
+                    'test1elasticsearch:es',
                 ],
                 'environment':[
                     'KIBANA_SECURE=false',
@@ -252,13 +253,14 @@ class TestDockerSetup(TestCase):
         self.assertEqual(data, correct_data)
 
     def test_generate_nginx_config_by_parsing(self):
-        context = Container.generate_container_context()
+        context = Container.generate_nginx_context()
         Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
         data = '\n'+ open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read()
         correct_data = """
 server {
     listen 80;
     server_name aws-hostname-example 54.158.41.187;
+    client_max_body_size 100M;
 
     location / {
         proxy_pass http://0.0.0.0:8000/;
@@ -279,35 +281,3 @@ server {
 """
         self.assertEqual(data, correct_data)
 
-
-#    def test_generate_nginx_config_by_parsing(self):
-#        self.kibana_container.high_port = 46666
-#        self.kibana_container.save()
-#        context = Container.generate_nginx_context()
-#        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
-#        from nginxparser import load as nginx_load
-#        data = nginx_load(open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r'))
-#        print('\n')
-#        print(open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read())
-#        #problem1: this is unicode, not strings.
-#        #problem2: It doesn't have any bearing on what nginx does.
-#        correct_data = [
-#                [['server'], [
-#                ['listen', '80'],
-#                ['server_name', settings.IP_ADDR, settings.HOSTNAME],
-#                ['location', '/'], [
-#                    ['proxy_pass', 'http://0.0.0.0:{}'.format(settings.ROOT_PORT)],
-#                ]
-#            ]],
-#            [['server'], [
-#                ['listen', '80'],
-#                ['server_name', settings.IP_ADDR, settings.HOSTNAME],
-#                ['location', self.kibana_container.public_urlbase()], [
-#                    ['rewrite', '{}/(.*)'.format(self.kibana_container.public_urlbase()), '/$1', 'break'],
-#                    ['proxy_pass', 'http://0.0.0.0:{}'.format(self.kibana_container.high_port)],
-#                    ['proxy_redirect', 'off'],
-#                    ['proxy_set_header', 'Host', '$host'],
-#                ]
-#            ]]
-#        ]
-#        self.assertEqual(data, correct_data)
