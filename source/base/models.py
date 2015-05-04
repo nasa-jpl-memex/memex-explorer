@@ -220,8 +220,19 @@ class Container(models.Model):
         Create a new docker compose file with an entry for every container that is supposed to be running.
         """
         cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
-        docker_compose_path = settings.get('DOCKER_COMPOSE_PATH', os.path.expanduser('~/miniconda/bin/docker-compose'))
-        out = compose_output = subprocess.check_output(["sudo",docker_compose_path,"-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        if os.path.exists(os.path.expanduser('~/miniconda/')):
+            DOCKER_COMPOSE_PATH=os.path.expanduser('~/miniconda/bin/docker-compose')
+        elif os.path.exists(os.path.expanduser('~/anaconda/')):
+            DOCKER_COMPOSE_PATH=os.path.expanduser('~/anaconda/bin/docker-compose')
+        elif os.path.exists('/miniconda/'):
+            DOCKER_COMPOSE_PATH='/miniconda/bin/docker-compose'
+        elif os.path.exists('/anaconda/'):
+            DOCKER_COMPOSE_PATH='/anaconda/bin/docker-compose'
+        else:
+            DOCKER_COMPOSE_PATH='docker-compose'
+        command = ["sudo",DOCKER_COMPOSE_PATH,"-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
+        print(command)
+        out = subprocess.check_output(command)
 
         app_ids = AppPort.objects.filter(expose_publicly = True).values_list('app_id', flat=True)
         return out
@@ -262,7 +273,9 @@ class Container(models.Model):
         Then, restart nginx.
         """
         cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context(port_mappings))
-        subprocess.check_output(["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH])
+        command = ["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH]
+        print(command)
+        subprocess.check_output(command)
         return subprocess.check_output(["sudo","service","nginx","restart"])
 
 
