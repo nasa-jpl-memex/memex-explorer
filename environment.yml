@@ -29,4 +29,3 @@ dependencies:
         - sphinx-rtd-theme
         - celery
         - elasticsearch
-        - docker-compose

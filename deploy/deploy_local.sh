@@ -14,8 +14,10 @@ export PATH="~/miniconda/bin:/usr/bin:$PATH"
 echo 'export PATH="~/miniconda/bin:/usr/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml
+ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate
 
+echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx
 ~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana
 

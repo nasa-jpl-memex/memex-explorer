@@ -160,21 +160,25 @@ def install_repo(public_dns_name, ip_address):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
+    sudo("ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("cp ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
+    run("echo 'DOCKER_COMPOSE_PATH = \"{}\"' >> {}".format("/home/ubuntu/miniconda/bin/docker-compose", SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
+    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
-    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
 def start_nginx():
-    sudo("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
+    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
 
 def install_docker():
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
+    run("~/miniconda/bin/pip install requests==2.5.3") #in case docker-compose looks outside the conda environment when run under sudo
+    run("~/miniconda/bin/pip install docker-compose")
+    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
     sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
     sudo("docker pull continuumio/kibana")
@@ -183,9 +187,8 @@ def conventience_aliases():
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
 def start_server_running():
-    run("redis-server & disown")
-    run("celery --workdir=\"$HOME/memex-explorer/source\" -A memex worker & disown")
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py runserver 0.0.0.0:{}".format(MEMEX_APP_PORT))
+    with cd('~/memex-explorer/source'):
+        run("~/memex-explorer/deploy/ec2_gunicorn_start.sh")
 
 
 
@@ -194,6 +197,14 @@ if os.environ.get('MEMEX_IP_ADDR'):
     key_filename = os.path.abspath('./ec2-{}.pem'.format(ip_address))
     public_dns_name = 'ec2-{}.compute-1.amazonaws.com'.format(ip_address.replace('.','-'))
     connect_to_existing_machine(ip_address, key_filename)
+    with cd("~/memex-explorer"):
+        if os.environ.get('GIT_BRANCH'):
+            run("git pull origin {}".format(os.environ.get('GIT_BRANCH')))
+        else:
+            run("git pull origin master")
+    run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
+    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
+    start_server_running()
 else:
     key_filename = create_keypair()
     instance = create_box()
