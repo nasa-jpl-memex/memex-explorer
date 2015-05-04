@@ -162,14 +162,12 @@ def install_repo(public_dns_name, ip_address):
         run("git clone {}".format(url))
     sudo("ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
     run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("cp ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
     run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
-    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
 
 def start_nginx():
     run("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
@@ -177,6 +175,10 @@ def start_nginx():
 def install_docker():
     run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
     run("~/memex-explorer/deploy/install-docker.sh")
+    run("conda install requests=2.5")
+    run("pip install docker-compose")
+    sudo("pip install requests=2.5") #in case docker-compose looks outside the conda environment when run under sudo
+    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
     sudo("docker pull elasticsearch")
     sudo("docker pull continuumio/tika")
     sudo("docker pull continuumio/kibana")
