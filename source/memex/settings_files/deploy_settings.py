@@ -141,3 +141,6 @@ CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ACCEPT_CONTENT=['pickle']
 
+
+# Enable dockerize functionality
+DEPLOYMENT = True
