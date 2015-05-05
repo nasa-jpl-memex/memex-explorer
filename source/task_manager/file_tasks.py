@@ -19,8 +19,6 @@ def unzip(input_zip, output_folder):
             filename = os.path.basename(x)
             if not filename:
                 continue
-            elif not (filename.endswith("pdf") or filename.endswith("PDF")):
-                continue
             source = archive.open(x)
             target = file(os.path.join(output_folder, filename), "wb")
             with source, target:
