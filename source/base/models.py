@@ -243,7 +243,7 @@ class Container(models.Model):
     @staticmethod
     def get_port_mappings():
         app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
-        port_mappings = []
+        port_mappings = set()
         for container in Container.objects.filter(app_id__in = app_ports.keys()).filter(running = True).all():
             docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', container.docker_name()])
             for raw_mapping in docker_port_output.split('\n'):
@@ -253,7 +253,7 @@ class Container(models.Model):
                         internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
                         container.high_port = int(external)
                         container.save()
-                        port_mappings.append((container.public_urlbase(), container.high_port))
+                        port_mappings.add((container.public_urlbase(), container.high_port))
         return port_mappings
 
     @staticmethod
