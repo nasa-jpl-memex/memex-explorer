@@ -271,7 +271,7 @@ class TestDockerSetup(TestCase):
                 ]
             }}))
             f.flush()
-            create_command = ['sudo', Container.docker_compose_path(), '-f', f.name, 'up', '-d'
+            create_command = ['sudo', Container.docker_compose_path(), '-f', f.name, 'up', '-d']
             os.subprocess.check_output(create_command)
             docker_name = "{}_{}_1".format(os.path.dirname(os.path.basename(f.name)), 'test2tika')
             port_command = ['sudo', 'docker', 'port', docker_name]
@@ -300,7 +300,7 @@ server {
 
     location /static/ {
         rewrite ^/static/(.*)$ /$1 break;
-        root /home/ubuntu/memex-explorer/source/base/static/;
+        root %s/;
     }
 
     location /test1/kibana/ {
@@ -309,7 +309,6 @@ server {
         proxy_redirect      off;
         proxy_set_header    Host $host;
     }
-}"""
-    self.maxDiff = None
+}""" % settings.STATIC_ROOT
         self.assertEqual(data, correct_data)
 

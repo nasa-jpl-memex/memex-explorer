@@ -259,7 +259,7 @@ class Container(models.Model):
     @staticmethod
     def generate_nginx_context(port_mappings=[]):
         if port_mappings is None:
-         port_mappings = Container.get_port_mappings()
+            port_mappings = Container.get_port_mappings()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
         ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
