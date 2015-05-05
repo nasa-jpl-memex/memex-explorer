@@ -213,13 +213,8 @@ class Container(models.Model):
     def generate_container_context():
         containers = Container.objects.filter(running = True).select_related('app', 'project').all()
         return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
-
     @staticmethod
-    def create_containers(cls):
-        """
-        Create a new docker compose file with an entry for every container that is supposed to be running.
-        """
-        Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, Container.generate_container_context())
+    def docker_compose_path():
         if os.path.exists(os.path.expanduser('~/miniconda/')):
             DOCKER_COMPOSE_PATH=os.path.expanduser('~/miniconda/bin/docker-compose')
         elif os.path.exists(os.path.expanduser('~/anaconda/')):
@@ -230,7 +225,15 @@ class Container(models.Model):
             DOCKER_COMPOSE_PATH='/anaconda/bin/docker-compose'
         else:
             DOCKER_COMPOSE_PATH='docker-compose'
-        command = ["sudo",DOCKER_COMPOSE_PATH,"-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
+        return DOCKER_COMPOSE_PATH
+
+    @staticmethod
+    def create_containers():
+        """
+        Create a new docker compose file with an entry for every container that is supposed to be running.
+        """
+        Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, Container.generate_container_context())
+        command = ["sudo",Container.docker_compose_path(),"-f",Container.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
         print(command)
         out = subprocess.check_output(command)
 
@@ -241,16 +244,16 @@ class Container(models.Model):
     def get_port_mappings():
         app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
         port_mappings = []
-        for container in Container.objects.filter(app_id__in = app_ports.values()).filter(running = True).all():
-            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
+        for container in Container.objects.filter(app_id__in = app_ports.keys()).filter(running = True).all():
+            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', container.docker_name()])
             for raw_mapping in docker_port_output.split('\n'):
                 print(raw_mapping)
                 if '/tcp -> 0.0.0.0:' in raw_mapping:
-                    if internal == app_ports[container.app_id]:
+                    if app_ports[container.app_id] in app_ports.values():
                         internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
                         container.high_port = int(external)
                         container.save()
-                        port_mappings.append((container.public_urlbase(), self.high_port))
+                        port_mappings.append((container.public_urlbase(), container.high_port))
         return port_mappings
 
     @staticmethod
