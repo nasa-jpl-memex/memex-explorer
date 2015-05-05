@@ -148,7 +148,7 @@ class TestDockerSetup(TestCase):
         AppPort.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
         VolumeMount.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
         EnvVar.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
-        AppLink.objects.filter(to_app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        AppLink.objects.filter(from_app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
         App.objects.filter(name__in=['tika', 'elasticsearch', 'kibana']).delete()
 
 
@@ -177,7 +177,7 @@ class TestDockerSetup(TestCase):
         VolumeMount.objects.create(
             app = elasticsearch,
             mounted_at = '/data',
-            located_at = '/home/ubuntu/elasticsearch/data',
+            located_at = os.path.join(settings.BASE_DIR, '/home/ubuntu/elasticsearch/data'),
         )
         kibana = App.objects.create(
             name = 'kibana',
@@ -185,7 +185,7 @@ class TestDockerSetup(TestCase):
         )
         AppPort.objects.create(
             app = kibana,
-            internal_port = 9999,
+            internal_port = 80,
             expose_publicly = True,
         )
         EnvVar.objects.create(
@@ -211,6 +211,12 @@ class TestDockerSetup(TestCase):
         cls.kibana_container.high_port = 46666
         cls.kibana_container.save()
 
+    def test_kibana_container_urlbase(self):
+        self.assertEqual(self.kibana_container.public_urlbase(), '/test1/kibana')
+
+    def test_kibana_container_name(self):
+        self.assertEqual(os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH)), 'base')
+        self.assertEqual(self.kibana_container.docker_name(), 'base_test1kibana_1')
 
     def test_generate_docker_compose(self):
         context = Container.generate_container_context()
@@ -240,7 +246,7 @@ class TestDockerSetup(TestCase):
             'test1kibana':{
                 'image': 'continuumio/kibana',
                 'ports': [
-                    '9999',
+                    '80',
                 ],
                 'links': [
                     'test1elasticsearch:es',
@@ -252,32 +258,58 @@ class TestDockerSetup(TestCase):
         }
         self.assertEqual(data, correct_data)
 
-    def test_generate_nginx_config_by_parsing(self):
-        context = Container.generate_nginx_context()
+    def skip_test_launch_single_container(self):
+        import tempfile
+        import os
+        import subprocess
+        with tempfile.NamedTemporaryFile(delete=True) as f:
+            self.assertTrue(os.path.exists(f.name))
+            f.write(yaml_dump({'test2tika': {
+                'image': 'continuumio/tika',
+                'ports': [
+                    '9998',
+                ]
+            }}))
+            f.flush()
+            create_command = ['sudo', Container.docker_compose_path(), '-f', f.name, 'up', '-d'
+            os.subprocess.check_output(create_command)
+            docker_name = "{}_{}_1".format(os.path.dirname(os.path.basename(f.name)), 'test2tika')
+            port_command = ['sudo', 'docker', 'port', docker_name]
+            port_response = os.subprocess.check_output(port_command)
+            self.assert_in('9998/tcp -> 0.0.0.0:', port_response)
+            self.assert_equal(port_response.split('/tcp -> 0.0.0.0:')[0], '9998')
+
+    def test_generate_nginx_context(self):
+        context = Container.generate_nginx_context([('/test1/kibana',46666),])
+        self.assertEqual(context['static_root'], settings.STATIC_ROOT)
+
+
+    def test_generate_nginx_config(self):
+        context = Container.generate_nginx_context([('/test1/kibana',46666),])
         Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
         data = '\n'+ open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read()
         correct_data = """
 server {
     listen 80;
-    server_name aws-hostname-example 54.158.41.187;
+    server_name example.com 0.0.0.0;
     client_max_body_size 100M;
 
     location / {
         proxy_pass http://0.0.0.0:8000/;
     }
-}
 
-server {
-    listen 80;
-    server_name aws-hostname-example 54.158.41.187;
+    location /static/ {
+        rewrite ^/static/(.*)$ /$1 break;
+        root /home/ubuntu/memex-explorer/source/base/static/;
+    }
 
-    location  {
-        rewrite /(.*) /$1 break;
+    location /test1/kibana/ {
+        rewrite /test1/kibana/(.*) /$1 break;
         proxy_pass          http://0.0.0.0:46666/;
         proxy_redirect      off;
         proxy_set_header    Host $host;
     }
-}
-"""
+}"""
+    self.maxDiff = None
         self.assertEqual(data, correct_data)
 

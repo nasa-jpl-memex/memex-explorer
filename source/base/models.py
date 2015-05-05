@@ -197,72 +197,89 @@ class Container(models.Model):
             raise ValueError("container {} has neither an image not a build.".format(self.slug()))
         return result
 
-    @classmethod
-    def __slug(cls, project, app):
+    @staticmethod
+    def __slug(project, app):
         return "{}{}".format(project.name, app.name)
 
-    @classmethod
-    def fill_template(cls, source, destination, context_dict):
+    @staticmethod
+    def fill_template(source, destination, context_dict):
         template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
         result = template.render(context_dict)
         with open(destination, 'w') as f:
             f.write(result)
             f.flush()
 
-    @classmethod
-    def generate_container_context(cls):
+    @staticmethod
+    def generate_container_context():
         containers = Container.objects.filter(running = True).select_related('app', 'project').all()
         return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
+    @staticmethod
+    def docker_compose_path():
+        if os.path.exists(os.path.expanduser('~/miniconda/')):
+            DOCKER_COMPOSE_PATH=os.path.expanduser('~/miniconda/bin/docker-compose')
+        elif os.path.exists(os.path.expanduser('~/anaconda/')):
+            DOCKER_COMPOSE_PATH=os.path.expanduser('~/anaconda/bin/docker-compose')
+        elif os.path.exists('/miniconda/'):
+            DOCKER_COMPOSE_PATH='/miniconda/bin/docker-compose'
+        elif os.path.exists('/anaconda/'):
+            DOCKER_COMPOSE_PATH='/anaconda/bin/docker-compose'
+        else:
+            DOCKER_COMPOSE_PATH='docker-compose'
+        return DOCKER_COMPOSE_PATH
 
-    @classmethod
-    def create_containers(cls):
+    @staticmethod
+    def create_containers():
         """
         Create a new docker compose file with an entry for every container that is supposed to be running.
         """
-        cls.fill_template(cls.DOCKER_COMPOSE_TEMPLATE_PATH, cls.DOCKER_COMPOSE_DESTINATION_PATH, cls.generate_container_context())
-        docker_compose_path = settings.get('DOCKER_COMPOSE_PATH', os.path.expanduser('~/miniconda/bin/docker-compose'))
-        out = compose_output = subprocess.check_output(["sudo",docker_compose_path,"-f",cls.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"])
+        Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, Container.generate_container_context())
+        command = ["sudo",Container.docker_compose_path(),"-f",Container.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
+        print(command)
+        out = subprocess.check_output(command)
 
         app_ids = AppPort.objects.filter(expose_publicly = True).values_list('app_id', flat=True)
         return out
 
-    @classmethod
-    def get_port_mappings(cls):
+    @staticmethod
+    def get_port_mappings():
         app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
         port_mappings = []
-        for container in Container.objects.filter(app_id__in = app_ports.values()).filter(running = True).all():
-            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', self.docker_name()])
+        for container in Container.objects.filter(app_id__in = app_ports.keys()).filter(running = True).all():
+            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', container.docker_name()])
             for raw_mapping in docker_port_output.split('\n'):
                 print(raw_mapping)
                 if '/tcp -> 0.0.0.0:' in raw_mapping:
-                    if internal == app_ports[container.app_id]:
+                    if app_ports[container.app_id] in app_ports.values():
                         internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
                         container.high_port = int(external)
                         container.save()
-                        port_mappings.append((container.public_urlbase(), self.high_port))
+                        port_mappings.append((container.public_urlbase(), container.high_port))
         return port_mappings
 
-    @classmethod
-    def generate_nginx_context(cls, port_mappings=[]):
+    @staticmethod
+    def generate_nginx_context(port_mappings=[]):
         if port_mappings is None:
-            port_mappings = cls.get_port_mappings()
+         port_mappings = Container.get_port_mappings()
         root_port = os.environ.get('ROOT_PORT', '8000')
         hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
         ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
         return {
             'static_root': settings.STATIC_ROOT,
-            'containers': [{'high_port': mapping[1], 'public_urlbase': mapping[0]}
+            'portmaps': [{'port': mapping[1], 'urlbase': mapping[0]}
                                     for mapping in port_mappings]
                 , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
 
-    @classmethod
-    def map_public_ports(cls, port_mappings=None):
+    @staticmethod
+    def map_public_ports(port_mappings=None):
         """
         Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
         Then, restart nginx.
         """
-        cls.fill_template(cls.NGINX_CONFIG_TEMPLATE_PATH, cls.NGINX_CONFIG_DESTINATION_PATH, cls.generate_nginx_context(port_mappings))
-        subprocess.check_output(["sudo","cp",cls.NGINX_CONFIG_DESTINATION_PATH, cls.NGINX_CONFIG_COPY_PATH])
+        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH,
+            Container.NGINX_CONFIG_DESTINATION_PATH, Container.generate_nginx_context(port_mappings))
+        command = ["sudo","cp",Container.NGINX_CONFIG_DESTINATION_PATH, Container.NGINX_CONFIG_COPY_PATH]
+        print(command)
+        subprocess.check_output(command)
         return subprocess.check_output(["sudo","service","nginx","restart"])
 
 

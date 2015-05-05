@@ -12,11 +12,10 @@ server {
         root {{ static_root }}/;
     }
 
-{% for container in containers %}
-
-    location {{ container.public_urlbase }} {
-        rewrite {{ container.public_urlbase }}/(.*) /$1 break;
-        proxy_pass          http://0.0.0.0:{{ container.high_port }}/;
+{% for portmap in portmaps %}
+    location {{ portmap.urlbase }}/ {
+        rewrite {{ portmap.urlbase }}/(.*) /$1 break;
+        proxy_pass          http://0.0.0.0:{{ portmap.port }}/;
         proxy_redirect      off;
         proxy_set_header    Host $host;
     }
