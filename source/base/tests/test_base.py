@@ -257,6 +257,27 @@ class TestDockerSetup(TestCase):
         }
         self.assertEqual(data, correct_data)
 
+    def skip_test_launch_single_container(self):
+        import tempfile
+        import os
+        import subprocess
+        with tempfile.NamedTemporaryFile(delete=True) as f:
+            self.assertTrue(os.path.exists(f.name))
+            f.write(yaml_dump({'test2tika': {
+                'image': 'continuumio/tika',
+                'ports': [
+                    '9998',
+                ]
+            }}))
+            f.flush()
+            create_command = ['sudo', Container.docker_compose_path(), '-f', f.name, 'up', '-d'
+            os.subprocess.check_output(create_command)
+            docker_name = "{}_{}_1".format(os.path.dirname(os.path.basename(f.name)), 'test2tika')
+            port_command = ['sudo', 'docker', 'port', docker_name]
+            port_response = os.subprocess.check_output(port_command)
+            self.assert_in('9998/tcp -> 0.0.0.0:', port_response)
+            self.assert_equal(port_response.split('/tcp -> 0.0.0.0:')[0], '9998')
+
     def test_generate_nginx_context(self):
         context = Container.generate_nginx_context([('/test1/kibana',46666),])
         self.assertEqual(context['static_root'], settings.STATIC_ROOT)
