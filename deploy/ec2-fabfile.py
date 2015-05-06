@@ -87,12 +87,17 @@ def create_keypair(source = AMI_ID+'-amfarrell'):
 
     kp = ec2.create_key_pair(source)
     filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
+    latest_filename = os.environ.get('EC2_KEY_PATH', './latest.pem')
     kfile = open(filename, 'wb')
+    lastest_kfile = open(filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
     kfile.write(kp.material)
+    latest_kfile.write(kp.material)
     kfile.close()
+    latest_kfile.close()
     os.chmod(filename, file_mode(7,0,0))
+    os.chmod(latest_filename, file_mode(7,0,0))
     return filename
 
 def test_ssh(instance, key_file):
