@@ -9,8 +9,6 @@ def unzip(input_zip, output_folder):
     """
     Celery task which unzips files in a .zip archive and ignores folder
     structure, taking each file to the top level of the output folder.
-
-    Currently only works with PDFs.
     """
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
