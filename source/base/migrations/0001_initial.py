@@ -78,14 +78,25 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='Index',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=64, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z0-9-_ ]+$', b'Only numbers, letters, underscores, dashes and spaces are allowed.')])),
+                ('slug', models.SlugField(unique=True, max_length=64)),
+                ('uploaded_data', models.FileField(upload_to=base.models.get_zipped_data_path, validators=[django.core.validators.RegexValidator(b'.*\\.(ZIP|zip)$', b'Only compressed archive (.zip) files are allowed.')])),
+                ('data_folder', models.TextField(blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='Project',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(unique=True, max_length=64, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z0-9-_ ]+$', b'Only numbers, letters, underscores, dashes and spaces are allowed.')])),
                 ('slug', models.SlugField(unique=True, max_length=64)),
                 ('description', models.TextField(blank=True)),
-                ('uploaded_data', models.FileField(default=None, validators=[django.core.validators.RegexValidator(b'.*\\.(ZIP|zip)$', b'Only compressed archive (.zip) files are allowed.')], upload_to=base.models.get_zipped_data_path, blank=True, null=True)),
-                ('data_folder', models.TextField(blank=True)),
             ],
             options={
             },
@@ -103,6 +114,12 @@ class Migration(migrations.Migration):
             options={
             },
             bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='index',
+            name='project',
+            field=models.ForeignKey(to='base.Project'),
+            preserve_default=True,
         ),
         migrations.AddField(
             model_name='container',
