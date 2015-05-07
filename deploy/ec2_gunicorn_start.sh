@@ -1,5 +1,5 @@
 #!/bin/bash
-pkill gunicorn 
+pkill 'bin/gunicorn'
 NAME="memex_explorer"                                  # Name of the application
 DJANGODIR=/home/ubuntu/memex-explorer/memex_explorer             # Django project directory
 SOCKFILE=/tmp/gunicorn_supervisor.sock # we will communicte using this unix socket
