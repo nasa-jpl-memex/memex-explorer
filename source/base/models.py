@@ -351,6 +351,6 @@ class Index(models.Model):
         super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('base:index_settings',
-            kwargs=dict(index_slug=self.slug, project_slug=self.project.slug))
+        return reverse('base:project',
+            kwargs=dict(project_slug=self.project.slug))
 
