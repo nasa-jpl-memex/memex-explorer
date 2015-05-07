@@ -23,6 +23,18 @@ def validate_features_file(value):
     if value != 'pageclassifier.features':
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
+
+
+def get_model_upload_path(instance, filename):
+    """
+    This method must stay outside of the class definition because django
+    cannot serialize unbound methods in Python 2:
+
+    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
+    """
+    return join(MODELS_TMP_DIR, instance.name, filename)
+
+
 class CrawlModel(models.Model):
     """CrawlModel model, specifically for ACHE crawls.
 
@@ -38,19 +50,14 @@ class CrawlModel(models.Model):
 
     """
 
-
-    def get_model_upload_path(self, filename):
-        return join(MODELS_TMP_DIR, self.name, filename)
-
     def get_model_path(self):
         return join(MODEL_PATH, str(self.pk))
 
     def ensure_model_path(self):
         model_path = self.get_model_path()
         ensure_exists(model_path)
-
         return model_path
-    
+
     name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     model = models.FileField(upload_to=get_model_upload_path,
@@ -85,6 +92,16 @@ class CrawlModel(models.Model):
         return self.name
 
 
+def get_seeds_upload_path(instance, filename):
+    """
+    This method must stay outside of the class definition because django
+    cannot serialize unbound methods in Python 2:
+
+    https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
+    """
+    return join(SEEDS_TMP_DIR, instance.name, filename)
+
+
 class Crawl(models.Model):
     """Crawl model.
 
@@ -110,9 +127,6 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
-    def get_seeds_upload_path(self, filename):
-        return join(SEEDS_TMP_DIR, self.name, filename)
-        
     def get_crawl_path(self):
         return join(CRAWL_PATH, self.location)
 
@@ -149,7 +163,7 @@ class Crawl(models.Model):
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
-    crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True, 
+    crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
         default=None)
     location = models.CharField(max_length=64, default="location")
 
@@ -199,4 +213,3 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
-

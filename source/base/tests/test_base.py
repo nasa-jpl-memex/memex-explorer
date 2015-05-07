@@ -1,5 +1,20 @@
 from __future__ import unicode_literals
+
+import os
 import urllib2
+import yaml
+import pytest
+from yaml import load as yaml_load
+from yaml import Loader, SafeLoader
+
+from django.conf import settings
+
+def construct_yaml_str(self, node):
+    # Override the default string handling function 
+    # to always return unicode objects
+    return self.construct_scalar(node)
+Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
+SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -8,7 +23,7 @@ from django.db import IntegrityError
 
 # App
 from base.forms import AddProjectForm
-from base.models import Project
+from base.models import * #TODO: fix this. Explicitly list models.
 
 
 class TestViews(UnitTestSkeleton):
@@ -122,4 +137,181 @@ class TestProjectQueries(TestCase):
 
     def test_get_by_slug(self):
         assert 'bicycles-for-sale' == self.project.slug
+
+
+#run this with cd ~/memex-explorer && py.test --pdb -s -m docker
+@pytest.mark.docker
+class TestDockerSetup(TestCase):
+
+    maxDiff = None
+
+    @classmethod
+    def tearDownClass(cls):
+        AppPort.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        VolumeMount.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        EnvVar.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        AppLink.objects.filter(from_app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        App.objects.filter(name__in=['tika', 'elasticsearch', 'kibana']).delete()
+        os.remove(os.path.join(settings.BASE_DIR, 'base/nginx-reverse-proxy.conf'))
+        os.remove(os.path.join(settings.BASE_DIR, 'base/docker-compose.yml'))
+
+    @classmethod
+    def setUpClass(cls):
+        tika=App.objects.create(
+            name='tika',
+            image='continuumio/tika'
+        )
+        AppPort.objects.create(
+            app = tika,
+            internal_port = 9998
+        )
+        elasticsearch = App.objects.create(
+            name='elasticsearch',
+            image='elasticsearch'
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9200
+        )
+        AppPort.objects.create(
+            app = elasticsearch,
+            internal_port = 9300
+        )
+        VolumeMount.objects.create(
+            app = elasticsearch,
+            mounted_at = '/data',
+            located_at = os.path.join(settings.BASE_DIR, '/home/ubuntu/elasticsearch/data'),
+        )
+        kibana = App.objects.create(
+            name = 'kibana',
+            image = 'continuumio/kibana',
+        )
+        AppPort.objects.create(
+            app = kibana,
+            internal_port = 80,
+            expose_publicly = True,
+        )
+        EnvVar.objects.create(
+            app = kibana,
+            name='KIBANA_SECURE',
+            value='false'
+        )
+        AppLink.objects.create(
+            from_app = kibana,
+            to_app = elasticsearch,
+            alias = 'es'
+        )
+        project = Project.objects.create(
+            name='test1',
+            slug='test1_slug'
+        )
+        cls.tika_container = tika.create_container_entry(project)
+        cls.es_container = elasticsearch.create_container_entry(project)
+        cls.kibana_container = kibana.create_container_entry(project)
+        cls.tika_app = tika
+        cls.es_app = elasticsearch
+        cls.kibana_app = kibana
+        cls.kibana_container.high_port = 46666
+        cls.kibana_container.save()
+
+    def test_kibana_container_urlbase(self):
+        self.assertEqual(self.kibana_container.public_urlbase(), '/test1/kibana')
+
+    def test_kibana_container_name(self):
+        self.assertEqual(os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH)), 'base')
+        self.assertEqual(self.kibana_container.docker_name(), 'base_test1kibana_1')
+
+    def test_generate_docker_compose(self):
+        context = Container.generate_container_context()
+        Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, context)
+        container_yml = open(Container.DOCKER_COMPOSE_DESTINATION_PATH, 'r').read()
+        print(container_yml)
+
+        self.assertIn('KIBANA_SECURE=false', container_yml)
+        data = yaml_load(container_yml)
+        correct_data = {
+            'test1tika': {
+                'image': 'continuumio/tika',
+                'ports': [
+                    '9998',
+                ]
+            },
+            'test1elasticsearch': {
+                'image': 'elasticsearch',
+                'volumes': [
+                    '/home/ubuntu/elasticsearch/data:/data',
+                ],
+                'ports': [
+                    '9200',
+                    '9300',
+                ],
+            },
+            'test1kibana':{
+                'image': 'continuumio/kibana',
+                'ports': [
+                    '80',
+                ],
+                'links': [
+                    'test1elasticsearch:es',
+                ],
+                'environment':[
+                    'KIBANA_SECURE=false',
+                ],
+            },
+        }
+        self.assertEqual(data, correct_data)
+
+    def skip_test_launch_single_container(self):
+        import tempfile
+        import os
+        import subprocess
+        with tempfile.NamedTemporaryFile(delete=True) as f:
+            self.assertTrue(os.path.exists(f.name))
+            f.write(yaml_dump({'test2tika': {
+                'image': 'continuumio/tika',
+                'ports': [
+                    '9998',
+                ]
+            }}))
+            f.flush()
+            create_command = ['sudo', Container.docker_compose_path(), '-f', f.name, 'up', '-d']
+            os.subprocess.check_output(create_command)
+            docker_name = "{}_{}_1".format(os.path.dirname(os.path.basename(f.name)), 'test2tika')
+            port_command = ['sudo', 'docker', 'port', docker_name]
+            port_response = os.subprocess.check_output(port_command)
+            self.assert_in('9998/tcp -> 0.0.0.0:', port_response)
+            self.assert_equal(port_response.split('/tcp -> 0.0.0.0:')[0], '9998')
+
+    def test_generate_nginx_context(self):
+        context = Container.generate_nginx_context([('/test1/kibana',46666),])
+        self.assertEqual(context['static_root'], settings.STATIC_ROOT)
+
+
+    def test_generate_nginx_config(self):
+        context = Container.generate_nginx_context([('/test1/kibana',46666),])
+        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH, Container.NGINX_CONFIG_DESTINATION_PATH, context)
+        data = '\n'+ open(Container.NGINX_CONFIG_DESTINATION_PATH, 'r').read()
+        correct_data = """
+server {
+    listen 80;
+    server_name example.com 0.0.0.0;
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://0.0.0.0:8000/;
+    }
+
+    location /static/ {
+        rewrite ^/static/(.*)$ /$1 break;
+        root %s/;
+    }
+
+    location /test1/kibana/ {
+        rewrite /test1/kibana/(.*) /$1 break;
+        proxy_pass          http://0.0.0.0:46666/;
+        proxy_redirect      off;
+        proxy_set_header    Host $host;
+    }
+}""" % settings.STATIC_ROOT
+        self.assertEqual(data, correct_data)
 

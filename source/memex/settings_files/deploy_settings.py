@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from local_settings import *
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -140,3 +141,6 @@ CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ACCEPT_CONTENT=['pickle']
 
+
+# Enable dockerize functionality
+DEPLOYMENT = True
