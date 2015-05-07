@@ -7,11 +7,11 @@ from django.conf import settings
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
 from django.test import TestCase
 from django.db import IntegrityError
-from django.core.files.uploadedfile import UploadedFile
 from django.core.files import File
-from django.utils.text import slugify
 
 from base.models import Project, Index
+
+from task_manager.file_tasks import unzip
 
 
 class TestIndex(UnitTestSkeleton):
@@ -74,4 +74,19 @@ class TestIndex(UnitTestSkeleton):
 
         response = self.get('base:index_settings', **self.index_slugs())
         assert 'base/index_update_form.html' in response.template_name
+
+    def test_verify_unzip(self):
+        """
+        Test that the unzip function works with zip files that contain files
+        other than pdfs.
+        """
+        assert os.path.exists(
+            os.path.join(
+                settings.MEDIA_ROOT,
+                "indices",
+                "test-index",
+                "data",
+                "sample.txt"
+            )
+        )
 
