@@ -1,4 +1,6 @@
 from __future__ import unicode_literals
+
+import os
 import urllib2
 import yaml
 import pytest
@@ -150,7 +152,8 @@ class TestDockerSetup(TestCase):
         EnvVar.objects.filter(app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
         AppLink.objects.filter(from_app__name__in=['tika', 'elasticsearch', 'kibana']).delete()
         App.objects.filter(name__in=['tika', 'elasticsearch', 'kibana']).delete()
-
+        os.remove(os.path.join(settings.BASE_DIR, 'base/nginx-reverse-proxy.conf'))
+        os.remove(os.path.join(settings.BASE_DIR, 'base/docker-compose.yml'))
 
     @classmethod
     def setUpClass(cls):

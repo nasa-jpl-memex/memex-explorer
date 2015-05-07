@@ -30,18 +30,6 @@ def zipped_file_validator():
         'Only compressed archive (.zip) files are allowed.')
 
 
-def delete_folder_contents(folder):
-    for file in os.listdir(folder):
-        file_path = os.path.join(folder, file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shitul.rmtree(file_path)
-        except Exception, e:
-            print(e)
-
-
 class Project(models.Model):
     """Project model.
 
@@ -303,6 +291,18 @@ def get_zipped_data_path(instance, filename):
     return os.path.join(settings.MEDIA_ROOT, "indices", instance.slug, "zipped_data", filename)
 
 
+def delete_folder_contents(folder):
+    for file in os.listdir(folder):
+        file_path = os.path.join(folder, file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception, e:
+            print(e)
+
+
 class Index(models.Model):
     """Index model.
 
@@ -351,6 +351,6 @@ class Index(models.Model):
         super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('base:index_settings',
-            kwargs=dict(index_slug=self.slug, project_slug=self.project.slug))
+        return reverse('base:project',
+            kwargs=dict(project_slug=self.project.slug))
 
