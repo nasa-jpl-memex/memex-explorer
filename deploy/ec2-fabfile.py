@@ -52,7 +52,7 @@ if 'xxx' == os.environ.get('AWS_SECRET').lower():
     print("you must pass a value for the environment variable AWS_SECRET")
     quit()
 
-ec2 = boto.ec2.connect_to_region('us-east-1', 
+ec2 = boto.ec2.connect_to_region('us-east-1',
         aws_access_key_id = os.environ.get('AWS_ID'),
         aws_secret_access_key = os.environ.get('AWS_SECRET'))
 env.use_ssh_config = True
@@ -60,11 +60,12 @@ env.disable_known_hosts = True
 env.connection_attempts = True
 env.timeout = 40
 
+KEYNAME = "{}-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
+
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
-    machine = ec2.run_instances(AMI_ID, key_name=AMI_ID+"-amfarrell", security_groups=['all-open',],
-        instance_type='m3.2xlarge')
-    #    instance_type='m3.medium')
+    machine = ec2.run_instances(AMI_ID, key_name=KEYNAME,
+        security_groups=['all-open',], instance_type='m3.2xlarge')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     #It is utterly inefficient and stupid to run through all of these.
     print(new_instance.id)
@@ -79,7 +80,7 @@ def create_box():
     return new_instance
 
 
-def create_keypair(source = AMI_ID+'-amfarrell'):
+def create_keypair(source = KEYNAME):
     try:
         kp = ec2.delete_key_pair(source)
     except (boto.exception.EC2ResponseError):
@@ -89,7 +90,7 @@ def create_keypair(source = AMI_ID+'-amfarrell'):
     filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
     latest_filename = os.environ.get('EC2_KEY_PATH', './latest.pem')
     kfile = open(filename, 'wb')
-    lastest_kfile = open(filename, 'wb')
+    latest_kfile = open(latest_filename, 'wb')
     def file_mode(user, group, other):
         return user*(8**2) + group*(8**1) + other*(8**0)
     kfile.write(kp.material)
