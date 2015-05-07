@@ -1,0 +1,4 @@
+name : memex_deploy
+dependencies:
+    - boto
+    - fabric
