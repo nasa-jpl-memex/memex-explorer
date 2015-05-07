@@ -30,18 +30,6 @@ def zipped_file_validator():
         'Only compressed archive (.zip) files are allowed.')
 
 
-def delete_folder_contents(folder):
-    for file in os.listdir(folder):
-        file_path = os.path.join(folder, file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shitul.rmtree(file_path)
-        except Exception, e:
-            print(e)
-
-
 class Project(models.Model):
     """Project model.
 
@@ -301,6 +289,18 @@ def get_zipped_data_path(instance, filename):
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
     return os.path.join(settings.MEDIA_ROOT, "indices", instance.slug, "zipped_data", filename)
+
+
+def delete_folder_contents(folder):
+    for file in os.listdir(folder):
+        file_path = os.path.join(folder, file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception, e:
+            print(e)
 
 
 class Index(models.Model):
