@@ -25,6 +25,7 @@ dependencies:
         - pytest-django
         - pytest-ordering
         - django-crispy-forms
+        - django-debug-toolbar
         - coveralls
         - sphinx-rtd-theme
         - celery
