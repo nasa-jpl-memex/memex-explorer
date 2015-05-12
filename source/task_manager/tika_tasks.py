@@ -14,7 +14,7 @@ TIKA_ENDPOINT="http://ec2-54-237-89-165.compute-1.amazonaws.com:9998/"
 ELASTICSEARCH_HOST="http://ec2-54-237-89-165.compute-1.amazonaws.com:9200/"
 
 from elasticsearch import Elasticsearch
-from tika import parse1 as parse
+from tika.tika import parse1 as parse
 
 def process_content(content_str, stopwords):
     """Produces a nicer content string by removing stop words and numbers.
