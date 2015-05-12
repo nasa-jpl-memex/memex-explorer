@@ -116,7 +116,7 @@ $(document).ready(function(){
   function get_kibana(){
     return $.ajax({
       type: "GET",
-      url: "/{{ project.name }}/kibana/",
+      url: "/{{ project.slug }}/kibana/",
       statusCode: {
         404: function(){
           goto_kibana.attr("disabled", true);
