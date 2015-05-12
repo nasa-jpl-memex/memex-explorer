@@ -19,10 +19,8 @@ Vagrant.configure(2) do |config|
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  # Note: this must match deploy_vagrant.sh exported port
+  config.vm.network "forwarded_port", guest: 8000, host: 8000 
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -64,9 +62,21 @@ end
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-config.vm.provision "shell", inline: <<-SHELL
+
+$bootstrap = <<SCRIPT
   sudo apt-get update
   sudo apt-get install git
   source /vagrant/deploy/deploy_vagrant.sh
-  SHELL
+SCRIPT
+  
+config.vm.provision "bootstrap", type: "shell", inline: $bootstrap
+
+$app = <<SCRIPT
+  cd /vagrant/source/
+  echo "MEMEX-EXPLORER IS NOW RUNNING, POINT YOUR BROWSER TO: http://localhost:8000"
+  /home/vagrant/miniconda/bin/python ./manage.py runserver 0.0.0.0:8000
+SCRIPT
+
+config.vm.provision "app", type: "shell", inline: $app
+
 end
