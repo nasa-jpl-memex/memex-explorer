@@ -11,5 +11,5 @@ class CrawlTask(models.Model):
     returned = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.pid
+        return str(self.pid)
 
