@@ -41,11 +41,7 @@
         <a href="{% url 'base:indices' project_slug=project.slug %}">
           <i class="fa fa-archive"> &nbsp; </i>Indices
         </a>
-        <button style="float:right;" id="gotoKibana" title="Goto Kibana" type="button" class="btn btn-control"
-            data-container="body"
-            disabled
-            data-toggle="tooltip" data-placement="bottom">
-        Goto Kibana</button>
+        <a id="gotoKibana" disabled style="float:right;" class="btn btn-default btn-duo center link-button" href="/{{ project.slug}}/kibana">Goto Kibana</a>
       </h4>
 
       {% if project.index_set.all %}
@@ -120,7 +116,7 @@ $(document).ready(function(){
   function get_kibana(){
     return $.ajax({
       type: "GET",
-      url: "/{{ project.name }}/kibana/",
+      url: "/{{ project.slug }}/kibana/",
       statusCode: {
         404: function(){
           goto_kibana.attr("disabled", true);

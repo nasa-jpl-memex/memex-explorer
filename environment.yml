@@ -19,12 +19,14 @@ dependencies:
     - redis-py
     - pip:
         - tld
+        - tika==1.8.7
         - selenium
         - coverage
         - pytest-cov
         - pytest-django
         - pytest-ordering
         - django-crispy-forms
+        - django-debug-toolbar
         - coveralls
         - sphinx-rtd-theme
         - celery

@@ -9,11 +9,7 @@
 <div class='row'>
     <div class="col-sm-5 col-sm-offset-3 col-sm-5  col-md-offset-2 main">
         <h1>Indices
-        <button style="float:right;" id="gotoKibana" title="Goto Kibana" type="button" class="btn btn-control"
-            data-container="body"
-            disabled
-            data-toggle="tooltip" data-placement="bottom">
-        Goto Kibana</button>
+            <a id="gotoKibana" disabled style="float:right;" class="btn btn-default btn-duo center link-button" href="/{{ project.slug}}/kibana">Goto Kibana</a>
         </h1>
     </div>
     {% for index in project.index_set.all %}
@@ -62,7 +58,7 @@ $(document).ready(function(){
   function get_kibana(){
     return $.ajax({
       type: "GET",
-      url: "/{{ project.name }}/kibana/",
+      url: "/{{ project.slug }}/kibana/",
       statusCode: {
         404: function(){
           goto_kibana.attr("disabled", true);
