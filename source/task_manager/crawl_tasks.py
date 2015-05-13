@@ -6,7 +6,7 @@ import shlex
 
 from celery import shared_task, Task
 
-from task_manager.models import CeleryTask
+from task_manager.models import CrawlTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH
 
@@ -28,19 +28,24 @@ def nutch_log_statistics(crawl):
     stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
     proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
-
     stdout, stderr = proc.communicate()
-
     nutch_stats = stdout.decode()
-
     for line in stdout.split('\n'):
         if 'db_fetched' in line:
             crawl.pages_crawled = int(line.split('\t')[-1])
             crawl.save()
 
 
-@shared_task()
-def nutch(crawl, rounds=1, *args, **kwargs):
+class NutchTask(Task):
+    abstract = True
+
+    def after_return(self, *args, **kwargs):
+        nutch_log_statistics(self.crawl)
+
+
+@shared_task(bind=True, base=NutchTask)
+def nutch(self, crawl, rounds=1, *args, **kwargs):
+    self.crawl = crawl
     call = [
         "crawl",
         crawl.seeds_list.path,
@@ -50,10 +55,9 @@ def nutch(crawl, rounds=1, *args, **kwargs):
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+    task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
     task.save()
     stdout, stderr = proc.communicate()
-    nutch_log_statistics(crawl)
     return "Finished"
 
 
