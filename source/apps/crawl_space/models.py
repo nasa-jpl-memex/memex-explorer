@@ -156,7 +156,7 @@ class Crawl(models.Model):
         choices=CRAWLER_CHOICES,
         default='nutch')
     status = models.CharField(max_length=64,
-        default="Not started")
+        default="NOT STARTED")
     config = models.CharField(max_length=64,
         default="config_default")
     seeds_list = models.FileField(upload_to=get_seeds_upload_path)
