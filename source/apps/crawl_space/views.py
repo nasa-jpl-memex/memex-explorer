@@ -81,7 +81,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
                 subprocess.Popen(call)
             else:
-                self.task = nutch.delay(crawl_task)
+                nutch.delay(crawl_task)
 
             return HttpResponse(json.dumps(dict(
                     status="STARTING")),
@@ -107,8 +107,8 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_task.crawler == "nutch":
-                if crawl_task.status != "NOT STARTED":
-                    crawl_task.status = self.task.status
+                if hasattr(self, 'task'):
+                    crawl_task.status = self.celery_task.status
                     crawl_task.save()
             return HttpResponse(json.dumps(dict(
                     status=crawl_task.status,
