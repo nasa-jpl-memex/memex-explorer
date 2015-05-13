@@ -41,6 +41,8 @@ class NutchTask(Task):
 
     def after_return(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
+        self.task.returned = True
+        self.task.save()
 
 
 @shared_task(bind=True, base=NutchTask)
@@ -55,8 +57,8 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
-    task.save()
+    self.task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+    self.task.save()
     stdout, stderr = proc.communicate()
     return "Finished"
 
