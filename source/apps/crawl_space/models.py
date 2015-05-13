@@ -24,7 +24,6 @@ def validate_features_file(value):
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
 
-
 def get_model_upload_path(instance, filename):
     """
     This method must stay outside of the class definition because django
@@ -213,3 +212,4 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
+

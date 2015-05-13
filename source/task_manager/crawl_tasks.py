@@ -41,8 +41,7 @@ class NutchTask(Task):
 
     def after_return(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
-        self.task.returned = True
-        self.task.save()
+        self.crawl.status = self.task.get_task_status()
 
 
 @shared_task(bind=True, base=NutchTask)
