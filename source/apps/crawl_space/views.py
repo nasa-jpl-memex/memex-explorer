@@ -63,14 +63,14 @@ class CrawlView(ProjectObjectMixin, DetailView):
     template_name = "crawl_space/crawl.html"
 
     def post(self, request, *args, **kwargs):
-        crawl_task = self.get_object()
+        crawl_object = self.get_object()
 
         # Start
         if request.POST['action'] == "start":
-            crawl_task.status = "STARTING"
-            crawl_task.save()
+            crawl_object.status = "STARTING"
+            crawl_object.save()
 
-            if crawl_task.crawler == "ache":
+            if crawl_object.crawler == "ache":
                 project_slug = self.kwargs['project_slug']
                 crawl_slug = self.kwargs['crawl_slug']
 
@@ -81,7 +81,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
                 subprocess.Popen(call)
             else:
-                nutch.delay(crawl_task)
+                nutch.delay(crawl_object)
 
             return HttpResponse(json.dumps(dict(
                     status="STARTING")),
@@ -90,13 +90,18 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Stop
         elif request.POST['action'] == "stop":
-            crawl_task.status = 'stopping'
-            crawl_task.save()
-
-            crawl_path = crawl_task.get_crawl_path()
-            # TODO use crawl_task.status as a stop flag
+            if crawl.crawler == "ache":
+                crawl_object.status = 'stopping'
+                crawl_object.save()
+                crawl_path = crawl_object.get_crawl_path()
+                touch(join(crawl_path, 'stop'))
+            if crawl.crawler == "nutch":
+                os.killpg(crawl_object.crawltask.pid, 9)
+                crawl_object.status = "STOPPED"
+                crawl_object.save()
+            # TODO use crawl_object.status as a stop flag
             return HttpResponse(json.dumps(dict(
-                    status="stopping")),
+                    status="STOPPED")),
                 content_type="application/json")
 
         # Dump Images
@@ -106,14 +111,14 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
-            if crawl_task.crawler == "nutch":
-                if hasattr(self, 'task'):
-                    crawl_task.status = self.celery_task.status
-                    crawl_task.save()
+            if crawl_object.crawler == "nutch":
+                if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
+                    crawl_object.status = crawl_object.crawltask.task.status
+                    crawl_object.save()
             return HttpResponse(json.dumps(dict(
-                    status=crawl_task.status,
-                    harvest_rate=crawl_task.harvest_rate,
-                    pages_crawled=crawl_task.pages_crawled,
+                    status=crawl_object.status,
+                    harvest_rate=crawl_object.harvest_rate,
+                    pages_crawled=crawl_object.pages_crawled,
                     )),
                 content_type="application/json")
 

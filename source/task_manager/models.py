@@ -11,8 +11,13 @@ class CrawlTask(models.Model):
     crawl = models.OneToOneField(Crawl)
     uuid = models.TextField()
 
-    def get_task_status(self):
-        return AsyncResult(self.uuid).status
+    @property
+    def task(self):
+        """
+        Gives an instance of the crawl task which can be used to check on the
+        status of the crawl.
+        """
+        return AsyncResult(self.uuid)
 
     def __unicode__(self):
         return str(self.uuid)
