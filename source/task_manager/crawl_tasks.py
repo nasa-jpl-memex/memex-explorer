@@ -6,21 +6,11 @@ import shlex
 
 from celery import shared_task, Task
 
+from django.db import IntegrityError
+
 from task_manager.models import CrawlTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH
-
-
-class CrawlException(Exception):
-    pass
-
-
-class NutchException(CrawlException):
-    pass
-
-
-class AcheException(CrawlException):
-    pass
 
 
 def nutch_log_statistics(crawl):
@@ -39,9 +29,9 @@ def nutch_log_statistics(crawl):
 class NutchTask(Task):
     abstract = True
 
-    def after_return(self, *args, **kwargs):
+    def on_success(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
-        self.crawl.status = self.task.get_task_status()
+        self.crawl.status = self.crawl_task.task.status
 
 
 @shared_task(bind=True, base=NutchTask)
@@ -56,8 +46,14 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    self.task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
-    self.task.save()
+    try:
+        self.crawl_task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+        self.crawl_task.save()
+    except IntegrityError:
+        self.crawl_task = CrawlTask.objects.get(crawl=crawl)
+        self.crawl_task.pid = proc.pid
+        self.crawl_task.uuid = self.request.id
+        self.crawl_task.save()
     stdout, stderr = proc.communicate()
     return "Finished"
 
