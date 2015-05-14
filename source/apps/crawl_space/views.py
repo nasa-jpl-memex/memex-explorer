@@ -90,12 +90,12 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Stop
         elif request.POST['action'] == "stop":
-            if crawl.crawler == "ache":
+            if crawl_object.crawler == "ache":
                 crawl_object.status = 'stopping'
                 crawl_object.save()
                 crawl_path = crawl_object.get_crawl_path()
                 touch(join(crawl_path, 'stop'))
-            if crawl.crawler == "nutch":
+            if crawl_object.crawler == "nutch":
                 os.killpg(crawl_object.crawltask.pid, 9)
                 crawl_object.status = "STOPPED"
                 crawl_object.save()
@@ -112,7 +112,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_object.crawler == "nutch":
-                if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
+                if crawl_object.status not in ["NOT STARTED", "STOPPED"]:
                     crawl_object.status = crawl_object.crawltask.task.status
                     crawl_object.save()
             return HttpResponse(json.dumps(dict(
