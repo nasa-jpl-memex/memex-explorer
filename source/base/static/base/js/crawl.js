@@ -26,7 +26,7 @@ $( document ).ready(function() {
 
   $('#playButton').on('click', function() {
 
-    $( '#status' ).text( "starting" );
+    $( '#status' ).text( "STARTING" );
     this.disabled = true;
     $('#stopButton').removeAttr("disabled");
 
@@ -48,7 +48,7 @@ $( document ).ready(function() {
 
   $('#stopButton').on('click', function() {
 
-    $( '#status' ).text( "stopping" );
+    $( '#status' ).text( "STOPPING" );
     this.disabled = true;
 
     $.ajax({
@@ -96,11 +96,11 @@ $( document ).ready(function() {
             $('#getSeeds').removeAttr("disabled");
           }
         }
-        if (response.status == "stopped") {
+        if (response.status == "STOPPED"){
           $('#stopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
           $('#dumpImages').removeAttr("disabled");
-        } else if (response.status == "running") {
+        } else if ((response.status == "running") || (response.status == "STARTED")) {
           $('#stopButton').removeAttr("disabled");
         }
       }
