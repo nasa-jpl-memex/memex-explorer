@@ -81,7 +81,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
                 subprocess.Popen(call)
             else:
-                nutch.delay(crawl_object)
+                nutch.delay(crawl_object, int(request.POST["rounds"]))
 
             return HttpResponse(json.dumps(dict(
                     status="STARTING")),
@@ -112,7 +112,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_object.crawler == "nutch":
-                if crawl_object.status not in ["NOT STARTED", "STOPPED"]:
+                if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
                     crawl_object.status = crawl_object.crawltask.task.status
                     crawl_object.save()
             return HttpResponse(json.dumps(dict(

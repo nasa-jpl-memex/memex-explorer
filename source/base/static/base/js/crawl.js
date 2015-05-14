@@ -29,10 +29,16 @@ $( document ).ready(function() {
     $( '#status' ).text( "STARTING" );
     this.disabled = true;
     $('#stopButton').removeAttr("disabled");
+    $('#rounds').attr("disabled", true);
+
+    val = $("#rounds")? $("#rounds").val() : 0,
 
     $.ajax({
       type: "POST",
-      data: {"action": "start"},
+      data: {
+        "action": "start",
+        "rounds": val,
+      },
       success: function(response) {
         $('#getCrawlLog').removeAttr("disabled");
         console.log(response);
@@ -53,7 +59,9 @@ $( document ).ready(function() {
 
     $.ajax({
       type: "POST",
-      data: {"action": "stop"},
+      data: {
+        "action": "stop",
+      },
       success: function(response) {
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
@@ -67,12 +75,17 @@ $( document ).ready(function() {
 
   $('#restartButton').on('click', function() {
 
-    $( '#status' ).text( "restarting" );
+    $( '#status' ).text( "RESTARTING" );
     this.disabled = true;
+
+    val = $("#rounds")? $("#rounds").val() : 0,
 
     $.ajax({
       type: "POST",
-      data: {"action": "start"},
+      data: {
+        "action": "start",
+        "rounds": val,
+      },
       success: function(response) {
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
@@ -83,8 +96,8 @@ $( document ).ready(function() {
     });
   });
 
-  setInterval(function(){
-    $.ajax({
+  function statusCall(){
+    return $.ajax({
       type: "POST",
       data: {"action": "status"},
       success: function(response){
@@ -102,9 +115,20 @@ $( document ).ready(function() {
           $('#dumpImages').removeAttr("disabled");
         } else if ((response.status == "running") || (response.status == "STARTED")) {
           $('#stopButton').removeAttr("disabled");
+          $('#rounds').attr("disabled", true);
+        } else if (response.status == "SUCCESS") {
+          $('#stopButton').attr("disabled", true);
+          $('#restartButton').removeAttr("disabled");
+          $('#rounds').removeAttr("disabled");
         }
       }
     });
+  }
+
+  statusCall();
+
+  setInterval(function(){
+    statusCall()
   }, 5000);
 
   $("#gotoSolr").on('click', function(){
