@@ -1,17 +1,40 @@
-#######################################
-Integrating additional apps with docker
-#######################################
+#############################################
+Docker Container Services
+#############################################
 
-Project: a memex-explorer project as shown in the interface
-App: an application like elasticsearch, kibana, or tika that can be spun up in a...
-Container: A particular docker container running an app for a paticular project.
+Memex Explorer currently supports the following external services in Docker containers:
 
-When a project is created, a container is created for every app by
-1) Instantiating container objects in a celery task kicked off by a post-save signal
-   2) Generating a docker-compose.yml from the container objects and running `docker-compose up`.
-      3) Generating an nginx conf from the container objects which expose a port publicly at a certain URL, then restarting nginx.
+- Tika
+- Elasticsearch
+- Kibana
 
-         To integrate a service, first create a docker image for it and then write out the yml that would be added to the docker compose file to spin it up. See intro to docker-compose & docker-compose.yml reference. Then, when you start up the memex-explorer app, create database entries for that in the models App, AppPort, AppLink, and VolumeMount. See the command to create those entries for tika, kibana, and elasticsearch as a reference.
+The current design of Memex Explorer associates a unique Docker container containing each service for each project.  We use the following definitions for the rest of this guide:
 
-         To get started on this now without worrying about the hard-coding, you could simply add on to create_apps_Tika_ES_Kibana.py. Then, when a project is created, 4 containers will be created: the ones for your container and the vestigial ones for tika, elasticsearch, and kibana.
+Project: A Memex Explorer project.  One instance of Memex Explorer may have multiple projects, and they may be created via the web interface
+Service: An application stack that provides a single service.  Tika, Elasticsearch, and Kibana are all examples of this.
+Container: A specific Docker container associated with a project that is responsible for a service.
 
+==============================================
+Details of the Launch Process
+==============================================
+
+
+1. Container objects are instantiated in a celery task that is launched by a post-save signal.
+2. A ``docker-compose.yml`` describing the containers is dynamically generated, then launched via ``docker-compose up``.
+3. A nginx configuration file for publicly exposing each service is dynamically generated, then nginx is restarted.
+
+==============================================
+Integrating Additional Services
+==============================================
+
+
+To integrate a service, you need:
+
+1. A Docker image containing your service
+2. A description of your service as it would be input in docker-compose YAML format
+
+You can read more about `docker-compose <https://docs.docker.com/compose/yml/>`_ at the Docker website.
+
+For now, all services are hardcoded in :py:mod:`base.management.commands.create_apps_Tika_ES_Kibana`.  There are examples of using App, AppPort, AppLink, and VolumeMount functionality to describe a service's requirements.  If your service requires other functionality, please raise an issue on the GitHub repository. 
+
+If you are interested in contributing a Docker Containerized service, create a branch implementing the service and start a Pull Request.

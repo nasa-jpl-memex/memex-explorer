@@ -22,4 +22,4 @@ Contents:
    user_guide
    crawler_guide
    dev_guide
-
+   docker_guide
