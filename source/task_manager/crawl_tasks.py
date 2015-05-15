@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import subprocess
 import os
 import shlex
+import time
 
 from celery import shared_task, Task
 
@@ -32,6 +33,11 @@ class NutchTask(Task):
     def on_success(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
         self.crawl.status = self.crawl_task.task.status
+        self.crawl.rounds_left -= 1
+        self.crawl.save()
+        if self.crawl.rounds_left >= 1:
+            time.sleep(10)
+            nutch.delay(self.crawl)
 
 
 @shared_task(bind=True, base=NutchTask)
@@ -55,7 +61,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
-    return "Finished"
+    return "Round Complete"
 
 
 def ache_log_statistics(crawl):

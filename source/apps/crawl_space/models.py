@@ -165,6 +165,7 @@ class Crawl(models.Model):
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
         default=None)
     location = models.CharField(max_length=64, default="location")
+    rounds_left = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
