@@ -41,6 +41,7 @@ $( document ).ready(function() {
       },
       success: function(response) {
         $('#getCrawlLog').removeAttr("disabled");
+        $('#forceStopButton').removeAttr("disabled");
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
         else console.log(response)},
@@ -113,12 +114,14 @@ $( document ).ready(function() {
         if (response.status == "STOPPED"){
           $('#stopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
+          $('#forceStopButton').attr("disabled", true);
           $('#dumpImages').removeAttr("disabled");
         } else if ((response.status == "running") || (response.status == "STARTED")) {
           $('#stopButton').removeAttr("disabled");
           $('#rounds').attr("disabled", true);
         } else if (response.status == "SUCCESS") {
           $('#stopButton').attr("disabled", true);
+          $('#forceStopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
           $('#rounds').removeAttr("disabled");
         }

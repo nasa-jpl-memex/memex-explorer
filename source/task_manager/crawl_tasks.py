@@ -12,6 +12,7 @@ from django.db import IntegrityError
 from task_manager.models import CrawlTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH
+from apps.crawl_space.models import Crawl
 
 
 def nutch_log_statistics(crawl):
@@ -32,17 +33,19 @@ class NutchTask(Task):
 
     def on_success(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
-        self.crawl.status = self.crawl_task.task.status
-        self.crawl.rounds_left -= 1
-        self.crawl.save()
-        if self.crawl.rounds_left >= 1:
+        self.updated_crawl = Crawl.objects.get(pk=self.crawl.pk)
+        self.updated_crawl.status = self.crawl_task.task.status
+        self.updated_crawl.rounds_left -= 1
+        self.updated_crawl.save()
+        if self.updated_crawl.rounds_left >= 1:
             time.sleep(10)
-            nutch.delay(self.crawl)
+            nutch.delay(self.updated_crawl)
 
 
 @shared_task(bind=True, base=NutchTask)
 def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
+    print(self.crawl.rounds_left)
     call = [
         "crawl",
         crawl.seeds_list.path,
@@ -53,10 +56,10 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CrawlTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
-        self.crawl_task = CrawlTask.objects.get(crawl=crawl)
+        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
         self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
