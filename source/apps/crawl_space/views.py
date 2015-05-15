@@ -97,12 +97,12 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 crawl_path = crawl_object.get_crawl_path()
                 touch(join(crawl_path, 'stop'))
             if crawl_object.crawler == "nutch":
-                os.killpg(crawl_object.crawltask.pid, 9)
-                crawl_object.status = "STOPPED"
+                crawl_object.rounds_left = 1
+                crawl_object.status = "STOPPING"
                 crawl_object.save()
             # TODO use crawl_object.status as a stop flag
             return HttpResponse(json.dumps(dict(
-                    status="STOPPED")),
+                    status="STOPPING")),
                 content_type="application/json")
 
         # Dump Images
@@ -120,6 +120,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     status=crawl_object.status,
                     harvest_rate=crawl_object.harvest_rate,
                     pages_crawled=crawl_object.pages_crawled,
+                    rounds_left=crawl_object.rounds_left,
                     )),
                 content_type="application/json")
 

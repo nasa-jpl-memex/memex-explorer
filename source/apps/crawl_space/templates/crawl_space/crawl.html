@@ -35,6 +35,9 @@
 
   <!-- Crawl Status -->
     <h4>Crawl Status: <span id="status">{{ crawl.status }}</span></h4>
+    {% if crawl.crawler == "nutch" %}
+    <h4>Rounds Left: <span id="roundsLeft">{{ crawl.rounds_left }}</span></h4>
+    {% endif %}
   </div>
 </div>
 
