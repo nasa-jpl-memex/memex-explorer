@@ -102,6 +102,7 @@ $( document ).ready(function() {
       data: {"action": "status"},
       success: function(response){
         $( '#status' ).text(response.status);
+        $( '#roundsLeft' ).text(response.rounds_left);
         $( '#stats-pages' ).text(response.pages_crawled);
         if ('harvest_rate' in response) {
           $( '#stats-harvest' ).text(response.harvest_rate);
