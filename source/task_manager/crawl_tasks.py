@@ -35,9 +35,10 @@ class NutchTask(Task):
         nutch_log_statistics(self.crawl)
         self.crawl = Crawl.objects.get(pk=self.crawl.pk)
         self.crawl.status = self.crawl_task.task.status
-        self.crawl.rounds_left -= 1
         self.crawl.save()
         if os.path.exists(os.path.join(self.crawl.get_crawl_path(), "stop")):
+            self.crawl.rounds_left = 0
+            self.crawl.save()
             os.remove(os.path.join(self.crawl.get_crawl_path(), "stop"))
             return
         if self.crawl.rounds_left >= 1:
@@ -88,21 +89,22 @@ def ache_log_statistics(crawl):
     crawl.save()
 
 
-@shared_task()
-def ache(crawl, *args, **kwargs):
+@shared_task(bind=True)
+def ache(self, crawl, *args, **kwargs):
+    self.crawl = crawl
     call = [
         "ache",
         "startCrawl",
-        crawl.get_crawl_path(),
-        crawl.get_config_path(),
-        crawl.seeds_list.path,
-        crawl.crawl_model.get_model_path(),
+        self.crawl.get_crawl_path(),
+        self.crawl.get_config_path(),
+        self.crawl.seeds_list.path,
+        self.crawl.crawl_model.get_model_path(),
         LANG_DETECT_PATH,
     ]
-    with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
+    with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
+    task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
     task.save()
     stdout, stderr = proc.communicate()
     return "Finished"
