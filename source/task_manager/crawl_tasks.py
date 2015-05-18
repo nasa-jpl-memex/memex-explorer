@@ -37,6 +37,9 @@ class NutchTask(Task):
         self.crawl.status = self.crawl_task.task.status
         self.crawl.rounds_left -= 1
         self.crawl.save()
+        if os.path.exists(os.path.join(self.crawl.get_crawl_path(), "stop")):
+            os.remove(os.path.join(self.crawl.get_crawl_path(), "stop"))
+            return
         if self.crawl.rounds_left >= 1:
             time.sleep(10)
             nutch.delay(self.crawl)

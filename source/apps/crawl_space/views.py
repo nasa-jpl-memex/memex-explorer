@@ -91,14 +91,15 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Stop
         elif request.POST['action'] == "stop":
+            crawl_path = crawl_object.get_crawl_path()
             if crawl_object.crawler == "ache":
                 crawl_object.status = 'stopping'
                 crawl_object.save()
-                crawl_path = crawl_object.get_crawl_path()
                 touch(join(crawl_path, 'stop'))
             if crawl_object.crawler == "nutch":
                 crawl_object.rounds_left = 1
                 crawl_object.save()
+                touch(join(crawl_path, 'stop'))
             # TODO use crawl_object.status as a stop flag
             return HttpResponse(json.dumps(dict(
                     status="STOPPING")),
