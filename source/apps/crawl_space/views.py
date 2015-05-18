@@ -26,7 +26,7 @@ from apps.crawl_space.viz.plot import AcheDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
 from task_manager.tika_tasks import create_index
-from task_manager.crawl_tasks import nutch
+from task_manager.crawl_tasks import nutch, ache
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -68,20 +68,12 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Start
         if request.POST['action'] == "start":
             crawl_object.status = "STARTING"
-            crawl_object.rounds_left = int(request.POST["rounds"])
             crawl_object.save()
-
             if crawl_object.crawler == "ache":
-                project_slug = self.kwargs['project_slug']
-                crawl_slug = self.kwargs['crawl_slug']
-
-                call = ["python",
-                        "apps/crawl_space/crawl_supervisor.py",
-                        "--project", project_slug,
-                        "--crawl", crawl_slug]
-
-                subprocess.Popen(call)
+                ache.delay(crawl_object)
             else:
+                crawl_object.rounds_left = int(request.POST["rounds"])
+                crawl_object.save()
                 nutch.delay(crawl_object)
 
             return HttpResponse(json.dumps(dict(
@@ -93,14 +85,13 @@ class CrawlView(ProjectObjectMixin, DetailView):
         elif request.POST['action'] == "stop":
             crawl_path = crawl_object.get_crawl_path()
             if crawl_object.crawler == "ache":
-                crawl_object.status = 'stopping'
+                crawl_object.status = 'STOPPED'
                 crawl_object.save()
-                touch(join(crawl_path, 'stop'))
+                os.killpg(crawl_object.crawltask.pid, 9)
             if crawl_object.crawler == "nutch":
                 crawl_object.rounds_left = 1
                 crawl_object.save()
                 touch(join(crawl_path, 'stop'))
-            # TODO use crawl_object.status as a stop flag
             return HttpResponse(json.dumps(dict(
                     status="STOPPING")),
                 content_type="application/json")
@@ -112,10 +103,9 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
-            if crawl_object.crawler == "nutch":
-                if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
-                    crawl_object.status = crawl_object.crawltask.task.status
-                    crawl_object.save()
+            if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
+                crawl_object.status = crawl_object.crawltask.task.status
+                crawl_object.save()
             return HttpResponse(json.dumps(dict(
                     status=crawl_object.status,
                     harvest_rate=crawl_object.harvest_rate,
