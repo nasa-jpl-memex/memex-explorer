@@ -33,24 +33,23 @@ class NutchTask(Task):
 
     def on_success(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
-        self.updated_crawl = Crawl.objects.get(pk=self.crawl.pk)
-        self.updated_crawl.status = self.crawl_task.task.status
-        self.updated_crawl.rounds_left -= 1
-        self.updated_crawl.save()
-        if self.updated_crawl.rounds_left >= 1:
+        self.crawl = Crawl.objects.get(pk=self.crawl.pk)
+        self.crawl.status = self.crawl_task.task.status
+        self.crawl.rounds_left -= 1
+        self.crawl.save()
+        if self.crawl.rounds_left >= 1:
             time.sleep(10)
-            nutch.delay(self.updated_crawl)
+            nutch.delay(self.crawl)
 
 
 @shared_task(bind=True, base=NutchTask)
 def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
-    print(self.crawl.rounds_left)
     call = [
         "crawl",
         crawl.seeds_list.path,
         crawl.get_crawl_path(),
-        str(rounds),
+        "1",
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,

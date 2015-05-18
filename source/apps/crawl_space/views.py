@@ -98,7 +98,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 touch(join(crawl_path, 'stop'))
             if crawl_object.crawler == "nutch":
                 crawl_object.rounds_left = 1
-                crawl_object.status = "STOPPING"
                 crawl_object.save()
             # TODO use crawl_object.status as a stop flag
             return HttpResponse(json.dumps(dict(
