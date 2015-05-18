@@ -104,8 +104,14 @@ def ache(self, crawl, *args, **kwargs):
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
-    task.save()
+    try:
+        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task.save()
+    except IntegrityError:
+        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task.pid = proc.pid
+        self.crawl_task.uuid = self.request.id
+        self.crawl_task.save()
     stdout, stderr = proc.communicate()
-    return "Finished"
+    return "Stopped"
 

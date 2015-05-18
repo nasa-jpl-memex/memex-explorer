@@ -165,6 +165,11 @@ $( document ).ready(function() {
           $('#forceStopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
           $('#rounds').removeAttr("disabled");
+        } else if (response.status == "FORCE STOPPED") {
+          $('#restartButton').attr("disabled", true);
+          $('#stopButton').attr("disabled", true);
+          $('#forceStopButton').attr("disabled", true);
+          $('#rounds').attr("disabled", true);
         }
       }
     });
