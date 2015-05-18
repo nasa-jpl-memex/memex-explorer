@@ -31,10 +31,11 @@ def nutch_log_statistics(crawl):
 class NutchTask(Task):
     abstract = True
 
-    def on_success(self, *args, **kwargs):
+    def after_return(self, *args, **kwargs):
         nutch_log_statistics(self.crawl)
         self.crawl = Crawl.objects.get(pk=self.crawl.pk)
         self.crawl.status = self.crawl_task.task.status
+        self.crawl.rounds_left -= 1
         self.crawl.save()
         if os.path.exists(os.path.join(self.crawl.get_crawl_path(), "stop")):
             self.crawl.rounds_left = 0

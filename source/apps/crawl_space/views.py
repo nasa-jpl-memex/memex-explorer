@@ -26,7 +26,7 @@ from apps.crawl_space.viz.plot import AcheDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
 from task_manager.tika_tasks import create_index
-from task_manager.crawl_tasks import nutch, ache
+from task_manager.crawl_tasks import nutch, ache, ache_log_statistics
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -93,7 +93,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 crawl_object.save()
                 touch(join(crawl_path, 'stop'))
             return HttpResponse(json.dumps(dict(
-                    status="STOPPING")),
+                    status="STOP SIGNAL SENT")),
                 content_type="application/json")
 
         # Dump Images
@@ -106,6 +106,8 @@ class CrawlView(ProjectObjectMixin, DetailView):
             if crawl_object.status != "NOT STARTED" and crawl_object.status != "STOPPED":
                 crawl_object.status = crawl_object.crawltask.task.status
                 crawl_object.save()
+            if crawl_object.crawler == "ache":
+                ache_log_statistics(crawl_object)
             return HttpResponse(json.dumps(dict(
                     status=crawl_object.status,
                     harvest_rate=crawl_object.harvest_rate,
