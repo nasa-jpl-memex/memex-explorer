@@ -127,7 +127,7 @@ class Crawl(models.Model):
     """
 
     def get_crawl_path(self):
-        return join(CRAWL_PATH, self.location)
+        return join(self.location)
 
     def get_config_path(self):
         return os.path.join(self.get_crawl_path(), "config")
@@ -177,7 +177,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(self.project.slug, "crawls", self.slug)
+            self.location = os.path.join(resources_dir, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
