@@ -4,6 +4,7 @@ import zipfile
 
 from celery import shared_task, Task, task
 
+
 @shared_task()
 def unzip(input_zip, output_folder):
     """

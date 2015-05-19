@@ -26,15 +26,22 @@ $( document ).ready(function() {
 
   $('#playButton').on('click', function() {
 
-    $( '#status' ).text( "starting" );
+    $( '#status' ).text( "STARTING" );
     this.disabled = true;
     $('#stopButton').removeAttr("disabled");
+    $('#rounds').attr("disabled", true);
+
+    val = $("#rounds")? $("#rounds").val() : 0,
 
     $.ajax({
       type: "POST",
-      data: {"action": "start"},
+      data: {
+        "action": "start",
+        "rounds": val,
+      },
       success: function(response) {
         $('#getCrawlLog').removeAttr("disabled");
+        $('#forceStopButton').removeAttr("disabled");
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
         else console.log(response)},
@@ -48,12 +55,14 @@ $( document ).ready(function() {
 
   $('#stopButton').on('click', function() {
 
-    $( '#status' ).text( "stopping" );
+    $( '#status' ).text( "STOPPING" );
     this.disabled = true;
 
     $.ajax({
       type: "POST",
-      data: {"action": "stop"},
+      data: {
+        "action": "stop",
+      },
       success: function(response) {
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
@@ -64,15 +73,61 @@ $( document ).ready(function() {
     });
   });
 
-
-  $('#restartButton').on('click', function() {
-
-    $( '#status' ).text( "restarting" );
+  function forceStop(){
+    $( '#status' ).text( "STOPPING" );
     this.disabled = true;
 
     $.ajax({
       type: "POST",
-      data: {"action": "start"},
+      data: {
+        "action": "force_stop",
+      },
+      success: function(response) {
+        console.log(response);
+        if (response.status != "error") $( '#status' ).text(response.status);
+        else console.log(response)},
+      failure: function() {
+        $( '#status' ).text( "Error (could not stop crawl)" );
+      }
+    });
+    return "success"
+  }
+
+  $('#forceStopButton').on('click', function() {
+    swal({
+      title: "Are you sure?",
+      text: "This will corrupt all crawl data, and you will be unable to restart the crawl.",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: '#DD6B55',
+      confirmButtonText: 'Yes, stop it!',
+      cancelButtonText: "No, cancel!",
+      closeOnConfirm: false,
+      closeOnCancel: false
+    },
+    function(isConfirm){
+      if (isConfirm){
+        forceStop();
+        swal("Stopped", "Your crawl has been stopped.", "success");
+      } else {
+        swal("Cancelled", "You cancelled the force-stop process", "error");
+      }
+    })
+  })
+
+  $('#restartButton').on('click', function() {
+
+    $( '#status' ).text( "RESTARTING" );
+    this.disabled = true;
+
+    val = $("#rounds")? $("#rounds").val() : 0,
+
+    $.ajax({
+      type: "POST",
+      data: {
+        "action": "start",
+        "rounds": val,
+      },
       success: function(response) {
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
@@ -83,12 +138,13 @@ $( document ).ready(function() {
     });
   });
 
-  setInterval(function(){
-    $.ajax({
+  function statusCall(){
+    return $.ajax({
       type: "POST",
       data: {"action": "status"},
       success: function(response){
         $( '#status' ).text(response.status);
+        $( '#roundsLeft' ).text(response.rounds_left);
         $( '#stats-pages' ).text(response.pages_crawled);
         if ('harvest_rate' in response) {
           $( '#stats-harvest' ).text(response.harvest_rate);
@@ -96,15 +152,33 @@ $( document ).ready(function() {
             $('#getSeeds').removeAttr("disabled");
           }
         }
-        if (response.status == "stopped") {
+        if (response.status == "STOPPED"){
           $('#stopButton').attr("disabled", true);
           $('#restartButton').removeAttr("disabled");
+          $('#forceStopButton').attr("disabled", true);
           $('#dumpImages').removeAttr("disabled");
-        } else if (response.status == "running") {
+        } else if (response.status == "STARTED") {
           $('#stopButton').removeAttr("disabled");
+          $('#rounds').attr("disabled", true);
+        } else if (response.status == "SUCCESS") {
+          $('#stopButton').attr("disabled", true);
+          $('#forceStopButton').attr("disabled", true);
+          $('#restartButton').removeAttr("disabled");
+          $('#rounds').removeAttr("disabled");
+        } else if (response.status == "FORCE STOPPED") {
+          $('#restartButton').attr("disabled", true);
+          $('#stopButton').attr("disabled", true);
+          $('#forceStopButton').attr("disabled", true);
+          $('#rounds').attr("disabled", true);
         }
       }
     });
+  }
+
+  statusCall();
+
+  setInterval(function(){
+    statusCall();
   }, 5000);
 
   $("#gotoSolr").on('click', function(){
@@ -128,4 +202,3 @@ $( document ).ready(function() {
       });
   });
 });
-
