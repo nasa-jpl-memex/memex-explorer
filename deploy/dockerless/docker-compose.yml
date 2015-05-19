@@ -1,0 +1,19 @@
+template_projectelasticsearch:
+    image: elasticsearch
+    volumes:
+      - /home/ubuntu/memex-explorer/source/container_volumes/elasticsearch/data:/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+template_projectkibana:
+    image: continuumio/kibana
+    ports:
+      - "5555:80"
+    links:
+     - template_projectelasticsearch:es
+    environment:
+      - KIBANA_SECURE=false
+template_projecttika:
+    image: continuumio/tika
+    ports:
+      - "9998:9998"
