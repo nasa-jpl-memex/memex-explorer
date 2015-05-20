@@ -13,6 +13,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -44,6 +45,19 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
+
+    def post(self, request, *args, **kwargs):
+        """
+        Check if a seed list file was supplied. If not, convert the content of
+        the textseeds value to an in-memory file.
+        """
+        if request.POST.get('textseeds', False) and not request.FILES.get("seeds_list", False):
+            request.FILES["seeds_list"] = SimpleUploadedFile(
+                'seeds',
+                bytes(request.POST["textseeds"]),
+                'utf-8'
+            )
+        return super(AddCrawlView, self).post(request, *args, **kwargs)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
