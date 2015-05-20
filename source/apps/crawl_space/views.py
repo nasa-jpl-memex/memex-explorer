@@ -45,6 +45,11 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
 
+    def post(self, request, *args, **kwargs):
+        if request.POST['textseeds'] and not request.FILES.get("seeds_list", False):
+            print("bananas")
+        return super(AddCrawlView, self).post(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.object.get_absolute_url()
 

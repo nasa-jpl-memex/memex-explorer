@@ -28,6 +28,24 @@ class AddCrawlForm(CrispyModelForm):
                 InlineRadios('crawler'),
                 'crawl_model',
                 'seeds_list',
+                HTML(
+                '''
+                    <label for="id_textseeds" class="">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Or, paste  urls to crawl.
+                    </label>
+                    <div class="controls ">
+                        <textarea class="textarea form-control"
+                            cols="10"
+                            id="id_textseeds"
+                            name="textseeds"
+                            rows="10">
+                        </textarea>
+                    </div>
+                    <br>
+                '''
+                ),
                 FormActions(Submit('submit', "Submit"))
             )
         )
