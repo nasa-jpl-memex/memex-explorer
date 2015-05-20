@@ -18,6 +18,7 @@ dependencies:
     - redis
     - redis-py
     - pip:
+        - docker-compose
         - tld
         - tika==1.8.7
         - selenium
