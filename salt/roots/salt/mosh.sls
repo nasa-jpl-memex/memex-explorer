@@ -1,0 +1,3 @@
+mosh:
+  pkg:
+    - installed

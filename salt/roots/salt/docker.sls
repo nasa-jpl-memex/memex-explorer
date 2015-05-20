@@ -1,0 +1,3 @@
+docker.io:
+  pkg:
+    - installed

@@ -36,18 +36,19 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
+  config.vm.synced_folder "salt/roots/", "/srv"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-  vb.memory = "4096"
-end
+    vb.memory = "4096"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -63,20 +64,29 @@ end
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
+    ## For masterless, mount your salt file root
+
+    ## Use all the defaults:
+  config.vm.provision :salt do |salt|
+    salt.minion_config = "salt/minion"
+    salt.run_highstate = true
+  end
+
 $bootstrap = <<SCRIPT
   sudo apt-get update
   sudo apt-get install git
   source /vagrant/deploy/deploy_vagrant.sh
 SCRIPT
   
-config.vm.provision "bootstrap", type: "shell", inline: $bootstrap
+# config.vm.provision "bootstrap", type: "shell", inline: $bootstrap
 
 $app = <<SCRIPT
   cd /vagrant/source/
   echo "MEMEX-EXPLORER IS NOW RUNNING, POINT YOUR BROWSER TO: http://localhost:8000"
-  /home/vagrant/miniconda/bin/python ./manage.py runserver 0.0.0.0:8000
+  /home/vagrant/miniconda/envs/memex/bin/python ./manage.py runserver 0.0.0.0:8000
 SCRIPT
 
 config.vm.provision "app", type: "shell", inline: $app
 
 end
+
