@@ -51,7 +51,6 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
     call = [
         "crawl",
-        "--index",
         crawl.seeds_list.path,
         crawl.get_crawl_path(),
         "1",
