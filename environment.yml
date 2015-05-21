@@ -15,7 +15,6 @@ dependencies:
     - pip
     - sphinx
     - jinja2
-    - redis
     - redis-py
     - pip:
         - docker-compose

@@ -3,6 +3,7 @@ base:
     - pkgrepo.managed:
       - ppa: keithw/mosh
     - nginx
+    - redis-server
     - git
     - silversearcher-ag
     - docker
