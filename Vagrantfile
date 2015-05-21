@@ -72,14 +72,6 @@ Vagrant.configure(2) do |config|
     salt.run_highstate = true
   end
 
-$bootstrap = <<SCRIPT
-  sudo apt-get update
-  sudo apt-get install git
-  source /vagrant/deploy/deploy_vagrant.sh
-SCRIPT
-  
-# config.vm.provision "bootstrap", type: "shell", inline: $bootstrap
-
 $app = <<SCRIPT
   cd /vagrant/source/
   echo "MEMEX-EXPLORER IS NOW RUNNING, POINT YOUR BROWSER TO: http://localhost:8000"
