@@ -163,7 +163,6 @@ class TestViews(UnitTestSkeleton):
 
         crawl = get_object(response)
         assert (crawl.name, crawl.slug) == ("Test Crawl", "test-crawl")
-
         assert crawl.project == self.test_project
 
     def test_crawl_settings_page(self):

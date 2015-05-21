@@ -26,6 +26,7 @@ from apps.crawl_space.viz.plot import AcheDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
 
 from task_manager.tika_tasks import create_index
+from task_manager.crawl_tasks import nutch, ache, ache_log_statistics
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -62,38 +63,37 @@ class CrawlView(ProjectObjectMixin, DetailView):
     template_name = "crawl_space/crawl.html"
 
     def post(self, request, *args, **kwargs):
-        crawl_model = self.get_object()
+        crawl_object = self.get_object()
 
         # Start
         if request.POST['action'] == "start":
-            crawl_model.status = "starting"
-            crawl_model.save()
-
-            project_slug = self.kwargs['project_slug']
-            crawl_slug = self.kwargs['crawl_slug']
-
-            call = ["python",
-                    "apps/crawl_space/crawl_supervisor.py",
-                    "--project", project_slug,
-                    "--crawl", crawl_slug]
-
-            subprocess.Popen(call)
+            crawl_object.status = "STARTING"
+            crawl_object.save()
+            if crawl_object.crawler == "ache":
+                ache.delay(crawl_object)
+            else:
+                crawl_object.rounds_left = int(request.POST["rounds"])
+                crawl_object.save()
+                nutch.delay(crawl_object)
 
             return HttpResponse(json.dumps(dict(
-                    status="starting")),
+                    status="STARTING")),
                 content_type="application/json")
 
 
         # Stop
         elif request.POST['action'] == "stop":
-            crawl_model.status = 'stopping'
-            crawl_model.save()
-
-            crawl_path = crawl_model.get_crawl_path()
-            # TODO use crawl_model.status as a stop flag
-            touch(join(crawl_path, 'stop'))
+            crawl_path = crawl_object.get_crawl_path()
+            if crawl_object.crawler == "ache":
+                crawl_object.status = 'STOPPED'
+                crawl_object.save()
+                os.killpg(crawl_object.crawltask.pid, 9)
+            if crawl_object.crawler == "nutch":
+                crawl_object.rounds_left = 1
+                crawl_object.save()
+                touch(join(crawl_path, 'stop'))
             return HttpResponse(json.dumps(dict(
-                    status="stopping")),
+                    status="STOP SIGNAL SENT")),
                 content_type="application/json")
 
         # Dump Images
@@ -101,12 +101,28 @@ class CrawlView(ProjectObjectMixin, DetailView):
             self.dump_images()
             return HttpResponse("Success")
 
+        # Force Stop Nutch
+        elif request.POST['action'] == "force_stop":
+            touch(join(crawl_object.get_crawl_path(), 'stop'))
+            os.killpg(crawl_object.crawltask.pid, 9)
+            crawl_object.status = "FORCE STOPPED"
+            crawl_object.save()
+            return HttpResponse(json.dumps(dict(
+                    status="FORCE STOPPED")),
+                content_type="application/json")
+
         # Update status, statistics
         elif request.POST['action'] == "status":
+            if crawl_object.status not in ["NOT STARTED", "STOPPED", "FORCE STOPPED"]:
+                crawl_object.status = crawl_object.crawltask.task.status
+                crawl_object.save()
+            if crawl_object.crawler == "ache":
+                ache_log_statistics(crawl_object)
             return HttpResponse(json.dumps(dict(
-                    status=crawl_model.status,
-                    harvest_rate=crawl_model.harvest_rate,
-                    pages_crawled=crawl_model.pages_crawled,
+                    status=crawl_object.status,
+                    harvest_rate=crawl_object.harvest_rate,
+                    pages_crawled=crawl_object.pages_crawled,
+                    rounds_left=crawl_object.rounds_left,
                     )),
                 content_type="application/json")
 

@@ -35,6 +35,9 @@
 
   <!-- Crawl Status -->
     <h4>Crawl Status: <span id="status">{{ crawl.status }}</span></h4>
+    {% if crawl.crawler == "nutch" %}
+    <h4>Rounds Left: <span id="roundsLeft">{{ crawl.rounds_left }}</span></h4>
+    {% endif %}
   </div>
 </div>
 
@@ -43,10 +46,10 @@
 <div class='row'>
   <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
     <!-- Crawl actions (Start, Stop[, Restart]) -->
-    <div class='col-xs-2'>
+    <div class='col-xs-3'>
       <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
         data-container="body"
-        {% if crawl.status != "Not started" %}
+        {% if crawl.status != "NOT STARTED" %}
             disabled
         {% endif %}
         data-toggle="tooltip" data-placement="bottom">
@@ -70,6 +73,20 @@
         data-toggle="tooltip" data-placement="bottom">
         <span class="fa fa-refresh"></span>
       </button>
+
+      {% if crawl.crawler == "nutch" %}
+      <p style="display:inline;margin-left:5px;">Rounds:
+        <input id="rounds" type="number" class="btn btn-control" value="1" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
+      </p>
+      <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
+        data-container="body"
+        {% if crawl.status != "STARTED" %}
+          disabled
+        {% endif %}
+        data-toggle="tooltip" data-placement="bottom">
+        <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
+      </button>
+      {% endif %}
     </div>
     <div class="col-sm-3" style="padding-left:0px;display:inline;">
         <form method="get" style="display:inline;">
@@ -134,9 +151,11 @@
 <div class='row'>
     <div id="nutchButtons" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <br>
+       <!-- 
         <button id="gotoSolr" type="button" title="Goto Solr" class="btn btn-default btn-duo center">
             <a>View Results in Solr</a>
         </button>
+        --> 
         <button id="dumpImages" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
             <a>Dump Images</a>
         </button>

@@ -3,28 +3,16 @@ from __future__ import absolute_import
 import subprocess
 import os
 import shlex
+import time
 
 from celery import shared_task, Task
 
-from task_manager.models import CeleryTask
+from django.db import IntegrityError
+
+from task_manager.models import CrawlTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH
-
-
-class CrawlException(Exception):
-    pass
-
-
-class NutchException(CrawlException):
-    pass
-
-
-class AcheException(CrawlException):
-    pass
-
-
-class NutchTask(Task):
-    abstract = True
+from apps.crawl_space.models import Crawl
 
 
 def nutch_log_statistics(crawl):
@@ -32,37 +20,54 @@ def nutch_log_statistics(crawl):
     stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
     proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
-
     stdout, stderr = proc.communicate()
-
     nutch_stats = stdout.decode()
-
     for line in stdout.split('\n'):
         if 'db_fetched' in line:
             crawl.pages_crawled = int(line.split('\t')[-1])
             crawl.save()
 
 
+class NutchTask(Task):
+    abstract = True
+
+    def after_return(self, *args, **kwargs):
+        nutch_log_statistics(self.crawl)
+        self.crawl = Crawl.objects.get(pk=self.crawl.pk)
+        self.crawl.rounds_left -= 1
+        self.crawl.save()
+        if os.path.exists(os.path.join(self.crawl.get_crawl_path(), "stop")):
+            self.crawl.rounds_left = 0
+            self.crawl.save()
+            os.remove(os.path.join(self.crawl.get_crawl_path(), "stop"))
+            return
+        if self.crawl.rounds_left >= 1:
+            time.sleep(10)
+            nutch.delay(self.crawl)
+
+
 @shared_task(bind=True, base=NutchTask)
-def nutch(self, crawl, rounds="1", *args, **kwargs):
+def nutch(self, crawl, rounds=1, *args, **kwargs):
+    self.crawl = crawl
     call = [
         "crawl",
         crawl.seeds_list.path,
         crawl.get_crawl_path(),
-        rounds,
+        "1",
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
-    task.save()
+    try:
+        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task.save()
+    except IntegrityError:
+        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task.pid = proc.pid
+        self.crawl_task.uuid = self.request.id
+        self.crawl_task.save()
     stdout, stderr = proc.communicate()
-    nutch_log_statistics(crawl)
-    return "Finished"
-
-
-class AcheTask(Task):
-    abstract = True
+    return "Round Complete"
 
 
 def ache_log_statistics(crawl):
@@ -84,22 +89,29 @@ def ache_log_statistics(crawl):
     crawl.save()
 
 
-@shared_task(bind=True, base=AcheTask)
+@shared_task(bind=True)
 def ache(self, crawl, *args, **kwargs):
+    self.crawl = crawl
     call = [
         "ache",
         "startCrawl",
-        crawl.get_crawl_path(),
-        crawl.get_config_path(),
-        crawl.seeds_list.path,
-        crawl.crawl_model.get_model_path(),
+        self.crawl.get_crawl_path(),
+        self.crawl.get_config_path(),
+        self.crawl.seeds_list.path,
+        self.crawl.crawl_model.get_model_path(),
         LANG_DETECT_PATH,
     ]
-    with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
+    with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    task = CeleryTask(pid=proc.pid, crawl=crawl, uuid=self.request.id)
-    task.save()
+    try:
+        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task.save()
+    except IntegrityError:
+        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task.pid = proc.pid
+        self.crawl_task.uuid = self.request.id
+        self.crawl_task.save()
     stdout, stderr = proc.communicate()
-    return "Finished"
+    return "Stopped"
 

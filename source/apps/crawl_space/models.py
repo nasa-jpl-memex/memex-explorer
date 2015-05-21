@@ -24,7 +24,6 @@ def validate_features_file(value):
         raise ValidationError("Features file must be named 'pageclassifier.features'.")
 
 
-
 def get_model_upload_path(instance, filename):
     """
     This method must stay outside of the class definition because django
@@ -128,7 +127,7 @@ class Crawl(models.Model):
     """
 
     def get_crawl_path(self):
-        return join(CRAWL_PATH, self.location)
+        return join(self.location)
 
     def get_config_path(self):
         return os.path.join(self.get_crawl_path(), "config")
@@ -156,7 +155,7 @@ class Crawl(models.Model):
         choices=CRAWLER_CHOICES,
         default='nutch')
     status = models.CharField(max_length=64,
-        default="Not started")
+        default="NOT STARTED")
     config = models.CharField(max_length=64,
         default="config_default")
     seeds_list = models.FileField(upload_to=get_seeds_upload_path)
@@ -166,6 +165,7 @@ class Crawl(models.Model):
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
         default=None)
     location = models.CharField(max_length=64, default="location")
+    rounds_left = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -177,7 +177,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(self.project.slug, "crawls", self.slug)
+            self.location = os.path.join(resources_dir, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
@@ -213,3 +213,4 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
+

@@ -58,3 +58,14 @@ $ cd ../
 $ compass watch
 ```
 
+# Building the Documentation
+The project documentation is written in [reStructuredText](http://docutils.sf.net/rst.html) and can be built using the popular [Sphinx](http://sphinx-doc.org/) tool. 
+To build the documentation please ensure that you've created the conda environment and activated the memex profile.
+```
+$ cd $MEMEX_EXPLORER_HOME
+$ conda env create
+$ source activate memex
+$ cd docs
+$ make html
+```
+The documentation can now be view within */build/html/index.html*.

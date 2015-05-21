@@ -23,3 +23,4 @@ Contents:
    crawler_guide
    dev_guide
    docker_guide
+   glossary
