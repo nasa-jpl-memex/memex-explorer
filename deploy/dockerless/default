@@ -1,0 +1,21 @@
+server {
+    listen 80;
+    server_name ec2-54-87-11-10.compute-1.amazonaws.com 54.87.11.10;
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://0.0.0.0:8000/;
+    }
+
+    location /kibana/ {
+        rewrite /kibana/(.*) /$1 break;
+        proxy_pass          http://0.0.0.0:5555/;
+        proxy_redirect      off;
+        proxy_set_header    Host $host;
+    }
+
+    location /static/ {
+        rewrite ^/static/(.*)$ /$1 break;
+        root /home/ubuntu/memex-explorer/source/base/static/;
+    }
+}
