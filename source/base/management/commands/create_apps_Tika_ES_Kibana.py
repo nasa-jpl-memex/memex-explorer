@@ -23,51 +23,51 @@ class Command(BaseCommand):
     help = 'Creates Tika, Elasticsearch, and Kibana apps'
 
     def handle(self, *args, **options):
-        tika=App.objects.create(
+        tika=App.objects.get_or_create(
             name='tika',
             image='continuumio/tika'
-        )
-        AppPort.objects.create(
+        )[0]
+        AppPort.objects.get_or_create(
             app = tika,
             internal_port = 9998
-        )
+        )[0]
 
 
-        elasticsearch = App.objects.create(
+        elasticsearch = App.objects.get_or_create(
             name='elasticsearch',
             image='elasticsearch'
-        )
-        AppPort.objects.create(
+        )[0]
+        AppPort.objects.get_or_create(
             app = elasticsearch,
             internal_port = 9200
-        )
-        AppPort.objects.create(
+        )[0]
+        AppPort.objects.get_or_create(
             app = elasticsearch,
             internal_port = 9300
-        )
-        VolumeMount.objects.create(
+        )[0]
+        VolumeMount.objects.get_or_create(
             app = elasticsearch,
             mounted_at = '/data',
             located_at = os.path.join(settings.BASE_DIR, 'container_volumes/elasticsearch/data'),
-        )
+        )[0]
 
 
-        kibana = App.objects.create(
+        kibana = App.objects.get_or_create(
             name = 'kibana',
             image = 'continuumio/kibana',
-        )
-        AppPort.objects.create(
+        )[0]
+        AppPort.objects.get_or_create(
             app = kibana,
             internal_port = 80,
             expose_publicly = True,
-        )
-        EnvVar.objects.create(
+        )[0]
+        EnvVar.objects.get_or_create(
             app = kibana,
             name='KIBANA_SECURE',
             value='false'
-        )
-        AppLink.objects.create(
+        )[0]
+        AppLink.objects.get_or_create(
             from_app = kibana,
             to_app = elasticsearch,
             alias = 'es'
-        )
+        )[0]
