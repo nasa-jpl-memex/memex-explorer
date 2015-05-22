@@ -279,7 +279,8 @@ def start_container_celery(sender, instance, **kwargs):
 
 
 if settings.DEPLOYMENT:
-    post_save.connect(start_container_celery, sender = Project)
+    pass
+    #post_save.connect(start_container_celery, sender = Project)
 
 
 def get_zipped_data_path(instance, filename):
