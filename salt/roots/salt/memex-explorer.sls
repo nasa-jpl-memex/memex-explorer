@@ -63,25 +63,22 @@ create_apps:
   file.copy:
     - source: /home/vagrant/miniconda/envs/memex/bin/docker-compose
 
-docker-containers:
-  cmd.run:
-    - name: |
-         docker pull elasticsearch
-         docker pull continuumio/tika
-         docker pull continuumio/kibana
-    - require:
-        - pkg: docker.io
+elasticsearch:
+  docker.pulled:
+    - tag: latest
 
-redis-server:
-  cmd.run:
-    - name: /sbin/start-stop-daemon --chuid vagrant --background --oknodo --start --exec /home/vagrant/miniconda/envs/memex/bin/redis-server
-    - cwd: /vagrant/source
-    - require:
-        - sls: conda-memex
+continuumio/tika:
+  docker.pulled:
+    - tag: latest
+
+continuumio/kibana:
+  docker.pulled:
+    - tag: latest
 
 celery:
   cmd.run:
-    - name: /sbin/start-stop-daemon --chuid vagrant --background --oknodo --start --exec /home/vagrant/miniconda/envs/memex/bin/celery  -- --workdir="/vagrant/source" -A memex worker
+    - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --workdir="/vagrant/source" -A memex worker
     - cwd: /vagrant/source
+    - user: vagrant
     - require:
         - sls: conda-memex
