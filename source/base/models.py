@@ -273,6 +273,7 @@ class Container(models.Model):
 
 from task_manager.docker_tasks import start_containers
 
+
 def start_container_celery(sender, instance, **kwargs):
     start_containers.delay(instance)
 
