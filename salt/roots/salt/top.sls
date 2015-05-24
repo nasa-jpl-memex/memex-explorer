@@ -4,6 +4,7 @@ base:
       - ppa: keithw/mosh
     - nginx
     - redis-server
+    - java
     - git
     - pip
     - silversearcher-ag

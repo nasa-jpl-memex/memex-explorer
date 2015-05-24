@@ -80,5 +80,6 @@ celery:
     - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --workdir="/vagrant/source" -A memex worker
     - cwd: /vagrant/source
     - user: vagrant
+    - creates: /vagrant/source/celeryd.pid
     - require:
         - sls: conda-memex
