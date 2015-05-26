@@ -77,7 +77,7 @@ continuumio/kibana:
 
 celery:
   cmd.run:
-    - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --workdir="/vagrant/source" -A memex worker
+    - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --loglevel=debug --logfile=/vagrant/source/celeryd.log --workdir="/vagrant/source" -A memex worker
     - cwd: /vagrant/source
     - user: vagrant
     - creates: /vagrant/source/celeryd.pid

@@ -19,7 +19,7 @@ def nutch_log_statistics(crawl):
     crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
     stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
     proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
+                                        stderr=subprocess.PIPE, shell=True)
     stdout, stderr = proc.communicate()
     nutch_stats = stdout.decode()
     for line in stdout.split('\n'):
@@ -60,7 +60,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid)
+            preexec_fn=os.setsid, shell=True)
     try:
         self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
@@ -106,7 +106,7 @@ def ache(self, crawl, *args, **kwargs):
     ]
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid)
+            preexec_fn=os.setsid, shell=True)
     try:
         self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
