@@ -213,14 +213,29 @@
   </div>
  -->  </div>
 </div>
+
 {% if settings.DEPLOYMENT %}
 {% if crawl.crawler == "nutch" %}
 <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
-       <iframe src="http://127.0.0.1:28778" style="width:100%;height:500px;border:1px solid #EEEEEE;border-radius:5px;"></iframe>
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#logio" aria-controls="logio" role="tab" data-toggle="tab">Crawl Log</a></li>
+                <li role="presentation"><a href="#kibana" aria-controls="kibana" role="tab" data-toggle="tab">Kibana</a></li>
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="logio">
+                <iframe src="http://127.0.0.1:28778" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="kibana">
+                <iframe src="http://127.0.0.1:9999" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
+            </div>
+        </div>
     </div>
 </div>
 {% endif %}
 {% endif %}
+
 {% endblock content %}
 
