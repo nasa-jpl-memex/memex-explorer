@@ -15,3 +15,4 @@ base:
     - miniconda
     - conda-memex
     - memex-explorer
+    - logio
