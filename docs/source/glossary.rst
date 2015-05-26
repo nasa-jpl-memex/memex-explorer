@@ -28,5 +28,9 @@
       A python web application framework. Django is the core of the memex explorer application.
       
    Crawl Space
-      An application which provides service for crawling the web using Nutch or Ache.
+      Provides service for crawling the web using Nutch or Ache.
 
+   Task Manager
+      Manages the application tasks, like running crawls. Task manager is not available from the Memex Explorer GUI interface.
+      
+   
