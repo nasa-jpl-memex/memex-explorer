@@ -7,6 +7,7 @@
     <script src="{% static 'base/js/bokeh.min.js' %}"></script>
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/crawl.js' %}"></script>
+    <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -212,12 +213,14 @@
   </div>
  -->  </div>
 </div>
+{% if settings.DEPLOYMENT %}
 {% if crawl.crawler == "nutch" %}
 <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
        <iframe src="http://127.0.0.1:28778" style="width:100%;height:500px;border:1px solid #EEEEEE;border-radius:5px;"></iframe>
     </div>
 </div>
+{% endif %}
 {% endif %}
 {% endblock content %}
 
