@@ -82,6 +82,6 @@ celery:
     - user: vagrant
     - env:
         - JAVA_HOME: '/usr/lib/jvm/java-7-oracle'
-    - creates: /vagrant/source/celeryd.pid
+    - unless: "ps -p $(cat /vagrant/source/celeryd.pid)"
     - require:
         - sls: conda-memex
