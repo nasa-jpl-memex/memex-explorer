@@ -13,4 +13,4 @@ oracle-java7-installer:
 JAVA_HOME:
   file.append:
     - name: /home/vagrant/.bashrc
-    - text: export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64/"
+    - text: export JAVA_HOME="/usr/lib/jvm/java-7-oracle"
