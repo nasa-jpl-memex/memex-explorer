@@ -80,6 +80,8 @@ celery:
     - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --loglevel=debug --logfile=/vagrant/source/celeryd.log --workdir="/vagrant/source" -A memex worker
     - cwd: /vagrant/source
     - user: vagrant
+    - env:
+        - JAVA_HOME: '/usr/lib/jvm/java-7-oracle'
     - creates: /vagrant/source/celeryd.pid
     - require:
         - sls: conda-memex

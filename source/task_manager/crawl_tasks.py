@@ -14,12 +14,22 @@ from task_manager.models import CrawlTask
 from apps.crawl_space.settings import LANG_DETECT_PATH
 from apps.crawl_space.models import Crawl
 
+# TODO - pull out this hardcode search
+if os.path.exists('/home/vagrant/miniconda/envs/memex/bin/nutch'):
+    nutch_path = '/home/vagrant/miniconda/envs/memex/lib/nutch/bin/nutch'
+    crawl_path = '/home/vagrant/miniconda/envs/memex/lib/nutch/bin/crawl'
+    ache_path = '/home/vagrant/miniconda/envs/memex/bin/ache'
+else:
+    nutch_path = 'nutch'
+    crawl_path = 'crawl'
+    ache_path = 'ache'
+# END TODO
 
 def nutch_log_statistics(crawl):
     crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
-    stats_call = "nutch readdb {} -stats".format(crawl_db_dir)
+    stats_call = nutch_path + " readdb {} -stats".format(crawl_db_dir)
     proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE, shell=True)
+                                        stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     nutch_stats = stdout.decode()
     for line in stdout.split('\n'):
@@ -50,7 +60,7 @@ class NutchTask(Task):
 def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
     call = [
-        "crawl",
+        crawl_path,
         "--index",
         "-D",
         "elastic.index=%s" % crawl.slug,
@@ -60,7 +70,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid, shell=True)
+            preexec_fn=os.setsid)
     try:
         self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
@@ -96,7 +106,7 @@ def ache_log_statistics(crawl):
 def ache(self, crawl, *args, **kwargs):
     self.crawl = crawl
     call = [
-        "ache",
+        ache_path,
         "startCrawl",
         self.crawl.get_crawl_path(),
         self.crawl.get_config_path(),
@@ -106,7 +116,7 @@ def ache(self, crawl, *args, **kwargs):
     ]
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid, shell=True)
+            preexec_fn=os.setsid)
     try:
         self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
