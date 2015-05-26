@@ -59,21 +59,23 @@ create_apps:
     - require:
         - sls: conda-memex
 
-/bin/docker-compose:
-  file.copy:
-    - source: /home/vagrant/miniconda/envs/memex/bin/docker-compose
-
 elasticsearch:
   docker.pulled:
     - tag: latest
+    - require:
+        - sls: docker
 
 continuumio/tika:
   docker.pulled:
     - tag: latest
+    - require:
+        - sls: docker
 
 continuumio/kibana:
   docker.pulled:
     - tag: latest
+    - require:
+        - sls: docker
 
 celery:
   cmd.run:
