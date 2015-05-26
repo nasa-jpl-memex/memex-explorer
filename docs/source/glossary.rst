@@ -17,4 +17,16 @@
 
    Skin
       A particular UI (Text, CSS, etc...) on a particular webpage for a domain challenge
+      
+   Celery
+      A task manager build with Python, which manages several tasks in Memex Explorer, including the crawlers.
+   
+   Redis
+      A key-value store database which is required by Celery to keep information about task history and task queues.
+   
+   Django
+      A python web application framework. Django is the core of the memex explorer application.
+      
+   Crawl Space
+      An application which provides service for crawling the web using Nutch or Ache.
 
