@@ -19,8 +19,14 @@ Vagrant.configure(2) do |config|
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
 
-  # Note: this must match deploy_vagrant.sh exported port
+  # We bring the memex-explorer main server up on 8000
   config.vm.network "forwarded_port", guest: 8000, host: 8000 
+  # And (if needed) a local elasticsearch container up on 9200
+  config.vm.network "forwarded_port", guest: 9200, host: 9200
+  # And (if needed) a local kibana container up on 9999
+  config.vm.network "forwarded_port", guest: 9999, host: 9999
+  # And (if needed) a local tika container up on 9998
+  config.vm.network "forwarded_port", guest: 9998, host: 9998
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
