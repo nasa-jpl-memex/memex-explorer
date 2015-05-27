@@ -1,6 +1,7 @@
 docker.io:
-  pkg:
-    - installed
+  pkg.installed:
+    - name: docker
+    - version: 1.5-1
 
 docker-py:
   pip.installed:
