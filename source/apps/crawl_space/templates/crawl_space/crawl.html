@@ -156,9 +156,7 @@
             <a>View Results in Solr</a>
         </button>
         --> 
-        <button id="dumpImages" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
-            <a>Dump Images</a>
-        </button>
+        <a id="gotoKibana" disabled style="float:right;" class="btn btn-default btn-duo center link-button" href="http://0.0.0.0:9999">Goto Kibana</a>
     </div>
 </div>
 {% endif %}
@@ -218,6 +216,42 @@
        <iframe src="http://127.0.0.1:28778" style="width:100%;height:500px;border:1px solid #EEEEEE;border-radius:5px;"></iframe>
     </div>
 </div>
+{% endif %}
+
+{% if deployment %}
+<script>
+
+$(document).ready(function(){
+
+  var goto_kibana = $("#gotoKibana");
+
+  function get_kibana(){
+    return $.ajax({
+      type: "GET",
+      url: "http://0.0.0.0:9999",
+      statusCode: {
+        404: function(){
+          goto_kibana.attr("disabled", true);
+        }
+      },
+      success: function(){
+        goto_kibana.attr("disabled", false);
+      }
+    });
+  }
+
+  function kibana_interval(){
+    get_kibana();
+    return setInterval(function(){
+      get_kibana();
+    }, 20000);
+  }
+
+  kibana_interval();
+
+});
+
+</script>
 {% endif %}
 {% endblock content %}
 
