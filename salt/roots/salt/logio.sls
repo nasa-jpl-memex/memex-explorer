@@ -23,7 +23,7 @@ log.io-harvester-config:
           nodeName: "application_server",
           logStreams: {
             nutch: [
-            "/<anaconda_location>/envs/<environment_name>/lib/nutch/logs/hadoop.log"
+            "/home/vagrant/miniconda/envs/memex/lib/nutch/logs/hadoop.log"
             ]
           },
           server: {
