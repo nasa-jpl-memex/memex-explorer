@@ -14,10 +14,10 @@ logio:
     - require:
       - pkg: npm
 
-
 log.io-harvester-config:
   file.managed:
     - name: /home/vagrant/.log.io/harvester.conf
+    - makedirs: True
     - contents: |
         exports.config = {
           nodeName: "application_server",
