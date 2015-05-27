@@ -9,7 +9,7 @@ server {
 
     location /kibana/ {
         rewrite /kibana/(.*) /$1 break;
-        proxy_pass          http://0.0.0.0:5555/;
+        proxy_pass          http://0.0.0.0:9999/;
         proxy_redirect      off;
         proxy_set_header    Host $host;
     }
