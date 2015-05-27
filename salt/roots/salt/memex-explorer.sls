@@ -19,9 +19,8 @@ local_settings_path:
 # As a workaround, the SQL database is currently reset on each provision.
 
 reset:
-  cmd.run:
-    - name: |
-          rm /vagrant/source/db.sqlite3
+  file.absent:
+    - name: /vagrant/source/db.sqlite3
 
 migrate:
   cmd.run:
