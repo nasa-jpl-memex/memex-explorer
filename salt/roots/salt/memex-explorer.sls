@@ -58,24 +58,6 @@ create_apps:
     - require:
         - sls: conda-memex
 
-elasticsearch:
-  docker.pulled:
-    - tag: latest
-    - require:
-        - sls: docker
-
-continuumio/tika:
-  docker.pulled:
-    - tag: latest
-    - require:
-        - sls: docker
-
-continuumio/kibana:
-  docker.pulled:
-    - tag: latest
-    - require:
-        - sls: docker
-
 celery:
   cmd.run:
     - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --loglevel=debug --logfile=/vagrant/source/celeryd.log --workdir="/vagrant/source" -A memex worker

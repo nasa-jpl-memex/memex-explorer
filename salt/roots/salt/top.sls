@@ -2,7 +2,7 @@ base:
   '*':
     - pkgrepo.managed:
       - ppa: keithw/mosh
-    - nginx
+    - memex-nginx
     - redis-server
     - java
     - git

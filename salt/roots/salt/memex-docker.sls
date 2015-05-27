@@ -23,43 +23,22 @@ kibana-pulled:
         - sls: docker
 
 elasticsearch-running:
-  docker.running:
-    - image: "elasticsearch:latest"
-    - name: "continuumio/elasticsearch"
-    - ports:
-        - "9200/tcp":
-            HostIp: ""
-            HostPort: "9200"
-        - "9300/tcp":
-            HostIp: ""
-            HostPort: "9300"
-    - volumes:
-        - /home/ubuntu/memex-explorer/source/container_volumes/elasticsearch/data: /data
+  cmd.run:
+    - name: docker run -d -p 9200:9200 -p 9300:9300 -v /home/ubuntu/memex-explorer/source/container_volumes/elasticsearch/data:/data --name=elasticsearch elasticsearch
+    - unless: docker ps | grep elasticsearch
     - require:
         - docker: elasticsearch-pulled
 
 tika-running:
-  docker.running:
-    - name: "continuumio/tika"
-    - image: "continuumio/tika:latest"
-    - ports:
-        - "9998/tcp":
-            HostIp: ""
-            HostPort: "9998"
+  cmd.run:
+    - name: docker run -d -p 9998:9998 continuumio/tika
+    - unless: docker ps | grep continuumio/tika
     - require:
         - docker: tika-pulled
 
 kibana-running:
-  docker.running:
-    - image: "continuumio/kibana:latest"
-    - name: "continuumio/kibana"
-    - ports:
-        - "80/tcp":
-            HostIp: ""
-            HostPort: "9999"
-    - environment:
-        - KIBANA_SECURE: false
-    - links:
-        - elasticsearch_1: es
+  cmd.run:
+    - name: docker run -d -p 9999:80 -e KIBANA_SECURE=false --link elasticsearch:es  continuumio/kibana
+    - unless: docker ps | grep continuumio/kibana
     - require:
         - docker: kibana-pulled
