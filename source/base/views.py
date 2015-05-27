@@ -33,6 +33,7 @@ from task_manager.tika_tasks import create_index
 def project_context_processor(request):
     return {
         'projects': Project.objects.all(),
+        'settings': settings,
     }
 
 
@@ -65,7 +66,6 @@ class ProjectView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectView, self).get_context_data(**kwargs)
-        context["deployment"] = settings.DEPLOYMENT
         return context
 
 
