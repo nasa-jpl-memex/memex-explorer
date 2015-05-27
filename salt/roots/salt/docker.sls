@@ -2,6 +2,8 @@ docker.io:
   pkg.installed:
     - name: docker
     - version: 1.5-1
+  service:
+    - running
 
 docker-py:
   pip.installed:
