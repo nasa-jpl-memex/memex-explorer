@@ -14,5 +14,6 @@ base:
     - mosh
     - miniconda
     - conda-memex
+    - memex-docker
     - memex-explorer
     - logio
