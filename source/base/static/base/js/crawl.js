@@ -24,6 +24,28 @@ $( document ).ready(function() {
 
   $("#dumpImages").attr("disabled", true);
 
+  $('#common-crawl-dump').on('click', function() {
+     $( '#status' ).text( "DUMPING" );
+     this.disabled = true;
+     $('#playButton').attr("disabled", true);
+     $('#stopButton').attr("disabled", true);
+     $('#common-crawl-dump').removeAttr("disabled");
+
+    $("#nutchButtons").append('<i id="imageSpinner" class="fa fa-refresh fa-spin" style="font-size:20;"></i>')
+    $.ajax({
+        type: "POST",
+        data: {"action": "ccadump"},
+        success: function(response) {
+          sweetAlert("Success", "Crawled data has been successfully dumped in CCA format!", "success");
+          $("#imageSpinner").remove()
+        },
+        failure: function() {
+          sweetAlert("Error", "Dump in CCA format has failed.", "error");
+          $("#imageSpinner").remove()
+        }
+      });
+  });
+
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "STARTING" );
