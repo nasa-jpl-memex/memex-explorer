@@ -1,6 +1,12 @@
-docker.io:
-  pkg:
-    - installed
+docker.io-installed:
+  pkg.installed:
+    - name: docker.io
+
+docker-io-running:
+  service.running:
+    - name: docker.io
+    - require:
+        - pkg: docker.io
 
 docker-py:
   pip.installed:
