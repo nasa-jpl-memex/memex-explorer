@@ -221,14 +221,13 @@
  -->  </div>
 </div>
 
-{% if settings.DEPLOYMENT %}
 {% if crawl.crawler == "nutch" %}
 {% if settings.DEPLOYMENT %}
 <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
         <div role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" class="active"><a href="#logio" aria-controls="logio" role="tab" data-toggle="tab">Crawl Log</a></li>
+                <li role="presentation" class="active"><a href="#logio" aria-controls="logio" role="tab" data-toggle="tab">log.io</a></li>
                 <li role="presentation"><a href="#kibana" aria-controls="kibana" role="tab" data-toggle="tab">Kibana</a></li>
             </ul>
         </div>
