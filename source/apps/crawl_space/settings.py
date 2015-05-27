@@ -26,6 +26,7 @@ resources_dir = settings.MEDIA_ROOT
 # TODO Investigate using conda-installed ACHE resources.
 LANG_DETECT_PATH = os.path.join(resources_dir, 'profiles')
 
+CCA_PATH = os.path.join(resources_dir, 'cca')
 CRAWL_PATH = os.path.join(resources_dir, 'crawls')
 MODEL_PATH = os.path.join(resources_dir, 'models')
 CONFIG_PATH = os.path.join(resources_dir, 'configs')

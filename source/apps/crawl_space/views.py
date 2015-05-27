@@ -24,10 +24,10 @@ from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard
-from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH
+from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 
 from task_manager.tika_tasks import create_index
-from task_manager.crawl_tasks import nutch, ache, ache_log_statistics
+from task_manager.crawl_tasks import nutch, ache, ache_log_statistics, cca_dump
 
 
 class ProjectObjectMixin(ContextMixin):
@@ -110,6 +110,13 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     status="STOP SIGNAL SENT")),
                 content_type="application/json")
 
+
+        # Common Crawl Dump
+        elif request.POST['action'] == "ccadump":
+            crawl_object.status = "DUMPING"
+            crawl_object.save()
+            cca_dump(self.get_object())
+            return HttpResponse("Success")
         # Dump Images
         elif request.POST['action'] == "dump":
             self.dump_images()
@@ -147,6 +154,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 kwargs=kwargs,
                 post=request.POST)),
             content_type="application/json")
+
 
     def dump_images(self):
         self.img_dir = os.path.join(IMAGES_PATH, self.get_object().slug)

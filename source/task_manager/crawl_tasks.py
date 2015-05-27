@@ -4,14 +4,15 @@ import subprocess
 import os
 import shlex
 import time
-
+import shutil
+import sys
 from celery import shared_task, Task
 
 from django.db import IntegrityError
 
 from task_manager.models import CrawlTask
 
-from apps.crawl_space.settings import LANG_DETECT_PATH
+from apps.crawl_space.settings import LANG_DETECT_PATH, CCA_PATH
 from apps.crawl_space.models import Crawl
 
 # TODO - pull out this hardcode search
@@ -37,6 +38,28 @@ def nutch_log_statistics(crawl):
             crawl.pages_crawled = int(line.split('\t')[-1])
             crawl.save()
 
+
+
+def cca_dump(crawl):
+        cca_dir = os.path.join(CCA_PATH, crawl.slug)
+        if os.path.exists(cca_dir):
+            shutil.rmtree(cca_dir)
+        else:
+            os.makedirs(cca_dir)
+
+        sys.stderr.write("CCA DIR "+cca_dir)
+        sys.stderr.write("SEGMENTS DIR "+os.path.join(crawl.get_crawl_path(), 'segments'))
+
+        environ = os.environ.copy()
+        environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-oracle'
+        cca_dump_proc = subprocess.Popen([nutch_path, "commoncrawldump", "-outputDir", cca_dir,
+                                          "-segment", os.path.join(crawl.get_crawl_path(), 'segments')], 
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environ)
+        stdout, stderr = cca_dump_proc.communicate()
+        sys.stderr.write(stdout)
+        sys.stderr.write(stderr)
+        crawl.save()
+        return "Dumping CCA data"
 
 class NutchTask(Task):
     abstract = True

@@ -75,6 +75,14 @@
       </button>
 
       {% if crawl.crawler == "nutch" %}
+        <button id="common-crawl-dump" title="Dump (CCA format)" type="button" class="btn btn-control"
+            data-container="body" data-toggle="tooltip" data-placement="bottom"
+            style="height:40px;width:auto;display:inline;">
+           Dump (CCA format)
+        </button>
+      {% endif %}
+
+      {% if crawl.crawler == "nutch" %}
       <p style="display:inline;margin-left:5px;">Rounds:
         <input id="rounds" type="number" class="btn btn-control" value="1" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
       </p>
