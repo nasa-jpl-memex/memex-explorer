@@ -41,7 +41,13 @@
         <a href="{% url 'base:indices' project_slug=project.slug %}">
           <i class="fa fa-archive"> &nbsp; </i>Indices
         </a>
-        <a id="gotoKibana" disabled style="float:right;" class="btn btn-default btn-duo center link-button" href="/{{ project.slug}}/kibana">Goto Kibana</a>
+        <a id="gotoKibana"
+            {% if not settings.DEPLOYMENT %}
+            disabled
+            {% endif %}
+            style="float:right;" class="btn btn-default btn-duo center link-button" href="http://localhost:9999">
+            Kibana
+        </a>
       </h4>
 
       {% if project.index_set.all %}
@@ -106,39 +112,4 @@
     </div>
 
   </div>
-{% if deployment %}
-<script>
-
-$(document).ready(function(){
-
-  var goto_kibana = $("#gotoKibana");
-
-  function get_kibana(){
-    return $.ajax({
-      type: "GET",
-      url: "/{{ project.slug }}/kibana/",
-      statusCode: {
-        404: function(){
-          goto_kibana.attr("disabled", true);
-        }
-      },
-      success: function(){
-        goto_kibana.attr("disabled", false);
-      }
-    });
-  }
-
-  function kibana_interval(){
-    get_kibana();
-    return setInterval(function(){
-      get_kibana();
-    }, 20000);
-  }
-
-  kibana_interval();
-
-});
-
-</script>
-{% endif %}
 {% endblock %}
