@@ -10,7 +10,7 @@ npm:
 # npm.installed does NOT do the right thing here, hardcoding an install
 logio:
   cmd.run:
-    - name: "sudo npm install -g log.io"
+    - name: "sudo npm install -g log.io --user vagrant"
     - require:
       - pkg: npm
 
