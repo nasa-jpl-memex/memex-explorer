@@ -19,9 +19,8 @@ local_settings_path:
 # As a workaround, the SQL database is currently reset on each provision.
 
 reset:
-  cmd.run:
-    - name: |
-          rm /vagrant/source/db.sqlite3
+  file.absent:
+    - name: /vagrant/source/db.sqlite3
 
 migrate:
   cmd.run:
@@ -59,27 +58,13 @@ create_apps:
     - require:
         - sls: conda-memex
 
-/bin/docker-compose:
-  file.copy:
-    - source: /home/vagrant/miniconda/envs/memex/bin/docker-compose
-
-elasticsearch:
-  docker.pulled:
-    - tag: latest
-
-continuumio/tika:
-  docker.pulled:
-    - tag: latest
-
-continuumio/kibana:
-  docker.pulled:
-    - tag: latest
-
 celery:
   cmd.run:
-    - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --workdir="/vagrant/source" -A memex worker
+    - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --loglevel=debug --logfile=/vagrant/source/celeryd.log --workdir="/vagrant/source" -A memex worker
     - cwd: /vagrant/source
     - user: vagrant
-    - creates: /vagrant/source/celeryd.pid
+    - env:
+        - JAVA_HOME: '/usr/lib/jvm/java-7-oracle'
+    - unless: "ps -p $(cat /vagrant/source/celeryd.pid)"
     - require:
         - sls: conda-memex

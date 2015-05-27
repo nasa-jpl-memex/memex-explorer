@@ -26,7 +26,7 @@ install:
     - cd ../
 
 script:
-    - coverage run $(which py.test) --runslow
+    - coverage run $(which py.test)
     - coverage report --show-missing
 
 after_success:

@@ -10,8 +10,8 @@ import os
 
 from celery import shared_task, task
 
-TIKA_ENDPOINT="http://ec2-54-237-89-165.compute-1.amazonaws.com:9998/"
-ELASTICSEARCH_HOST="http://ec2-54-237-89-165.compute-1.amazonaws.com:9200/"
+TIKA_ENDPOINT="http://0.0.0.0:9998"
+ELASTICSEARCH_HOST="http://0.0.0.0:9200"
 
 from elasticsearch import Elasticsearch
 from tika.tika import parse1 as parse
@@ -51,7 +51,7 @@ def process_content(content_str, stopwords):
 
 @shared_task()
 def create_index(index):
-    es = Elasticsearch(["/" + index.project.slug + "/elasticsearch"])
+    es = Elasticsearch([ELASTICSEARCH_HOST])
     files = [os.path.join(index.data_folder, x) for x in os.listdir(index.data_folder)]
     if es.indices.exists(index.slug):
         print("Deleting '%s' index" % index.slug)
@@ -62,7 +62,7 @@ def create_index(index):
 
     for f in files:
         #Using experimental tika library - just a little janky
-        response = parse('all', f, serverEndpoint="/" + index.project.slug + "/tika")[1]
+        response = parse('all', f, TIKA_ENDPOINT)[1]
         try:
             if response[0] == '[':
                 #Sometimes response comes in brackets

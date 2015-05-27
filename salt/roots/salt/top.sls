@@ -2,7 +2,7 @@ base:
   '*':
     - pkgrepo.managed:
       - ppa: keithw/mosh
-    - nginx
+    - memex-nginx
     - redis-server
     - java
     - git
@@ -14,4 +14,6 @@ base:
     - mosh
     - miniconda
     - conda-memex
+    - memex-docker
     - memex-explorer
+    - logio

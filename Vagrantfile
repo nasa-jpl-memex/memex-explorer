@@ -19,8 +19,16 @@ Vagrant.configure(2) do |config|
   # `vagrant box outdated`. This is not recommended.
   # config.vm.box_check_update = false
 
-  # Note: this must match deploy_vagrant.sh exported port
-  config.vm.network "forwarded_port", guest: 8000, host: 8000 
+  # We bring the memex-explorer main server up on 8000
+  config.vm.network "forwarded_port", guest: 8000, host: 8000
+  # And the log.io server on 28778
+  config.vm.network "forwarded_port", guest: 28778, host: 28778
+  # And (if needed) a local elasticsearch container up on 9200
+  config.vm.network "forwarded_port", guest: 9200, host: 9200
+  # And (if needed) a local kibana container up on 9999
+  config.vm.network "forwarded_port", guest: 9999, host: 9999
+  # And (if needed) a local tika container up on 9998
+  config.vm.network "forwarded_port", guest: 9998, host: 9998
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -48,6 +56,7 @@ Vagrant.configure(2) do |config|
   #
   #   # Customize the amount of memory on the VM:
     vb.memory = "4096"
+    vb.cpus = 4
   end
   #
   # View the documentation for the provider you are using for more
