@@ -10,8 +10,8 @@ import os
 
 from celery import shared_task, task
 
-TIKA_ENDPOINT="http://127.0.0.1:9998"
-ELASTICSEARCH_HOST="http://127.0.0.1:9300"
+TIKA_ENDPOINT="http://0.0.0.0:9998"
+ELASTICSEARCH_HOST="http://0.0.0.0:9200"
 
 from elasticsearch import Elasticsearch
 from tika.tika import parse1 as parse
