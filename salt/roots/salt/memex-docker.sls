@@ -24,7 +24,7 @@ kibana-pulled:
 
 elasticsearch-running:
   cmd.run:
-    - name: docker run -d -p 9200:9200 -p 9300:9300 -v /home/ubuntu/memex-explorer/source/container_volumes/elasticsearch/data:/data --name=elasticsearch elasticsearch
+    - name: docker run -d -p 9200:9200 -p 9300:9300 -v /vagrant/source/container_volumes/elasticsearch/data:/data --name=elasticsearch elasticsearch
     - unless: docker ps | grep elasticsearch
     - require:
         - docker: elasticsearch-pulled
