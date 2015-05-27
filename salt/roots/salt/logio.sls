@@ -3,7 +3,13 @@ nodejs-legacy:
   pkg.installed
 
 npm:
-  pkg.installed
+  pkg.installed:
+    - require:
+        - pkg: nodejs-legacy
 
+# npm.installed does NOT do the right thing here, hardcoding an install
 logio:
-  npm.installed
+  cmd.run:
+    - name: "sudo npm install -g log.io"
+    - require:
+      - pkg: npm
