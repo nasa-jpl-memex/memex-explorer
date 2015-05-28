@@ -132,23 +132,13 @@ $( document ).ready(function() {
     },
   }
 
-  function disable(element){
-    document.getElementById(element).disabled=true;
+  function onOff(element, state){
+    document.getElementById(element).disabled=state;
   }
 
-  function enable(element){
-    document.getElementById(element).disabled=false;
-  }
-
-  function disableList(elementList){
-    for(var i=0; i<elementList.length; i++){
-      disable(buttons[elementList[i]]);
-    }
-  }
-
-  function enableList(elementList){
-    for(var i=0; i<elementList.length; i++){
-      enable(buttons[elementList[i]]);
+  function onOffGroup(elementArray, itemsObject, state){
+    for(var i=0; i<elementArray.length; i++){
+      onOff(itemsObject[elementArray[i]], state);
     }
   }
 
@@ -166,8 +156,8 @@ $( document ).ready(function() {
             $('#getSeeds').attr("disabled", false);
           }
         }
-        disableList(statuses[response.status]["disabled"]);
-        enableList(statuses[response.status]["enabled"]);
+        onOffGroup(statuses[response.status]["disabled"], buttons, true);
+        onOffGroup(statuses[response.status]["enabled"], buttons, false);
       }
     });
   }
