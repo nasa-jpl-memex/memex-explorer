@@ -18,101 +18,165 @@ $( document ).ready(function() {
 
   var csrftoken = getCookie('csrftoken');
 
-/*
- * Crawl Dashboard interactions
- */
+  /*
+  * Crawl Dashboard interactions
+  */
 
-var buttons = {
-  play: $('#playButton'),
-  stop: $('#stopButton'),
-  restart: $('#restartButton'),
-  kill: $('#forceStopButton'),
-  images: $('#dumpImages'),
-  cca: $('#common-crawl-dump'),
-}
+  var buttons = {
+    play: "playButton",
+    stop: "stopButton",
+    restart: "restartButton",
+    kill: "forceStopButton",
+    images: "dumpImages",
+    cca: "common-crawl-dump",
+    rounds: "rounds",
+    log: "getCrawlLog",
+    seeds: "getInitialSeeds",
+  }
 
-var states = {
-  "NOT STARTED": {
-    "disabled": [
-      "stop",
-      "restart",
-      "kill",
-      "images",
-      "cca",
-    ],
-    "enabled": [
-      "play",
-    ]
-  },
-  "STARTING": {
-    "disabled": [
-      "stop",
-      "restart",
-      "kill",
-      "images",
-      "cca",
-      "play",
-    ],
-    "enabled": [],
-  },
-  "STARTED": {
-    "disabled": [
-      "play",
-      "restart",
-      "images",
-      "cca",
-    ],
-    "enabled": [
-      "stop",
-      "kill",
-    ],
-  },
-  "SUCCESS": {
-    "disabled": [
-      "play",
-      "stop",
-      "kill",
-    ],
-    "enabled": [
-      "restart",
-      "images",
-      "cca",
-    ],
-  },
-  "FAILURE": {
-    "disabled": [
-      "stop",
-      "restart",
-      "kill",
-      "images",
-      "cca",
-      "play",
-    ],
-    "enabled": [],
-  },
-  "FORCE STOPPED": {
-    "disabled": [
-      "stop",
-      "restart",
-      "kill",
-      "images",
-      "cca",
-      "play",
-    ],
-    "enabled": [],
-  },
-}
+  /*
+  * This object contains information on which buttons should be enabled or
+  * disabled based on the status of the crawl.
+  */
 
+  var statuses = {
+    "NOT STARTED": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "log",
+      ],
+      "enabled": [
+        "play",
+        "rounds",
+        "seeds",
+      ],
+    },
+    "STARTING": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+    "STARTED": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "SUCCESS": {
+      "disabled": [
+        "play",
+        "stop",
+        "kill",
+      ],
+      "enabled": [
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+        "log",
+        "seeds",
+      ],
+    },
+    "FAILURE": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+    "FORCE STOPPED": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+  }
 
-function disable(element){
-  element.attr("disabled", true);
-}
+  function disable(element){
+    document.getElementById(element).disabled=true;
+  }
 
+  function enable(element){
+    document.getElementById(element).disabled=false;
+  }
 
-function enable(element){
-  element.attr("disabled", false);
-}
+  function disableList(elementList){
+    for(var i=0; i<elementList.length; i++){
+      disable(buttons[elementList[i]]);
+    }
+  }
 
+  function enableList(elementList){
+    for(var i=0; i<elementList.length; i++){
+      enable(buttons[elementList[i]]);
+    }
+  }
+
+  function statusCall(){
+    return $.ajax({
+      type: "POST",
+      data: {"action": "status"},
+      success: function(response){
+        $( '#status' ).text(response.status);
+        $( '#roundsLeft' ).text(response.rounds_left);
+        $( '#stats-pages' ).text(response.pages_crawled);
+        if ('harvest_rate' in response) {
+          $( '#stats-harvest' ).text(response.harvest_rate);
+          if (response.harvest_rate > 0) {
+            $('#getSeeds').attr("disabled", false);
+          }
+        }
+        disableList(statuses[response.status]["disabled"]);
+        enableList(statuses[response.status]["enabled"]);
+      }
+    });
+  }
+
+  statusCall();
+
+  setInterval(function(){
+    statusCall();
+  }, 5000);
 
   $( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
@@ -257,53 +321,6 @@ function enable(element){
     });
   });
 
-  function statusCall(){
-    return $.ajax({
-      type: "POST",
-      data: {"action": "status"},
-      success: function(response){
-        $( '#status' ).text(response.status);
-        $( '#roundsLeft' ).text(response.rounds_left);
-        $( '#stats-pages' ).text(response.pages_crawled);
-        if ('harvest_rate' in response) {
-          $( '#stats-harvest' ).text(response.harvest_rate);
-          if (response.harvest_rate > 0) {
-            $('#getSeeds').attr("disabled", false);
-          }
-        }
-        if (response.status == "STOPPED"){
-          $('#stopButton').attr("disabled", true);
-          $('#restartButton').attr("disabled", false);
-          $('#forceStopButton').attr("disabled", true);
-          $('#dumpImages').attr("disabled", false);
-        } else if (response.status == "STARTED") {
-          $('#stopButton').attr("disabled", false);
-          $('#rounds').attr("disabled", true);
-        } else if (response.status == "SUCCESS") {
-          $('#stopButton').attr("disabled", true);
-          $('#forceStopButton').attr("disabled", true);
-          $('#restartButton').attr("disabled", false);
-          $('#rounds').attr("disabled", false);
-        } else if (response.status == "FORCE STOPPED") {
-          $('#restartButton').attr("disabled", true);
-          $('#stopButton').attr("disabled", true);
-          $('#forceStopButton').attr("disabled", true);
-          $('#rounds').attr("disabled", true);
-        } else if (response.status == "DUMPING") {
-          $('#stopButton').attr("disabled", true);
-          $('#forceStopButton').attr("disabled", true);
-          $('#restartButton').attr("disabled", false);
-          $('#rounds').attr("disabled", false);
-        }
-      }
-    });
-  }
-
-  statusCall();
-
-  setInterval(function(){
-    statusCall();
-  }, 5000);
 
   $("#gotoSolr").on('click', function(){
     solr_url = "http://" + window.location.hostname + ":8983/solr/#"
