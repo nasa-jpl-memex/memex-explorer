@@ -133,7 +133,7 @@ $( document ).ready(function() {
   }
 
   function onOff(element, state){
-    document.getElementById(element).disabled=state;
+    $("#" + element).attr("disabled", state);
   }
 
   function onOffGroup(elementArray, itemsObject, state){
