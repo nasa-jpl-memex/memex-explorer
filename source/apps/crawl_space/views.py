@@ -14,6 +14,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -230,6 +231,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         context = super(CrawlView, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
         context['seeds'] = self.get_seeds_list(10)
+        context['settings'] = settings
         if self.get_object().crawler == "ache":
             plots = AcheDashboard(self.get_object()).get_plots()
             context['scripts'] = plots['scripts']
