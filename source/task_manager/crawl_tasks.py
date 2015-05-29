@@ -10,7 +10,7 @@ from celery import shared_task, Task
 
 from django.db import IntegrityError
 
-from task_manager.models import CrawlTask
+from task_manager.models import CeleryTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH, CCA_PATH
 from apps.crawl_space.models import Crawl
@@ -95,10 +95,10 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
-        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
         self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
@@ -141,10 +141,10 @@ def ache(self, crawl, *args, **kwargs):
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
-        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
         self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()

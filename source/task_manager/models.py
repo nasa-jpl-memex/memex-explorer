@@ -5,11 +5,12 @@ from celery.result import AsyncResult
 from apps.crawl_space.models import Crawl
 
 
-class CrawlTask(models.Model):
+class CeleryTask(models.Model):
     
     pid = models.IntegerField(default=0)
-    crawl = models.OneToOneField(Crawl)
+    crawl = models.OneToOneField(Crawl, blank=True, null=True, default=None)
     uuid = models.TextField()
+    failed = models.BooleanField(blank=True, default=False)
 
     @property
     def task(self):
@@ -21,4 +22,3 @@ class CrawlTask(models.Model):
 
     def __unicode__(self):
         return str(self.uuid)
-
