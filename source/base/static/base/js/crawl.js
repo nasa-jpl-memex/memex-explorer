@@ -18,6 +18,156 @@ $( document ).ready(function() {
 
   var csrftoken = getCookie('csrftoken');
 
+  /*
+  * Crawl Dashboard interactions
+  */
+
+  var buttons = {
+    play: "playButton",
+    stop: "stopButton",
+    restart: "restartButton",
+    kill: "forceStopButton",
+    images: "dumpImages",
+    cca: "common-crawl-dump",
+    rounds: "rounds",
+    log: "getCrawlLog",
+    seeds: "getInitialSeeds",
+  }
+
+  /*
+  * This object contains information on which buttons should be enabled or
+  * disabled based on the status of the crawl.
+  */
+
+  var statuses = {
+    "NOT STARTED": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "log",
+      ],
+      "enabled": [
+        "play",
+        "rounds",
+        "seeds",
+      ],
+    },
+    "STARTING": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+    "STARTED": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "SUCCESS": {
+      "disabled": [
+        "play",
+        "stop",
+        "kill",
+      ],
+      "enabled": [
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+        "log",
+        "seeds",
+      ],
+    },
+    "FAILURE": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+    "FORCE STOPPED": {
+      "disabled": [
+        "stop",
+        "restart",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+      ],
+    },
+  }
+
+  function onOff(element, state){
+    $("#" + element).attr("disabled", state);
+  }
+
+  function onOffGroup(elementArray, itemsObject, state){
+    for(var i=0; i<elementArray.length; i++){
+      onOff(itemsObject[elementArray[i]], state);
+    }
+  }
+
+  function statusCall(){
+    return $.ajax({
+      type: "POST",
+      data: {"action": "status"},
+      success: function(response){
+        $( '#status' ).text(response.status);
+        $( '#roundsLeft' ).text(response.rounds_left);
+        $( '#stats-pages' ).text(response.pages_crawled);
+        if ('harvest_rate' in response) {
+          $( '#stats-harvest' ).text(response.harvest_rate);
+          if (response.harvest_rate > 0) {
+            $('#getSeeds').attr("disabled", false);
+          }
+        }
+        onOffGroup(statuses[response.status]["disabled"], buttons, true);
+        onOffGroup(statuses[response.status]["enabled"], buttons, false);
+      }
+    });
+  }
+
+  statusCall();
+
+  setInterval(function(){
+    statusCall();
+  }, 5000);
+
   $( document ).ready(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
@@ -29,7 +179,7 @@ $( document ).ready(function() {
      this.disabled = true;
      $('#playButton').attr("disabled", true);
      $('#stopButton').attr("disabled", true);
-     $('#common-crawl-dump').removeAttr("disabled");
+     $('#common-crawl-dump').attr("disabled", false);
 
     $("#nutchButtons").append('<i id="imageSpinner" class="fa fa-refresh fa-spin" style="font-size:20;"></i>')
     $.ajax({
@@ -38,6 +188,7 @@ $( document ).ready(function() {
         success: function(response) {
           sweetAlert("Success", "Crawled data has been successfully dumped in CCA format!", "success");
           $("#imageSpinner").remove()
+          $('#playButton').attr("disabled", false);
         },
         failure: function() {
           sweetAlert("Error", "Dump in CCA format has failed.", "error");
@@ -46,11 +197,12 @@ $( document ).ready(function() {
       });
   });
 
+
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "STARTING" );
     this.disabled = true;
-    $('#stopButton').removeAttr("disabled");
+    $('#stopButton').attr("disabled", false);
     $('#rounds').attr("disabled", true);
 
     val = $("#rounds")? $("#rounds").val() : 0,
@@ -62,8 +214,8 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        $('#getCrawlLog').removeAttr("disabled");
-        $('#forceStopButton').removeAttr("disabled");
+        $('#getCrawlLog').attr("disabled", false);
+        $('#forceStopButton').attr("disabled", false);
         console.log(response);
         if (response.status != "error") $( '#status' ).text(response.status);
         else console.log(response)},
@@ -72,7 +224,6 @@ $( document ).ready(function() {
       }
     });
   });
-
 
 
   $('#stopButton').on('click', function() {
@@ -160,48 +311,6 @@ $( document ).ready(function() {
     });
   });
 
-  function statusCall(){
-    return $.ajax({
-      type: "POST",
-      data: {"action": "status"},
-      success: function(response){
-        $( '#status' ).text(response.status);
-        $( '#roundsLeft' ).text(response.rounds_left);
-        $( '#stats-pages' ).text(response.pages_crawled);
-        if ('harvest_rate' in response) {
-          $( '#stats-harvest' ).text(response.harvest_rate);
-          if (response.harvest_rate > 0) {
-            $('#getSeeds').removeAttr("disabled");
-          }
-        }
-        if (response.status == "STOPPED"){
-          $('#stopButton').attr("disabled", true);
-          $('#restartButton').removeAttr("disabled");
-          $('#forceStopButton').attr("disabled", true);
-          $('#dumpImages').removeAttr("disabled");
-        } else if (response.status == "STARTED") {
-          $('#stopButton').removeAttr("disabled");
-          $('#rounds').attr("disabled", true);
-        } else if (response.status == "SUCCESS") {
-          $('#stopButton').attr("disabled", true);
-          $('#forceStopButton').attr("disabled", true);
-          $('#restartButton').removeAttr("disabled");
-          $('#rounds').removeAttr("disabled");
-        } else if (response.status == "FORCE STOPPED") {
-          $('#restartButton').attr("disabled", true);
-          $('#stopButton').attr("disabled", true);
-          $('#forceStopButton').attr("disabled", true);
-          $('#rounds').attr("disabled", true);
-        }
-      }
-    });
-  }
-
-  statusCall();
-
-  setInterval(function(){
-    statusCall();
-  }, 5000);
 
   $("#gotoSolr").on('click', function(){
     solr_url = "http://" + window.location.hostname + ":8983/solr/#"
@@ -210,17 +319,19 @@ $( document ).ready(function() {
 
   $("#dumpImages").on('click', function(){
     $("#nutchButtons").append('<i id="imageSpinner" class="fa fa-refresh fa-spin" style="font-size:20;"></i>')
-      $.ajax({
-        type: "POST",
-        data: {"action": "dump"},
-        success: function(response) {
-          sweetAlert("Success", "Images have been successfully dumped!", "success");
-          $("#imageSpinner").remove()
-        },
-        failure: function() {
-          sweetAlert("Error", "Image dump has failed.", "error");
-          $("#imageSpinner").remove()
-        }
-      });
+    $.ajax({
+      type: "POST",
+      data: {"action": "dump"},
+      success: function(response) {
+        sweetAlert("Success", "Images have been successfully dumped!", "success");
+        $("#imageSpinner").remove()
+      },
+      failure: function() {
+        sweetAlert("Error", "Image dump has failed.", "error");
+        $("#imageSpinner").remove()
+      }
+    });
   });
+
+
 });
