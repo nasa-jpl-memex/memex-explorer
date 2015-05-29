@@ -33,7 +33,7 @@ from task_manager.tika_tasks import create_index
 def project_context_processor(request):
     return {
         'projects': Project.objects.all(),
-        'settings': settings,
+        'deployment': settings.DEPLOYMENT,
     }
 
 

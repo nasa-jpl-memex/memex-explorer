@@ -168,7 +168,7 @@
             <a>Dump Images</a>
         </button>
         <a id="gotoKibana"
-            {% if not settings.DEPLOYMENT %}
+            {% if not deployment %}
             disabled
             {% endif %}
             style="float:left;" class="btn btn-default btn-duo center link-button" href="http://localhost:9999">
@@ -228,7 +228,7 @@
  -->  </div>
 </div>
 {% if crawl.crawler == "nutch" %}
-{% if settings.DEPLOYMENT %}
+{% if deployment %}
 <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
        <iframe src="http://127.0.0.1:28778" style="width:100%;height:500px;border:1px solid #EEEEEE;border-radius:5px;"></iframe>
