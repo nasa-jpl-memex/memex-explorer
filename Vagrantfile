@@ -88,7 +88,7 @@ $app = <<SCRIPT
   /home/vagrant/miniconda/envs/memex/bin/python ./manage.py runserver 0.0.0.0:8000
 SCRIPT
 
-config.vm.provision "app", type: "shell", inline: $app
+config.vm.provision "app", type: "shell", privileged: false, inline: $app
 
 end
 
