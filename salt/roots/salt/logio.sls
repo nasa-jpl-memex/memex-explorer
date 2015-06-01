@@ -11,6 +11,7 @@ npm:
 logio:
   cmd.run:
     - name: "sudo npm install -g log.io --user vagrant"
+    - user: vagrant
     - require:
       - pkg: npm
     - unless: npm list -g log.io --user vagrant | grep log.io
