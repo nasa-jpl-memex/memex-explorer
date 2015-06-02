@@ -103,7 +103,7 @@ STATIC_URL = '/static/'
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'resources')
+MEDIA_ROOT = '/home/vagrant/resources'
 
 MEDIA_URL = '/resources/'
 
@@ -141,7 +141,8 @@ CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ACCEPT_CONTENT=['pickle']
 CELERY_TRACK_STARTED = True
-
+CELERYD_USER="vagrant"
+CELERYD_GROUP="vagrant"
 
 # Enable dockerize functionality
 DEPLOYMENT = True
