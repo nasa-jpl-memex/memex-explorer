@@ -102,7 +102,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
             if crawl_object.crawler == "ache":
                 crawl_object.status = 'STOPPED'
                 crawl_object.save()
-                os.killpg(crawl_object.crawltask.pid, 9)
+                os.killpg(crawl_object.celerytask.pid, 9)
             if crawl_object.crawler == "nutch":
                 crawl_object.rounds_left = 1
                 crawl_object.save()
@@ -126,7 +126,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Force Stop Nutch
         elif request.POST['action'] == "force_stop":
             touch(join(crawl_object.get_crawl_path(), 'stop'))
-            os.killpg(crawl_object.crawltask.pid, 9)
+            os.killpg(crawl_object.celerytask.pid, 9)
             crawl_object.status = "FORCE STOPPED"
             crawl_object.save()
             return HttpResponse(json.dumps(dict(
@@ -136,7 +136,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_object.status not in ["NOT STARTED", "STOPPED", "FORCE STOPPED"]:
-                crawl_object.status = crawl_object.crawltask.task.status
+                crawl_object.status = crawl_object.celerytask.task.status
                 crawl_object.save()
             if crawl_object.crawler == "ache":
                 ache_log_statistics(crawl_object)

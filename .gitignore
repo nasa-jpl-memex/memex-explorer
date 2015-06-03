@@ -1,7 +1,6 @@
 # Memex Explorer project
 resources/
 test_resources/
-migrations/
 source/memex/settings.py
 
 # Byte-compiled / optimized / DLL files

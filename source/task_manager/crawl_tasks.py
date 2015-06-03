@@ -10,7 +10,7 @@ from celery import shared_task, Task
 
 from django.db import IntegrityError
 
-from task_manager.models import CrawlTask
+from task_manager.models import CeleryTask
 
 from apps.crawl_space.settings import LANG_DETECT_PATH, CCA_PATH
 from apps.crawl_space.models import Crawl
@@ -26,6 +26,7 @@ else:
     ache_path = 'ache'
 # END TODO
 
+
 def nutch_log_statistics(crawl):
     crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
     stats_call = nutch_path + " readdb {} -stats".format(crawl_db_dir)
@@ -39,27 +40,27 @@ def nutch_log_statistics(crawl):
             crawl.save()
 
 
-
 def cca_dump(crawl):
-        cca_dir = os.path.join(CCA_PATH, crawl.slug)
-        if os.path.exists(cca_dir):
-            shutil.rmtree(cca_dir)
-        else:
-            os.makedirs(cca_dir)
+    cca_dir = os.path.join(CCA_PATH, crawl.slug)
+    if os.path.exists(cca_dir):
+        shutil.rmtree(cca_dir)
+    else:
+        os.makedirs(cca_dir)
 
-        sys.stderr.write("CCA DIR "+cca_dir)
-        sys.stderr.write("SEGMENTS DIR "+os.path.join(crawl.get_crawl_path(), 'segments'))
+    sys.stderr.write("CCA DIR "+cca_dir)
+    sys.stderr.write("SEGMENTS DIR "+os.path.join(crawl.get_crawl_path(), 'segments'))
 
-        environ = os.environ.copy()
-        environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-oracle'
-        cca_dump_proc = subprocess.Popen([nutch_path, "commoncrawldump", "-outputDir", cca_dir,
-                                          "-segment", os.path.join(crawl.get_crawl_path(), 'segments')], 
-                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environ)
-        stdout, stderr = cca_dump_proc.communicate()
-        sys.stderr.write(stdout)
-        sys.stderr.write(stderr)
-        crawl.save()
-        return "Dumping CCA data"
+    environ = os.environ.copy()
+    environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-oracle'
+    cca_dump_proc = subprocess.Popen([nutch_path, "commoncrawldump", "-outputDir", cca_dir,
+                                        "-segment", os.path.join(crawl.get_crawl_path(), 'segments')], 
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environ)
+    stdout, stderr = cca_dump_proc.communicate()
+    sys.stderr.write(stdout)
+    sys.stderr.write(stderr)
+    crawl.save()
+    return "Dumping CCA data"
+
 
 class NutchTask(Task):
     abstract = True
@@ -86,23 +87,25 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         crawl_path,
         "--index",
         "-D",
-        "elastic.index=%s" % crawl.slug,
-        crawl.seeds_list.path,
-        crawl.get_crawl_path(),
+        "elastic.index=%s" % self.crawl.slug,
+        self.crawl.seeds_list.path,
+        self.crawl.get_crawl_path(),
         "1",
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
-        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
         self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
+    if proc.returncode > 0:
+        raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Round Complete"
 
 
@@ -141,13 +144,14 @@ def ache(self, crawl, *args, **kwargs):
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CrawlTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
-        self.crawl_task = CrawlTask.objects.get(crawl=self.crawl)
+        self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
         self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
+    if proc.returncode > 0:
+        raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Stopped"
-

@@ -7,17 +7,17 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawl_space', '__first__'),
+        ('crawl_space', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CrawlTask',
+            name='CeleryTask',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('pid', models.IntegerField(default=0)),
                 ('uuid', models.TextField()),
-                ('crawl', models.OneToOneField(to='crawl_space.Crawl')),
+                ('crawl', models.OneToOneField(null=True, default=None, blank=True, to='crawl_space.Crawl')),
             ],
             options={
             },
