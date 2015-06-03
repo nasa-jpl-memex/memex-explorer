@@ -4,13 +4,30 @@ import zipfile
 
 from celery import shared_task, Task, task
 
+from tika_tasks import create_index
 
-@shared_task()
-def unzip(input_zip, output_folder):
+from django.conf import settings
+
+
+class UnzipTask(Task):
+    abstract = True
+
     """
-    Celery task which unzips files in a .zip archive and ignores folder
-    structure, taking each file to the top level of the output folder.
+    If we are in deployment mode, create the corresponding index after the task
+    has returned.
     """
+    def after_return(self, index, *args, **kwargs):
+        if settings.DEPLOYMENT:
+            create_index.delay(self.index)
+
+
+"""
+Celery task which unzips files in a .zip archive and ignores folder
+structure, taking each file to the top level of the output folder.
+"""
+@shared_task(bind=True, base=UnzipTask)
+def unzip(self, input_zip, output_folder, index, *args, **kwargs):
+    self.index = index
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)
     with zipfile.ZipFile(input_zip) as archive:
@@ -23,4 +40,3 @@ def unzip(input_zip, output_folder):
             with source, target:
                 shutil.copyfileobj(source, target)
     return "success"
-

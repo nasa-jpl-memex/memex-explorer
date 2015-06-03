@@ -16,9 +16,6 @@ from jinja2.runtime import Context
 
 from django.conf import settings
 
-from task_manager.file_tasks import unzip
-from task_manager.tika_tasks import create_index
-
 
 def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
@@ -347,9 +344,6 @@ class Index(models.Model):
             self.data_folder = self.get_dumped_data_path()
             if os.path.isdir(self.data_folder):
                 delete_folder_contents(self.data_folder)
-            unzip(self.uploaded_data.name, self.data_folder)
-            if settings.DEPLOYMENT:
-                create_index.delay(self)
         super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):

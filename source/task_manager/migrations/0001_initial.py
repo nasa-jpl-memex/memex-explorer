@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('crawl_space', '0001_initial'),
+        ('base', '0001_initial'),
     ]
 
     operations = [
@@ -18,6 +19,7 @@ class Migration(migrations.Migration):
                 ('pid', models.IntegerField(default=0)),
                 ('uuid', models.TextField()),
                 ('crawl', models.OneToOneField(null=True, default=None, blank=True, to='crawl_space.Crawl')),
+                ('index', models.OneToOneField(null=True, default=None, blank=True, to='base.Index')),
             ],
             options={
             },

@@ -27,7 +27,7 @@ from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
 from apps.crawl_space.views import ProjectObjectMixin
 
-from task_manager.tika_tasks import create_index
+from task_manager.file_tasks import unzip
 
 
 def project_context_processor(request):
@@ -109,6 +109,15 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+    """
+    Because CeleryTask needs an associated Index, start the index creation
+    task here in `views.py` instead of in `models.py` to avoid a circular import.
+    """
+    def post(self, *args, **kwargs):
+        # self.slug = slugify(self.get_form_kwargs()['data']['name'])
+        super(AddIndexView, self).post(*args, **kwargs)
+        unzip.delay(self.object.uploaded_data.name, self.object.data_folder, self.object)
 
     def form_valid(self, form):
         form.instance.project = self.get_project()
