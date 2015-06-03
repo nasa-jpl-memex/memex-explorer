@@ -7,8 +7,8 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('crawl_space', '0001_initial'),
         ('base', '0001_initial'),
+        ('crawl_space', '0001_initial'),
     ]
 
     operations = [

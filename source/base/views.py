@@ -110,17 +110,14 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
-    """
-    Because CeleryTask needs an associated Index, start the index creation
-    task here in `views.py` instead of in `models.py` to avoid a circular import.
-    """
-    def post(self, *args, **kwargs):
-        # self.slug = slugify(self.get_form_kwargs()['data']['name'])
-        super(AddIndexView, self).post(*args, **kwargs)
-        unzip.delay(self.object.uploaded_data.name, self.object.data_folder, self.object)
-
     def form_valid(self, form):
+        """
+        Add a project key:value for the form, then get the object created by
+        `form.save`.
+        """
         form.instance.project = self.get_project()
+        self.object = form.save()
+        unzip.delay(self.object.uploaded_data.name, self.object.data_folder, self.object)
         return super(AddIndexView, self).form_valid(form)
 
 

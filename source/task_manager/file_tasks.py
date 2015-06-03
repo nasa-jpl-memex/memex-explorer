@@ -12,21 +12,21 @@ from django.conf import settings
 class UnzipTask(Task):
     abstract = True
 
-    """
-    If we are in deployment mode, create the corresponding index after the task
-    has returned.
-    """
-    def after_return(self, index, *args, **kwargs):
+    def on_success(self, *args, **kwargs):
+        """
+        If we are in deployment mode, create the corresponding index after the task
+        has succeeded.
+        """
         if settings.DEPLOYMENT:
             create_index.delay(self.index)
 
 
-"""
-Celery task which unzips files in a .zip archive and ignores folder
-structure, taking each file to the top level of the output folder.
-"""
 @shared_task(bind=True, base=UnzipTask)
 def unzip(self, input_zip, output_folder, index, *args, **kwargs):
+    """
+    Celery task which unzips files in a .zip archive and ignores folder
+    structure, taking each file to the top level of the output folder.
+    """
     self.index = index
     if not os.path.exists(output_folder):
         os.mkdir(output_folder)

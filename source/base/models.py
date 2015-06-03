@@ -333,6 +333,7 @@ class Index(models.Model):
         validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
     project = models.ForeignKey(Project)
+    status = models.CharField(max_length=64, default="")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
