@@ -17,7 +17,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('pid', models.IntegerField(default=0)),
                 ('uuid', models.TextField()),
-                ('failed', models.BooleanField(default=False)),
                 ('crawl', models.OneToOneField(null=True, default=None, blank=True, to='crawl_space.Crawl')),
             ],
             options={

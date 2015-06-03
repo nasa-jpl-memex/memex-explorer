@@ -10,7 +10,6 @@ class CeleryTask(models.Model):
     pid = models.IntegerField(default=0)
     crawl = models.OneToOneField(Crawl, blank=True, null=True, default=None)
     uuid = models.TextField()
-    failed = models.BooleanField(blank=True, default=False)
 
     @property
     def task(self):

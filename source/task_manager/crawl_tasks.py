@@ -87,24 +87,24 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         crawl_path,
         "--index",
         "-D",
-        "elastic.index=%s" % crawl.slug,
-        crawl.seeds_list.path,
-        crawl.get_crawl_path(),
+        "elastic.index=%s" % self.crawl.slug,
+        self.crawl.seeds_list.path,
+        self.crawl.get_crawl_path(),
         "1",
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
-        self.proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
+        proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CeleryTask(pid=self.proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
         self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
-        self.crawl_task.pid = self.proc.pid
+        self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
-    stdout, stderr = self.proc.communicate()
-    if self.proc.returncode > 0:
+    stdout, stderr = proc.communicate()
+    if proc.returncode > 0:
         raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Round Complete"
 
@@ -141,17 +141,17 @@ def ache(self, crawl, *args, **kwargs):
         LANG_DETECT_PATH,
     ]
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
-        self.proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
+        proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
     try:
-        self.crawl_task = CeleryTask(pid=self.proc.pid, crawl=self.crawl, uuid=self.request.id)
+        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
     except IntegrityError:
         self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
-        self.crawl_task.pid = self.proc.pid
+        self.crawl_task.pid = proc.pid
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
-    stdout, stderr = self.proc.communicate()
-    if self.proc.returncode > 0:
+    stdout, stderr = proc.communicate()
+    if proc.returncode > 0:
         raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Stopped"
