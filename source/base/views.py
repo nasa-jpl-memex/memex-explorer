@@ -131,8 +131,8 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
     success_message = "Index was edited successfully."
     template_name_suffix = '_update_form'
 
-    def get_index_data_path(self, index):
-        return os.path.join(settings.MEDIA_ROOT, "indices", index.slug, "data")
+    def get_index_path(self, index):
+        return os.path.join(settings.MEDIA_ROOT, "indices", index.slug)
 
     def delete_folder_contents(self, folder):
         for file in os.listdir(folder):
@@ -160,8 +160,8 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if os.path.exists(get_index_data_path(self.object)):
-            delete_folder_contents(get_index_data_path(self.object))
+        if os.path.exists(self.get_index_path(self.object)):
+            self.delete_folder_contents(self.get_index_path(self.object))
         # If we are in deployment mode, use the asynced version. If not, use the
         # synced version.
         if settings.DEPLOYMENT:

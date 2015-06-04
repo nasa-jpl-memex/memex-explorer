@@ -28,7 +28,7 @@ class TestIndex(UnitTestSkeleton):
         cls.test_index = Index(
             name="Test Index",
             project=cls.test_project,
-            uploaded_data=cls.zip_file(),
+            uploaded_data=cls.zip_file1(),
         )
         cls.test_index.save()
 
@@ -39,8 +39,12 @@ class TestIndex(UnitTestSkeleton):
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, "indices", "test-index"))
 
     @classmethod
-    def zip_file(self):
+    def zip_file1(self):
         return UploadedFile(open(os.path.join(settings.MEDIA_ROOT, "sample.zip"), 'r'))
+
+    @classmethod
+    def zip_file2(self):
+        return UploadedFile(open(os.path.join(settings.MEDIA_ROOT, "sample2.zip"), 'r'))
 
     def slugs(self):
         return {
@@ -57,17 +61,25 @@ class TestIndex(UnitTestSkeleton):
             }
         }
 
+    def update_index_slugs(self):
+        return {
+            "slugs": {
+                "project_slug": "test-indices",
+                "index_slug": "test-index",
+            }
+        }
+
     def add_index_form_data(self):
         return {
             "name": "Test Index Post",
             "project": self.test_project,
-            "uploaded_data": self.zip_file(),
+            "uploaded_data": self.zip_file1(),
         }
 
     def update_index_form_data(self):
         return {
             "project": self.test_project,
-            "uploaded_data": self.zip_file(),
+            "uploaded_data": self.zip_file2(),
         }
 
     def test_add_index_page(self):
@@ -104,22 +116,36 @@ class TestIndex(UnitTestSkeleton):
             )
         )
 
-    def test_update_index_new_files(self):
-        """Upload new files from the settings page."""
-        pass
-
-    def test_new_files_exist(self):
-        """
-        Ensure that old files have been deleted when the index is updated with
-        new files.
-        """
-        pass
-        #assert not os.path.exists(
-        #    os.path.join(
-        #        settings.MEDIA_ROOT,
-        #        "indices",
-        #        "test-index",
-        #        "data",
-        #        "sample.txt"
-        #    )
-        #)
+#    def test_update_index(self):
+#        """
+#        Update the index with new files.
+#        """
+#        response = self.post('base:index_settings', *self.update_index_form_data(),
+#            **self.update_index_slugs())
+#        assert 'base/project.html' in response.template_name
+#
+#    def test_old_files_deleted(self):
+#        """
+#        Ensure that old files have been deleted when the index is updated with
+#        new files.
+#        """
+#        assert not os.path.exists(
+#            os.path.join(
+#                settings.MEDIA_ROOT,
+#                "indices",
+#                "test-index",
+#                "data",
+#                "sample.txt"
+#            )
+#        )
+#
+#    def test_new_files_exist(self):
+#        assert os.path.exists(
+#            os.path.join(
+#                settings.MEDIA_ROOT,
+#                "indices",
+#                "test-index",
+#                "data",
+#                "sample2.txt"
+#            )
+#        )
