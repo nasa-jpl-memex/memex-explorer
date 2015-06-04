@@ -339,8 +339,8 @@ class Index(models.Model):
         self.slug = slugify(unicode(self.name))
         if self.uploaded_data:
             zipped_data_path = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
-            if os.path.isdir(zipped_data_path):
-                delete_folder_contents(zipped_data_path)
+#            if os.path.isdir(zipped_data_path):
+#                delete_folder_contents(zipped_data_path)
             super(Index, self).save(*args, **kwargs)
             self.data_folder = self.get_dumped_data_path()
             if os.path.isdir(self.data_folder):

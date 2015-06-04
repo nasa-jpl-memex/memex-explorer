@@ -13,6 +13,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'test_resources')
 
 MEDIA_URL = '/test_resources/'
 
+DEPLOYMENT = False
+
 TEST_CRAWL_DATA = os.path.join(MEDIA_ROOT, "test_crawl_data")
 
 # Ignore (particular) warnings

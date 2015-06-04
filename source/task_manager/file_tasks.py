@@ -12,6 +12,11 @@ from django.conf import settings
 class UnzipTask(Task):
     abstract = True
 
+    def on_failure(self, *args, **kwargs):
+        """If there is an error, set the index status to FAILED."""
+        self.index.status = "FAILED"
+        self.index.save()
+
     def on_success(self, *args, **kwargs):
         """
         If we are in deployment mode, create the corresponding index after the task

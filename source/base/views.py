@@ -83,7 +83,7 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
-        """Remove crawls and folders for crawls."""
+        # Remove crawls and folders for crawls.
         # for crawl in self.get_crawls():
         #     shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
         #     crawl.delete()
@@ -161,4 +161,3 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
-
