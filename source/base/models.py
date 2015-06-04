@@ -275,6 +275,7 @@ def start_container_celery(sender, instance, **kwargs):
     start_containers.delay(instance)
 
 
+# TODO: Remove this conditional entirely.
 if settings.DEPLOYMENT:
     pass
     #post_save.connect(start_container_celery, sender = Project)
@@ -326,7 +327,7 @@ class Index(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         self.data_folder = self.get_dumped_data_path()
-        return super(Index, self).save(*args, **kwargs)
+        super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:project',

@@ -117,9 +117,11 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         """
         form.instance.project = self.get_project()
         self.object = form.save()
-        upload_zip.delay(self.object)
+        if settings.DEPLOYMENT:
+            upload_zip.delay(self.object)
+        else:
+            upload_zip(self.object)
         return super(AddIndexView, self).form_valid(form)
-
 
 
 class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
@@ -160,7 +162,12 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         self.object = self.get_object()
         if os.path.exists(get_index_data_path(self.object)):
             delete_folder_contents(get_index_data_path(self.object))
-        upload_zip.delay(self.object)
+        # If we are in deployment mode, use the asynced version. If not, use the
+        # synced version.
+        if settings.DEPLOYMENT:
+            upload_zip.delay(self.object)
+        else:
+            upload_zip(self.object)
         return super(IndexSettingsView, self).post(request, *args, **kwargs)
 
 

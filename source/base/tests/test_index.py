@@ -8,6 +8,7 @@ from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_
 from django.test import TestCase
 from django.db import IntegrityError
 from django.core.files import File
+from django.core.files.uploadedfile import UploadedFile
 
 from base.models import Project, Index
 
@@ -34,11 +35,12 @@ class TestIndex(UnitTestSkeleton):
     @classmethod
     def tearDownClass(cls):
         super(TestIndex, cls).tearDownClass()
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, "indices", "test-index-post"))
         shutil.rmtree(os.path.join(settings.MEDIA_ROOT, "indices", "test-index"))
 
     @classmethod
     def zip_file(self):
-        return File(open(os.path.join(settings.MEDIA_ROOT, "sample.zip"), 'r'))
+        return UploadedFile(open(os.path.join(settings.MEDIA_ROOT, "sample.zip"), 'r'))
 
     def slugs(self):
         return {
