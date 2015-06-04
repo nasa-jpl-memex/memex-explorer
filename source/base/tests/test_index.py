@@ -11,7 +11,7 @@ from django.core.files import File
 
 from base.models import Project, Index
 
-from task_manager.file_tasks import unzip
+from task_manager.file_tasks import upload_zip
 
 
 class TestIndex(UnitTestSkeleton):
@@ -24,6 +24,12 @@ class TestIndex(UnitTestSkeleton):
             description="Test Project Description"
         )
         cls.test_project.save()
+        cls.test_index = Index(
+            name="Test Index",
+            project=cls.test_project,
+            uploaded_data=cls.zip_file(),
+        )
+        cls.test_index.save()
 
     @classmethod
     def tearDownClass(cls):
@@ -41,17 +47,23 @@ class TestIndex(UnitTestSkeleton):
             }
         }
 
-    def index_slugs(self):
+    def add_index_slugs(self):
         return {
             "slugs": {
                 "project_slug": "test-indices",
-                "index_slug": "test-index",
+                "index_slug": "test-index-post",
             }
         }
 
-    def form_data(self):
+    def add_index_form_data(self):
         return {
-            "name": "Test Index",
+            "name": "Test Index Post",
+            "project": self.test_project,
+            "uploaded_data": self.zip_file(),
+        }
+
+    def update_index_form_data(self):
+        return {
             "project": self.test_project,
             "uploaded_data": self.zip_file(),
         }
@@ -69,10 +81,10 @@ class TestIndex(UnitTestSkeleton):
         Test for index settings page is included in this test because the
         database row does not appear to persist between tests.
         """
-        response = self.post('base:add_index', self.form_data(), **self.slugs())
+        response = self.post('base:add_index', self.add_index_form_data(), **self.slugs())
         assert 'base/project.html' in response.template_name
 
-        response = self.get('base:index_settings', **self.index_slugs())
+        response = self.get('base:index_settings', **self.add_index_slugs())
         assert 'base/index_update_form.html' in response.template_name
 
     def test_verify_unzip(self):
@@ -84,9 +96,28 @@ class TestIndex(UnitTestSkeleton):
             os.path.join(
                 settings.MEDIA_ROOT,
                 "indices",
-                "test-index",
+                "test-index-post",
                 "data",
                 "sample.txt"
             )
         )
 
+    def test_update_index_new_files(self):
+        """Upload new files from the settings page."""
+        pass
+
+    def test_new_files_exist(self):
+        """
+        Ensure that old files have been deleted when the index is updated with
+        new files.
+        """
+        pass
+        #assert not os.path.exists(
+        #    os.path.join(
+        #        settings.MEDIA_ROOT,
+        #        "indices",
+        #        "test-index",
+        #        "data",
+        #        "sample.txt"
+        #    )
+        #)

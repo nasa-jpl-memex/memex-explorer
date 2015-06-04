@@ -290,18 +290,6 @@ def get_zipped_data_path(instance, filename):
     return os.path.join(settings.MEDIA_ROOT, "indices", instance.slug, "zipped_data", filename)
 
 
-def delete_folder_contents(folder):
-    for file in os.listdir(folder):
-        file_path = os.path.join(folder, file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception, e:
-            print(e)
-
-
 class Index(models.Model):
     """Index model.
 
@@ -337,17 +325,9 @@ class Index(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
-        if self.uploaded_data:
-            zipped_data_path = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
-#            if os.path.isdir(zipped_data_path):
-#                delete_folder_contents(zipped_data_path)
-            super(Index, self).save(*args, **kwargs)
-            self.data_folder = self.get_dumped_data_path()
-            if os.path.isdir(self.data_folder):
-                delete_folder_contents(self.data_folder)
-        super(Index, self).save(*args, **kwargs)
+        self.data_folder = self.get_dumped_data_path()
+        return super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
-

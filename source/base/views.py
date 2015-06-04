@@ -27,7 +27,7 @@ from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
 from apps.crawl_space.views import ProjectObjectMixin
 
-from task_manager.file_tasks import unzip
+from task_manager.file_tasks import upload_zip
 
 
 def project_context_processor(request):
@@ -117,8 +117,9 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         """
         form.instance.project = self.get_project()
         self.object = form.save()
-        unzip.delay(self.object.uploaded_data.name, self.object.data_folder, self.object)
+        upload_zip.delay(self.object)
         return super(AddIndexView, self).form_valid(form)
+
 
 
 class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
@@ -127,6 +128,20 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
     form_class = IndexSettingsForm
     success_message = "Index was edited successfully."
     template_name_suffix = '_update_form'
+
+    def get_index_data_path(self, index):
+        return os.path.join(settings.MEDIA_ROOT, "indices", index.slug, "data")
+
+    def delete_folder_contents(self, folder):
+        for file in os.listdir(folder):
+            file_path = os.path.join(folder, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception, e:
+                print(e)
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
@@ -140,6 +155,13 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if os.path.exists(get_index_data_path(self.object)):
+            delete_folder_contents(get_index_data_path(self.object))
+        upload_zip.delay(self.object)
+        return super(IndexSettingsView, self).post(request, *args, **kwargs)
 
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
