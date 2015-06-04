@@ -17,14 +17,14 @@ $ vagrant up
 
 The installation process for the virtual machine can take about an hour, depending on the speed of your Internet connection, as it builds and provisions the Memex Explorer system.  Once it is running, you should receive a message stating that Memex Explorer is running locally on port 8000, which you will then be able to access from your web browser.
 
-
 # Deploying
 
 The documentation for remote deployment to EC2 is currently a work in progress.  For now, refer to https://github.com/memex-explorer/memex-explorer/issues/559
 
 
 # Testing
-* To run memex-explorer tests, use the command from within an active environment:
+
+To run memex-explorer tests, use the following command from within an active environment:
 ```
 $ py.test
 ```
@@ -50,8 +50,9 @@ $ cd docs
 $ make html
 ```
 
+The documentation is then available within `build/html/index.html`
+
 # Administration
 
 To access the administration panel, navigate to http://localhost:8000/admin (or the equivalent deployed URL) after starting Memex Explorer. Here you will be able to view and make manual changes to the database.
 
-The documentation is then available within `build/html/index.html`
