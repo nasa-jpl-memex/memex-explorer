@@ -24,7 +24,7 @@
 
     setInterval(function(){
       getStatus();
-    }, 7000);
+    }, 5000);
 
   });
 

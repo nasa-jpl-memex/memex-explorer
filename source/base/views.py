@@ -64,10 +64,10 @@ class ProjectView(DetailView):
     def post(self, request, *args, **kwargs):
         if request.POST['action'] == "index_status":
             statuses = {}
-            for i in self.get_object().index_set.all():
-                i.status = i.celerytask.task.status
-                statuses[i.slug] = i.status
-                i.save()
+            for x in self.get_object().index_set.all():
+                x.status = x.celerytask.task.status
+                statuses[x.slug] = x.status
+                x.save()
             return HttpResponse(
                 json.dumps({"statuses": statuses}),
                 content_type="application/json",
