@@ -22,8 +22,6 @@
 
   $(document).ready(function(){
 
-    getStatus();
-
     setInterval(function(){
       getStatus();
     }, 7000);

@@ -35,6 +35,8 @@ def upload_zip(self, index, *args, **kwargs):
     structure, taking each file to the top level of the output folder.
     """
     self.index = index
+    self.index.status = "STARTED"
+    self.index.save()
     if not os.path.exists(self.index.data_folder):
         os.mkdir(self.index.data_folder)
     with zipfile.ZipFile(self.index.uploaded_data.name) as archive:
