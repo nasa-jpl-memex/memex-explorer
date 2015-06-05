@@ -61,6 +61,27 @@ class ProjectView(DetailView):
     slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"
 
+    def post(self, request, *args, **kwargs):
+        if request.POST['action'] == "index_status":
+            statuses = {}
+            for i in self.get_object().index_set.all():
+                i.status = i.celerytask.task.status
+                statuses[i.slug] = i.status
+                i.save()
+            return HttpResponse(
+                json.dumps({"statuses": statuses}),
+                content_type="application/json",
+            )
+
+        return HttpResponse(
+            json.dumps({
+                "args": args,
+                "kwargs": kwargs,
+                "post": request.POST,
+            }),
+            content_type="application/json",
+        )
+
     def get_object(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
 

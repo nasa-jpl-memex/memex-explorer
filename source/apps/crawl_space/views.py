@@ -148,8 +148,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     )),
                 content_type="application/json")
 
-
-        # TESTING reflect POST request
         return HttpResponse(json.dumps(dict(
                 args=args,
                 kwargs=kwargs,
