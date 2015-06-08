@@ -116,36 +116,30 @@ class TestIndex(UnitTestSkeleton):
             )
         )
 
-#    def test_update_index(self):
-#        """
-#        Update the index with new files.
-#        """
-#        response = self.post('base:index_settings', *self.update_index_form_data(),
-#            **self.update_index_slugs())
-#        assert 'base/project.html' in response.template_name
-#
-#    def test_old_files_deleted(self):
-#        """
-#        Ensure that old files have been deleted when the index is updated with
-#        new files.
-#        """
-#        assert not os.path.exists(
-#            os.path.join(
-#                settings.MEDIA_ROOT,
-#                "indices",
-#                "test-index",
-#                "data",
-#                "sample.txt"
-#            )
-#        )
-#
-#    def test_new_files_exist(self):
-#        assert os.path.exists(
-#            os.path.join(
-#                settings.MEDIA_ROOT,
-#                "indices",
-#                "test-index",
-#                "data",
-#                "sample2.txt"
-#            )
-#        )
+    def test_update_index(self):
+        """
+        Update the index with new files.
+        """
+        response = self.post('base:index_settings', self.update_index_form_data(),
+            **self.update_index_slugs())
+        assert 'base/project.html' in response.template_name
+
+        assert not os.path.exists(
+            os.path.join(
+                settings.MEDIA_ROOT,
+                "indices",
+                "test-index",
+                "data",
+                "sample.txt"
+            )
+        )
+
+        assert os.path.exists(
+            os.path.join(
+                settings.MEDIA_ROOT,
+                "indices",
+                "test-index",
+                "data",
+                "sample2.txt"
+            )
+        )

@@ -185,7 +185,8 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         `form.save`.
         """
         form.instance.project = self.get_project()
-        self.object.celerytask.delete()
+        if hasattr(self.object, "celerytask"):
+            self.object.celerytask.delete()
         if os.path.exists(self.get_index_path(self.object)):
             self.delete_folder_contents(self.get_index_path(self.object))
         self.object = form.save()
