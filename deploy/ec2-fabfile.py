@@ -193,11 +193,6 @@ def run_salt():
 def convenience_aliases():
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
 
-def start_server_running():
-    with cd('~/memex-explorer/source'):
-        run("~/memex-explorer/deploy/ec2_gunicorn_start.sh")
-
-
 
 if os.environ.get('MEMEX_IP_ADDR'):
     ip_address = os.environ.get('MEMEX_IP_ADDR')
@@ -219,20 +214,19 @@ if 'quitafterec2spinup' in sys.argv:
     quit()
 try:
     print(ssh_command)
-#    apt_installs()
+    apt_installs()
     print(mosh_command)
-#    fix_sshd_config()
+    fix_sshd_config()
 except Exception:
     print("{} failed!".format(public_dns_name))
     if not os.environ.get('MEMEX_IP_ADDR'):
         ec2.terminate_instances([instance.id])
     raise
 try:
-#    create_vagrant()
-#    install_miniconda()
-#    install_repo(public_dns_name, ip_address)
-#    run_salt()
-    start_server_running()
+    create_vagrant()
+    install_miniconda()
+    install_repo(public_dns_name, ip_address)
+    run_salt()
 except Exception:
     print(ssh_command)
     print(mosh_command)
