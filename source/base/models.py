@@ -16,9 +16,6 @@ from jinja2.runtime import Context
 
 from django.conf import settings
 
-from task_manager.file_tasks import unzip
-from task_manager.tika_tasks import create_index
-
 
 def alphanumeric_validator():
     return RegexValidator(r'^[a-zA-Z0-9-_ ]+$',
@@ -278,6 +275,7 @@ def start_container_celery(sender, instance, **kwargs):
     start_containers.delay(instance)
 
 
+# TODO: Remove this conditional entirely.
 if settings.DEPLOYMENT:
     pass
     #post_save.connect(start_container_celery, sender = Project)
@@ -291,18 +289,6 @@ def get_zipped_data_path(instance, filename):
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
     return os.path.join(settings.MEDIA_ROOT, "indices", instance.slug, "zipped_data", filename)
-
-
-def delete_folder_contents(folder):
-    for file in os.listdir(folder):
-        file_path = os.path.join(folder, file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception, e:
-            print(e)
 
 
 class Index(models.Model):
@@ -336,23 +322,16 @@ class Index(models.Model):
         validators=[zipped_file_validator()])
     data_folder = models.TextField(blank=True)
     project = models.ForeignKey(Project)
+    status = models.CharField(max_length=64, default="")
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
-        if self.uploaded_data:
-            zipped_data_path = os.path.dirname(get_zipped_data_path(self, self.uploaded_data.name))
-            if os.path.isdir(zipped_data_path):
-                delete_folder_contents(zipped_data_path)
-            super(Index, self).save(*args, **kwargs)
-            self.data_folder = self.get_dumped_data_path()
-            if os.path.isdir(self.data_folder):
-                delete_folder_contents(self.data_folder)
-            unzip(self.uploaded_data.name, self.data_folder)
-            if settings.DEPLOYMENT:
-                create_index.delay(self)
+        self.data_folder = self.get_dumped_data_path()
         super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
 
+    def __unicode__(self):
+        return self.name

@@ -7,6 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('base', '0001_initial'),
         ('crawl_space', '0001_initial'),
     ]
 
@@ -18,6 +19,7 @@ class Migration(migrations.Migration):
                 ('pid', models.IntegerField(default=0)),
                 ('uuid', models.TextField()),
                 ('crawl', models.OneToOneField(null=True, default=None, blank=True, to='crawl_space.Crawl')),
+                ('index', models.OneToOneField(null=True, default=None, blank=True, to='base.Index')),
             ],
             options={
             },

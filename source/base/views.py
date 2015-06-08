@@ -27,7 +27,7 @@ from apps.crawl_space.models import Crawl
 from apps.crawl_space.settings import CRAWL_PATH
 from apps.crawl_space.views import ProjectObjectMixin
 
-from task_manager.tika_tasks import create_index
+from task_manager.file_tasks import upload_zip
 
 
 def project_context_processor(request):
@@ -61,6 +61,27 @@ class ProjectView(DetailView):
     slug_url_kwarg = 'project_slug'
     template_name = "base/project.html"
 
+    def post(self, request, *args, **kwargs):
+        if request.POST['action'] == "index_status":
+            statuses = {}
+            for x in self.get_object().index_set.all():
+                x.status = x.celerytask.task.status
+                statuses[x.slug] = x.status
+                x.save()
+            return HttpResponse(
+                json.dumps({"statuses": statuses}),
+                content_type="application/json",
+            )
+
+        return HttpResponse(
+            json.dumps({
+                "args": args,
+                "kwargs": kwargs,
+                "post": request.POST,
+            }),
+            content_type="application/json",
+        )
+
     def get_object(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
 
@@ -83,7 +104,7 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
-        """Remove crawls and folders for crawls."""
+        # Remove crawls and folders for crawls.
         # for crawl in self.get_crawls():
         #     shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
         #     crawl.delete()
@@ -111,7 +132,16 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         return self.object.get_absolute_url()
 
     def form_valid(self, form):
+        """
+        Add a project key:value for the form, then get the object created by
+        `form.save`.
+        """
         form.instance.project = self.get_project()
+        self.object = form.save()
+        if settings.DEPLOYMENT:
+            upload_zip.delay(self.object)
+        else:
+            upload_zip(self.object)
         return super(AddIndexView, self).form_valid(form)
 
 
@@ -121,6 +151,20 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
     form_class = IndexSettingsForm
     success_message = "Index was edited successfully."
     template_name_suffix = '_update_form'
+
+    def get_index_path(self, index):
+        return os.path.join(settings.MEDIA_ROOT, "indices", index.slug)
+
+    def delete_folder_contents(self, folder):
+        for file in os.listdir(folder):
+            file_path = os.path.join(folder, file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception, e:
+                print(e)
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
@@ -134,6 +178,25 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
+    def form_valid(self, form):
+        """
+        Add a project key:value for the form, then get the object created by
+        `form.save`.
+        """
+        form.instance.project = self.get_project()
+        if hasattr(self.object, "celerytask"):
+            self.object.celerytask.delete()
+        if os.path.exists(self.get_index_path(self.object)):
+            self.delete_folder_contents(self.get_index_path(self.object))
+        self.object = form.save()
+        # If we are in deployment mode, use the asynced version. If not, use the
+        # synced version.
+        if settings.DEPLOYMENT:
+            upload_zip.delay(self.object)
+        else:
+            upload_zip(self.object)
+        return super(IndexSettingsView, self).form_valid(form)
 
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
@@ -155,4 +218,3 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
-
