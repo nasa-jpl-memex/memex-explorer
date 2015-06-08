@@ -85,6 +85,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(unique=True, max_length=64)),
                 ('uploaded_data', models.FileField(upload_to=base.models.get_zipped_data_path, validators=[django.core.validators.RegexValidator(b'.*\\.(ZIP|zip)$', b'Only compressed archive (.zip) files are allowed.')])),
                 ('data_folder', models.TextField(blank=True)),
+                ('status', models.CharField(default=b'', max_length=64)),
             ],
             options={
             },

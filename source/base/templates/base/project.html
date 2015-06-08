@@ -51,11 +51,13 @@
       </h4>
 
       {% if project.index_set.all %}
-      <ul class="list-group">
+      <ul id="statuses" class="list-group">
         {%  for w in project.index_set.all %}
         <li class="list-group-item">
-        <a id="link-crawls" href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
-          <i class="fa fa-archive"></i>&nbsp{{ w.name }}
+            <a href={% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}>
+                <i class="fa fa-archive"></i>&nbsp{{ w.name }}
+            </a>
+            <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
         </li>
         {% endfor %}
        </ul>

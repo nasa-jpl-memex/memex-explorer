@@ -144,7 +144,6 @@ class TestViews(UnitTestSkeleton):
             form_data, **self.slugs)
         assert_form_errors(response, 'crawl_model', 'crawler')
 
-    @pytest.mark.xfail
     def test_add_crawl_success(self):
         """Post with a valid form payload, and assert that
         the client is redirected to the appropriate crawl page."""

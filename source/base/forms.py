@@ -91,6 +91,15 @@ class IndexSettingsForm(AddIndexForm):
         self.index_instance = kwargs["instance"]
         super(IndexSettingsForm, self).__init__(*args, **kwargs)
 
+    def set_layout(self):
+        """Called in __init__ to register a custom layout."""
+        self.helper.layout = Layout(
+            Fieldset(None,
+                'uploaded_data',
+                FormActions(Submit('submit', "Submit"))
+            )
+        )
+
     class Meta:
         model = Index
         fields = ['uploaded_data']

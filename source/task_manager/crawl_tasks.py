@@ -95,6 +95,10 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
+    """
+    Check whether a CeleryTask already exists. If no, create the new object. If
+    yes (IntegrityError), update the rows of the already existing object.
+    """
     try:
         self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
@@ -143,6 +147,10 @@ def ache(self, crawl, *args, **kwargs):
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
+    """
+    Check whether a CeleryTask already exists. If no, create the new object. If
+    yes (IntegrityError), update the rows of the already existing object.
+    """
     try:
         self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
