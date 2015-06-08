@@ -13,13 +13,13 @@ class UploadZipTask(Task):
     abstract = True
 
     def on_failure(self, *args, **kwargs):
-        """If there is an error, set the index status to UPLOAD FAILED."""
+        """If there is an error, set the index status to UPLOAD FAILURE."""
         self.index.status = "UPLOAD FAILURE"
         self.index.save()
 
     def on_success(self, *args, **kwargs):
         """
-        If the upload task succeeded, change index status to UPLOAD SUCCEEDED.
+        If the upload task succeeded, change index status to UPLOAD SUCCESS.
 
         If we are in deployment mode, create the corresponding index after the task
         has succeeded.

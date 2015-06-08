@@ -332,3 +332,6 @@ class Index(models.Model):
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
+
+    def __unicode__(self):
+        return self.name

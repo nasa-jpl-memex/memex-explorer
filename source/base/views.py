@@ -179,17 +179,23 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         context["name"] = self.get_object().name
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+    def form_valid(self, form):
+        """
+        Add a project key:value for the form, then get the object created by
+        `form.save`.
+        """
+        form.instance.project = self.get_project()
+        self.object.celerytask.delete()
         if os.path.exists(self.get_index_path(self.object)):
             self.delete_folder_contents(self.get_index_path(self.object))
+        self.object = form.save()
         # If we are in deployment mode, use the asynced version. If not, use the
         # synced version.
         if settings.DEPLOYMENT:
             upload_zip.delay(self.object)
         else:
             upload_zip(self.object)
-        return super(IndexSettingsView, self).post(request, *args, **kwargs)
+        return super(IndexSettingsView, self).form_valid(form)
 
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
