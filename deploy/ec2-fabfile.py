@@ -28,6 +28,7 @@ import logging
 
 MEMEX_APP_PORT = 8000
 SETTINGS_FILENAME = '/vagrant/source/memex/local_settings.py'
+HTPASSWD_FILENAME = '/vagrant/deploy/dot-htpasswd'
 
 #based on https://github.com/ContinuumIO/wakari-deploy/blob/master/ami_creation/fabfile.py
 
@@ -181,6 +182,7 @@ def install_repo(public_dns_name, ip_address):
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
+    run("echo {} > {}".format(os.environ.get('HTPASSWD'), HTPASSWD_FILENAME))
 
 def run_salt():
     sudo('mkdir -p /etc/salt')
