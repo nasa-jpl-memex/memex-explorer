@@ -9,7 +9,9 @@ Testing Projects
 
 Project Creation
 ================
-1. When you start up the application, you should see a landing page with a button for adding a new project. Click this button.
+When you start up the application, you should see a landing page with a button for adding a new project.
+
+1. Click the new project button.
 2. Provide a name and a description for the project on the next page, and press submit.
 3. Verify that you see a green banner at the top of the screen confirming that you have successfully created the project.
 
@@ -42,7 +44,7 @@ Testing Indices
 
 Index Creation
 ==============
-1. Create a new project for testing.
+1. Create a new project.
 2. Click on the "Add Index" button either in the sidebar or under the list of indices on the project page.
 3. Add an index. Give the index a name and a zip file. There are two zipfiles in the repository to use, located at "source/resources/test_resources". Click submit.
 4. Verify that the index was added successfully by checking for the success message at the top of the page.
@@ -65,3 +67,11 @@ Index Settings
 4. Verify that the new files were added to the newly created index.
 5. Return to the index settings page and click the "trashcan" icon. As before, confirm that the cancel button works, and then delete the index. 
 6. Confirm that the index was deleted successfully by looking at the list of indices on the project overview page.
+
+**************
+Testing Crawls
+**************
+
+Testing Nutch Crawls
+====================
+Potato.
