@@ -50,5 +50,18 @@ Index Creation
 
 .. image:: _static/img/testing_guide/index_creation_success.png
 
-6. In your browser, open a new tab or window and goto http://localhost:9200/.
+6. In your browser, open a new tab or window and goto http://localhost:9200/. This is the location of the elasticsearch instance.
 7. Navigate to your newly created index using the following URL structure: localhost:9200/<index_name>/_search?pretty.
+8. Verify that the newly created index reflects the number of documents in your zipfile and the content of those documents.
+
+Index Settings
+==============
+1. Click on the link to the index on the project overview page. This will take you to the index settings page.
+
+.. image:: _static/img/testing_guide/edit_index_link.png
+
+2. Supply a new zipfile for the index creation. Use the zipfile that you did not use earlier -- "sample2.zip" if you earlier used "sample.zip".
+3. Verify that the index was updated successfully by checking the indices list. 
+4. Verify that the new files were added to the newly created index.
+5. Return to the index settings page and click the "trashcan" icon. As before, confirm that the cancel button works, and then delete the index. 
+6. Confirm that the index was deleted successfully by looking at the list of indices on the project overview page.
