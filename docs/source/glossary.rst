@@ -1,4 +1,6 @@
-.. glossary::
+########
+Glossary
+########
 
    Service
       Anything that provides an external functionality not included directly in Memex Explorer.  Current examples include particular Docker containers holding specific versions of applications such as Tika, Kibana, Elasticsearch.
