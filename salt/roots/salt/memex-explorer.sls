@@ -1,6 +1,8 @@
 /vagrant/source/memex/settings.py:
   file.copy:
     - source: /vagrant/source/memex/settings_files/deploy_settings.py
+    - user: vagrant
+    - force: True
 
 LOCAL_PATH:
   file.append:

@@ -24,7 +24,7 @@ from base.forms import (AddProjectForm, ProjectSettingsForm, AddIndexForm,
     IndexSettingsForm)
 
 from apps.crawl_space.models import Crawl
-from apps.crawl_space.settings import CRAWL_PATH
+from memex.settings import CRAWL_PATH
 from apps.crawl_space.views import ProjectObjectMixin
 
 from task_manager.file_tasks import upload_zip
