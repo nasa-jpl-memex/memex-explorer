@@ -7,6 +7,7 @@ import shutil
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
 from django.test import TestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
+
 import pytest
 
 # App
@@ -29,7 +30,6 @@ class TestViews(UnitTestSkeleton):
     def setUpClass(cls):
         """Initialize a test project and crawl model,
         and save them to the test database."""
-
         super(TestViews, cls).setUpClass()
 
         cls.test_project = Project(
@@ -186,4 +186,3 @@ class TestViews(UnitTestSkeleton):
         response = self.post('base:crawl_space:delete_crawl',
             **self.crawl_slugs)
         assert 'base/project.html' in response.template_name
-
