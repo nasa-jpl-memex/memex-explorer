@@ -103,7 +103,7 @@ STATIC_URL = '/static/'
 
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
-MEDIA_ROOT = '/home/vagrant/resources'
+MEDIA_ROOT = os.path.join(BASE_DIR, "resources")
 
 MEDIA_URL = '/resources/'
 
