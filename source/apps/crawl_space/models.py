@@ -16,8 +16,8 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (resources_dir, MODEL_PATH, CRAWL_PATH,
-                                       SEEDS_TMP_DIR, MODELS_TMP_DIR)
+from apps.crawl_space.settings import (resources_dir,
+    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
