@@ -25,7 +25,7 @@ from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard
-from memex.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
+from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 
 from task_manager.tika_tasks import create_index
 from task_manager.crawl_tasks import nutch, ache, ache_log_statistics, cca_dump

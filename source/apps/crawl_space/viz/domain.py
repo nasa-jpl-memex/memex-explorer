@@ -15,7 +15,7 @@ import subprocess
 import shlex
 from StringIO import StringIO
 
-from memex.settings import CRAWL_PATH
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 GREEN = "#47a838"

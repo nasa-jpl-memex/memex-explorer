@@ -112,26 +112,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 PROJECT_PATH = os.path.join(MEDIA_ROOT, "projects")
 
-
-# Crawl Space Settings Files
-
-LANG_DETECT_PATH = os.path.join(MEDIA_ROOT, 'profiles')
-
-CONFIG_PATH = os.path.join(MEDIA_ROOT, 'configs')
-
-CCA_PATH = os.path.join(MEDIA_ROOT, 'cca')
-
-CRAWL_PATH = os.path.join(MEDIA_ROOT, 'crawls')
-
-MODEL_PATH = os.path.join(MEDIA_ROOT, 'models')
-
-IMAGES_PATH = os.path.join(MEDIA_ROOT, 'images')
-
-SEEDS_TMP_DIR = os.path.join(MEDIA_ROOT, 'seeds_tmp')
-
-MODELS_TMP_DIR = os.path.join(MEDIA_ROOT, 'models_tmp')
-
-
 # Logging
 import logging
 

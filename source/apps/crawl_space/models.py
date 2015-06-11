@@ -16,7 +16,8 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from memex.settings import MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR, MEDIA_ROOT
+from apps.crawl_space.settings import (resources_dir, MODEL_PATH, CRAWL_PATH,
+                                       SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
@@ -176,7 +177,7 @@ class Crawl(models.Model):
         if self.pk is None:
             # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(CRAWL_PATH, self.slug)
+            self.location = os.path.join(resources_dir, "crawls", self.slug)
             super(Crawl, self).save(*args, **kwargs)
 
             # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists

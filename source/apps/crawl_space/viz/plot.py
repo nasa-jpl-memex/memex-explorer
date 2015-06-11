@@ -9,7 +9,7 @@ import pandas as pd
 
 from harvest import Harvest
 from domain import Domain
-from memex.settings import CRAWL_PATH
+from apps.crawl_space.settings import CRAWL_PATH
 
 
 class PlotsNotReadyException(Exception):

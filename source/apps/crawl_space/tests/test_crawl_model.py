@@ -75,4 +75,3 @@ class TestAddDataModelView(UnitTestSkeleton):
                 'features': self.get_features_file(),
             },
             **self.slugs)
-

@@ -83,4 +83,3 @@ class TestPlots(UnitTestSkeleton):
         harvest = self.dashboard.get_harvest_plot()
         for x in harvest:
             assert x
-

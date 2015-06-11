@@ -12,7 +12,7 @@ from django.db import IntegrityError
 
 from task_manager.models import CeleryTask
 
-from memex.settings import LANG_DETECT_PATH, CCA_PATH
+from apps.crawl_space.settings import LANG_DETECT_PATH, CCA_PATH
 from apps.crawl_space.models import Crawl
 
 # TODO - pull out this hardcode search
