@@ -29,7 +29,7 @@ resources_dir = settings.MEDIA_ROOT
 LANG_DETECT_PATH = os.path.join(crawl_resources_dir, 'profiles')
 
 CCA_PATH = os.path.join(resources_dir, 'cca')
-CRAWL_PATH = os.path.join(crawl_resources_dir, 'crawls')
+CRAWL_PATH = os.path.join(resources_dir, 'crawls')
 MODEL_PATH = os.path.join(resources_dir, 'models')
 CONFIG_PATH = os.path.join(crawl_resources_dir, 'configs')
 IMAGES_PATH = os.path.join(resources_dir, 'images')
