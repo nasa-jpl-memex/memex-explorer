@@ -27,7 +27,8 @@ from fabric.contrib.files import (
 import logging
 
 MEMEX_APP_PORT = 8000
-SETTINGS_FILENAME = '/home/ubuntu/memex-explorer/source/memex/local_settings.py'
+SETTINGS_FILENAME = '/vagrant/source/memex/local_settings.py'
+HTPASSWD_FILENAME = '/vagrant/deploy/dot-htpasswd'
 
 #based on https://github.com/ContinuumIO/wakari-deploy/blob/master/ami_creation/fabfile.py
 
@@ -67,7 +68,6 @@ def create_box():
     machine = ec2.run_instances(AMI_ID, key_name=KEYNAME,
         security_groups=['all-open',], instance_type='m3.2xlarge')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
-    #It is utterly inefficient and stupid to run through all of these.
     print(new_instance.id)
     while new_instance.state != u'running':
         time.sleep(3)
@@ -131,19 +131,26 @@ def connect_to_existing_machine(ip, key_file_path):
     log.debug('Trying to connect...')
     run('pwd')
 
+def create_vagrant():
+    #Not idempotent
+    log.info("creating vagrant user")
+    sudo("sudo id -u vagrant &>/dev/null || sudo useradd vagrant -m -G sudo -p '*' --shell /bin/bash")
+    sudo("passwd -d vagrant")
+    run("echo 'vagrant ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/vagrant")
+    sudo("cp -rf /home/ubuntu/.ssh /home/vagrant/.ssh")
+    sudo("chown vagrant:vagrant /home/vagrant/.ssh")
+    sudo("chown vagrant:vagrant /home/vagrant/.ssh/authorized_keys")
+    env.user = 'vagrant'
+    log.debug('Trying to connect as vagrant...')
+    run('pwd')
+
+
 
 def apt_installs():
     log.info("installing packages with apt-get")
-    sudo("add-apt-repository -y ppa:keithw/mosh")
+    sudo("add-apt-repository -y ppa:saltstack/salt")
     sudo("apt-get update -y")
-    packages = [
-        'nginx',
-        'docker',
-        'git',
-        'silversearcher-ag',
-        'python-software-properties',
-        'mosh',
-        'tig']
+    packages = ['salt-master', 'salt-minion', 'salt-syndic', 'git', 'tig']
     sudo("apt-get install -y {}".format(' '.join(packages)))
 
 def fix_sshd_config():
@@ -161,41 +168,30 @@ def install_miniconda():
     run("source ~/.bashrc")
 
 def install_repo(public_dns_name, ip_address):
+    sudo('rm -rf ~/memex-explorer')
     url = 'https://github.com/memex-explorer/memex-explorer/'
     if os.environ.get('GIT_BRANCH'):
         run("git clone {} --branch {}".format(url, os.environ.get('GIT_BRANCH')))
     else:
         run("git clone {}".format(url))
-    sudo("ln -s ~/memex-explorer/source/memex/settings_files/deploy_settings.py ~/memex-explorer/source/memex/settings.py")
-    run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
+    sudo('rm -rf /vagrant')
+    sudo('mv /home/vagrant/memex-explorer /vagrant')
+    sudo('chown -R vagrant:vagrant /vagrant')
+    sudo("find /vagrant -type f -name '*' -print0 | sudo xargs -0 chown vagrant:vagrant")
+    sudo('ln -s /vagrant /home/vagrant/memex-explorer')
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
-    run("echo 'DOCKER_COMPOSE_PATH = \"{}\"' >> {}".format("/home/ubuntu/miniconda/bin/docker-compose", SETTINGS_FILENAME))
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py migrate")
-    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py create_apps_Tika_ES_Kibana")
+    run("echo {} > {}".format(os.environ.get('HTPASSWD'), HTPASSWD_FILENAME))
 
-def start_nginx():
-    run("~/miniconda/bin/python ~/memex-explorer/source/manage.py refresh_nginx")
+def run_salt():
+    sudo('mkdir -p /etc/salt')
+    sudo('ln -f -s /vagrant/salt/minion /etc/salt/minion')
+    sudo('ln -f -s /vagrant/salt/roots/salt /srv/salt')
+    sudo('sudo /usr/bin/salt-call state.highstate --retcode-passthrough --log-level=debug | tee /home/vagrant/salt-log')
 
-def install_docker():
-    run("chmod +x ~/memex-explorer/deploy/install-docker.sh")
-    run("~/memex-explorer/deploy/install-docker.sh")
-    run("~/miniconda/bin/pip install requests==2.5.3") #in case docker-compose looks outside the conda environment when run under sudo
-    run("~/miniconda/bin/pip install docker-compose")
-    sudo("ln -s ~/miniconda/bin/docker-compose /bin/docker-compose")
-    sudo("docker pull elasticsearch")
-    sudo("docker pull continuumio/tika")
-    sudo("docker pull continuumio/kibana")
-
-def conventience_aliases():
+def convenience_aliases():
     run("echo 'alias dj=\"~/miniconda/bin/python ~/memex-explorer/source/manage.py\"' >> ~/.bashrc")
-
-def start_server_running():
-    with cd('~/memex-explorer/source'):
-        run("~/memex-explorer/deploy/ec2_gunicorn_start.sh")
-
 
 
 if os.environ.get('MEMEX_IP_ADDR'):
@@ -203,14 +199,6 @@ if os.environ.get('MEMEX_IP_ADDR'):
     key_filename = os.path.abspath('./ec2-{}.pem'.format(ip_address))
     public_dns_name = 'ec2-{}.compute-1.amazonaws.com'.format(ip_address.replace('.','-'))
     connect_to_existing_machine(ip_address, key_filename)
-    with cd("~/memex-explorer"):
-        if os.environ.get('GIT_BRANCH'):
-            run("git pull origin {}".format(os.environ.get('GIT_BRANCH')))
-        else:
-            run("git pull origin master")
-    run("~/miniconda/bin/conda env update --name root --file ~/memex-explorer/environment.yml")
-    run("echo 'yes' | ~/miniconda/bin/python ~/memex-explorer/source/manage.py collectstatic")
-    start_server_running()
 else:
     key_filename = create_keypair()
     instance = create_box()
@@ -235,11 +223,10 @@ except Exception:
         ec2.terminate_instances([instance.id])
     raise
 try:
+    create_vagrant()
     install_miniconda()
     install_repo(public_dns_name, ip_address)
-    start_nginx()
-    install_docker()
-    start_server_running()
+    run_salt()
 except Exception:
     print(ssh_command)
     print(mosh_command)

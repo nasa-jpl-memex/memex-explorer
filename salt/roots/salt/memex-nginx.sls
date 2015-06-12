@@ -2,7 +2,13 @@
   file.copy:
     - force: True
     - makedirs: True
-    - source: /vagrant/deploy/dockerless/default
+    - source: /vagrant/deploy/nginx.conf
+
+/etc/nginx/.htpasswd:
+  file.copy:
+    - force: True
+    - makedirs: True
+    - source: /vagrant/deploy/dot-htpasswd
 
 nginx:
   pkg:
