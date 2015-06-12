@@ -24,21 +24,21 @@ kibana-pulled:
 
 elasticsearch-running:
   cmd.run:
-    - name: docker run -d -p 9200:9200 -p 9300:9300 -v /vagrant/source/container_volumes/elasticsearch/data:/data --name=elasticsearch elasticsearch
-    - unless: docker ps | grep elasticsearch
+    - name: docker run -d -p 9200:9200 -p 9300:9300 -v /vagrant/source/container_volumes/elasticsearch/data:/data --name=elasticsearch_1 elasticsearch
+    - unless: "docker ps | grep elasticsearch"
     - require:
         - docker: elasticsearch-pulled
 
 tika-running:
   cmd.run:
     - name: docker run -d -p 9998:9998 continuumio/tika
-    - unless: docker ps | grep continuumio/tika
+    - unless: "docker ps | grep continuumio/tika"
     - require:
         - docker: tika-pulled
 
 kibana-running:
   cmd.run:
-    - name: docker run -d -p 9999:80 -e KIBANA_SECURE=false --link elasticsearch:es  continuumio/kibana
-    - unless: docker ps | grep continuumio/kibana
+    - name: docker run -d -p 9999:80 -e KIBANA_SECURE=false --link elasticsearch_1:es  continuumio/kibana
+    - unless: "docker ps | grep continuumio/kibana"
     - require:
         - docker: kibana-pulled
