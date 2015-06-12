@@ -22,14 +22,16 @@ from django.conf import settings
 
 resources_dir = settings.MEDIA_ROOT
 
+crawl_resources_dir = os.path.join(settings.BASE_DIR, "resources")
+
 # ACHE language detection files.
 # TODO Investigate using conda-installed ACHE resources.
-LANG_DETECT_PATH = os.path.join(resources_dir, 'profiles')
+LANG_DETECT_PATH = os.path.join(crawl_resources_dir, 'profiles')
 
 CCA_PATH = os.path.join(resources_dir, 'cca')
 CRAWL_PATH = os.path.join(resources_dir, 'crawls')
 MODEL_PATH = os.path.join(resources_dir, 'models')
-CONFIG_PATH = os.path.join(resources_dir, 'configs')
+CONFIG_PATH = os.path.join(crawl_resources_dir, 'configs')
 IMAGES_PATH = os.path.join(resources_dir, 'images')
 
 # Directory to store seed files temporary. See `Crawl.save()` in
