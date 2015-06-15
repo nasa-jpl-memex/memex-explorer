@@ -11,6 +11,7 @@ from fabric.api import (
     env,
     settings,
     sudo,
+    put,
     prefix,
     cd,
     run,
@@ -29,6 +30,16 @@ import logging
 MEMEX_APP_PORT = 8000
 SETTINGS_FILENAME = '/vagrant/source/memex/local_settings.py'
 HTPASSWD_FILENAME = '/vagrant/deploy/dot-htpasswd'
+
+def check_env_vars():
+    missing = []
+    for varname in ['AWS_ID', 'AWS_SECRET', 'HTPASSWD_PATH',]:
+       if os.environ.get(varname, 'XXX').lower() == 'xxx':
+           missing.append(varname)
+    if missing:
+        raise ValueError("The following environment variables must be defined:\n{}".format('\n- '.join(missing)))
+
+check_env_vars()
 
 #based on https://github.com/ContinuumIO/wakari-deploy/blob/master/ami_creation/fabfile.py
 
@@ -62,6 +73,7 @@ env.connection_attempts = True
 env.timeout = 40
 
 KEYNAME = "{}-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
+
 
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
@@ -182,7 +194,7 @@ def install_repo(public_dns_name, ip_address):
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
-    run("echo {} > {}".format(os.environ.get('HTPASSWD'), HTPASSWD_FILENAME))
+    put(os.environ.get('HTPASSWD_PATH'), HTPASSWD_FILENAME)
 
 def run_salt():
     sudo('mkdir -p /etc/salt')
