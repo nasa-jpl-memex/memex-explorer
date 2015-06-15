@@ -16,7 +16,7 @@ def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (resources_dir,
+from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
     MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
@@ -138,7 +138,7 @@ class Crawl(models.Model):
         return crawl_path
 
     def get_default_config(self):
-        return os.path.join(resources_dir, "configs", "config_default")
+        return os.path.join(crawl_resources_dir, "configs", "config_default")
 
     def get_solr_url(self):
         return SOLR_URL
