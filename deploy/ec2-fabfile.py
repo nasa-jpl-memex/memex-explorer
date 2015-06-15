@@ -186,8 +186,8 @@ def install_repo(public_dns_name, ip_address):
 
 def run_salt():
     sudo('mkdir -p /etc/salt')
-    sudo('ln -f -s /vagrant/salt/deploy/minion /etc/salt/minion')
-    sudo('ln -f -s /vagrant/salt/deploy/roots/salt /srv/salt')
+    sudo('ln -f -s /vagrant/deploy/salt/minion /etc/salt/minion')
+    sudo('ln -f -s /vagrant/deploy/salt/roots/salt /srv/salt')
     sudo('sudo /usr/bin/salt-call state.highstate --retcode-passthrough --log-level=debug | tee /home/vagrant/salt-log')
 
 def convenience_aliases():
