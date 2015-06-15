@@ -82,7 +82,7 @@ supervisor:
            /home/vagrant/miniconda/bin:/home/ubuntu/miniconda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
     - require:
         - sls: conda-memex
-    - unless: test -e /home/vagrant/gunicorn_supervisor.sock
+    - unless: test -e /home/vagrant/supervisor.sock
 
 reload-supervisor:
   cmd.run:
