@@ -1,19 +1,21 @@
 $(document).ready(function(){
 (function(){
 
-  var uploadAjax = document.getElementById("upload_ajax");
-  var indexName = document.getElementById("name");
-  var submitButton = document.getElementById("submit");
+  var uploadAjax = document.getElementById("upload_data");
 
   uploadAjax.onsubmit = function(event){
     event.preventDefault();
+    var zipfile = uploadAjax.uploaded_data.files[0];
+    var name = uploadAjax.name;
+
+    var formData = new FormData();
+    formData.append("name", name);
+    formData.append("uploaded_data", zipfile, zipfile.name);
+
+    window.formData = formData;
+
+    var xhr = new XMLHttpRequest();
   }
-
-  var uploadedFiles = document.getElementById("uploaded_files");
-  var files = uploadedFiles.files;
-  var formData = new FormData();
-
-  window.uploadAjax = uploadAjax;
 
 })();
 });

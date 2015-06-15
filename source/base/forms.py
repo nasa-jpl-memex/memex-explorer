@@ -70,8 +70,9 @@ class AddIndexForm(CrispyModelForm):
                 'name',
                 'uploaded_data',
                 FormActions(Submit('submit', "Submit"))
-            )
+            ),
         )
+        self.helper.form_id="upload_data"
 
     def clean_name(self):
         name = self.cleaned_data['name']
