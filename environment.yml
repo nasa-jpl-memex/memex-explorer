@@ -31,3 +31,4 @@ dependencies:
         - sphinx-rtd-theme
         - celery
         - elasticsearch
+        - supervisor
