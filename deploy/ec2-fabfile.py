@@ -87,8 +87,8 @@ def create_keypair(source = KEYNAME):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
-    latest_filename = os.environ.get('EC2_KEY_PATH', './latest.pem')
+    filename = os.environ.get('EC2_KEY_PATH', './keys/ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
+    latest_filename = os.environ.get('EC2_KEY_PATH', './keys/latest.pem')
     kfile = open(filename, 'wb')
     latest_kfile = open(latest_filename, 'wb')
     def file_mode(user, group, other):
@@ -196,7 +196,7 @@ def convenience_aliases():
 
 if os.environ.get('MEMEX_IP_ADDR'):
     ip_address = os.environ.get('MEMEX_IP_ADDR')
-    key_filename = os.path.abspath('./ec2-{}.pem'.format(ip_address))
+    key_filename = os.path.abspath('./keys/ec2-{}.pem'.format(ip_address))
     public_dns_name = 'ec2-{}.compute-1.amazonaws.com'.format(ip_address.replace('.','-'))
     connect_to_existing_machine(ip_address, key_filename)
 else:
