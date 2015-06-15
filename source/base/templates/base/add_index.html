@@ -2,6 +2,12 @@
 {% load crispy_forms_tags %}
 
 {% block title %}Add Index{% endblock %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/upload_ajax.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 {% include "base/sidebar.html" %}
