@@ -71,3 +71,5 @@ deploy/keys/*.pem
 deploy/keys/latest.pem
 deploy/keys/production.pem
 
+#deployment script with AWS credentials
+deploy/nocommit.sh
