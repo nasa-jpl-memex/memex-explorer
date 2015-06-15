@@ -19,7 +19,40 @@ The installation process for the virtual machine can take about an hour, dependi
 
 # Deploying
 
-The documentation for remote deployment to EC2 is currently a work in progress.  For now, refer to https://github.com/memex-explorer/memex-explorer/issues/559
+The current method for deploying to the web is to deploy to ec2 by running a
+fabric script with a few environment variables set.
+
+$ git clone https://github.com/memex-explorer/memex-explorer
+$ cd memex-explorer/deploy
+$ conda env create --file deploy_environment.yml
+$ source activate memex_deploy
+$ cp deploy_ec2.sh nocommit.sh
+
+Now edit the file nocommit.sh. It will contain three environment variables
+which you must set and which you must not commit to the public repository.
+
+    AWS_KEY_ID: The key id for your aws account
+
+    AWS SECRET: the key secret for your aws account
+
+    HTPASSWD: the HTTP login password. Deploys to the web 
+
+Additionally, you can choose to deploy a different git branch than the production branch.
+
+Once you have set these variables, you can start a new machine with `source nocommit.sh`, which
+will create an ec2-machine, place a login key for it in memex-explorer/deploy/keys and run the deploy script on the new machine.
+
+The login key for the new machine will be given three names:
+
+    One based on the IP address of the new server.
+
+    One based on the creation time of the new server.
+
+    latest.pem, a convenience to logging in to the most-recently-created server.
+
+To connect to a machine given an IP address of 54.167.11.71, log in with the command
+
+    ssh -i keys/ec2-54.167.11.71.pem vagrant@54.167.11.71
 
 
 # Testing
