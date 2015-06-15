@@ -44,7 +44,7 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder "salt/roots/", "/srv"
+  config.vm.synced_folder "deploy/salt/roots/", "/srv"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -77,7 +77,7 @@ Vagrant.configure(2) do |config|
 
     ## Use all the defaults:
   config.vm.provision :salt do |salt|
-    salt.minion_config = "salt/minion"
+    salt.minion_config = "deploy/salt/minion"
     salt.run_highstate = true
     salt.verbose = true
   end
