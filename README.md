@@ -35,7 +35,8 @@ which you must set and which you must not commit to the public repository.
 
     AWS SECRET: the key secret for your aws account
 
-    HTPASSWD: the HTTP login password. Deploys to the web 
+    HTPASSWD_PATH: the HTTP login password path. This file should have been given to you. (If not email ...possibly @ahmadia ?).
+    place it at a location not tracked by git and enter the absolute path to this location in the value of this variable.
 
 Additionally, you can choose to deploy a different git branch than the production branch.
 
@@ -54,6 +55,7 @@ To connect to a machine given an IP address of 54.167.11.71, log in with the com
 
     ssh -i keys/ec2-54.167.11.71.pem vagrant@54.167.11.71
 
+After the setup script is done running, you will be able to access the application by entering the IP address into your browser.
 
 # Testing
 
