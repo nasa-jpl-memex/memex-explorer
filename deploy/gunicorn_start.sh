@@ -2,7 +2,7 @@
 
 NAME="memex_explorer"                                  # Name of the application
 DJANGODIR=/vagrant/source             # Django project directory
-SOCKFILE=/tmp/gunicorn_supervisor.sock # we will communicte using this unix socket
+SOCKFILE=/home/vagrant/gunicorn.sock # we will communicte using this unix socket
 USER=vagrant
 GROUP=vagrant
 NUM_WORKERS=3                                     # how many worker processes should Gunicorn spawn
