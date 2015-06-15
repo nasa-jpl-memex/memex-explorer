@@ -131,9 +131,10 @@ class EnvVar(models.Model):
     name = models.TextField(max_length=64)
     value = models.TextField(max_length=256, default='')
 
+# We are no longer having memex-explorer spin up additional containers dynamically.
+#Much of this is now dead code that can be removed. -- @amfarrell
 class Container(models.Model):
     """
-
     """
     NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
     DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')

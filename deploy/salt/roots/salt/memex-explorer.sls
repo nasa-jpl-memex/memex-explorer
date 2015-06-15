@@ -14,12 +14,9 @@ local_settings_path:
      - name: LOCAL_SETTINGS_PATH
      - value: /vagrant/source/memex/local_settings.py
 
-
-# TODO: The create_apps_Tika_ES_Kibana is not idempotent.  This needs
-# to be fixed or the command needs to be protected so that it only
-# executes when the applications need to be created.
-# As a workaround, the SQL database is currently reset on each provision.
-
+# We originally reset the database on each reprovision because of a database-modifying function that was not idempotent.
+# This may not be necessary.
+# @ahmadia, is there any other reason for it?
 reset:
   file.absent:
     - name: /vagrant/source/db.sqlite3
@@ -37,24 +34,6 @@ collectstatic:
   cmd.run:
     - name: |
         echo yes | /home/vagrant/miniconda/envs/memex/bin/python /vagrant/source/manage.py collectstatic
-    - cwd: /home/vagrant
-    - user: vagrant
-    - require:
-        - sls: conda-memex
-
-refresh_nginx:
-  cmd.run:
-    - name: |
-        /home/vagrant/miniconda/envs/memex/bin/python /vagrant/source/manage.py refresh_nginx
-    - cwd: /home/vagrant
-    - user: vagrant
-    - require:
-        - sls: conda-memex
-
-create_apps:
-  cmd.run:
-    - name: |
-        /home/vagrant/miniconda/envs/memex/bin/python /vagrant/source/manage.py create_apps_Tika_ES_Kibana
     - cwd: /home/vagrant
     - user: vagrant
     - require:
