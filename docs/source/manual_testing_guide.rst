@@ -90,7 +90,7 @@ Included with the repository is a test seeds file. You can use this file to test
 
     .. image:: _static/img/testing_guide/crawler_nutch.png
 
-    b. Add the seeds list from the test resources directory, and hit "Submit"
+    b. Add the seeds list from test_resources/test_crawl_data/cats.seeds , and hit "Submit"
 
 3. Verify that the crawl has been added successfully.
 
