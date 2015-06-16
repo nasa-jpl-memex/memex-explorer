@@ -14,13 +14,6 @@ local_settings_path:
      - name: LOCAL_SETTINGS_PATH
      - value: /vagrant/source/memex/local_settings.py
 
-# We originally reset the database on each reprovision because of a database-modifying function that was not idempotent.
-# This may not be necessary.
-# @ahmadia, is there any other reason for it?
-reset:
-  file.absent:
-    - name: /vagrant/source/db.sqlite3
-
 migrate:
   cmd.run:
     - name: |
