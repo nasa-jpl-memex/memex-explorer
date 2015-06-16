@@ -9,7 +9,15 @@
 <div class='row'>
     <div class="col-sm-5 col-sm-offset-3 col-sm-5  col-md-offset-2 main">
         <h1>Indices
-            <a id="gotoKibana" disabled style="float:right;" class="btn btn-default btn-duo center link-button" href="/{{ project.slug}}/kibana">Goto Kibana</a>
+            <a id="gotoKibana"
+                {% if not deployment %}
+                disabled
+                {% endif %}
+                style="float:right;"
+                class="btn btn-default btn-duo center link-button"
+                href="http://localhost:9999">
+                    Kibana
+                </a>
         </h1>
     </div>
     {% for index in project.index_set.all %}
@@ -49,37 +57,4 @@
         </div>
     </div>
 </div>
-<script>
-{% if deployment %}
-$(document).ready(function(){
-
-  var goto_kibana = $("#gotoKibana");
-
-  function get_kibana(){
-    return $.ajax({
-      type: "GET",
-      url: "/{{ project.slug }}/kibana/",
-      statusCode: {
-        404: function(){
-          goto_kibana.attr("disabled", true);
-        }
-      },
-      success: function(){
-        goto_kibana.attr("disabled", false);
-      }
-    });
-  }
-
-  function kibana_interval(){
-    get_kibana();
-    return setInterval(function(){
-      get_kibana();
-    }, 20000);
-  }
-
-  kibana_interval();
-
-});
-{% endif %}
-</script>
 {% endblock %}

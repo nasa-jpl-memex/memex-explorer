@@ -2,7 +2,6 @@ $(document).ready(function(){
 (function(){
 
   var uploadAjax = document.getElementById("upload_data");
-  window.uploadAjax = uploadAjax;
 
   uploadAjax.onsubmit = function(event){
     event.preventDefault();
@@ -18,9 +17,9 @@ $(document).ready(function(){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', uploadAjax.action, true);
     xhr.onload = function(){
-      if(xhr.status === 200){
+      if (xhr.status === 200){
         console.log("Success");
-      }else{
+      } else {
         console.log("Error");
       }
     }

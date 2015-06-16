@@ -69,6 +69,7 @@ class AddIndexForm(CrispyModelForm):
             Fieldset(None,
                 'name',
                 'uploaded_data',
+                HTML("<progress id='upload_progress'></progress>"),
                 FormActions(Submit('submit', "Submit"))
             ),
         )
