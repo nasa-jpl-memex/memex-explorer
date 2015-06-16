@@ -33,17 +33,18 @@ which you must set and which you must not commit to the public repository.
 
     AWS_KEY_ID: The key id for your aws account
 
-    AWS SECRET: the key secret for your aws account
+    AWS SECRET: The key secret for your aws account
 
-    HTPASSWD_PATH: the HTTP login password path. This file should have been given to you. (If not email ...possibly @ahmadia ?).
-    place it at a location not tracked by git and enter the absolute path to this location in the value of this variable.
+    HTPASSWD_PATH: The HTTP login password path. This file should have been
+    given to you.  Place it at a location not tracked by git and enter the absolute
+    path to this location in the value of this variable.
 
 Additionally, you can choose to deploy a different git branch than the production branch.
 
-Once you have set these variables, you can start a new machine with `source nocommit.sh`, which
-will create an ec2-machine, place a login key for it in memex-explorer/deploy/keys and run the deploy script on the new machine.
+Once you have set these variables, you can start a new instance with `source nocommit.sh`, which
+will create an ec2 instance, place a login key for it in memex-explorer/deploy/keys and run the deploy script on the new instance.
 
-The login key for the new machine will be given three names:
+The login key for the new instance will be given three names:
 
     One based on the IP address of the new server.
 
@@ -51,7 +52,7 @@ The login key for the new machine will be given three names:
 
     latest.pem, a convenience to logging in to the most-recently-created server.
 
-To connect to a machine given an IP address of 54.167.11.71, log in with the command
+To connect to a instance given an IP address of 54.167.11.71, log in with the command
 
     ssh -i keys/ec2-54.167.11.71.pem vagrant@54.167.11.71
 
