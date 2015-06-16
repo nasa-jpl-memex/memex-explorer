@@ -8,6 +8,7 @@ $(document).ready(function(){
   function updateProgress(event){
     var percentComplete = parseInt((event.loaded / event.total) * 100);
     progress.attr("aria-valuenow", percentComplete);
+    progress.css("width", percentComplete + "%");
     percentage.html(percentComplete + "%");
   }
 

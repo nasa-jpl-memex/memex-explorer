@@ -1,3 +1,4 @@
+$(document).ready(function(){
 (function(){
 
   function updateStatus(itemsObject){
@@ -20,12 +21,11 @@
     });
   }
 
-  $(document).ready(function(){
+  getStatus();
 
-    setInterval(function(){
-      getStatus();
-    }, 5000);
-
-  });
+  setInterval(function(){
+    getStatus();
+  }, 7000);
 
 })();
+});
