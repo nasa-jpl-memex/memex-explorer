@@ -100,6 +100,7 @@ class IndexSettingsForm(AddIndexForm):
                 FormActions(Submit('submit', "Submit"))
             )
         )
+        self.helper.form_id="upload_data"
 
     class Meta:
         model = Index

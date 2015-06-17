@@ -5,14 +5,6 @@ $(document).ready(function(){
   var progressBar = $("#progress");
   var uploadProgress = $("#upload_progress");
   var percentage = $("#upload_percentage");
-
-  function updateProgress(event){
-    var percentComplete = parseInt((event.loaded / event.total) * 100);
-    uploadProgress.attr("aria-valuenow", percentComplete);
-    uploadProgress.css("width", percentComplete + "%");
-    percentage.html(percentComplete + "%");
-  }
-
   var success = false;
   var uploading = false;
 
@@ -20,12 +12,23 @@ $(document).ready(function(){
   xhr.upload.addEventListener("progress", updateProgress, false);
   xhr.open('POST', uploadAjax.action, true);
   xhr.onload = function(){
-    if (xhr.status === 200){
+    if ((xhr.status === 200) || (xhr.status === 302)){
       success = true;
       uploading = false;
     } else {
       success = false;
       uploading = false;
+    }
+  }
+
+  function updateProgress(event){
+    var percentComplete = parseInt((event.loaded / event.total) * 100);
+    uploadProgress.attr("aria-valuenow", percentComplete);
+    uploadProgress.css("width", percentComplete + "%");
+    if (percentComplete == 100){
+      percentage.html("Completed");
+    } else {
+      percentage.html(percentComplete + "%");
     }
   }
 
