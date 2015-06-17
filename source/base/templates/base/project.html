@@ -64,7 +64,7 @@
       {% else %}
       <p>No Indices Registered.</p>
       {% endif %}
-        <a class="btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Index</a>
+        <a class="add_index btn btn-default btn-duo center link-button" target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">Add Index</a>
     </div>
     <div class="col-sm-4">
       <h4 style="line-height:2em;">

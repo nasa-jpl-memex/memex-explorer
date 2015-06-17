@@ -42,7 +42,6 @@ $(document).ready(function(){
     disableForm("upload_data");
     event.preventDefault();
     progressBar.attr("hidden", false);
-    //window.open('http://www.google.com/', 'newwindow', config='height=600, width=600, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
     var zipfile = uploadAjax.uploaded_data.files[0];
     var indexName = uploadAjax.name.value;
     var csrf_token = uploadAjax.csrfmiddlewaretoken.value;
