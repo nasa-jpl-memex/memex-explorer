@@ -13,14 +13,16 @@ $(document).ready(function(){
     percentage.html(percentComplete + "%");
   }
 
+  var success = false;
+
   var xhr = new XMLHttpRequest();
   xhr.upload.addEventListener("progress", updateProgress, false);
   xhr.open('POST', uploadAjax.action, true);
   xhr.onload = function(){
     if (xhr.status === 200){
-      console.log("Success");
+      success = true;
     } else {
-      console.log("Error");
+      success = false;
     }
   }
 
@@ -38,6 +40,12 @@ $(document).ready(function(){
     formData.append("uploaded_data", zipfile, zipfile.name);
 
     xhr.send(formData);
+  }
+
+  window.onbeforeunload = function(){
+    if (success != true){
+      return "Reloading or navgating away from this page will cause the upload to fail.";
+    }
   }
 
 })();
