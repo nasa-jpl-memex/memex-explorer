@@ -14,16 +14,6 @@ local_settings_path:
      - name: LOCAL_SETTINGS_PATH
      - value: /vagrant/source/memex/local_settings.py
 
-
-# TODO: The create_apps_Tika_ES_Kibana is not idempotent.  This needs
-# to be fixed or the command needs to be protected so that it only
-# executes when the applications need to be created.
-# As a workaround, the SQL database is currently reset on each provision.
-
-reset:
-  file.absent:
-    - name: /vagrant/source/db.sqlite3
-
 migrate:
   cmd.run:
     - name: |
@@ -42,24 +32,6 @@ collectstatic:
     - require:
         - sls: conda-memex
 
-refresh_nginx:
-  cmd.run:
-    - name: |
-        /home/vagrant/miniconda/envs/memex/bin/python /vagrant/source/manage.py refresh_nginx
-    - cwd: /home/vagrant
-    - user: vagrant
-    - require:
-        - sls: conda-memex
-
-create_apps:
-  cmd.run:
-    - name: |
-        /home/vagrant/miniconda/envs/memex/bin/python /vagrant/source/manage.py create_apps_Tika_ES_Kibana
-    - cwd: /home/vagrant
-    - user: vagrant
-    - require:
-        - sls: conda-memex
-
 celery:
   cmd.run:
     - name: /home/vagrant/miniconda/envs/memex/bin/celery --detach --loglevel=debug --logfile=/vagrant/source/celeryd.log --workdir="/vagrant/source" -A memex worker
@@ -68,5 +40,30 @@ celery:
     - env:
         - JAVA_HOME: '/usr/lib/jvm/java-7-oracle'
     - unless: "ps -p $(cat /vagrant/source/celeryd.pid)"
+    - require:
+        - sls: conda-memex
+
+supervisor:
+  cmd.run:
+    - name: |
+        source activate memex
+        supervisord -c /vagrant/deploy/supervisor.conf        
+    - user: vagrant
+    - env:
+       - PATH:
+           /home/vagrant/miniconda/bin:/home/ubuntu/miniconda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+    - require:
+        - sls: conda-memex
+    - unless: test -e /home/vagrant/supervisor.sock
+
+reload-supervisor:
+  cmd.run:
+    - name: |
+        source activate memex
+        supervisorctl -c /vagrant/deploy/supervisor.conf reload
+    - user: vagrant
+    - env:
+       - PATH:
+           /home/vagrant/miniconda/bin:/home/ubuntu/miniconda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
     - require:
         - sls: conda-memex

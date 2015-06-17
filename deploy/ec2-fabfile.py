@@ -11,6 +11,7 @@ from fabric.api import (
     env,
     settings,
     sudo,
+    put,
     prefix,
     cd,
     run,
@@ -29,6 +30,16 @@ import logging
 MEMEX_APP_PORT = 8000
 SETTINGS_FILENAME = '/vagrant/source/memex/local_settings.py'
 HTPASSWD_FILENAME = '/vagrant/deploy/dot-htpasswd'
+
+def check_env_vars():
+    missing = []
+    for varname in ['AWS_ID', 'AWS_SECRET', 'HTPASSWD_PATH',]:
+       if os.environ.get(varname, 'XXX').lower() == 'xxx':
+           missing.append(varname)
+    if missing:
+        raise ValueError("The following environment variables must be defined:\n{}".format('\n- '.join(missing)))
+
+check_env_vars()
 
 #based on https://github.com/ContinuumIO/wakari-deploy/blob/master/ami_creation/fabfile.py
 
@@ -63,6 +74,7 @@ env.timeout = 40
 
 KEYNAME = "{}-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
 
+
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
     machine = ec2.run_instances(AMI_ID, key_name=KEYNAME,
@@ -87,8 +99,8 @@ def create_keypair(source = KEYNAME):
         pass
 
     kp = ec2.create_key_pair(source)
-    filename = os.environ.get('EC2_KEY_PATH', './ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
-    latest_filename = os.environ.get('EC2_KEY_PATH', './latest.pem')
+    filename = os.environ.get('EC2_KEY_PATH', './keys/ec2-{}.pem'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H:%M')))
+    latest_filename = os.environ.get('EC2_KEY_PATH', './keys/latest.pem')
     kfile = open(filename, 'wb')
     latest_kfile = open(latest_filename, 'wb')
     def file_mode(user, group, other):
@@ -182,12 +194,12 @@ def install_repo(public_dns_name, ip_address):
     run("echo 'HOSTNAME = \"{}\"' >> {}".format(public_dns_name, SETTINGS_FILENAME))
     run("echo 'ROOT_PORT = \"{}\"' >> {}".format(MEMEX_APP_PORT, SETTINGS_FILENAME))
     run("echo 'IP_ADDR = \"{}\"' >> {}".format(ip_address, SETTINGS_FILENAME))
-    run("echo {} > {}".format(os.environ.get('HTPASSWD'), HTPASSWD_FILENAME))
+    put(os.environ.get('HTPASSWD_PATH'), HTPASSWD_FILENAME)
 
 def run_salt():
     sudo('mkdir -p /etc/salt')
-    sudo('ln -f -s /vagrant/salt/minion /etc/salt/minion')
-    sudo('ln -f -s /vagrant/salt/roots/salt /srv/salt')
+    sudo('ln -f -s /vagrant/deploy/salt/minion /etc/salt/minion')
+    sudo('ln -f -s /vagrant/deploy/salt/roots/salt /srv/salt')
     sudo('sudo /usr/bin/salt-call state.highstate --retcode-passthrough --log-level=debug | tee /home/vagrant/salt-log')
 
 def convenience_aliases():
@@ -196,7 +208,7 @@ def convenience_aliases():
 
 if os.environ.get('MEMEX_IP_ADDR'):
     ip_address = os.environ.get('MEMEX_IP_ADDR')
-    key_filename = os.path.abspath('./ec2-{}.pem'.format(ip_address))
+    key_filename = os.path.abspath('./keys/ec2-{}.pem'.format(ip_address))
     public_dns_name = 'ec2-{}.compute-1.amazonaws.com'.format(ip_address.replace('.','-'))
     connect_to_existing_machine(ip_address, key_filename)
 else:
