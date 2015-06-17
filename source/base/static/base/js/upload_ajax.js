@@ -54,7 +54,7 @@ $(document).ready(function(){
     xhr.send(formData);
   }
 
-  window.onbeforeunload = function(){
+  window.onbeforeunload = function(event){
     if (uploading == true){
       return "Reloading or navgating away from this page will cause the upload to fail.";
     }
