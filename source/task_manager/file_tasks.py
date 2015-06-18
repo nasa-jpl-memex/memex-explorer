@@ -43,11 +43,11 @@ def upload_zip(self, index, *args, **kwargs):
         os.mkdir(self.index.data_folder)
     with zipfile.ZipFile(self.index.uploaded_data.name) as archive:
         for x in archive.namelist():
-            filename = os.path.basename(x)
+            filename = os.path.basename(x).decode("utf-8")
             if not filename:
                 continue
             source = archive.open(x)
-            target = file(os.path.join(self.index.data_folder, filename), "wb")
+            target = open(os.path.join(self.index.data_folder, filename), "wb")
             with source, target:
                 shutil.copyfileobj(source, target)
     return "success"
