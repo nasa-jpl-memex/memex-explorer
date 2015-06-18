@@ -1,7 +1,7 @@
 remove-old-env:
   cmd.run:
     - name: |
-        /home/vagrant/miniconda/bin/conda env remove --name memex
+        /home/vagrant/miniconda/bin/conda env remove --name memex --yes
     - onlyif: test -e /home/vagrant/miniconda/envs/memex
     - cwd: /home/vagrant
     - user: vagrant
