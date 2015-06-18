@@ -121,6 +121,22 @@ class ListIndicesView(ProjectObjectMixin, ListView):
     model = Index
     template_name = "base/indices.html"
 
+    def post(self, request, *args, **kwargs):
+        if request.POST["get"] == "objects":
+            objects = Index.objects.all()
+            return HttpResponse(
+                json.dumps({
+                    "slugs": [x.slug for x in objects],
+                    "names": [x.name for x in objects],
+                }),
+                content_type="application/json",
+            )
+
+        return HttpResponse(
+            json.dumps("Hello!"),
+            content_type="application/json",
+        )
+
 
 class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     model = Index
