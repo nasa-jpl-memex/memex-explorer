@@ -28,6 +28,7 @@
     <link href="{% static 'base/css/custom.css' %}" rel="stylesheet">
     <link href="{% static 'base/css/dashboard.css' %}" rel="stylesheet">
     <link href="{% static 'base/css/forms.css' %}" rel="stylesheet">
+    {% block extrahead %}<link href="{% static 'base/css/update.css' %}" rel="stylesheet">{% endblock %}
 
   </head>
 
@@ -86,33 +87,6 @@
     <script src="{% static 'base/js/backbone-min.js' %}"></script>
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/upload_ajax.js' %}"></script>
-    <script>
-    $(document).ready(function() {
-        $('#deleteIndexButton').click(function(){
-            swal({
-                title: "Are you sure?",
-                text: "This will delete the index and all files associated with the index.",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: '#DD6B55',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: "No, cancel!",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            },
-            function(isConfirm){
-                if (isConfirm){
-                    $("<form action='{% url 'base:delete_index' project_slug=project.slug index_slug=index.slug %}' method='post'>{% csrf_token %}</form>").submit();
-                } else {
-                    swal("Cancelled", "You cancelled the delete process", "error");
-                }
-            })
-        });
-    });
-    </script>
-
-    {% block extrahead %}
-        <link href="{% static 'base/css/update.css' %}" rel="stylesheet">
-    {% endblock %}
+    <script src="{% static 'base/js/delete_index.js' %}"></script>
   </body>
 </html>

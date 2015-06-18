@@ -67,7 +67,9 @@ class AddIndexForm(CrispyModelForm):
         """Called in __init__ to register a custom layout."""
         self.helper.layout = Layout(
             Fieldset(None,
+                HTML("<p hidden id='name_error' style='color:#990000'></p>"),
                 'name',
+                HTML("<p hidden id='file_error' style='color:#990000'></p>"),
                 'uploaded_data',
                 FormActions(Submit('submit', "Submit"))
             ),
@@ -96,6 +98,7 @@ class IndexSettingsForm(AddIndexForm):
         """Called in __init__ to register a custom layout."""
         self.helper.layout = Layout(
             Fieldset(None,
+                HTML("<p hidden id='file_error' style='color:#990000'></p>"),
                 'uploaded_data',
                 FormActions(Submit('submit', "Submit"))
             )
