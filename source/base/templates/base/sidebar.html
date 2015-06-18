@@ -26,7 +26,7 @@
     <div class="accordion-group">
       <div class="accordion-heading sidebar-buttons">
         <a href="{% url 'base:indices' project_slug=project.slug %}">
-        Indices
+        Datasets
       </a>
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion3" href="#collapseThree"  style='float:right;'><i class="fa fa-list"></i></a>
     </div>
@@ -39,7 +39,7 @@
       {% endfor %}
       {% endif %}
       <div class="accordion-inner">
-        <a target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">+ Add Index</a>
+        <a target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">+ Add Dataset</a>
       </div>
     </div>
   </div>

@@ -79,7 +79,7 @@ class AddIndexForm(CrispyModelForm):
     def clean_name(self):
         name = self.cleaned_data['name']
         if slugify(unicode(name)) in [x.slug for x in Index.objects.all()]:
-            raise ValidationError("Index with this Name already exists.")
+            raise ValidationError("Dataset with this Name already exists.")
         return name
 
     class Meta:
