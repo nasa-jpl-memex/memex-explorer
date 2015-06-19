@@ -45,7 +45,7 @@ $(document).ready(function(){
         return url.split("/").slice(0, -3).join("/") + "/"
       } else {
         split_url = url.split("/").slice(0, -2);
-        split_url.push("indices");
+        split_url.push("datasets");
         return split_url.join("/") + "/"
       }
 

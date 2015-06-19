@@ -39,7 +39,7 @@
     <div class="col-sm-4">
       <h4 style="line-height:2em;">
         <a href="{% url 'base:indices' project_slug=project.slug %}">
-          <i class="fa fa-archive"> &nbsp; </i>Indices
+          <i class="fa fa-archive"> &nbsp; </i>Datasets
         </a>
         <a id="gotoKibana"
             {% if not deployment %}
@@ -62,9 +62,9 @@
         {% endfor %}
        </ul>
       {% else %}
-      <p>No Indices Registered.</p>
+      <p>No Datasets Registered.</p>
       {% endif %}
-        <a class="add_index btn btn-default btn-duo center link-button" target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">Add Index</a>
+        <a class="add_index btn btn-default btn-duo center link-button" target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
     </div>
     <div class="col-sm-4">
       <h4 style="line-height:2em;">

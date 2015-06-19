@@ -112,3 +112,8 @@ class AddCrawlModelForm(CrispyModelForm):
         model = CrawlModel
         fields = ['name', 'model', 'features']
 
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(unicode(name)) in [x.slug for x in CrawlModel.objects.all()]:
+            raise ValidationError("Crawl with this Name already exists.")
+        return name
