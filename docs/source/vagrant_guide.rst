@@ -12,6 +12,19 @@ Vagrant provisioning tool.
 This is a short guide explaining how to use Vagrant to install and
 develop Memex Explorer.
 
+Installing Vagrant and Virtualbox
++++++++++++++++++++++++++++++++++
+For this installation you need both Vagrant and Virtualbox.
+
+To install Vagrant and Virtualbox, you first need system administrator access to
+your computer. To get the relevant version of Vagrant, head the vagrant
+downloads page: http://www.vagrantup.com/downloads.
+
+To install Virtualbox on your computer, head to https://www.virtualbox.org/wiki/Downloads.
+Download and install the relevant version.
+
+After both applications are installed, you can continue with the vagrant install process.
+
 +++++++++
 Cheat sheet:
 +++++++++
