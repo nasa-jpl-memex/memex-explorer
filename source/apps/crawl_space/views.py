@@ -14,6 +14,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 from django.utils.decorators import method_decorator
@@ -136,8 +137,11 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_object.status not in ["NOT STARTED", "STOPPED", "FORCE STOPPED"]:
-                crawl_object.status = crawl_object.celerytask.task.status
-                crawl_object.save()
+                try:
+                    crawl_object.status = crawl_object.celerytask.task.status
+                    crawl_object.save()
+                except ObjectDoesNotExist:
+                    crawl_object.status = "FAILED TO START"
             if crawl_object.crawler == "ache":
                 ache_log_statistics(crawl_object)
             return HttpResponse(json.dumps(dict(
@@ -293,4 +297,3 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         return CrawlModel.objects.get(
             project=self.get_project(),
             slug=self.kwargs['model_slug'])
-
