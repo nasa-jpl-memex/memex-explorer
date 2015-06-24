@@ -130,6 +130,21 @@ $( document ).ready(function() {
         "seeds",
       ],
     },
+    "FAILED TO START": {
+      "disabled": [
+        "stop",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "log",
+        "seeds",
+        "restart",
+        "rounds",
+      ],
+      "enabled": [
+      ],
+    },
   }
 
   function onOff(element, state){
