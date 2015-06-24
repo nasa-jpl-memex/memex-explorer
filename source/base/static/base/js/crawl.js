@@ -18,7 +18,7 @@ $( document ).ready(function() {
 
   var csrftoken = getCookie('csrftoken');
 
-  /*
+  /**
   * Crawl Dashboard interactions
   */
 
@@ -34,7 +34,7 @@ $( document ).ready(function() {
     seeds: "getInitialSeeds",
   }
 
-  /*
+  /**
   * This object contains information on which buttons should be enabled or
   * disabled based on the status of the crawl.
   */
@@ -139,10 +139,10 @@ $( document ).ready(function() {
         "play",
         "log",
         "seeds",
-        "restart",
-        "rounds",
       ],
       "enabled": [
+        "restart",
+        "rounds",
       ],
     },
   }
@@ -318,18 +318,14 @@ $( document ).ready(function() {
       },
       success: function(response) {
         console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        if (response.status != "error"){
+          $( '#status' ).text(response.status);
+        }
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not restart crawl)" );
       }
     });
-  });
-
-
-  $("#gotoSolr").on('click', function(){
-    solr_url = "http://" + window.location.hostname + ":8983/solr/#"
-      window.open(solr_url, '_blank');
   });
 
   $("#dumpImages").on('click', function(){

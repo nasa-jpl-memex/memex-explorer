@@ -31,6 +31,10 @@ from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 from task_manager.tika_tasks import create_index
 from task_manager.crawl_tasks import nutch, ache, ache_log_statistics, cca_dump
 
+import celery
+
+from redis.connection import ConnectionError
+
 
 class ProjectObjectMixin(ContextMixin):
     def get_project(self):
@@ -96,7 +100,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
                     status="STARTING")),
                 content_type="application/json")
 
-
         # Stop
         elif request.POST['action'] == "stop":
             crawl_path = crawl_object.get_crawl_path()
@@ -136,6 +139,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
+            try:
+                celery_status = celery.current_app.control.ping()
+            except ConnectionError:
+                celery_status = "REDIS ERROR"
             if crawl_object.status not in ["NOT STARTED", "STOPPED", "FORCE STOPPED"]:
                 try:
                     crawl_object.status = crawl_object.celerytask.task.status
@@ -145,6 +152,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
             if crawl_object.crawler == "ache":
                 ache_log_statistics(crawl_object)
             return HttpResponse(json.dumps(dict(
+                    celery_status=celery_status,
                     status=crawl_object.status,
                     harvest_rate=crawl_object.harvest_rate,
                     pages_crawled=crawl_object.pages_crawled,
@@ -173,6 +181,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         # Get Relevant Seeds File
+        try:
+            self.celery_ping = ping_celery.delay()
+        except ConnectionError:
+            self.celery_ping = None
         if not request.GET:
             # no url parameters, return regular response
             return super(CrawlView, self).get(request, *args, **kwargs)
