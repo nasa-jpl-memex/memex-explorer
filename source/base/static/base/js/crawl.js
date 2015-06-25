@@ -183,6 +183,7 @@ $( document ).ready(function() {
       data: {"action": "status"},
       success: function(response){
         $( '#status' ).text(response.status);
+        onOffStatus(response.status);
         $( '#roundsLeft' ).text(response.rounds_left);
         $( '#stats-pages' ).text(response.pages_crawled);
         if ('harvest_rate' in response) {
@@ -248,11 +249,7 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        $('#getCrawlLog').attr("disabled", false);
-        $('#forceStopButton').attr("disabled", false);
-        if (response.status != "error"){
-          $( '#status' ).text(response.status);
-        }
+        $( '#status' ).text(response.status);
         onOffStatus(response.status);
       },
       failure: function() {
@@ -273,9 +270,7 @@ $( document ).ready(function() {
         "action": "stop",
       },
       success: function(response) {
-        if (response.status != "error"){
-          $( '#status' ).text(response.status);
-        }
+        $( '#status' ).text(response.status);
         onOffStatus(response.status);
       },
       failure: function() {
@@ -294,9 +289,7 @@ $( document ).ready(function() {
         "action": "force_stop",
       },
       success: function(response) {
-        if (response.status != "error"){
-          $( '#status' ).text(response.status);
-        }
+        $( '#status' ).text(response.status);
         onOffStatus(response.status);
       },
       failure: function() {
@@ -342,9 +335,7 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        if (response.status != "error"){
-          $( '#status' ).text(response.status);
-        }
+        $( '#status' ).text(response.status);
         onOffStatus(response.status);
       },
       failure: function() {
