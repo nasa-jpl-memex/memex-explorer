@@ -14,7 +14,6 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.apps import apps
 from django.http import HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 from django.utils.decorators import method_decorator
