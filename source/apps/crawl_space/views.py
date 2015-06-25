@@ -30,6 +30,10 @@ from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 from task_manager.tika_tasks import create_index
 from task_manager.crawl_tasks import nutch, ache, ache_log_statistics, cca_dump
 
+import celery
+
+from redis.connection import ConnectionError
+
 
 class ProjectObjectMixin(ContextMixin):
     def get_project(self):
@@ -82,19 +86,33 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Start
         if request.POST['action'] == "start":
-            crawl_object.status = "STARTING"
-            crawl_object.save()
-            if crawl_object.crawler == "ache":
-                ache.delay(crawl_object)
-            else:
-                crawl_object.rounds_left = int(request.POST["rounds"])
+            # Try to ping celery to see if it is ready. If the response is an
+            # empty list, status is NOT READY. If there is an error connecting to
+            # with redis, celery status is REDIS ERROR.
+            try:
+                celery_status = "READY" if celery.current_app.control.ping() else "CELERY ERROR"
+            except ConnectionError:
+                celery_status = "REDIS ERROR"
+            if celery_status in ["REDIS ERROR", "CELERY ERROR"]:
+                crawl_object.status = celery_status
                 crawl_object.save()
-                nutch.delay(crawl_object)
-
-            return HttpResponse(json.dumps(dict(
-                    status="STARTING")),
-                content_type="application/json")
-
+                return HttpResponse(json.dumps(dict(
+                        status=crawl_object.status,
+                        )),
+                    content_type="application/json")
+            else:
+                crawl_object.status = "STARTING"
+                crawl_object.save()
+                if crawl_object.crawler == "ache":
+                    ache.delay(crawl_object)
+                else:
+                    crawl_object.rounds_left = int(request.POST["rounds"])
+                    crawl_object.save()
+                    nutch.delay(crawl_object)
+                return HttpResponse(json.dumps(dict(
+                        status=crawl_object.status,
+                        )),
+                    content_type="application/json")
 
         # Stop
         elif request.POST['action'] == "stop":
@@ -135,7 +153,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
-            if crawl_object.status not in ["NOT STARTED", "STOPPED", "FORCE STOPPED"]:
+            if crawl_object.status not in ["REDIS ERROR", "CELERY ERROR", "NOT STARTED", "STOPPED", "FORCE STOPPED"]:
                 crawl_object.status = crawl_object.celerytask.task.status
                 crawl_object.save()
             if crawl_object.crawler == "ache":
@@ -293,4 +311,3 @@ class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         return CrawlModel.objects.get(
             project=self.get_project(),
             slug=self.kwargs['model_slug'])
-

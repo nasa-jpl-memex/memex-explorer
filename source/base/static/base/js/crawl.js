@@ -18,119 +18,6 @@ $( document ).ready(function() {
 
   var csrftoken = getCookie('csrftoken');
 
-  /*
-  * Crawl Dashboard interactions
-  */
-
-  var buttons = {
-    play: "playButton",
-    stop: "stopButton",
-    restart: "restartButton",
-    kill: "forceStopButton",
-    images: "dumpImages",
-    cca: "common-crawl-dump",
-    rounds: "rounds",
-    log: "getCrawlLog",
-    seeds: "getInitialSeeds",
-  }
-
-  /*
-  * This object contains information on which buttons should be enabled or
-  * disabled based on the status of the crawl.
-  */
-
-  var statuses = {
-    "NOT STARTED": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "log",
-      ],
-      "enabled": [
-        "play",
-        "rounds",
-        "seeds",
-      ],
-    },
-    "STARTING": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-    "STARTED": {
-      "disabled": [
-        "play",
-        "restart",
-        "images",
-        "cca",
-        "rounds",
-      ],
-      "enabled": [
-        "stop",
-        "kill",
-        "log",
-        "seeds",
-      ],
-    },
-    "SUCCESS": {
-      "disabled": [
-        "play",
-        "stop",
-        "kill",
-      ],
-      "enabled": [
-        "restart",
-        "images",
-        "cca",
-        "rounds",
-        "log",
-        "seeds",
-      ],
-    },
-    "FAILURE": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-    "FORCE STOPPED": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-  }
 
   function onOff(element, state){
     $("#" + element).attr("disabled", state);
@@ -142,12 +29,18 @@ $( document ).ready(function() {
     }
   }
 
+  function onOffStatus(status){
+    onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
+    onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+  }
+
   function statusCall(){
     return $.ajax({
       type: "POST",
       data: {"action": "status"},
       success: function(response){
         $( '#status' ).text(response.status);
+        onOffStatus(response.status);
         $( '#roundsLeft' ).text(response.rounds_left);
         $( '#stats-pages' ).text(response.pages_crawled);
         if ('harvest_rate' in response) {
@@ -156,8 +49,7 @@ $( document ).ready(function() {
             $('#getSeeds').attr("disabled", false);
           }
         }
-        onOffGroup(statuses[response.status]["disabled"], buttons, true);
-        onOffGroup(statuses[response.status]["enabled"], buttons, false);
+        onOffStatus(response.status);
       }
     });
   }
@@ -201,6 +93,7 @@ $( document ).ready(function() {
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "STARTING" );
+    onOffStatus("STARTING");
     this.disabled = true;
     $('#stopButton').attr("disabled", false);
     $('#rounds').attr("disabled", true);
@@ -214,11 +107,9 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        $('#getCrawlLog').attr("disabled", false);
-        $('#forceStopButton').attr("disabled", false);
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        $( '#status' ).text(response.status);
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not start crawl)" );
       }
@@ -229,6 +120,7 @@ $( document ).ready(function() {
   $('#stopButton').on('click', function() {
 
     $( '#status' ).text( "STOPPING" );
+    onOffStatus("STOPPING");
     this.disabled = true;
 
     $.ajax({
@@ -237,9 +129,9 @@ $( document ).ready(function() {
         "action": "stop",
       },
       success: function(response) {
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        $( '#status' ).text(response.status);
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not stop crawl)" );
       }
@@ -248,6 +140,7 @@ $( document ).ready(function() {
 
   function forceStop(){
     $( '#status' ).text( "STOPPING" );
+    onOffStatus("STOPPING");
     this.disabled = true;
 
     $.ajax({
@@ -256,9 +149,9 @@ $( document ).ready(function() {
         "action": "force_stop",
       },
       success: function(response) {
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        $( '#status' ).text(response.status);
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not stop crawl)" );
       }
@@ -291,6 +184,7 @@ $( document ).ready(function() {
   $('#restartButton').on('click', function() {
 
     $( '#status' ).text( "RESTARTING" );
+    onOffStatus("RESTARTING");
     this.disabled = true;
 
     val = $("#rounds")? $("#rounds").val() : 0,
@@ -302,19 +196,13 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        $( '#status' ).text(response.status);
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not restart crawl)" );
       }
     });
-  });
-
-
-  $("#gotoSolr").on('click', function(){
-    solr_url = "http://" + window.location.hostname + ":8983/solr/#"
-      window.open(solr_url, '_blank');
   });
 
   $("#dumpImages").on('click', function(){
@@ -332,6 +220,5 @@ $( document ).ready(function() {
       }
     });
   });
-
 
 });
