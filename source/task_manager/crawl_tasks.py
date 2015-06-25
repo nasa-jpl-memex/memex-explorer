@@ -53,7 +53,7 @@ def cca_dump(crawl):
     environ = os.environ.copy()
     environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-oracle'
     cca_dump_proc = subprocess.Popen([nutch_path, "commoncrawldump", "-outputDir", cca_dir,
-                                        "-segment", os.path.join(crawl.get_crawl_path(), 'segments')], 
+                                        "-segment", os.path.join(crawl.get_crawl_path(), 'segments')],
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environ)
     stdout, stderr = cca_dump_proc.communicate()
     sys.stderr.write(stdout)
@@ -94,11 +94,9 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     ]
     with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid)
-    """
-    Check whether a CeleryTask already exists. If no, create the new object. If
-    yes (IntegrityError), update the rows of the already existing object.
-    """
+             preexec_fn=os.setsid)
+    # Check whether a CeleryTask already exists. If no, create the new object. If
+    # yes (IntegrityError), update the rows of the already existing object.
     try:
         self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
@@ -147,10 +145,9 @@ def ache(self, crawl, *args, **kwargs):
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
             preexec_fn=os.setsid)
-    """
-    Check whether a CeleryTask already exists. If no, create the new object. If
-    yes (IntegrityError), update the rows of the already existing object.
-    """
+
+    # Check whether a CeleryTask already exists. If no, create the new object. If
+    # yes (IntegrityError), update the rows of the already existing object.
     try:
         self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
         self.crawl_task.save()
@@ -160,6 +157,9 @@ def ache(self, crawl, *args, **kwargs):
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
+    # Because of the differnce between the binaries in lib/nutch/bin/nutch and
+    # bin/nutch, the returncode is not always reliable. When nutch is called from
+    # bin/nutch the error codes do not work properly.
     if proc.returncode > 0:
         raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Stopped"
