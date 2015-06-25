@@ -18,164 +18,6 @@ $( document ).ready(function() {
 
   var csrftoken = getCookie('csrftoken');
 
-  /**
-  * Crawl Dashboard interactions
-  */
-
-  var buttons = {
-    play: "playButton",
-    stop: "stopButton",
-    restart: "restartButton",
-    kill: "forceStopButton",
-    images: "dumpImages",
-    cca: "common-crawl-dump",
-    rounds: "rounds",
-    log: "getCrawlLog",
-    seeds: "getInitialSeeds",
-  }
-
-  /**
-  * This object contains information on which buttons should be enabled or
-  * disabled based on the status of the crawl.
-  */
-
-  var statuses = {
-    "NOT STARTED": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "log",
-      ],
-      "enabled": [
-        "play",
-        "rounds",
-        "seeds",
-      ],
-    },
-    "STARTING": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-    "STARTED": {
-      "disabled": [
-        "play",
-        "restart",
-        "images",
-        "cca",
-        "rounds",
-      ],
-      "enabled": [
-        "stop",
-        "kill",
-        "log",
-        "seeds",
-      ],
-    },
-    "RESTARTING": {
-      "disabled": [
-        "play",
-        "restart",
-        "images",
-        "cca",
-        "rounds",
-        "stop",
-        "kill",
-        "log",
-        "seeds",
-      ],
-      "enabled": [
-      ],
-    },
-    "SUCCESS": {
-      "disabled": [
-        "play",
-        "stop",
-        "kill",
-      ],
-      "enabled": [
-        "restart",
-        "images",
-        "cca",
-        "rounds",
-        "log",
-        "seeds",
-      ],
-    },
-    "FAILURE": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-    "FORCE STOPPED": {
-      "disabled": [
-        "stop",
-        "restart",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "rounds",
-      ],
-      "enabled": [
-        "log",
-        "seeds",
-      ],
-    },
-    "REDIS ERROR": {
-      "disabled": [
-        "stop",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "log",
-        "seeds",
-      ],
-      "enabled": [
-        "restart",
-        "rounds",
-      ],
-    },
-    "CELERY ERROR": {
-      "disabled": [
-        "stop",
-        "kill",
-        "images",
-        "cca",
-        "play",
-        "log",
-        "seeds",
-      ],
-      "enabled": [
-        "restart",
-        "rounds",
-      ],
-    },
-  }
 
   function onOff(element, state){
     $("#" + element).attr("disabled", state);
@@ -188,8 +30,8 @@ $( document ).ready(function() {
   }
 
   function onOffStatus(status){
-    onOffGroup(statuses[status]["disabled"], buttons, true);
-    onOffGroup(statuses[status]["enabled"], buttons, false);
+    onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
+    onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
   }
 
   function statusCall(){
@@ -378,6 +220,5 @@ $( document ).ready(function() {
       }
     });
   });
-
 
 });
