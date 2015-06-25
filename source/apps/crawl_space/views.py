@@ -155,12 +155,8 @@ class CrawlView(ProjectObjectMixin, DetailView):
         # Update status, statistics
         elif request.POST['action'] == "status":
             if crawl_object.status not in ["REDIS ERROR", "CELERY ERROR", "NOT STARTED", "STOPPED", "FORCE STOPPED"]:
-                try:
-                    crawl_object.status = crawl_object.celerytask.task.status
-                    crawl_object.save()
-                except ObjectDoesNotExist:
-                    crawl_object.status = "FAILED TO START"
-                    crawl_object.save()
+                crawl_object.status = crawl_object.celerytask.task.status
+                crawl_object.save()
             if crawl_object.crawler == "ache":
                 ache_log_statistics(crawl_object)
             return HttpResponse(json.dumps(dict(
