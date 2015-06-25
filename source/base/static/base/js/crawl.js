@@ -130,7 +130,22 @@ $( document ).ready(function() {
         "seeds",
       ],
     },
-    "FAILED TO START": {
+    "REDIS ERROR": {
+      "disabled": [
+        "stop",
+        "kill",
+        "images",
+        "cca",
+        "play",
+        "log",
+        "seeds",
+      ],
+      "enabled": [
+        "restart",
+        "rounds",
+      ],
+    },
+    "CELERY ERROR": {
       "disabled": [
         "stop",
         "kill",
@@ -157,6 +172,11 @@ $( document ).ready(function() {
     }
   }
 
+  function onOffStatus(status){
+    onOffGroup(statuses[status]["disabled"], buttons, true);
+    onOffGroup(statuses[status]["enabled"], buttons, false);
+  }
+
   function statusCall(){
     return $.ajax({
       type: "POST",
@@ -171,8 +191,7 @@ $( document ).ready(function() {
             $('#getSeeds').attr("disabled", false);
           }
         }
-        onOffGroup(statuses[response.status]["disabled"], buttons, true);
-        onOffGroup(statuses[response.status]["enabled"], buttons, false);
+        onOffStatus(response.status);
       }
     });
   }
@@ -231,9 +250,11 @@ $( document ).ready(function() {
       success: function(response) {
         $('#getCrawlLog').attr("disabled", false);
         $('#forceStopButton').attr("disabled", false);
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        if (response.status != "error"){
+          $( '#status' ).text(response.status);
+        }
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not start crawl)" );
       }
@@ -252,9 +273,11 @@ $( document ).ready(function() {
         "action": "stop",
       },
       success: function(response) {
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        if (response.status != "error"){
+          $( '#status' ).text(response.status);
+        }
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not stop crawl)" );
       }
@@ -271,9 +294,11 @@ $( document ).ready(function() {
         "action": "force_stop",
       },
       success: function(response) {
-        console.log(response);
-        if (response.status != "error") $( '#status' ).text(response.status);
-        else console.log(response)},
+        if (response.status != "error"){
+          $( '#status' ).text(response.status);
+        }
+        onOffStatus(response.status);
+      },
       failure: function() {
         $( '#status' ).text( "Error (could not stop crawl)" );
       }
@@ -317,10 +342,10 @@ $( document ).ready(function() {
         "rounds": val,
       },
       success: function(response) {
-        console.log(response);
         if (response.status != "error"){
           $( '#status' ).text(response.status);
         }
+        onOffStatus(response.status);
       },
       failure: function() {
         $( '#status' ).text( "Error (could not restart crawl)" );

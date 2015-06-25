@@ -91,11 +91,11 @@ class CrawlView(ProjectObjectMixin, DetailView):
             # empty list, status is NOT READY. If there is an error connecting to
             # with redis, celery status is REDIS ERROR.
             try:
-                celery_status = "READY" if celery.current_app.control.ping() else "NOT READY"
+                celery_status = "READY" if celery.current_app.control.ping() else "CELERY ERROR"
             except ConnectionError:
                 celery_status = "REDIS ERROR"
-            if celery_status in ["REDIS ERROR", "NOT READY"]:
-                crawl_object.status = "FAILED TO START"
+            if celery_status in ["REDIS ERROR", "CELERY ERROR"]:
+                crawl_object.status = celery_status
                 crawl_object.save()
                 return HttpResponse(json.dumps(dict(
                         status=crawl_object.status,
@@ -154,7 +154,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
-            if crawl_object.status not in ["FAILED TO START", "NOT STARTED", "STOPPED", "FORCE STOPPED"]:
+            if crawl_object.status not in ["REDIS ERROR", "CELERY ERROR", "NOT STARTED", "STOPPED", "FORCE STOPPED"]:
                 try:
                     crawl_object.status = crawl_object.celerytask.task.status
                     crawl_object.save()

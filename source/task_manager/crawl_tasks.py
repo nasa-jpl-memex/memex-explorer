@@ -106,6 +106,9 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
+    # Because of the difference between the binaries in lib/nutch/bin/nutch and
+    # bin/nutch, the returncode is not always reliable. When nutch is called from
+    # bin/nutch the error codes do not work properly.
     if proc.returncode > 0:
         raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Round Complete"
@@ -157,9 +160,6 @@ def ache(self, crawl, *args, **kwargs):
         self.crawl_task.uuid = self.request.id
         self.crawl_task.save()
     stdout, stderr = proc.communicate()
-    # Because of the differnce between the binaries in lib/nutch/bin/nutch and
-    # bin/nutch, the returncode is not always reliable. When nutch is called from
-    # bin/nutch the error codes do not work properly.
     if proc.returncode > 0:
         raise RuntimeError("Crawl has failed. Please review the crawl logs.")
     return "Stopped"
