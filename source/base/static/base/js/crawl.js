@@ -85,6 +85,21 @@ $( document ).ready(function() {
         "seeds",
       ],
     },
+    "RESTARTING": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+      "enabled": [
+      ],
+    },
     "SUCCESS": {
       "disabled": [
         "play",
@@ -236,6 +251,7 @@ $( document ).ready(function() {
   $('#playButton').on('click', function() {
 
     $( '#status' ).text( "STARTING" );
+    onOffStatus("STARTING");
     this.disabled = true;
     $('#stopButton').attr("disabled", false);
     $('#rounds').attr("disabled", true);
@@ -262,6 +278,7 @@ $( document ).ready(function() {
   $('#stopButton').on('click', function() {
 
     $( '#status' ).text( "STOPPING" );
+    onOffStatus("STOPPING");
     this.disabled = true;
 
     $.ajax({
@@ -281,6 +298,7 @@ $( document ).ready(function() {
 
   function forceStop(){
     $( '#status' ).text( "STOPPING" );
+    onOffStatus("STOPPING");
     this.disabled = true;
 
     $.ajax({
@@ -324,6 +342,7 @@ $( document ).ready(function() {
   $('#restartButton').on('click', function() {
 
     $( '#status' ).text( "RESTARTING" );
+    onOffStatus("RESTARTING");
     this.disabled = true;
 
     val = $("#rounds")? $("#rounds").val() : 0,
