@@ -142,6 +142,21 @@ var statuses = statuses || {};
         "seeds",
       ],
     },
+    "FINISHING": {
+      "disabled": [
+        "stop",
+        "restart",
+        "images",
+        "cca",
+        "play",
+        "rounds",
+      ],
+      "enabled": [
+        "log",
+        "seeds",
+        "kill",
+      ],
+    },
     "FORCE STOPPED": {
       "disabled": [
         "stop",
