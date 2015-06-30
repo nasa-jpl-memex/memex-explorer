@@ -10,11 +10,9 @@ var tad = tad || {};
       },
       success: function(response){
         $("#tadResponse").html(response)
-        console.log(response);
       },
       error: function(response){
         $("#tadResponse").html(response)
-        console.log("Failure");
       },
     });
   }

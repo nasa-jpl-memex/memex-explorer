@@ -256,7 +256,7 @@ class TadView(ProjectObjectMixin, TemplateView):
                 "analysis-end-date": "2014/02/05",
                 "stratify": "false",
             }
-            r = requests.post("http://127.0.0.1:32768", data=json.dumps(payload))
+            r = requests.post("http://127.0.0.1:32768/event-report", data=json.dumps(payload))
             return HttpResponse(
                 json.dumps(r.text),
                 content_type="application/json",
