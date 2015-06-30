@@ -9,16 +9,23 @@ var tad = tad || {};
         "get": "data",
       },
       success: function(response){
+        $("#tadResponse").html(response)
         console.log(response);
       },
       error: function(response){
+        $("#tadResponse").html(response)
         console.log("Failure");
       },
     });
   }
 
   $(document).ready(function(){
-    tadUpdate();
+    $("#tadUpdate").click(function(){
+      tadUpdate();
+      setInterval(function(){
+        tadUpdate();
+      }, 5000);
+    });
   });
 
 })();
