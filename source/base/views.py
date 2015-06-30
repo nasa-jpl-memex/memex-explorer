@@ -29,6 +29,8 @@ from apps.crawl_space.views import ProjectObjectMixin
 
 from task_manager.file_tasks import upload_zip
 
+import requests
+
 
 def project_context_processor(request):
     additional_context = {
@@ -244,3 +246,23 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
 class TadView(ProjectObjectMixin, TemplateView):
     template_name = "base/tad.html"
+
+    def post(self, request, *args, **kwargs):
+        if request.POST["get"] == "data":
+            payload = {
+                "target-location": "Colorado Springs;Colorado;United States",
+                "baseline-location": ";Colorado;United States",
+                "analysis-start-date": "2014/01/05",
+                "analysis-end-date": "2014/02/05",
+                "stratify": "false",
+            }
+            r = requests.post("http://127.0.0.1:5000", data=json.dumps(payload))
+            return HttpResponse(
+                json.dumps(r.text),
+                content_type="application/json",
+            )
+
+        return HttpResponse(
+            json.dumps("Nope!"),
+            content_type="application/json",
+        )
