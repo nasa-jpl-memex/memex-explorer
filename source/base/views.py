@@ -240,3 +240,7 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
+
+class TadView(ProjectObjectMixin, TemplateView):
+    template_name = "base/tad.html"
