@@ -70,7 +70,13 @@ $(document).ready(function(){
 
     function isUnique(indexName){
       var jsonResponse = objectsResponse.responseJSON;
-      if (isInArray(indexName, jsonResponse.index_slugs) || isInArray(indexName, jsonResponse.index_names) || isInArray(indexName, jsonResponse.crawl_names) || isInArray(indexName, jsonResponse.crawl_names)){
+      var objectNames = _.flatten(
+        jsonResponse.index_slugs,
+        jsonResponse.index_names,
+        jsonResponse.crawl_slugs,
+        jsonResponse.crawl_names
+      )
+      if (isInArray(indexName, objectNames)){
         return false;
       } else {
         return true;
