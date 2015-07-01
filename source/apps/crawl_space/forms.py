@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from apps.crawl_space.models import Crawl, CrawlModel
 
+from base.models import Index
+
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
@@ -62,7 +64,9 @@ class AddCrawlForm(CrispyModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]:
+        unique_crawl_name = slugify(unicode(name)) in [x.slug for x in Crawl.objects.all()]
+        unique_index_name = slugify(unicode(name)) in [x.slug for x in Index.objects.all()]
+        if not (unqiue_crawl_name and unique_index_name):
             raise ValidationError("Crawl with this Name already exists.")
         return name
 
