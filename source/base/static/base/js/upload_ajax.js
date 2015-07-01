@@ -105,7 +105,7 @@ $(document).ready(function(){
       if (!!nameErrorSelector.length){
         if (isUnique(uploadAjax.name.value) == false){
           nameErrorSelector.attr("hidden", false);
-          nameErrorSelector.html("* Index by this name already exists");
+          nameErrorSelector.html("* Object by this name already exists");
           uploading = false;
           formError = true;
         } else if (Boolean(uploadAjax.name.value) == false){
