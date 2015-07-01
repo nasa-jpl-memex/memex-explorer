@@ -72,7 +72,7 @@ env.disable_known_hosts = True
 env.connection_attempts = True
 env.timeout = 40
 
-KEYNAME = "{}-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
+KEYNAME = "{}-memex-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
 
 
 def create_box():
