@@ -70,7 +70,13 @@ $(document).ready(function(){
 
     function isUnique(indexName){
       var jsonResponse = objectsResponse.responseJSON;
-      if (isInArray(indexName, jsonResponse.slugs) || isInArray(indexName, jsonResponse.names)){
+      var objectNames = _.flatten(
+        jsonResponse.index_slugs,
+        jsonResponse.index_names,
+        jsonResponse.crawl_slugs,
+        jsonResponse.crawl_names
+      )
+      if (isInArray(indexName, objectNames)){
         return false;
       } else {
         return true;
@@ -99,7 +105,7 @@ $(document).ready(function(){
       if (!!nameErrorSelector.length){
         if (isUnique(uploadAjax.name.value) == false){
           nameErrorSelector.attr("hidden", false);
-          nameErrorSelector.html("* Index by this name already exists");
+          nameErrorSelector.html("* Object by this name already exists");
           uploading = false;
           formError = true;
         } else if (Boolean(uploadAjax.name.value) == false){
