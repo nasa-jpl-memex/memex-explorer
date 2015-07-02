@@ -6,6 +6,7 @@ base:
     - redis-server
     - java
     - git
+    - emacs
     - pip
     - silversearcher-ag
     - docker

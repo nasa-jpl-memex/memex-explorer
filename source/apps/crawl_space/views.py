@@ -118,10 +118,11 @@ class CrawlView(ProjectObjectMixin, DetailView):
         elif request.POST['action'] == "stop":
             crawl_path = crawl_object.get_crawl_path()
             if crawl_object.crawler == "ache":
-                crawl_object.status = 'STOPPED'
+                crawl_object.status = "STOPPED"
                 crawl_object.save()
                 os.killpg(crawl_object.celerytask.pid, 9)
             if crawl_object.crawler == "nutch":
+                crawl_object.status = "FINISHING"
                 crawl_object.rounds_left = 1
                 crawl_object.save()
                 touch(join(crawl_path, 'stop'))
@@ -153,7 +154,19 @@ class CrawlView(ProjectObjectMixin, DetailView):
 
         # Update status, statistics
         elif request.POST['action'] == "status":
-            if crawl_object.status not in ["REDIS ERROR", "CELERY ERROR", "NOT STARTED", "STOPPED", "FORCE STOPPED"]:
+            # Do not update the status if the current status is any of
+            # the following. This is to prevent errors or interface problems
+            # when checking the status of a celery task.
+            no_go_statuses = [
+                "FINISHING",
+                "STOPPING",
+                "REDIS ERROR",
+                "CELERY ERROR",
+                "NOT STARTED",
+                "STOPPED",
+                "FORCE STOPPED"
+            ]
+            if crawl_object.status not in no_go_statuses:
                 crawl_object.status = crawl_object.celerytask.task.status
                 crawl_object.save()
             if crawl_object.crawler == "ache":

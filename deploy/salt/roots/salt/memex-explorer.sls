@@ -1,3 +1,7 @@
+{# This settings makes sure that the proper settings file is copied when salt is
+ run. For vagrant and EC2 deployment, the deploy_settings file must be used.
+ For development on a django development server, the dev_settings.py file must
+ be used. #}
 /vagrant/source/memex/settings.py:
   file.copy:
     - source: /vagrant/source/memex/settings_files/deploy_settings.py
@@ -47,7 +51,7 @@ supervisor:
   cmd.run:
     - name: |
         source activate memex
-        supervisord -c /vagrant/deploy/supervisor.conf        
+        supervisord -c /vagrant/deploy/supervisor.conf
     - user: vagrant
     - env:
        - PATH:
