@@ -49,7 +49,7 @@ class ProjectObjectMixin(ContextMixin):
         Prepend the hostname and the port to the path for an object.
         """
         return "{}/{}".format(
-            self.request.META['HTTP_ORIGIN'].rstrip(),
+            self.request.META.get('HTTP_ORIGIN', '').rstrip(),
             self.object.get_absolute_url().lstrip())
 
 
