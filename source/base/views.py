@@ -123,11 +123,14 @@ class ListIndicesView(ProjectObjectMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         if request.POST["get"] == "objects":
-            objects = Index.objects.all()
+            indices = Index.objects.all()
+            crawls = Crawl.objects.all()
             return HttpResponse(
                 json.dumps({
-                    "slugs": [x.slug for x in objects],
-                    "names": [x.name for x in objects],
+                    "index_slugs": [x.slug for x in indices],
+                    "index_names": [x.name for x in indices],
+                    "crawl_slugs": [x.slug for x in crawls],
+                    "crawl_names": [x.name for x in crawls],
                 }),
                 content_type="application/json",
             )
