@@ -78,7 +78,7 @@ KEYNAME = "{}-memex-{}".format(AMI_ID,os.environ.get('USER', 'memex'))
 def create_box():
     old_ids = set(i.id for i in ec2.get_only_instances())
     machine = ec2.run_instances(AMI_ID, key_name=KEYNAME,
-        security_groups=['all-open',], instance_type='m3.2xlarge')
+        security_groups=[os.environ.get('SECURITY_GROUP', 'memex-explorer-prod'),], instance_type='m3.2xlarge')
     new_instance = [i for i in ec2.get_only_instances() if i.id not in old_ids][0]
     print(new_instance.id)
     while new_instance.state != u'running':
