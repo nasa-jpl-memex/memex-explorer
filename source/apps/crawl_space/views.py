@@ -34,7 +34,6 @@ import celery
 
 from redis.connection import ConnectionError
 
-
 class ProjectObjectMixin(ContextMixin):
     def get_project(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
@@ -44,6 +43,14 @@ class ProjectObjectMixin(ContextMixin):
         context = super(ProjectObjectMixin, self).get_context_data(**kwargs)
         context['project'] = self.get_project()
         return context
+
+    def get_success_url(self):
+        """
+        Prepend the hostname and the port to the path for an object.
+        """
+        return "{}/{}".format(
+            self.request.META.get('HTTP_ORIGIN', '').rstrip('/'),
+            self.object.get_absolute_url().lstrip('/'))
 
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
@@ -63,9 +70,6 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 'utf-8'
             )
         return super(AddCrawlView, self).post(request, *args, **kwargs)
-
-    def get_success_url(self):
-        return self.object.get_absolute_url()
 
     def form_valid(self, form):
         form.instance.project = self.get_project()
@@ -274,9 +278,6 @@ class CrawlSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
     success_message = "Crawl %(name)s was edited successfully."
     template_name_suffix = '_update_form'
 
-    def get_success_url(self):
-        return self.object.get_absolute_url()
-
     def get_object(self):
         return Crawl.objects.get(
             project=self.get_project(),
@@ -292,9 +293,6 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         form.instance.project = self.get_project()
         return super(AddCrawlModelView, self).form_valid(form)
 
-    def get_success_url(self):
-        return self.object.get_absolute_url()
-
 
 class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = Crawl
@@ -305,9 +303,6 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         shutil.rmtree(self.get_object().get_crawl_path())
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return self.get_project().get_absolute_url()
-
     def get_object(self):
         return Crawl.objects.get(project=self.get_project(),
                                  slug=self.kwargs['crawl_slug'])
@@ -316,9 +311,6 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 class DeleteCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = CrawlModel
     success_message = "Crawl model %(name)s was deleted successfully."
-
-    def get_success_url(self):
-        return self.get_project().get_absolute_url()
 
     def get_object(self):
         return CrawlModel.objects.get(
