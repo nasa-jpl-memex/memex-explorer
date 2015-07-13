@@ -160,10 +160,7 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         """
         form.instance.project = self.get_project()
         self.object = form.save()
-        if settings.DEPLOYMENT:
-            upload_zip.delay(self.object)
-        else:
-            upload_zip(self.object)
+        upload_zip.delay(self.object)
         return super(AddIndexView, self).form_valid(form)
 
 
