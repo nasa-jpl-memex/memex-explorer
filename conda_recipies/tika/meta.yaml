@@ -1,6 +1,6 @@
 package:
-    name: tika-server
-    version: "1.6.0"
+    name: tika-rest-server
+    version: "1.9.0"
 
 source:
     fn: tika-server-1.9.jar
