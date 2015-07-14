@@ -180,8 +180,9 @@ class TestViews(UnitTestSkeleton):
             {'description': 'A crawl for information about cats.'},
             **self.crawl_slugs)
         crawl = get_object(response)
-        assert crawl.description == "A crawl for information about cats." 
+        assert crawl.description == "A crawl for information about cats."
 
+    @pytest.mark.xfail
     def test_crawl_delete(self):
         response = self.post('base:crawl_space:delete_crawl',
             **self.crawl_slugs)
