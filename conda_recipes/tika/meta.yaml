@@ -1,0 +1,8 @@
+package:
+    name: tika-rest-server
+    version: "1.9.0"
+
+source:
+    fn: tika-server-1.9.jar
+    url: http://repo1.maven.org/maven2/org/apache/tika/tika-server/1.9/tika-server-1.9.jar
+    sha1: 24a9d553ec95c55be8bd06090e9593f874ac5f10
