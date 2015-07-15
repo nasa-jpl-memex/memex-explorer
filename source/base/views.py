@@ -160,7 +160,10 @@ class AddIndexView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         """
         form.instance.project = self.get_project()
         self.object = form.save()
-        upload_zip.delay(self.object)
+        if hasattr(settings, "TESTING"):
+            upload_zip(self.object)
+        else:
+            upload_zip.delay(self.object)
         return super(AddIndexView, self).form_valid(form)
 
 
@@ -211,10 +214,10 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         self.object = form.save()
         # If we are in deployment mode, use the asynced version. If not, use the
         # synced version.
-        if settings.DEPLOYMENT:
-            upload_zip.delay(self.object)
-        else:
+        if hasattr(settings, "TESTING"):
             upload_zip(self.object)
+        else:
+            upload_zip.delay(self.object)
         return super(IndexSettingsView, self).form_valid(form)
 
 
