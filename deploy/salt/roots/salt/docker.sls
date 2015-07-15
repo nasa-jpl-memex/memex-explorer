@@ -27,6 +27,12 @@ lxc-docker:
   pkg.installed:
     - name: lxc-docker
 
+/etc/default/docker:
+  file.copy:
+    - force: True
+    - makedirs: True
+    - source: /vagrant/deploy/docker.conf
+      
 docker-service:
   service.running:
     - name: docker
