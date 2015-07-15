@@ -5,6 +5,8 @@ channels:
     - quasiben
     - brittainhard
 dependencies:
+    - elasticsearch=1.6.0
+    - tika-rest-server=1.9.0
     - bokeh=0.7.0
     - blaze=0.7.0
     - python=2.7.8

@@ -1,6 +1,6 @@
 #!/bin/bash
 pushd ../
-conda env update;
+conda env update --file local-environment.yml;
 popd
 
 source activate memex;
