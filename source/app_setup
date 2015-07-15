@@ -1,0 +1,8 @@
+#!/bin/bash
+pushd ../
+conda env update;
+popd
+
+pushd memex
+cp settings_files/dev_settings.py settings.py;
+popd
