@@ -18,18 +18,18 @@
     <div class="row">
         <div class="col-lg-3 col-md-4">
             <div class="panel panel-project">
-                <a href="{% url 'base:add_project' %}">
+                <!-- <a href="{% url 'base:add_project' %}"> -->
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
                             <i class="fa fa-plus fa-3x"></i>
                         </div>
-                        <div class="col-xs-9 text-right">
+                        <div class="col-xs-9 text-right" data-toggle="modal" data-target="#newProjectModal">
                             <p>New Project</p>
                         </div>
                     </div>
                 </div>
-                </a>
+                <!-- </a> -->
             </div>
         </div>
         {% for project in projects %}
@@ -56,6 +56,20 @@
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Project</h4>
+                </div>
+                <div class="modal-body">
+                    {% crispy form %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
