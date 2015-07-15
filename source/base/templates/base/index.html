@@ -2,39 +2,19 @@
 
 {% block content %}
 <div class='inner'>
-    <h1 style='text-align: center;'>Memex Explorer</h1>
-    <p style='text-align: center;font-size:18px;'>The next generation of information retrieval, data mining, and visualization.</p>
-    <div style='text-align: center;'>
-        <a class="btn btn-default btn-duo center link-button" href="{% url 'base:about' %}">Learn More</a>
-        <a class="btn btn-default btn-duo center link-button" href="http://memex-explorer.readthedocs.org/en/latest/">Documentation</a>
-    </div>
-    <br><br>
-    <h3>My Projects</h3>
     <div class="row">
-        {% for project in projects %}
-        <div class="col-lg-3 col-md-4 project-tab">
-            <div class="panel panel-project">
-                <div class="panel-heading">
-                <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <p style="color:white;">{{ project.name }}</p>
-                        </div>
-                        <!--div class="col-xs-9 text-right">
-                            <i class="fa {{project.icon}} fa-3x"></i>
-                        </div-->
-                    </div>
-                </div>
-                    <div class="panel-footer">
-                        <p>{{ project.description }}</p>
-                 
-                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
+        <div class="col-md-8">
+            <h3>MY PROJECTS</h3>
         </div>
-        {% endfor %}
+        <div class="col-md-4 search-bar">
+            <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon2"><i class="fa fa-search"></i></span>
+                  <input type="text" class="form-control search" placeholder="Search for projects here">
+                </div>
+            </div>
+    </div>
+
+    <div class="row">
         <div class="col-lg-3 col-md-4">
             <div class="panel panel-project">
                 <a href="{% url 'base:add_project' %}">
@@ -51,6 +31,31 @@
                 </a>
             </div>
         </div>
+        {% for project in projects %}
+        <div class="col-lg-3 col-md-4 project-tab">
+            <div class="panel panel-project">
+                <div class="panel-heading">
+                <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>{{ project.name }}</p>
+                        </div>
+                        <!--div class="col-xs-9 text-right">
+                            <i class="fa {{project.icon}} fa-3x"></i>
+                        </div-->
+                    </div>
+                </div>
+                    <div class="panel-footer">
+                        <p>{{ project.description }}</p>
+                 
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+        
     </div>
 </div>
 {% endblock %}

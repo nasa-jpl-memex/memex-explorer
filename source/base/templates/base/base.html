@@ -21,7 +21,6 @@
 
     <link href="{% static 'base/css/sweet-alert.css' %}" rel="stylesheet" type="text/css" >
 
-    <link href="{% static 'base/css/bokeh.min.css' %}" rel="stylesheet">
     <link href="{% static 'base/css/font-awesome.min.css' %}" rel="stylesheet">
     <script src="{% static 'base/js/jquery.min.js' %}"></script>
 
@@ -39,6 +38,29 @@
       <div class="container-fluid">
         <div class="navbar-header">
           <a class="navbar-brand" href="/">MEMEX-EXPLORER</a>
+            <ul class="nav navbar-nav">
+                      <li class="active dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-left:60px">Projects <span class="caret"></span></a>
+                        {% if projects %}
+                          <ul class="dropdown-menu">
+                          {% for x in projects %}
+                           <a href="{% url 'base:project' project_slug=x.slug %}"><li>{{ x.name }}</li></a>
+                            {% endfor %}
+                          </ul>
+                            {% endif %}
+                      </li>
+               
+                  <li>
+                      <a href ="http://memex-explorer.readthedocs.org/en/latest/" target="_blank" style="color: white; margin-left:60px"> Docs </a>
+                  </li>
+                  <li>
+                      <a href ="#" style="color: white; margin-left:60px"> Tour </a>
+                  </li>
+                  <li>
+                      <a href ="/about" target="_blank" style="color: white; margin-left:60px"> About </a>
+                  </li>
+               
+            </ul>
         </div>
         <!-- <div class="navbar-collapse collapse">
           <a class='navbar-brand right' href="#">Projects</a>
@@ -50,19 +72,7 @@
             <input type="text" class="form-control" placeholder="Search...">
           </form>
         </div> -->
-      <div class="dropdown" style="float:right">
-          <button id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" role="button" aria-expanded="false" class="navbar-brand projects">
-            Projects
-            <span class="caret"></span>
-          </button>
-            {% if projects %}
-          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-            {% for x in projects %}
-            <a href="{% url 'base:project' project_slug=x.slug %}"><li>{{ x.name }}</li></a>
-            {% endfor %}
-          </ul>
-            {% endif %}
-        </div>
+      
         {# <a class="navbar-brand projects link-button" href="http://explorer.continuum.io:8022" style="float:right;margin-top:10px;margin-bottom:0px;text-decoration:none;color:#eaeaea">IMAGE SPACE</a> #}
       </div>
     </div>
