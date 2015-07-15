@@ -79,7 +79,7 @@ $ compass watch
 ```
 
 # Building the Documentation
-The project documentation is written in [reStructuredText](http://docutils.sf.net/rst.html) and can be built using the popular [Sphinx](http://sphinx-doc.org/) tool. 
+The project documentation is written in [reStructuredText](http://docutils.sf.net/rst.html) and can be built using the popular [Sphinx](http://sphinx-doc.org/) tool.
 
 ```
 $ cd docs
@@ -91,4 +91,3 @@ The documentation is then available within `build/html/index.html`
 # Administration
 
 To access the administration panel, navigate to http://localhost:8000/admin (or the equivalent deployed URL) after starting Memex Explorer. Here you will be able to view and make manual changes to the database.
-
