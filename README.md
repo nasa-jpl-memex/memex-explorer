@@ -6,7 +6,15 @@
 Memex Explorer is a web application that provides easy-to-use interfaces for gathering, analyzing, and graphing web crawl data.
 
 # Local Development
+Clone the repository and `cd memex-explorer/source`. Run the following commands:
+```
+$ ./app_setup.sh && source activate memex && supervisord
+```
+These commands will set up your memex environment, prepare the application by creating the database, and run all of the necessary services for the application. If there are any problems with any of these commands, please report them as a github issue.
 
+To stop running the services, simply press `Ctrl-c`.
+
+<!---
 The current recommended method for developing Memex Explorer locally is to run it in a [Vagrant](https://www.vagrantup.com/) environment using [VirtualBox](http://docs.vagrantup.com/v2/virtualbox).  After you have installed Vagrant and VirtualBox, run the following commands.
 
 ```
@@ -57,25 +65,12 @@ To connect to a instance given an IP address of 54.167.11.71, log in with the co
     ssh -i keys/ec2-54.167.11.71.pem vagrant@54.167.11.71
 
 After the setup script is done running, you will be able to access the application by entering the IP address into your browser.
-
+-->
 # Testing
 
 To run memex-explorer tests, use the following command from within an active environment:
 ```
 $ py.test
-```
-
-# Modifying Stylesheets
-If you need to make changes to the .scss stylesheets, [Compass](http://compass-style.org/) is a useful tool. The following are instructions on how to install compass without using `sudo`.
-* For Mac users, add this line to your `~/.bash_profile`:
-```
-export PATH=/Users/<username>/.gem/ruby/<ruby version>/bin:$PATH
-```
-Then run `$ gem install compass --user-install`. This will install Compass on your system.
-* To make changes to the stylesheets, do:
-```
-$ cd ../
-$ compass watch
 ```
 
 # Building the Documentation
