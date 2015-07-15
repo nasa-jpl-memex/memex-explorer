@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class='inner'>
@@ -47,7 +48,7 @@
                 </div>
                     <div class="panel-footer">
                         <p>{{ project.description }}</p>
-                 
+
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                         <div class="clearfix"></div>
                     </div>
@@ -55,7 +56,6 @@
             </div>
         </div>
         {% endfor %}
-        
     </div>
 </div>
 {% endblock %}
