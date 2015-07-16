@@ -1,20 +1,20 @@
 mkdir -vp ${PREFIX}/bin;
-mkdir -vp ${PREFIX}/lib/elasticsearch/bin;
-mkdir -vp ${PREFIX}/lib/elasticsearch/lib;
-mkdir -vp ${PREFIX}/lib/elasticsearch/config;
-mkdir ${PREFIX}/lib/elasticsearch/lib/sigar;
+mkdir -vp ${PREFIX}/lib/kibana/bin;
+mkdir -vp ${PREFIX}/lib/kibana/config;
+mkdir -vp ${PREFIX}/lib/kibana/plugins;
+mkdir -vp ${PREFIX}/lib/kibana/node;
+mkdir -vp ${PREFIX}/lib/kibana/src;
 
-mvn clean package -DskipTests;
+cp -r src/* ${PREFIX}/lib/kibana/src/;
+cp -r plugins/* ${PREFIX}/lib/kibana/plugins/;
+cp -r node/* ${PREFIX}/lib/kibana/node/;
+cp -r config/* ${PREFIX}/lib/kibana/config/;
 
-cp -r target/lib/* ${PREFIX}/lib/elasticsearch/lib/;
-cp target/elasticsearch-1.6.0.jar ${PREFIX}/lib/elasticsearch/lib/elasticsearch-1.6.0.jar;
-cp -r target/bin/* ${PREFIX}/lib/elasticsearch/bin/;
-cp -r config/* ${PREFIX}/lib/elasticsearch/config/;
-cp ${RECIPE_DIR}/elasticsearch.yml ${PREFIX}/lib/elasticsearch/config/elasticsearch.yml;
+cp bin/kibana ${PREFIX}/lib/kibana/bin/kibana;
+cp README.txt ${PREFIX}/lib/kibana/;
+cp LICENSE.txt ${PREFIX}/lib/kibana/;
 
-rm ${PREFIX}/lib/elasticsearch/bin/*.exe;
+chmod +x ${PREFIX}/lib/kibana/bin/kibana;
 
-chmod +x ${PREFIX}/lib/elasticsearch/bin/elasticsearch;
-
-pushd "${PREFIX}/bin"
-ln -vs "../lib/elasticsearch/bin/elasticsearch" elasticsearch
+pushd "${PREFIX}/bin";
+ln -vs "../lib/kibana/bin/kibana" kibana;

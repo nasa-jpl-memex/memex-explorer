@@ -6,6 +6,3 @@ source:
     fn: kibana-4.1.1-darwin-x64.tar.gz
     url: https://download.elastic.co/kibana/kibana/kibana-4.1.1-darwin-x64.tar.gz
     sha1: 8b9dbf67ea9c56029ee211a6ef4ff3396be5cf7c
-
-build:
-    number: 0
