@@ -10,7 +10,7 @@
         <div class="col-md-4 search-bar">
             <div class="input-group">
                   <span class="input-group-addon" id="basic-addon2"><i class="fa fa-search"></i></span>
-                  <input type="text" class="form-control search" placeholder="Search for projects here">
+                  <input type="text" class="form-control search filterinput" placeholder="Search for projects here">
                 </div>
             </div>
     </div>
@@ -18,7 +18,7 @@
     <div class="row">
         <div class="col-lg-3 col-md-4">
             <div class="panel panel-project">
-                <!-- <a href="{% url 'base:add_project' %}"> -->
+                <a href="{% url 'base:add_project' %}">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- </a> -->
+                </a>
             </div>
         </div>
         {% for project in projects %}
@@ -58,6 +58,9 @@
         {% endfor %}
     </div>
 
+    <!--
+    modal for upload project
+
     <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -71,5 +74,26 @@
             </div>
         </div>
     </div>
+
+    -->
 </div>
+<script type="text/javascript">
+/* simple project name search implementation */
+    $('.filterinput').keyup(function () {
+        var a = $(this).val();
+        if (a.length > 0) {
+            children = ($(".project-tab").children());
+            children.parent().css("min-height", "200px");
+            var containing = children.filter(function () {
+                var regex = new RegExp('\\b' + a, 'i');
+                return regex.test($('p', this).text());
+            }).slideDown();
+            children.not(containing).slideUp();
+            children.not(containing).parent().css("min-height", "0");
+        } else {
+            children.slideDown();
+        }
+        return false;
+    });
+</script>
 {% endblock %}
