@@ -82,14 +82,6 @@ Vagrant.configure(2) do |config|
     salt.run_highstate = true
     salt.verbose = true
   end
-
-$app = <<SCRIPT
-  cd /vagrant/source/
-  echo "MEMEX-EXPLORER IS NOW RUNNING, POINT YOUR BROWSER TO: http://localhost:8000"
-  /home/vagrant/miniconda/envs/memex/bin/python ./manage.py runserver 0.0.0.0:8000
-SCRIPT
-
-config.vm.provision "app", type: "shell", privileged: false, inline: $app
-
+  
 end
 
