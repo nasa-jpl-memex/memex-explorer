@@ -27,8 +27,6 @@ class AddCrawlForm(CrispyModelForm):
             Fieldset(None,
                 'name',
                 'description',
-                InlineRadios('crawler'),
-                'crawl_model',
                 'seeds_list',
                 HTML(
                 '''
@@ -48,7 +46,20 @@ class AddCrawlForm(CrispyModelForm):
                     <br>
                 '''
                 ),
-                FormActions(Submit('submit', "Submit"))
+                "rounds_left",
+                InlineRadios('crawler'),
+                'crawl_model',
+                FormActions(Submit('submit', "Create")),
+                HTML(
+                """
+                    <a class="add_index btn btn-primary link-button"
+                        id="cancelSubmit"
+                        target="_blank"
+                        href="#">
+                        Cancel
+                    </a>
+                """
+                ),
             )
         )
 
@@ -73,7 +84,7 @@ class AddCrawlForm(CrispyModelForm):
     class Meta:
         model = Crawl
         fields = ['name', 'description', 'crawler',
-                  'crawl_model', 'seeds_list']
+                  'crawl_model', 'seeds_list', 'rounds_left']
         widgets = {'crawl_model': Select}
 
 
