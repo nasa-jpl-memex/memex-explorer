@@ -14,7 +14,10 @@ $ ./app_setup.sh && source activate memex && supervisord
 ```
 These commands will set up your memex environment, prepare the application by creating the database, and run all of the necessary services for the application. If there are any problems with any of these commands, please report them as a github issue.
 
+
 To stop running the services, simply press `Ctrl-c`.
+
+If you have already run the install script, simply run `supervisord` from the `memex-explorer/source` directory to restart all of the services.
 
 <!---
 The current recommended method for developing Memex Explorer locally is to run it in a [Vagrant](https://www.vagrantup.com/) environment using [VirtualBox](http://docs.vagrantup.com/v2/virtualbox).  After you have installed Vagrant and VirtualBox, run the following commands.
