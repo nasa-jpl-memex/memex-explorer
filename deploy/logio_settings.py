@@ -18,6 +18,6 @@ p = jinja2.Template(
 }"""
 )
 
-f = open("harvester.conf", "w")
+f = open(os.path.join(os.environ["HOME"], ".log.io", "harvester.conf"), "w")
 f.write(p.render(conda_env_location=conda_env_location))
 f.close()
