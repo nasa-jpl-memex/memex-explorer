@@ -19,6 +19,7 @@ class AddCrawlForm(CrispyModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AddCrawlForm, self).__init__(*args, **kwargs)
+        self.fields["rounds_left"].label = "Rounds"
         self.set_layout()
 
     def set_layout(self):
