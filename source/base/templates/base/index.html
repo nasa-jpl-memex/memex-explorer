@@ -20,7 +20,7 @@
             <div class="panel panel-project">
                 <a href="{% url 'base:add_project' %}">
                 <div class="panel-heading">
-                    <div class="row">
+                    <div class="row color-set">
                         <div class="col-xs-3">
                             <i class="fa fa-plus fa-3x"></i>
                         </div>
@@ -38,7 +38,7 @@
                 <div class="panel-heading">
                 <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-12 color-set">
                             <p>{{ project.name }}</p>
                         </div>
                         <!--div class="col-xs-9 text-right">
