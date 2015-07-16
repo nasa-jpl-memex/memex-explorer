@@ -33,6 +33,8 @@ SEEDS_TMP_DIR = os.path.join(MEDIA_ROOT, 'seeds_tmp')
 
 MODELS_TMP_DIR = os.path.join(MEDIA_ROOT, 'models_tmp')
 
+TESTING = True
+
 # Ignore (particular) warnings
 # ============================
 
