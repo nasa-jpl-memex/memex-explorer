@@ -35,13 +35,24 @@
 </div>
 
 <div class='row'>
-  <div class="col-md-8 col-md-offset-2 main">
+  <div class="col-md-8 col-md-offset-3 main">
+    <div class="row">
+          <div class="btn-group" role="group" aria-label="...">
+             <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
+
+            <a class="add_index btn btn-default btn-duo center link-button" target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
+
+            <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
+          </div>
+           
+    </div>
+
     <div class="row">
       <h4 style="line-height:2em;">
         <!-- <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}"> -->
           <i class="fa fa-search"> &nbsp; </i>Crawls
         <!-- </a> -->
-        <a id="link-add-crawl" class="pull-right btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
+        
       </h4>
 
 <!--
@@ -58,7 +69,7 @@
       {% endif %}
 -->
       {% if project.crawl_set.all %}
-      <table class="table table-condensed table-striped">
+      <table class="table table-condensed table-striped ">
         <tr>
           <th>Crawl</th>
           <th>Status</th>
@@ -83,17 +94,17 @@
 
     <div class="row">
       <h4 style="line-height:2em;">
-        <a href="{% url 'base:indices' project_slug=project.slug %}">
+        <!--<a href="{% url 'base:indices' project_slug=project.slug %}"> -->
           <i class="fa fa-archive"> &nbsp; </i>Datasets
         </a>
 
-        <a class="add_index btn btn-default btn-duo center link-button pull-right" target="_blank" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
+        
         <a id="gotoKibana"
             {% if not deployment %}
             disabled
             {% endif %}
-            style="float:right;" class="btn btn-default btn-duo center link-button" href="{{ kibana_link }}">
-            Kibana
+            class="btn btn-default btn-duo center link-button" href="{{ kibana_link }}">
+            Visualize
         </a>
       </h4>
 <!--
@@ -143,7 +154,7 @@
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
         &nbsp;&nbsp;&nbsp;
 
-      <a class="btn btn-default btn-duo center link-button pull-right" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
+      
       </h4>
 <!--
         {% if project.crawlmodel_set.all %}
