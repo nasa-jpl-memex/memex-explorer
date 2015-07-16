@@ -1,5 +1,7 @@
 #!/bin/bash
 pushd ../
+conda update conda;
+conda install conda-env -y;
 conda env update --file local-environment.yml;
 popd
 

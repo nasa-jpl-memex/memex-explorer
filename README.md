@@ -6,6 +6,8 @@
 Memex Explorer is a web application that provides easy-to-use interfaces for gathering, analyzing, and graphing web crawl data.
 
 # Local Development
+To setup your machine, you will need Anaconda or Miniconds installed. Miniconda is a smaller version of Anaconda which does not come with the many scientific packages that Anaconda offers. Install Anaconda from http://continuum.io/downloads or Miniconda from http://conda.pydata.org/miniconda.html
+
 Clone the repository and `cd memex-explorer/source`. Run the following commands:
 ```
 $ ./app_setup.sh && source activate memex && supervisord
