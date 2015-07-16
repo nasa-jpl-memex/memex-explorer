@@ -16,6 +16,7 @@
     background-color:#f5f5f5;
     border: none;
     margin-top: 20px;
+    box-shadow: 3px 3px 15px #888888;
 }
 
 .panel-project>.panel-heading{
