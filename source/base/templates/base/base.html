@@ -44,7 +44,7 @@
                         {% if projects %}
                           <ul class="dropdown-menu">
                           {% for x in projects %}
-                           <a href="{% url 'base:project' project_slug=x.slug %}"><li>{{ x.name }}</li></a>
+                          <li> <a href="{% url 'base:project' project_slug=x.slug %}">{{ x.name }}</a></li>
                             {% endfor %}
                           </ul>
                             {% endif %}

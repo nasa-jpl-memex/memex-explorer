@@ -13,27 +13,27 @@
 }
 
 .panel-project {
-    background-color:#1D4971;
+    background-color:#f5f5f5;
     border: none;
     margin-top: 20px;
 }
 
 .panel-project>.panel-heading{
 color: black !important;
-background-color: #f5f5f5;
-border-color: #f5f5f5;
+background-color: #1D4971;
+border-color: #1D4971;
 }
 
-
+.color-set {
+  color:white;
+}
 .panel-project>a>.panel-heading {
-color: #fff;
 background-color: #1D4971;
 /*border-color: #1D4971; */
 }
 
 .panel-footer{
-  background-color:#1D4971 !important;
-  color: white;
+  background-color:#f5f5f5 !important;
 }
 
 .search-bar {
