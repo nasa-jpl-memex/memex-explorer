@@ -47,8 +47,8 @@ class AddCrawlForm(CrispyModelForm):
                     <br>
                 '''
                 ),
-                "rounds_left",
                 InlineRadios('crawler'),
+                "rounds_left",
                 'crawl_model',
                 FormActions(Submit('submit', "Create")),
                 HTML(
