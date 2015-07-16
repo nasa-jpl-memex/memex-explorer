@@ -26,8 +26,7 @@ class UploadZipTask(Task):
         """
         self.index.status = "UPLOAD SUCCESS"
         self.index.save()
-        if settings.DEPLOYMENT:
-            create_index.delay(self.index)
+        create_index.delay(self.index)
 
 
 @shared_task(bind=True, base=UploadZipTask)
