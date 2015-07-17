@@ -31,7 +31,6 @@ from task_manager.file_tasks import upload_zip
 
 import requests
 
-
 def project_context_processor(request):
     additional_context = {
         'projects': Project.objects.all(),
@@ -248,21 +247,59 @@ class TadView(ProjectObjectMixin, TemplateView):
     template_name = "base/tad.html"
 
     def post(self, request, *args, **kwargs):
-        if request.POST["get"] == "data":
-            payload = {
-                "target-location": "Colorado Springs;Colorado;United States",
-                "baseline-location": ";Colorado;United States",
+        simple_chart(request)
+        if request.POST['action'] == 'post':
+            query = {
+                "target-filters": {'city': 'Colorado Springs', 'state': 'Colorado'},
+                "baseline-filters": {'state': 'Colorado'},
                 "analysis-start-date": "2014/01/05",
-                "analysis-end-date": "2014/02/05",
-                "stratify": "false",
+                "analysis-end-date": "2014/02/05"
             }
-            r = requests.post("http://127.0.0.1:5000/event-report", data=json.dumps(payload))
+            r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
-                json.dumps(r.text),
+                r.text,
                 content_type="application/json",
             )
+
+        elif request.POST['action'] == 'progress':
+            print('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
+            r = requests.get('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
+            return HttpResponse(r.text, content_type='application/json')
 
         return HttpResponse(
             json.dumps("Nope!"),
             content_type="application/json",
         )
+
+    # Somewhat extracted from the harvest plot example.
+    #def make_random_plot(self):
+    #    p = figure(plot_width=500, plot_height=250,
+    #               title="Harvest Plot", x_axis_type='datetime',
+    #               tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
+    #    p.legend.orientation = "top_left"
+
+    #    # Save ColumnDataSource model id to database model
+    #    script, div = components(p, INLINE)
+    #    return (script, div)
+
+    #def get_context_data(self, **kwargs):
+    #    context = super(TadView, self).get_context_data(**kwargs)
+    #    (scripts, divs) = self.make_random_plot()
+    #    context['scripts'] = {'the_script': scripts}
+    #    context['divs'] = {'the_div': divs}
+    #    return context
+
+from django.shortcuts import render
+from bokeh.plotting import figure
+from bokeh.resources import CDN, INLINE
+from bokeh.embed import components
+
+def simple_chart(request):
+    plot = figure()
+    plot.circle([1,2], [3,4])
+
+    script, div = components(plot, CDN)
+
+    print(os.getcwd())
+
+    return render(request, "base/templates/base/tad.html", {"the_script":script, "the_div":div})
