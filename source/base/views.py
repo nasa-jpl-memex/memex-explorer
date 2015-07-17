@@ -258,7 +258,7 @@ class TadView(ProjectObjectMixin, TemplateView):
             return HttpResponse(
                 json.dumps({
                     # "response_text": r.text,
-                    "plot": simple_chart()}
+                    "plot": simple_chart(),
                 }),
                 content_type="application/json",
             )
