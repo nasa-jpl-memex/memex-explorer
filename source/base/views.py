@@ -247,7 +247,6 @@ class TadView(ProjectObjectMixin, TemplateView):
     template_name = "base/tad.html"
 
     def post(self, request, *args, **kwargs):
-        simple_chart(request)
         if request.POST['action'] == 'post':
             query = {
                 "target-filters": {'city': 'Colorado Springs', 'state': 'Colorado'},
@@ -255,9 +254,12 @@ class TadView(ProjectObjectMixin, TemplateView):
                 "analysis-start-date": "2014/01/05",
                 "analysis-end-date": "2014/02/05"
             }
-            r = requests.post("http://127.0.0.1:5000/event-report", json=query)
+            #r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
-                r.text,
+                json.dumps({
+                    # "response_text": r.text,
+                    "plot": simple_chart()}
+                }),
                 content_type="application/json",
             )
 
@@ -294,7 +296,7 @@ from bokeh.plotting import figure
 from bokeh.resources import CDN, INLINE
 from bokeh.embed import components
 
-def simple_chart(request):
+def simple_chart():
     plot = figure()
     plot.circle([1,2], [3,4])
 
@@ -302,4 +304,4 @@ def simple_chart(request):
 
     print(os.getcwd())
 
-    return render(request, "base/templates/base/tad.html", {"the_script":script, "the_div":div})
+    return {"script":script, "div":div}

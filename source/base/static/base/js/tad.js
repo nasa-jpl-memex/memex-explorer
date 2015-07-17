@@ -10,7 +10,8 @@ var tad = tad || {};
       },
       success: function(response){
         task_id = response['task-id'];
-        $("#response").text('Looks like it worked! Task ID: ' + task_id);
+        $("#response").html(response["plot"]["script"] + response["plot"]["div"]);
+        //$("#response").text('Looks like it worked! Task ID: ' + task_id);
         $("#task-id").text(task_id)
       },
       error: function(response){
