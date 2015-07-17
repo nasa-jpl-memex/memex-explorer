@@ -46,6 +46,7 @@ class Harvest(object):
         df = pd.read_csv(StringIO(stdout), delimiter='\t',
             names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
 
         source = into(ColumnDataSource, df)
         return source
@@ -79,4 +80,3 @@ class Harvest(object):
         script, div = components(p, INLINE)
 
         return (script, div)
-
