@@ -16,12 +16,10 @@
   <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-2 main">
     <h1>Temporal Anomaly Detectory</h1>
       <div id="response" style="padding:4px; border: solid 1px black;">No query run.</div>
-      <div id="task-id"></div>
+      <div id="task-id" style="display: none;"></div>
       <br />
       <button class="btn btn-default btn-duo center link-button" id="run-detector" style="float:right;">Run Detector</button>
       <button class="btn btn-default btn-duo center link-button" id="get-status" style="float:right;">Get Status</button>
   </div>
 </div>
-{{ the_div | safe }}
-{{ the_script | safe }}
 {% endblock %}

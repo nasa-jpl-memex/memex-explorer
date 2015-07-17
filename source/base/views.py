@@ -29,6 +29,9 @@ from apps.crawl_space.views import ProjectObjectMixin
 
 from task_manager.file_tasks import upload_zip
 
+import datetime as dt
+import time
+
 import requests
 
 def project_context_processor(request):
@@ -249,59 +252,44 @@ class TadView(ProjectObjectMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         if request.POST['action'] == 'post':
             query = {
-                "target-filters": {'city': 'Colorado Springs', 'state': 'Colorado'},
-                "baseline-filters": {'state': 'Colorado'},
-                "analysis-start-date": "2014/01/05",
-                "analysis-end-date": "2014/02/05"
+                "target-filters": {'stock': 'ACOL'},
+                "baseline-filters": {},
+                "analysis-start-date": "2015-06-01",
+                "analysis-end-date": "2015-07-10"
             }
-            #r = requests.post("http://127.0.0.1:5000/event-report", json=query)
+            r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
-                json.dumps({
-                    # "response_text": r.text,
-                    "plot": simple_chart(),
-                }),
+                json.dumps(json.loads(r.text)),
                 content_type="application/json",
             )
 
         elif request.POST['action'] == 'progress':
-            print('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
             r = requests.get('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
-            return HttpResponse(r.text, content_type='application/json')
+            try: result = json.loads(r.text)
+            except: result = r.text
+            if result['error']  != None:
+                return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
+            elif result['result'] != None:
+                x = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
+                y = [[r[5]] for r in result['result']]
+                return HttpResponse(
+                        json.dumps({'result': result, 'plot': time_series_plot(x, y)}),
+                        content_type='application/json')
+            else: return HttpResponse(r.text, content_type='application/json')
 
         return HttpResponse(
             json.dumps("Nope!"),
             content_type="application/json",
         )
 
-    # Somewhat extracted from the harvest plot example.
-    #def make_random_plot(self):
-    #    p = figure(plot_width=500, plot_height=250,
-    #               title="Harvest Plot", x_axis_type='datetime',
-    #               tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
-    #    p.legend.orientation = "top_left"
-
-    #    # Save ColumnDataSource model id to database model
-    #    script, div = components(p, INLINE)
-    #    return (script, div)
-
-    #def get_context_data(self, **kwargs):
-    #    context = super(TadView, self).get_context_data(**kwargs)
-    #    (scripts, divs) = self.make_random_plot()
-    #    context['scripts'] = {'the_script': scripts}
-    #    context['divs'] = {'the_div': divs}
-    #    return context
-
-from django.shortcuts import render
 from bokeh.plotting import figure
 from bokeh.resources import CDN, INLINE
 from bokeh.embed import components
 
-def simple_chart():
-    plot = figure()
-    plot.circle([1,2], [3,4])
+def time_series_plot( x, y ):
+    plot = figure(x_axis_type = "datetime", plot_height=300)
+    plot.line(x, y)
+    plot.title = 'P Values'
 
     script, div = components(plot, CDN)
-
-    print(os.getcwd())
-
-    return {"script":script, "div":div}
+    return { 'script': script, 'div': div }

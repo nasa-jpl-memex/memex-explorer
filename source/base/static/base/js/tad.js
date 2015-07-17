@@ -10,13 +10,15 @@ var tad = tad || {};
       },
       success: function(response){
         task_id = response['task-id'];
-        $("#response").html(response["plot"]["script"] + response["plot"]["div"]);
-        //$("#response").text('Looks like it worked! Task ID: ' + task_id);
+        $("#response").html(
+            "Looks like things worked! Here's your magical task ID:<br />" +
+            "<b>" + response['task-id'] + "</b>");
         $("#task-id").text(task_id)
       },
       error: function(response){
-        $("#response").text(JSON.stringify(response))
-      },
+        $("#response").html("Something failed! Hopefully what follows is useful:<br />" + 
+            '<span style="color: red;">' + JSON.stringify(response) + '</span>')
+      }
     });
   }
 
@@ -28,10 +30,12 @@ var tad = tad || {};
         "task-id": $("#task-id").text()
       },
       success: function(response) {
-        $("#response").text(JSON.stringify(response))
+        $("#response").html(response['plot']['script'] + response['plot']['div'] +
+          JSON.stringify(response['result']))
       },
-      error: function(response) {
-        $("#response").text("The progress ping failed.\n" + JSON.stringify(response))
+      error: function(response){
+        $("#response").html("Something failed! Hopefully what follows is useful:<br />" + 
+          '<span style="color: red;">' + JSON.stringify(response) + '</span>')
       }
     });
   }
