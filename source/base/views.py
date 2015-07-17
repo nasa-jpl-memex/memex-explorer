@@ -252,10 +252,10 @@ class TadView(ProjectObjectMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         if request.POST['action'] == 'post':
             query = {
-                "target-filters": {'stock': 'ACOL'},
+                "target-filters": {'stock': 'HEMP'},
                 "baseline-filters": {},
-                "analysis-start-date": "2015-06-01",
-                "analysis-end-date": "2015-07-10"
+                "analysis-start-date": "2014-10-25",
+                "analysis-end-date": "2014-11-15"
             }
             r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
@@ -271,7 +271,7 @@ class TadView(ProjectObjectMixin, TemplateView):
                 return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
             elif result['result'] != None:
                 x = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
-                y = [[r[5]] for r in result['result']]
+                y = [[r[7]] for r in result['result']]
                 return HttpResponse(
                         json.dumps({'result': result, 'plot': time_series_plot(x, y)}),
                         content_type='application/json')

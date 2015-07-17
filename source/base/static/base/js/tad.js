@@ -12,7 +12,7 @@ var tad = tad || {};
         task_id = response['task-id'];
         $("#response").html(
             "Looks like things worked! Here's your magical task ID:<br />" +
-            "<b>" + response['task-id'] + "</b>");
+            "<b>" + response['task-id'] + "</b><br />" + JSON.stringify(response));
         $("#task-id").text(task_id)
       },
       error: function(response){
