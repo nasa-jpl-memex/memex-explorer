@@ -43,6 +43,11 @@
     </div>
 {% load crispy_forms_tags %}
     <div class="container-fluid">
+    <div class="col-md-offset-2 col-md-3">
+                <ol class="breadcrumb">
+                  <li> <a href="/"> / My Projects / </a></li> <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">{{ project.name }}  </a> / Add Dataset
+                </ol>
+    </div>
       <div class="row">
 <div class='row'>
     <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
@@ -55,6 +60,7 @@
             </div>
         </div>
         <div class="center">
+            
             <h1>Add Dataset</h1>
             {% crispy form %}
         </div>
