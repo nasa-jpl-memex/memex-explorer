@@ -111,7 +111,6 @@ class Index(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         self.data_folder = self.get_dumped_data_path()
-        self.num_files = len(os.listdir(self.get_dumped_data_path()))
         super(Index, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
