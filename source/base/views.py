@@ -272,13 +272,14 @@ class TadView(ProjectObjectMixin, TemplateView):
                 return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
             elif result['result'] != None:
                 dates = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
-                pvalues = [[-np.log(r[7])] for r in result['result']]
+                pvalues_lower = [[-np.log(r[-3])] for r in result['result']]
+                pvalues_upper = [[-np.log(r[-1])] for r in result['result']]
                 baseline_counts = [[r[3]] for r in result['result']]
                 target_counts = [[r[4]] for r in result['result']]
                 return HttpResponse(
                         json.dumps({
                             'result': result,
-                            'pvalue_plot': pvalue_plot(dates, pvalues),
+                            'pvalue_plot': pvalue_plot(dates, pvalues_lower, pvalues_upper),
                             'count_plot' : counts_plot(dates, baseline_counts, target_counts)}),
                         content_type='application/json')
             else: return HttpResponse(json.dumps({'result', r.text}), content_type='application/json')
@@ -292,18 +293,21 @@ from bokeh.plotting import figure
 from bokeh.resources import CDN, INLINE
 from bokeh.embed import components
 
-def pvalue_plot( x, y ):
+def pvalue_plot( date, pvalues_lower, pvalues_upper ):
     plot = figure(x_axis_type = "datetime", plot_height=200)
-    plot.line(x, y)
+    plot.line(date, pvalues_lower, legend='Lower', line_color='green')
+    plot.line(date, pvalues_upper, legend='Upper', line_color='red')
     plot.title = '-log(P Values)'
 
     script, div = components(plot, CDN)
     return { 'script': script, 'div': div }
 
-def counts_plot( time, baseline_counts, target_counts ):
+def counts_plot( date, baseline_counts, target_counts ):
     plot = figure(x_axis_type = "datetime", plot_height=200)
-    plot.line(time, baseline_counts, legend='Basline')
-    plot.line(time, target_counts, line_color='orange', legend='Target')
+    #plot.add_layout(LinearAxis(y_range_name="target"), 'right')
+    plot.line(date, baseline_counts, legend='Basline')
+    #plot.line(date, target_counts, line_color='orange', legend='Target', y_range_name='target')
+    plot.line(date, target_counts, line_color='orange', legend='Target')
     plot.title = 'Counts'
 
     script, div = components(plot, CDN)
