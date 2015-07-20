@@ -256,7 +256,8 @@ class TadView(ProjectObjectMixin, TemplateView):
                 "target-filters"        : json.loads(request.POST['target-filters']),
                 "baseline-filters"      : json.loads(request.POST['baseline-filters']),
                 "analysis-start-date"   : request.POST['analysis-start-date'],
-                "analysis-end-date"     : request.POST['analysis-end-date']
+                "analysis-end-date"     : request.POST['analysis-end-date'],
+                "constant-baseline"     : request.POST['constant-baseline'] == 'true'
             }
             r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
@@ -272,8 +273,8 @@ class TadView(ProjectObjectMixin, TemplateView):
                 return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
             elif result['result'] != None:
                 dates = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
-                pvalues_lower = [[-np.log(r[-3])] for r in result['result']]
-                pvalues_upper = [[-np.log(r[-1])] for r in result['result']]
+                pvalues_lower = [[-np.log10(r[-3])] for r in result['result']]
+                pvalues_upper = [[-np.log10(r[-1])] for r in result['result']]
                 baseline_counts = [[r[3]] for r in result['result']]
                 target_counts = [[r[4]] for r in result['result']]
                 return HttpResponse(
@@ -282,7 +283,7 @@ class TadView(ProjectObjectMixin, TemplateView):
                             'pvalue_plot': pvalue_plot(dates, pvalues_lower, pvalues_upper),
                             'count_plot' : counts_plot(dates, baseline_counts, target_counts)}),
                         content_type='application/json')
-            else: return HttpResponse(json.dumps({'result', r.text}), content_type='application/json')
+            else: return HttpResponse(json.dumps({'result': r.text}), content_type='application/json')
 
         return HttpResponse(
             json.dumps("Nope!"),

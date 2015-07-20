@@ -10,7 +10,8 @@ var tad = tad || {};
         "target-filters"        : "{" + $("#target-filters").val() + "}",
         "baseline-filters"      : "{" + $("#baseline-filters").val() + "}",
         "analysis-start-date"   : $("#analysis-start-date").val(),
-        "analysis-end-date"     : $("#analysis-end-date").val()
+        "analysis-end-date"     : $("#analysis-end-date").val(),
+        "constant-baseline"     : $("#constant-baseline").is(":checked")
       },
       success: function(response){
         $("#raw-response").text(JSON.stringify(response));
@@ -45,12 +46,13 @@ var tad = tad || {};
         "task-id": $("#task-id").text()
       },
       success: function(response) {
-        $("#response").html(
-          response['pvalue_plot']['script'] + response['pvalue_plot']['div'] +
-          response['count_plot']['script'] + response['count_plot']['div']);
         $("#raw-response").text(JSON.stringify(response['result']));
         if ((response['result']['status'] != 'Finished') && (!response['result']['error']))
           setTimeout(get_results, 1000);
+        else
+          $("#response").html(
+            response['pvalue_plot']['script'] + response['pvalue_plot']['div'] +
+            response['count_plot']['script'] + response['count_plot']['div']);
       },
       error: function(response){
         $("#response").html("Something failed! Hopefully something in the response is useful.") 
