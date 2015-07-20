@@ -44,8 +44,8 @@
     </h1>
 
   <!-- Crawl Status -->
-    
-    
+
+
   </div>
 </div>
 
@@ -61,7 +61,7 @@
         <h5>Rounds left: <span id="roundsLeft">{{ crawl.rounds_left }}</span></h5>
         {% endif %}
       </div>
-      <div class="col-md-2" style="margin-top:1%">
+      <div class="col-md-3" style="margin-top:1%">
         <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
           data-container="body"
           {% if crawl.status != "NOT STARTED" %}
@@ -88,6 +88,19 @@
           data-toggle="tooltip" data-placement="bottom">
           <span class="fa fa-refresh"></span>
         </button>
+      {% if crawl.crawler == "nutch" %}
+      <p style="display:inline;margin-left:5px;">Rounds:
+        <input id="rounds" type="number" class="btn btn-control" value="{{ crawl.rounds_left }}" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
+      </p>
+      <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
+        data-container="body"
+        {% if crawl.status != "STARTED" %}
+          disabled
+        {% endif %}
+        data-toggle="tooltip" data-placement="bottom">
+        <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
+      </button>
+      {% endif %}
       </div>
       <div class="col-md-4 btn-group" style="margin-top:1%;">
         <form method="get" style="display:inline;">
@@ -110,21 +123,6 @@
             </button>
         </form>
       </div>
-      <!--
-      {% if crawl.crawler == "nutch" %}
-      <p style="display:inline;margin-left:5px;">Rounds:
-        <input id="rounds" type="number" class="btn btn-control" value="{{ crawl.rounds_left }}" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
-      </p>
-      <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "STARTED" %}
-          disabled
-        {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
-      </button>
-      {% endif %}
-      -->
     </div>
 
     <!--
@@ -139,7 +137,7 @@
     </div>
     -->
     <div class="col-sm-3" style="padding-left:0px;display:inline;">
-        
+
     </div>
   </div>
 </div>
@@ -221,7 +219,7 @@
     <div class="row">
       <hr/>
         <h4 class="col-md-3">
-            Summary Statistics 
+            Summary Statistics
         </h4>
         <div class="col-md-2 pull-right">
           <a id="gotoKibana"
