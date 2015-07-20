@@ -170,10 +170,7 @@
             <a>Dump Images</a>
         </button>
         <a id="gotoKibana"
-            {% if not deployment %}
-            disabled
-            {% endif %}
-            style="float:left;" class="btn btn-default btn-duo center link-button" href="{{ kibana_link }}">
+            style="float:left;" class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
             Kibana
         </a>
     </div>
@@ -231,7 +228,6 @@
 </div>
 
 {% if crawl.crawler == "nutch" %}
-{% if deployment %}
 <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
         <div role="tabpanel">
@@ -242,15 +238,14 @@
         </div>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="logio">
-                <iframe src="{{ exterinal_app_locations.logio }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
+                <iframe src="{{ logio }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
             </div>
             <div role="tabpanel" class="tab-pane" id="kibana">
-                <iframe src="{{ kibana_link }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
+                <iframe src="{{ kibana }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
             </div>
         </div>
     </div>
 </div>
-{% endif %}
 {% endif %}
 
 {% endblock content %}

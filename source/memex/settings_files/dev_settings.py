@@ -148,6 +148,6 @@ CELERY_TRACK_STARTED = True
 DEPLOYMENT = False
 
 EXTERNAL_APP_LOCATIONS = {
-    'kibana': 'http://localhost:9999',
+    'kibana': 'http://localhost:5601',
     'logio': 'http://localhost:28778',
 }
