@@ -6,18 +6,33 @@ var tad = tad || {};
     return $.ajax({
       type: "POST",
       data: {
-        "action": "post",
+        "action"                : "post",
+        "target-filters"        : "{" + $("#target-filters").val() + "}",
+        "baseline-filters"      : "{" + $("#baseline-filters").val() + "}",
+        "analysis-start-date"   : $("#analysis-start-date").val(),
+        "analysis-end-date"     : $("#analysis-end-date").val()
       },
       success: function(response){
-        task_id = response['task-id'];
-        $("#response").html(
+        $("#raw-response").text(JSON.stringify(response));
+        task_id = response['result']['task-id'];
+        if (task_id)
+        {
+          $("#response").html(
             "Looks like things worked! Here's your magical task ID:<br />" +
-            "<b>" + response['task-id'] + "</b><br />" + JSON.stringify(response));
-        $("#task-id").text(task_id)
+            "<b>" + task_id + "</b>");
+          $("#task-id").text(task_id);
+          $("#raw-response").text(JSON.stringify(response));
+          setTimeout(get_results, 1000);
+        }
+        else
+        {
+          $("#response").html("Something failed! Hopefully something in the response is useful.<br />" + response['result']['error']); 
+          $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
+        }
       },
       error: function(response){
-        $("#response").html("Something failed! Hopefully what follows is useful:<br />" + 
-            '<span style="color: red;">' + JSON.stringify(response) + '</span>')
+        $("#response").html("Something failed! Hopefully something in the response is useful."); 
+        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
       }
     });
   }
@@ -30,12 +45,16 @@ var tad = tad || {};
         "task-id": $("#task-id").text()
       },
       success: function(response) {
-        $("#response").html(response['plot']['script'] + response['plot']['div'] +
-          JSON.stringify(response['result']))
+        $("#response").html(
+          response['pvalue_plot']['script'] + response['pvalue_plot']['div'] +
+          response['count_plot']['script'] + response['count_plot']['div']);
+        $("#raw-response").text(JSON.stringify(response['result']));
+        if ((response['result']['status'] != 'Finished') && (!response['result']['error']))
+          setTimeout(get_results, 1000);
       },
       error: function(response){
-        $("#response").html("Something failed! Hopefully what follows is useful:<br />" + 
-          '<span style="color: red;">' + JSON.stringify(response) + '</span>')
+        $("#response").html("Something failed! Hopefully something in the response is useful.") 
+        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
       }
     });
   }
@@ -44,9 +63,20 @@ var tad = tad || {};
     $("#run-detector").click(function(){
       submit_query();
     });
-    $("#get-status").click(function(){
-      get_results();
-    });
   });
 
 })();
+
+$(function() {
+    $.datepicker.setDefaults({
+        dateFormat: 'yy-mm-dd'
+    });
+});
+
+$(function() {
+    $("#analysis-start-date").datepicker();
+});
+
+$(function() {
+    $("#analysis-end-date").datepicker();
+});

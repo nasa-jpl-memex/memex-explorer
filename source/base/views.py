@@ -32,6 +32,7 @@ from task_manager.file_tasks import upload_zip
 import datetime as dt
 import time
 
+import numpy as np
 import requests
 
 def project_context_processor(request):
@@ -252,30 +253,35 @@ class TadView(ProjectObjectMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         if request.POST['action'] == 'post':
             query = {
-                "target-filters": {'stock': 'HEMP'},
-                "baseline-filters": {},
-                "analysis-start-date": "2014-10-25",
-                "analysis-end-date": "2014-11-15"
+                "target-filters"        : json.loads(request.POST['target-filters']),
+                "baseline-filters"      : json.loads(request.POST['baseline-filters']),
+                "analysis-start-date"   : request.POST['analysis-start-date'],
+                "analysis-end-date"     : request.POST['analysis-end-date']
             }
             r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
-                json.dumps(json.loads(r.text)),
-                content_type="application/json",
+                json.dumps({'result': json.loads(r.text)}),
+                content_type="application/json"
             )
 
         elif request.POST['action'] == 'progress':
             r = requests.get('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
             try: result = json.loads(r.text)
-            except: result = r.text
+            except: result = {'result': r.text, 'error': 'Could not parse response.'}
             if result['error']  != None:
                 return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
             elif result['result'] != None:
-                x = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
-                y = [[r[7]] for r in result['result']]
+                dates = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
+                pvalues = [[-np.log(r[7])] for r in result['result']]
+                baseline_counts = [[r[3]] for r in result['result']]
+                target_counts = [[r[4]] for r in result['result']]
                 return HttpResponse(
-                        json.dumps({'result': result, 'plot': time_series_plot(x, y)}),
+                        json.dumps({
+                            'result': result,
+                            'pvalue_plot': pvalue_plot(dates, pvalues),
+                            'count_plot' : counts_plot(dates, baseline_counts, target_counts)}),
                         content_type='application/json')
-            else: return HttpResponse(r.text, content_type='application/json')
+            else: return HttpResponse(json.dumps({'result', r.text}), content_type='application/json')
 
         return HttpResponse(
             json.dumps("Nope!"),
@@ -286,10 +292,19 @@ from bokeh.plotting import figure
 from bokeh.resources import CDN, INLINE
 from bokeh.embed import components
 
-def time_series_plot( x, y ):
-    plot = figure(x_axis_type = "datetime", plot_height=300)
+def pvalue_plot( x, y ):
+    plot = figure(x_axis_type = "datetime", plot_height=200)
     plot.line(x, y)
-    plot.title = 'P Values'
+    plot.title = '-log(P Values)'
+
+    script, div = components(plot, CDN)
+    return { 'script': script, 'div': div }
+
+def counts_plot( time, baseline_counts, target_counts ):
+    plot = figure(x_axis_type = "datetime", plot_height=200)
+    plot.line(time, baseline_counts, legend='Basline')
+    plot.line(time, target_counts, line_color='orange', legend='Target')
+    plot.title = 'Counts'
 
     script, div = components(plot, CDN)
     return { 'script': script, 'div': div }
