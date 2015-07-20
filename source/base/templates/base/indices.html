@@ -11,14 +11,11 @@
     <div class="col-sm-5 col-sm-offset-3 col-sm-5  col-md-offset-2 main">
         <h1>Datasets
             <a id="gotoKibana"
-                {% if not deployment %}
-                disabled
-                {% endif %}
                 style="float:right;"
                 class="btn btn-default btn-duo center link-button"
-                href="{{ kibana_link }}">
-                    Kibana
-                </a>
+                href="{{ kibana }}">
+                Kibana
+            </a>
         </h1>
     </div>
     {% for index in project.index_set.all %}
@@ -36,7 +33,7 @@
                 <th>Number of Files</th>
             </tr>
             <tr>
-                <td>0</td>
+                <td>{{ index.num_files }}</td>
             </tr>
         </table>
     </div>

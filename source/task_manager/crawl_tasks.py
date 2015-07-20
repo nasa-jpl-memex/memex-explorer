@@ -139,11 +139,16 @@ def ache(self, crawl, *args, **kwargs):
     call = [
         ache_path,
         "startCrawl",
+        "-o",
         self.crawl.get_crawl_path(),
+        "-c",
         self.crawl.get_config_path(),
+        "-s",
         self.crawl.seeds_list.path,
+        "-m",
         self.crawl.crawl_model.get_model_path(),
-        LANG_DETECT_PATH,
+        "-e",
+        self.crawl.slug
     ]
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,

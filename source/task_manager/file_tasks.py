@@ -25,6 +25,7 @@ class UploadZipTask(Task):
         has succeeded.
         """
         self.index.status = "UPLOAD SUCCESS"
+        self.index.num_files = len(os.listdir(self.get_dumped_data_path()))
         self.index.save()
         create_index.delay(self.index)
 

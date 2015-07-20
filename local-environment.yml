@@ -4,14 +4,16 @@ channels:
     - memex
     - quasiben
     - brittainhard
+    - bokeh
 dependencies:
     - elasticsearch=1.6.0
     - tika-rest-server=1.9.0
+    - kibana
     - bokeh=0.7.0
     - blaze=0.7.0
     - python=2.7.8
     - elasticnutch
-    - ache=0.2.0
+    - ache=0.3.0
     - django=1.7.3
     - gunicorn
     - pytest
@@ -19,6 +21,7 @@ dependencies:
     - sphinx
     - jinja2
     - redis-py
+    - nodejs
     - pip:
         - tld
         - tika==1.8.7

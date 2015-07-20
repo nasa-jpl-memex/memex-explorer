@@ -34,9 +34,9 @@ def project_context_processor(request):
     additional_context = {
         'projects': Project.objects.all(),
         'deployment': settings.DEPLOYMENT,
+        'logio': settings.EXTERNAL_APP_LOCATIONS["logio"],
+        'kibana': settings.EXTERNAL_APP_LOCATIONS["kibana"],
     }
-    for app, location in settings.EXTERNAL_APP_LOCATIONS.items():
-        additional_context["{}_link".format(app)] = location
     return additional_context
 
 

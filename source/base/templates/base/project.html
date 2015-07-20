@@ -49,7 +49,7 @@
 
             <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
           </div>
-           
+
     </div>
 
     <div class="row">
@@ -57,7 +57,7 @@
         <!-- <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}"> -->
           <i class="fa fa-search"> &nbsp; </i>Crawls
         <!-- </a> -->
-        
+
       </h4>
 
 <!--
@@ -83,7 +83,7 @@
         {%  for w in project.crawl_set.all %}
         <tr>
 
-        
+
           <td><a href="{{ w.get_absolute_url }}">{{ w.name }}</a></td>
           <td>{{ w.status}}</td>
           <td>{{ w.pages_crawled }}</td>
@@ -103,12 +103,9 @@
           <i class="fa fa-archive"> &nbsp; </i>Datasets
         </a>
 
-        
+
         <a id="gotoKibana"
-            {% if not deployment %}
-            disabled
-            {% endif %}
-            class="btn btn-default btn-duo center link-button" href="{{ kibana_link }}">
+            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
             Visualize
         </a>
       </h4>
@@ -159,7 +156,7 @@
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
         &nbsp;&nbsp;&nbsp;
 
-      
+
       </h4>
 <!--
         {% if project.crawlmodel_set.all %}
