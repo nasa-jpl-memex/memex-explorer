@@ -1,0 +1,19 @@
+package:
+    name: ddt-word2vec
+    version: 0.0.1
+
+build:
+    number: 1
+
+requirements:
+  build:
+    - curl
+
+# Source
+# from: https://s3.amazonaws.com/vida-nyu/DDT/D_cbow_pdw_8B.pkl
+
+# Contact the authors of the below paper for more information about this dataset
+about:
+  home: http://arxiv.org/abs/1504.00548
+  license: CC BY
+  summary: 'word2vec model compiled using https://code.google.com/p/word2vec/source/browse/trunk/demo-train-big-model-v1.sh'
