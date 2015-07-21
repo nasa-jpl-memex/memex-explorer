@@ -1,0 +1,29 @@
+
+package:
+    name: maven
+    version: 3.3.3
+
+source:
+    fn: apache-maven-3.3.3-bin.zip
+    url: http://www.webhostingjams.com/mirror/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip
+    md5: 6e5da03a3324f616493a0fd09d6383fc
+
+build:
+    number: 0
+
+requirements:
+    build:
+
+    run:
+
+test:
+    commands:
+        - mvn --version
+
+# install maven to /prefix/lib/maven instead of /prefix/ to isolate it from other installers
+# these redundancies can be removed by capturing maven dependencies
+        
+about:
+    home: http://maven.apache.org/
+    license: Apache License v2.0
+
