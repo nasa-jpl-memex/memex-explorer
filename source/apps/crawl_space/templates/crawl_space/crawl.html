@@ -2,6 +2,9 @@
 {% load static %}
 {% block title %}Crawl {{ crawl.name }}{% endblock %}
 
+{% block extrahead %}
+  <link href="{% static 'base/css/bokeh.min.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block extrafooter %}
     <script src="{% static 'base/js/bokeh.min.js' %}"></script>
@@ -22,6 +25,11 @@
 
   <!-- Crawl Header -->
 <div class='row'>
+  <div class="col-md-offset-2 col-md-4">
+          <ol class="breadcrumb">
+            <li> <a href="/"> / My Projects / </a></li> <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">{{ project.name }} </a> / {{ crawl.name }}
+          </ol>
+  </div>
   <div class="col-sm-offset-4 col-md-offset-2 col-sm-7 col-md-8 main">
 
   <!-- Crawl Title -->
@@ -31,15 +39,13 @@
       <button id="editButton" title="Edit Crawl" type="button" class="btn btn-control"
       data-container="body"
       data-toggle="tooltip" data-placement="bottom">
-      <i class="fa fa-gears" style="font-size:24px;"></i>
+      <i class="fa fa-pencil" style="font-size:24px;"></i>
     </button></a>
     </h1>
 
   <!-- Crawl Status -->
-    <h4>Crawl Status: <span id="status">{{ crawl.status }}</span></h4>
-    {% if crawl.crawler == "nutch" %}
-    <h4>Rounds Left: <span id="roundsLeft">{{ crawl.rounds_left }}</span></h4>
-    {% endif %}
+
+
   </div>
 </div>
 
@@ -48,45 +54,43 @@
 <div class='row'>
   <div class='col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 controls'>
     <!-- Crawl actions (Start, Stop[, Restart]) -->
-    <div class='col-xs-3'>
-      <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "NOT STARTED" %}
-            disabled
+    <div class='row'>
+      <div class="col-md-2">
+        <h5>Crawl Status: <span id="status">{{ crawl.status }}</span></h5>
+        {% if crawl.crawler == "nutch" %}
+        <h5>Rounds left: <span id="roundsLeft">{{ crawl.rounds_left }}</span></h5>
         {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-play"></span>
-      </button>
-
-      <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "running" %}
-        disabled
-        {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-stop"></span>
-      </button>
-
-      <button id="restartButton" title="Restart Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "stopped" %}
-          disabled
-        {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-refresh"></span>
-      </button>
-
-      {% if crawl.crawler == "nutch" %}
-        <button id="common-crawl-dump" title="Dump (CCA format)" type="button" class="btn btn-control"
-            data-container="body" data-toggle="tooltip" data-placement="bottom"
-            style="height:40px;width:auto;display:inline;">
-           Dump (CCA format)
+      </div>
+      <div class="col-md-3" style="margin-top:1%">
+        <button id="playButton" title="Start Crawl" type="button" class="btn btn-control"
+          data-container="body"
+          {% if crawl.status != "NOT STARTED" %}
+              disabled
+          {% endif %}
+          data-toggle="tooltip" data-placement="bottom">
+          <span class="fa fa-play"></span>
         </button>
-      {% endif %}
 
+        <button id="stopButton" title="Stop Crawl" type="button" class="btn btn-control"
+          data-container="body"
+          {% if crawl.status != "running" %}
+          disabled
+          {% endif %}
+          data-toggle="tooltip" data-placement="bottom">
+          <span class="fa fa-stop"></span>
+        </button>
+
+        <button id="restartButton" title="Restart Crawl" type="button" class="btn btn-control"
+          data-container="body"
+          {% if crawl.status != "stopped" %}
+            disabled
+          {% endif %}
+          data-toggle="tooltip" data-placement="bottom">
+          <span class="fa fa-refresh"></span>
+        </button>
       {% if crawl.crawler == "nutch" %}
       <p style="display:inline;margin-left:5px;">Rounds:
-        <input id="rounds" type="number" class="btn btn-control" value="1" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
+        <input id="rounds" type="number" class="btn btn-control" value="{{ crawl.rounds_left }}" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
       </p>
       <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
         data-container="body"
@@ -97,11 +101,11 @@
         <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
       </button>
       {% endif %}
-    </div>
-    <div class="col-sm-3" style="padding-left:0px;display:inline;">
+      </div>
+      <div class="col-md-4 btn-group" style="margin-top:1%;">
         <form method="get" style="display:inline;">
             <input type="hidden" name="resource" value="initial_seeds">
-            <button title="Get Seeds List" id="getInitialSeeds" class="btn btn-control"
+            <button title="Get Seeds List" id="getInitialSeeds" class="btn btn-default btn-duo center link-button"
             data-container="body" data-toggle="tooltip" data-placement="bottom"
             style="height:40px;width:auto;display:inline;">
             Get Seeds List
@@ -109,7 +113,7 @@
         </form>
         <form method="get" style="display:inline;">
             <input type="hidden" name="resource" value="crawl_log">
-            <button title="Get Crawl Log" id="getCrawlLog" class="btn btn-control"
+            <button title="Get Crawl Log" id="getCrawlLog" class="btn btn-default btn-duo center link-button"
             {% if crawl.status == "Not started" %}
             disabled
             {% endif %}
@@ -118,6 +122,22 @@
             Get Crawl Log
             </button>
         </form>
+      </div>
+    </div>
+
+    <!--
+    <div class="row">
+      {% if crawl.crawler == "nutch" %}
+        <button id="common-crawl-dump" title="Dump (CCA format)" type="button" class="btn btn-control"
+            data-container="body" data-toggle="tooltip" data-placement="bottom"
+            style="height:40px;width:auto;display:inline;">
+           Dump (CCA format)
+        </button>
+      {% endif %}
+    </div>
+    -->
+    <div class="col-sm-3" style="padding-left:0px;display:inline;">
+
     </div>
   </div>
 </div>
@@ -128,7 +148,7 @@
 
         {% for div in divs %}
         {% if div %}
-        <div class='col-sm-6'>
+        <div class='col-sm-5'>
             {{ div | safe }}
         </div>
         {% endif %}
@@ -157,15 +177,16 @@
   </div>
 </div>
 {% endif %}
+
+<!--
 {% if crawl.crawler == "nutch" %}
 <div class='row'>
     <div id="nutchButtons" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <br>
-       <!--
+
         <button id="gotoSolr" type="button" title="Goto Solr" class="btn btn-default btn-duo center">
             <a>View Results in Solr</a>
         </button>
-        -->
         <button id="dumpImages" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
             <a>Dump Images</a>
         </button>
@@ -176,6 +197,8 @@
     </div>
 </div>
 {% endif %}
+-->
+
 {% if crawl.description or crawl.crawler == "ache" %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -197,31 +220,42 @@
 
 <div class='row'>
   <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
-  <h3>Summary Statistics</h3>
-<!--   <div class='row'>
-  <div class="col-sm-12 col-md-5">
- --> <table data-toggle="table">
-    <thead>
-      <tr>
-    {% if crawl.crawler == "ache" %}
-        <th>Pages Crawled</th>
-        <th>Harvest Rate</th>
-    {% else %}
-        <th>Pages Crawled</th>
-    {% endif %}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-    {% if crawl.crawler == "ache" %}
-        <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
-        <td><span id="stats-harvest">{{ crawl.harvest_rate }}</span></td>
-    {% else %}
-        <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
-    {% endif %}
-      </tr>
-    </tbody>
-  </table>
+    <div class="row">
+      <hr/>
+        <h4 class="col-md-3">
+            Summary Statistics
+        </h4>
+        <div class="col-md-2 pull-right">
+          <a id="gotoKibana"
+            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
+            Visualize
+              </a>
+        </div>
+    <!--   <div class='row'>
+      <div class="col-sm-12 col-md-5">
+     --> <table data-toggle="table" class="table col-md-12">
+        <thead>
+          <tr>
+        {% if crawl.crawler == "ache" %}
+            <th>Pages Crawled</th>
+            <th>Harvest Rate</th>
+        {% else %}
+            <th>Pages Crawled</th>
+        {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+        {% if crawl.crawler == "ache" %}
+            <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
+            <td><span id="stats-harvest">{{ crawl.harvest_rate }}</span></td>
+        {% else %}
+            <td><span id="stats-pages">{{ crawl.pages_crawled }}</span></td>
+        {% endif %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
 <!--   </div>
   </div>
  -->  </div>

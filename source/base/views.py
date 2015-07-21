@@ -40,9 +40,14 @@ def project_context_processor(request):
     return additional_context
 
 
-class IndexView(ListView):
+class IndexView(CreateView):
     model = Project
+    form_class = AddProjectForm
     template_name = "base/index.html"
+    success_message = "Project %(name)s was added successfully."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
 
 class AboutView(TemplateView):

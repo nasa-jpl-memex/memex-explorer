@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('pages_crawled', models.BigIntegerField(default=0)),
                 ('harvest_rate', models.FloatField(default=0)),
                 ('location', models.CharField(default=b'location', max_length=64)),
-                ('rounds_left', models.IntegerField(default=0)),
+                ('rounds_left', models.IntegerField(default=1, null=True, blank=True)),
             ],
             options={
             },
