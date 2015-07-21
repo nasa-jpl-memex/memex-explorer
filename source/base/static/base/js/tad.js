@@ -11,7 +11,9 @@ var tad = tad || {};
         "baseline-filters"      : "{" + $("#baseline-filters").val() + "}",
         "analysis-start-date"   : $("#analysis-start-date").val(),
         "analysis-end-date"     : $("#analysis-end-date").val(),
-        "constant-baseline"     : $("#constant-baseline").is(":checked")
+        "constant-baseline"     : $("#constant-baseline").is(":checked"),
+        "index"                 : $("#index").val(),
+        "time_field"            : $("#time-field").val()
       },
       success: function(response){
         $("#raw-response").text(JSON.stringify(response));
