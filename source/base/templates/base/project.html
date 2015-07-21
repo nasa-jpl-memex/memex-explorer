@@ -8,6 +8,7 @@
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/project.js' %}"></script>
     <script src="{% static 'base/js/form_ajax.js' %}"></script>
+    <script src="{% static 'base/js/crawl_form.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -204,7 +205,8 @@
         <p>No Crawl Models Registered.</p>
         {% endif %}
   <form method="post" enctype="multipart/form-data" id="addCrawlForm">
-    <input type='hidden' name='csrfmiddlewaretoken' value='ZTHcCrWDuqpE9gXoyDK4cSJ5fWKhjc6c' />
+    <h1>Add Crawl</h1>
+    {% csrf_token %}
     <fieldset>
       <div id="div_id_name" class="form-group">
         <label for="id_name" class="control-label  requiredField">
@@ -226,23 +228,23 @@
         <label for="id_seeds_list" class="control-label  requiredField">
   				Seeds list<span class="asteriskField">*</span>
         </label>
-        <div class="controls ">
+        <div class="controls">
           <input class="clearablefileinput" id="id_seeds_list" name="seeds_list" type="file" />
         </div>
       </div>
-      <label for="id_textseeds" class="">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Or, paste  urls to crawl.
-      </label>
-      <div class="controls ">
-        <textarea class="textarea form-control" cols="10" id="id_textseeds" name="textseeds"rows="10"></textarea>
-      </div><br>
-      <div id="div_id_crawler" class="form-group">
-        <label for="id_crawler"  class="control-label  requiredField">
-                  Crawler<span class="asteriskField">*</span>
+      <div id="div_id_textseeds" class="form-group">
+        <label for="id_textseeds" class="control-label">
+          Or, paste  urls to crawl.
         </label>
         <div class="controls ">
+          <textarea class="textarea form-control" cols="10" id="id_textseeds" name="textseeds"rows="10"></textarea>
+        </div>
+      </div>
+      <div id="div_id_crawler" class="form-group">
+        <label for="id_crawler"  class="control-label  requiredField">
+          Crawler<span class="asteriskField">*</span>
+        </label>
+        <div class="controls">
           <label class="radio-inline">
             <input type="radio" checked="checked" name="crawler" id="id_crawler_1" value="nutch" >Nutch
           </label>
@@ -267,7 +269,7 @@
           <select class="select form-control" id="id_crawl_model" name="crawl_model">
             <option value="" selected="selected">---------</option>
             {% for w in project.crawlmodel_set.all %}
-              <option value="{{ w }}" selected="selected">{{ w }}</option>
+              <option value="{{ w }}">{{ w }}</option>
             {% endfor %}
           </select>
         </div>

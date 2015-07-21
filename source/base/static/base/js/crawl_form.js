@@ -28,4 +28,10 @@ $(document).ready(function(){
     on_crawler_change();
 
     crawler.change(on_crawler_change);
+
+    var crawlForm = $("#addCrawlForm");
+    crawlForm.submit(function(event){
+      event.preventDefault();
+      console.log(ajaxForms.formToJson(crawlForm))
+    })
 });
