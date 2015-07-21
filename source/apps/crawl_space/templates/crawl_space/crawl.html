@@ -148,7 +148,7 @@
 
         {% for div in divs %}
         {% if div %}
-        <div class='col-sm-6'>
+        <div class='col-sm-5'>
             {{ div | safe }}
         </div>
         {% endif %}
@@ -227,11 +227,8 @@
         </h4>
         <div class="col-md-2 pull-right">
           <a id="gotoKibana"
-                  {% if not deployment %}
-                  disabled
-                  {% endif %}
-                  class="btn btn-default btn-duo center link-button" href="{{ kibana_link }}">
-                  Kibana
+            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
+            Visualize
               </a>
         </div>
     <!--   <div class='row'>

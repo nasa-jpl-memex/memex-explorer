@@ -103,4 +103,3 @@ class Domain(object):
 
         if os.path.exists(self.crawled_data) and os.path.exists(self.relevant_data):
             return (script, div)
-

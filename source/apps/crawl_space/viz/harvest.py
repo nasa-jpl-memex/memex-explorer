@@ -54,7 +54,7 @@ class Harvest(object):
     def create(self):
         self.source = self.update_source()
 
-        p = figure(plot_width=500, plot_height=250,
+        p = figure(plot_width=400, plot_height=400,
                    title="Harvest Plot", x_axis_type='datetime',
                    tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
