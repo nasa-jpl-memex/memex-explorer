@@ -32,6 +32,8 @@ $(document).ready(function(){
     var crawlForm = $("#addCrawlForm");
     crawlForm.submit(function(event){
       event.preventDefault();
-      console.log(ajaxForms.formToJson(crawlForm))
+      crawlFormData = ajaxForms.formToJson(crawlForm);
+      seedsList = $("#id_seeds_list")
+      crawlFormData["seeds_list"] = seedsList.prop("files")[0]
     })
 });
