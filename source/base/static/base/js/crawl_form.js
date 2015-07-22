@@ -29,13 +29,4 @@ $(document).ready(function(){
 
     crawler.change(on_crawler_change);
 
-    // Manage crawl submits.
-    var crawlForm = $("#addCrawlForm");
-    var seedsList = $("#id_seeds_list");
-    crawlForm.submit(function(event){
-      var seedsList = $("#id_seeds_list");
-      event.preventDefault();
-      var crawlFormData = ajaxForms.formToJson(crawlForm);
-      ajaxForms.formSubmit(crawlFormData);
-    })
 });

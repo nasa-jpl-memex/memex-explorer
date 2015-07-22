@@ -9,6 +9,7 @@
     <script src="{% static 'base/js/project.js' %}"></script>
     <script src="{% static 'base/js/form_ajax.js' %}"></script>
     <script src="{% static 'base/js/crawl_form.js' %}"></script>
+    <script src="{% static 'base/js/crawl_submit.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -204,8 +205,8 @@
         {% else %}
         <p>No Crawl Models Registered.</p>
         {% endif %}
-  <form method="post" enctype="multipart/form-data" id="addCrawlForm">
     <h1>Add Crawl</h1>
+  <form method="post" enctype="multipart/form-data" id="addCrawlForm">
     {% csrf_token %}
     <fieldset>
       <div id="div_id_name" class="form-group">

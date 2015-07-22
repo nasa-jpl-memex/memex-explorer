@@ -1,28 +1,21 @@
 (function(exports){
 
-  exports.formSubmit = function(formData){
-    return $.ajax({
-      method: "POST",
-      data: {
-        action: "add_crawl",
-        form_data: formData,
-      },
-      success: function(response){
-        console.log(response);
-      },
-      failure: function(response){
-        console.log(response);
-      }
-    });
-  }
-
-  exports.formToJson = function(formElement){
-    var formDataObject = new FormData();
+  exports.toFormData = function(formElement){
+    var objects = new FormData();
     var formData = formElement.serializeArray();
     _.each(formData, function(formObject){
-      formDataObject[formObject.name] = formObject.value;
+      objects[formObject.name] = formObject.value;
     });
-    return formDataObject;
+    return objects;
+  }
+
+  exports.toJson = function(formElement){
+    var objects = {};
+    var formData = formElement.serializeArray();
+    _.each(formData, function(formObject){
+      objects[formObject.name] = formObject.value;
+    });
+    return objects;
   }
 
 })(this.ajaxForms = {});
