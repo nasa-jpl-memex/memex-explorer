@@ -1,0 +1,74 @@
+package:
+  name: pyelasticsearch
+  version: "1.4"
+
+source:
+  fn: pyelasticsearch-1.4.tar.gz
+  url: https://pypi.python.org/packages/source/p/pyelasticsearch/pyelasticsearch-1.4.tar.gz
+  md5: ed61ebb7b253364e55b4923d11e17049
+#  patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  noarch_python: True
+  # preserve_egg_dir: True
+  # entry_points:
+    # Put any entry points (scripts to be generated automatically) here. The
+    # syntax is module:function.  For example
+    #
+    # - pyelasticsearch = pyelasticsearch:main
+    #
+    # Would create an entry point called pyelasticsearch that calls pyelasticsearch.main()
+
+
+  # If this is a new build for the same version, increment the build
+  # number. If you do not include this key, it defaults to 0.
+  # number: 1
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - certifi
+    - elasticsearch-py >=1.3.0,<2.0.0
+    - urllib3 >=1.8,<2.0
+    - simplejson >=3.0
+    - six >=1.4.0,<2.0
+
+  run:
+    - python
+    - certifi
+    - elasticsearch-py >=1.3.0,<2.0.0
+    - urllib3 >=1.8,<2.0
+    - simplejson >=3.0
+    - six >=1.4.0,<2.0
+
+test:
+  # Python imports
+  imports:
+    - pyelasticsearch
+    - pyelasticsearch.tests
+
+  # commands:
+    # You can put test commands to be run here.  Use this to test that the
+    # entry points work.
+
+
+  # You can also put a file called run_test.py in the recipe that will be run
+  # at test time.
+
+  requires:
+    - mock
+    - nose >=1.2.1
+    # Put any additional test requirements here.  For example
+    # - nose
+
+about:
+  home: https://github.com/pyelasticsearch/pyelasticsearch
+  license: BSD License
+  summary: 'Flexible, high-scale API to elasticsearch'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
