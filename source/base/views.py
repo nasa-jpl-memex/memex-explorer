@@ -81,6 +81,12 @@ class ProjectView(DetailView):
                 content_type="application/json",
             )
 
+        elif request.POST["action"] == "add_crawl":
+            return HttpResponse(
+                json.dumps("Hello"),
+                content_type="application/json",
+            )
+
         return HttpResponse(
             json.dumps({
                 "args": args,

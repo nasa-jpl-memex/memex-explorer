@@ -1,9 +1,12 @@
 (function(exports){
 
-  exports.formSubmit = function(formElement){
+  exports.formSubmit = function(formData){
     return $.ajax({
       method: "POST",
-      data: formToJson(formElement),
+      data: {
+        action: "add_crawl",
+        form_data: formData,
+      },
       success: function(response){
         console.log(response);
       },
@@ -14,12 +17,12 @@
   }
 
   exports.formToJson = function(formElement){
-    var objects = {};
+    var formDataObject = new FormData();
     var formData = formElement.serializeArray();
     _.each(formData, function(formObject){
-      objects[formObject.name] = formObject.value;
+      formDataObject[formObject.name] = formObject.value;
     });
-    return objects;
+    return formDataObject;
   }
 
 })(this.ajaxForms = {});
