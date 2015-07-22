@@ -17,16 +17,26 @@
   });
 </script>
 
+<style>
+.table-gray{
+  border: 4px solid #eee !important;
+}
 
+.table-gray th{
+  background: #eee !important;
+}
+</style>
+<!--
 {% include "base/sidebar.html" %}
+-->
 
 <div class='row'>
-<div class="col-md-offset-2 col-md-4">
+<div class="col-md-offset-1 col-md-6">
   <ol class="breadcrumb">
     <li> <a href="/"> / My Projects / </a></li> {{ project.name }}
   </ol>
 </div>
-  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 main">
     <h1>{{ project.name }}
     <a href="{% url 'base:project_settings' project_slug=project.slug %}">
       <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
@@ -40,23 +50,15 @@
 </div>
 
 <div class='row'>
-  <div class="col-md-8 col-md-offset-3 main">
-    <div class="row">
-          <div class="btn-group" role="group" aria-label="...">
-             <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
-
-            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
-
-            <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
-          </div>
-
-    </div>
+  <div class="col-md-10 col-md-offset-1 main">
 
     <div class="row">
       <h4 style="line-height:2em;">
         <!-- <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}"> -->
           <i class="fa fa-search"> &nbsp; </i>Crawls
         <!-- </a> -->
+        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
+
 
       </h4>
 
@@ -74,20 +76,35 @@
       {% endif %}
 -->
       {% if project.crawl_set.all %}
-      <table class="table table-condensed table-striped ">
+      <table class="table table-condensed table-striped table-gray ">
         <tr>
-          <th>Crawl</th>
+          <th>Crawl Name</th>
+          <th>Executed By</th>
+          <th>Total Domains Hit</th>
+          <th>Date Created</th>
           <th>Status</th>
-          <th>Crawl Count</th>
+          <th>Actions</th>
+          <th></th>
         </tr>
         {%  for w in project.crawl_set.all %}
         <tr>
-
-
           <td><a href="{{ w.get_absolute_url }}">{{ w.name }}</a></td>
-          <td>{{ w.status}}</td>
+          <td>Person Name</td>
           <td>{{ w.pages_crawled }}</td>
-
+          <td>06/20/2015</td>
+          <td>
+            {{ w.status}}
+          </td>
+          <td> 
+            <i class="fa fa-pencil"></i>&nbsp; <i class="fa fa-trash"> </i>&nbsp; <i class="fa fa-pie-chart"> &nbsp; </i>
+          </td>
+          <td>
+            {% if w.status == "NOT STARTED"%}
+              <button class="btn btn-success btn-xs">Launch</button>
+            {% else %}
+              <button class="btn btn-primary btn-xs">View</button>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
        </table>
@@ -101,13 +118,17 @@
       <h4 style="line-height:2em;">
         <!--<a href="{% url 'base:indices' project_slug=project.slug %}"> -->
           <i class="fa fa-archive"> &nbsp; </i>Datasets
+
+            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
+
         </a>
 
-
+        <!--
         <a id="gotoKibana"
             class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
             Visualize
         </a>
+        -->
       </h4>
 <!--
       {% if project.index_set.all %}
@@ -127,10 +148,13 @@
 -->
 
       {% if project.index_set.all %}
-      <table id="statuses" class="table table-condensed table-striped">
+      <table id="statuses" class="table table-condensed table-striped table-gray">
         <tr>
-          <th>Name</th>
+          <th>Dataset Name</th>
+          <th>Added By</th>
+          <th>Date Created</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
         {%  for w in project.index_set.all %}
         <tr>
@@ -139,8 +163,18 @@
                 &nbsp{{ w.name }}
             </a>
           </td>
+          <td>Person Name</td>
+          <td>06/20/2015</td>
           <td>
             <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
+          </td>
+          <td>
+            <i class="fa fa-pencil"></i>&nbsp; 
+            <i class="fa fa-trash"> </i>&nbsp; 
+            <a id="gotoKibana"
+            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
+              <i class="fa fa-pie-chart"> &nbsp; </i>
+            </a>
           </td>
         </tr>
         {% endfor %}
@@ -154,6 +188,7 @@
     <div class="row">
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
+            <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}"><i class="fa-fa-plus"></i>&nbsp; &nbsp;Add Crawl Model</a>
         &nbsp;&nbsp;&nbsp;
 
 
@@ -179,10 +214,10 @@
 
 
         {% if project.crawlmodel_set.all %}
-        <table class="table table-striped table-condensed">
+        <table class="table table-striped table-condensed table-gray">
           <tr>
             <th>Name</th>
-            <th>Action</th>
+            <th>Actions</th>
           </tr>
           {% for x in project.crawlmodel_set.all %}
             <tr>
