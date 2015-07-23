@@ -45,7 +45,6 @@ INSTALLED_APPS = (
 
 EXPLORER_APPS = (
     'crawl_space',
-    'test_crawl'
 )
 
 INSTALLED_APPS += tuple("apps.%s" % app for app in EXPLORER_APPS)
