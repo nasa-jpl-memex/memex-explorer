@@ -31,33 +31,44 @@
 -->
 
 <div class='row'>
-<div class="col-md-offset-1 col-md-6">
-  <ol class="breadcrumb">
-    <li> <a href="/"> / My Projects / </a></li> {{ project.name }}
-  </ol>
-</div>
+
+  <div class="col-md-offset-1 col-md-6">
+    <ol class="breadcrumb">
+      <li> <a href="/"> / My Projects / </a></li> {{ project.name }}
+    </ol>
+  </div>
   <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 main">
-    <h1>{{ project.name }}
-    <a href="{% url 'base:project_settings' project_slug=project.slug %}">
-      <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
-      data-container="body"
-      data-toggle="tooltip" data-placement="bottom">
-      <i class="fa fa-pencil" style="font-size:24px;"></i>
-    </button></a>
-  </h1>
-  <p>{{ project.description }}</p>
-</div>
+    <div class="row">
+      <h1>{{ project.name }}
+      <a href="{% url 'base:project_settings' project_slug=project.slug %}">
+        <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
+        data-container="body"
+        data-toggle="tooltip" data-placement="bottom">
+        <i class="fa fa-pencil" style="font-size:24px;"></i>
+        </button></a>
+      </h1>
+      <p>{{ project.description }}</p>
+    </div>
+  </div>
+
 </div>
 
 <div class='row'>
   <div class="col-md-10 col-md-offset-1 main">
 
     <div class="row">
+            <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
+
+            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
+
+            <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}"><i class="fa-fa-plus"></i>&nbsp; &nbsp;Add a new Crawl Model</a>
+    </div>
+
+    <div class="row">
       <h4 style="line-height:2em;">
         <!-- <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}"> -->
           <i class="fa fa-search"> &nbsp; </i>Crawls
         <!-- </a> -->
-        <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
 
 
       </h4>
@@ -118,9 +129,6 @@
       <h4 style="line-height:2em;">
         <!--<a href="{% url 'base:indices' project_slug=project.slug %}"> -->
           <i class="fa fa-archive"> &nbsp; </i>Datasets
-
-            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
-
         </a>
 
         <!--
@@ -172,7 +180,7 @@
             <i class="fa fa-pencil"></i>&nbsp; 
             <i class="fa fa-trash"> </i>&nbsp; 
             <a id="gotoKibana"
-            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
+            class="center link-button" href="{{ kibana }}">
               <i class="fa fa-pie-chart"> &nbsp; </i>
             </a>
           </td>
@@ -188,10 +196,6 @@
     <div class="row">
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
-            <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}"><i class="fa-fa-plus"></i>&nbsp; &nbsp;Add Crawl Model</a>
-        &nbsp;&nbsp;&nbsp;
-
-
       </h4>
 <!--
         {% if project.crawlmodel_set.all %}
