@@ -1,13 +1,16 @@
-    <h1>Add Crawl</h1>
+  <h1>Add Crawl</h1>
   <form method="post" enctype="multipart/form-data" id="addCrawlForm">
     {% csrf_token %}
     <fieldset>
       <div id="div_id_name" class="form-group">
-        <label for="id_name" class="control-label  requiredField">
+        <label for="id_name" class="control-label requiredField">
   				Name<span class="asteriskField">*</span>
         </label>
         <div class="controls ">
           <input class="textinput textInput form-control" id="id_name" maxlength="64" name="name" type="text" />
+          <span class="help-block">
+            <strong id="error_id_name" hidden></strong>
+          </span>
         </div>
       </div>
       <div id="div_id_description" class="form-group">
@@ -45,6 +48,9 @@
           <label class="radio-inline">
             <input type="radio" name="crawler" id="id_crawler_2" value="ache" >ACHE
           </label>
+          <span class="help-block">
+            <strong id="error_id_crawler" hidden></strong>
+          </span>
         </div>
       </div>
       <div id="div_id_rounds_left" class="form-group">
@@ -53,6 +59,9 @@
   			</label>
         <div class="controls ">
           <input class="numberinput form-control" id="id_rounds_left" name="rounds_left" type="number" value="1" />
+          <span class="help-block">
+            <strong id="error_id_rounds_left" hidden></strong>
+          </span>
         </div>
       </div>
       <div id="div_id_crawl_model" class="form-group">
@@ -66,6 +75,9 @@
               <option value="{{ w }}">{{ w }}</option>
             {% endfor %}
           </select>
+          <span class="help-block">
+            <strong id="error_id_crawl_model" hidden></strong>
+          </span>
         </div>
       </div>
       <div class="form-actions">

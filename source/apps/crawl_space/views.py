@@ -71,15 +71,20 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 'utf-8'
             )
         form = AddCrawlForm(request.POST, request.FILES)
-        if form.is_valid():
-            return super(AddCrawlView, self).post(request, *args, **kwargs)
+        # Let add crawl work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            if form.is_valid():
+                return super(AddCrawlView, self).post(request, *args, **kwargs)
+            else:
+                return HttpResponse(
+                    json.dumps({
+                        "form_errors": form.errors,
+                    }),
+                    status=500,
+                    content_type="application/json",
+                )
         else:
-            return HttpResponse(
-                json.dumps({
-                    "errors": form.errors,
-                }),
-                content_type="application/json",
-            )
+            return super(AddCrawlView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.project = self.get_project()

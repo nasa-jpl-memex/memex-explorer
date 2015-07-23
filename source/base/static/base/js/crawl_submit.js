@@ -9,6 +9,7 @@
       var xhr = new XMLHttpRequest();
 
       xhr.open('POST', window.location.href + "add_crawl/", true);
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
       xhr.onload = function(){
         if ((xhr.status === 200) || (xhr.status === 302)){
           success = true;
