@@ -12,11 +12,12 @@ var tad = tad || {};
         "analysis-start-date"   : $("#analysis-start-date").val(),
         "analysis-end-date"     : $("#analysis-end-date").val(),
         "constant-baseline"     : $("#constant-baseline").is(":checked"),
+        "scale-baseline"        : $("#scale-baseline").is(":checked"),
         "index"                 : $("#index").val(),
         "time_field"            : $("#time-field").val()
       },
       success: function(response){
-        $("#raw-response").text(JSON.stringify(response));
+        $("#raw-response").text(JSON.stringify(response, null, 2));
         task_id = response['result']['task-id'];
         if (task_id)
         {
@@ -24,18 +25,18 @@ var tad = tad || {};
             "Looks like things worked! Here's your magical task ID:<br />" +
             "<b>" + task_id + "</b>");
           $("#task-id").text(task_id);
-          $("#raw-response").text(JSON.stringify(response));
+          $("#raw-response").text(JSON.stringify(response, null, 2));
           setTimeout(get_results, 1000);
         }
         else
         {
           $("#response").html("Something failed! Hopefully something in the response is useful.<br />" + response['result']['error']); 
-          $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
+          $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response, null, 2) + '</span>');
         }
       },
       error: function(response){
         $("#response").html("Something failed! Hopefully something in the response is useful."); 
-        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
+        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response, null, 2) + '</span>');
       }
     });
   }
@@ -48,7 +49,7 @@ var tad = tad || {};
         "task-id": $("#task-id").text()
       },
       success: function(response) {
-        $("#raw-response").text(JSON.stringify(response['result']));
+        $("#raw-response").text(JSON.stringify(response['result'], null, 2));
         if ((response['result']['status'] != 'Finished') && (!response['result']['error']))
           setTimeout(get_results, 1000);
         else
@@ -58,7 +59,7 @@ var tad = tad || {};
       },
       error: function(response){
         $("#response").html("Something failed! Hopefully something in the response is useful.") 
-        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response) + '</span>');
+        $("#raw-response").html('<span style="color: red;">' + JSON.stringify(response, null, 2) + '</span>');
       }
     });
   }

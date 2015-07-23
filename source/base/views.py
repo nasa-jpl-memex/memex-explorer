@@ -275,10 +275,10 @@ class TadView(ProjectObjectMixin, TemplateView):
                 return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
             elif result['result'] != None:
                 dates = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
-                pvalues_lower = [[-np.log10(r[-3])] for r in result['result']]
-                pvalues_upper = [[-np.log10(r[-1])] for r in result['result']]
-                baseline_counts = [[r[3]] for r in result['result']]
-                target_counts = [[r[4]] for r in result['result']]
+                pvalues_lower = [-np.log10(r[-3] + 1e-300) for r in result['result']]
+                pvalues_upper = [-np.log10(r[-1] + 1e-300) for r in result['result']]
+                baseline_counts = np.array([r[3] for r in result['result']])
+                target_counts = np.array([r[4] for r in result['result']])
                 return HttpResponse(
                         json.dumps({
                             'result': result,
@@ -297,7 +297,7 @@ from bokeh.resources import CDN, INLINE
 from bokeh.embed import components
 
 def pvalue_plot( date, pvalues_lower, pvalues_upper ):
-    plot = figure(x_axis_type = "datetime", plot_height=200)
+    plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
     plot.line(date, pvalues_lower, legend='Lower', line_color='green')
     plot.line(date, pvalues_upper, legend='Upper', line_color='red')
     plot.title = '-log(P Values)'
@@ -306,10 +306,14 @@ def pvalue_plot( date, pvalues_lower, pvalues_upper ):
     return { 'script': script, 'div': div }
 
 def counts_plot( date, baseline_counts, target_counts ):
-    plot = figure(x_axis_type = "datetime", plot_height=200)
-    #plot.add_layout(LinearAxis(y_range_name="target"), 'right')
-    plot.line(date, baseline_counts, legend='Baseline')
-    #plot.line(date, target_counts, line_color='orange', legend='Target', y_range_name='target')
+    counts_t = np.sum(target_counts)
+    counts_b = np.sum(baseline_counts)
+    scale_baseline = counts_b >= 10*counts_t
+    if scale_baseline:
+        baseline_counts *= np.sum(target_counts)/np.sum(baseline_counts)
+
+    plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
+    plot.line(date, baseline_counts, legend='Scaled Baseline' if scale_baseline else 'Baseline')
     plot.line(date, target_counts, line_color='orange', legend='Target')
     plot.title = 'Counts'
 
