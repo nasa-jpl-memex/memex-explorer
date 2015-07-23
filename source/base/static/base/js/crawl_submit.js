@@ -33,7 +33,7 @@
       formData.append("crawl_model", crawl_model);
       formData.append("rounds_left", rounds_left);
       formData.append("textseeds", textseeds);
-      formData.append("seeds_list", seeds_list, seeds_list.name);
+      // formData.append("seeds_list", seeds_list, seeds_list.name);
 
       xhr.send(formData);
     }
