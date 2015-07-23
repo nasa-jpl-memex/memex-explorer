@@ -70,7 +70,16 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 bytes(request.POST["textseeds"]),
                 'utf-8'
             )
-        return super(AddCrawlView, self).post(request, *args, **kwargs)
+        form = AddCrawlForm(request.POST, request.FILES)
+        if form.is_valid():
+            return super(AddCrawlView, self).post(request, *args, **kwargs)
+        else:
+            return HttpResponse(
+                json.dumps({
+                    "errors": form.errors,
+                }),
+                content_type="application/json",
+            )
 
     def form_valid(self, form):
         form.instance.project = self.get_project()
