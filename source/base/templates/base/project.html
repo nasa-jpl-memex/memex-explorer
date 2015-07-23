@@ -48,7 +48,7 @@
           <div class="btn-group" role="group" aria-label="...">
              <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}">Add Crawl</a>
 
-            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
+            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
 
             <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
           </div>

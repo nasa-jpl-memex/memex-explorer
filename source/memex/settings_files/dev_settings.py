@@ -40,7 +40,6 @@ INSTALLED_APPS = (
     'crispy_forms',
     'base',
     'task_manager',
-    'debug_toolbar',
 )
 
 EXPLORER_APPS = (
