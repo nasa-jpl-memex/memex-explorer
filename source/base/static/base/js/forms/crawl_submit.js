@@ -3,6 +3,19 @@
 
     var addCrawlForm = document.getElementById("addCrawlForm")
 
+    function cleanErrors(){
+      crispyFormErrors.clearErrors([
+        "csrfmiddlewaretoken",
+        "name",
+        "description",
+        "crawl_model",
+        "rounds_left",
+        "seeds_list",
+        "crawler",
+        "submit",
+      ]);
+    }
+
     addCrawlForm.onsubmit = function(event){
       event.preventDefault();
 
@@ -44,19 +57,14 @@
       formData.append("crawler", crawler);
       formData.append("submit", submit);
 
-      crispyFormErrors.clearErrors([
-        "csrfmiddlewaretoken",
-        "name",
-        "description",
-        "crawl_model",
-        "rounds_left",
-        "seeds_list",
-        "crawler",
-        "submit",
-      ]);
+      cleanErrors();
 
       xhr.send(formData);
     }
+
+    $("#cancelSubmit").click(function(){
+      cleanErrors();
+    })
 
   });
 })();
