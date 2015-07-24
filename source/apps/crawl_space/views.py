@@ -48,9 +48,7 @@ class ProjectObjectMixin(ContextMixin):
         """
         Prepend the hostname and the port to the path for an object.
         """
-        return "{}/{}".format(
-            self.request.META.get('HTTP_ORIGIN', '').rstrip('/'),
-            self.object.get_absolute_url().lstrip('/'))
+        return self.get_project().get_absolute_url()
 
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
@@ -58,6 +56,9 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
     def post(self, request, *args, **kwargs):
         """
