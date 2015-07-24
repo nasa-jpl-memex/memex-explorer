@@ -1,5 +1,4 @@
   <form method="post" enctype="multipart/form-data" id="addCrawlForm">
-    <h1>Add Crawl</h1>
     {% csrf_token %}
     <fieldset>
       <div id="div_id_name" class="form-group">
@@ -83,11 +82,15 @@
           </span>
         </div>
       </div>
+      <hr />
       <div class="form-actions">
-        <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
-      </div>
-      <a class="add_index btn btn-primary link-button" id="cancelSubmit" target="_blank" href="#">
-        Cancel
-      </a>
+        <div class="col-md-2">
+            <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
+        </div>
+        
+        <div class="col-md-2">
+         <input type="submit" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
+        </div>
+     </div>
     </fieldset>
   </form>
