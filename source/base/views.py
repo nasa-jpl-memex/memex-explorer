@@ -259,7 +259,7 @@ class TadView(ProjectObjectMixin, TemplateView):
                 "analysis-end-date"     : request.POST['analysis-end-date'],
                 "constant-baseline"     : request.POST['constant-baseline'] == 'true',
                 "index"                 : request.POST['index'],
-                "time_field"            : request.POST['time_field']
+                "time-field"            : request.POST['time-field']
             }
             r = requests.post("http://127.0.0.1:5000/event-report", json=query)
             return HttpResponse(
@@ -300,6 +300,7 @@ def pvalue_plot( date, pvalues_lower, pvalues_upper ):
     plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
     plot.line(date, pvalues_lower, legend='Lower', line_color='green')
     plot.line(date, pvalues_upper, legend='Upper', line_color='red')
+    plot.legend.orientation = "top_left"
     plot.title = '-log(P Values)'
 
     script, div = components(plot, CDN)
@@ -315,6 +316,7 @@ def counts_plot( date, baseline_counts, target_counts ):
     plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
     plot.line(date, baseline_counts, legend='Scaled Baseline' if scale_baseline else 'Baseline')
     plot.line(date, target_counts, line_color='orange', legend='Target')
+    plot.legend.orientation = "top_left"
     plot.title = 'Counts'
 
     script, div = components(plot, CDN)

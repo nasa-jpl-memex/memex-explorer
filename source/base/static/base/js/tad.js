@@ -14,7 +14,7 @@ var tad = tad || {};
         "constant-baseline"     : $("#constant-baseline").is(":checked"),
         "scale-baseline"        : $("#scale-baseline").is(":checked"),
         "index"                 : $("#index").val(),
-        "time_field"            : $("#time-field").val()
+        "time-field"            : $("#time-field").val()
       },
       success: function(response){
         $("#raw-response").text(JSON.stringify(response, null, 2));
