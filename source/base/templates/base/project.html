@@ -61,7 +61,29 @@
   <div class="col-md-10 col-md-offset-1 main">
 
     <div class="row">
-            <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
+           <!-- <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
+
+            -->
+            <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#myModal">
+             START A NEW CRAWL
+            </button>
+
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Crawl</h4>
+                  </div>
+                  <div class="modal-body">
+                     {% include "crawl_space/add_crawl_form.html" %}
+                  </div>
+                 
+                </div>
+              </div>
+            </div>
 
             <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
 
@@ -94,8 +116,8 @@
       <table class="table table-condensed table-striped table-gray ">
         <tr>
           <th>Crawl Name</th>
-          <th>Executed By</th>
-          <th>Total Domains Hit</th>
+         
+          <th>Pages Crawled</th>
           <th>Date Created</th>
           <th>Status</th>
           <th>Actions</th>
@@ -104,7 +126,7 @@
         {%  for w in project.crawl_set.all %}
         <tr>
           <td><a href="{{ w.get_absolute_url }}">{{ w.name }}</a></td>
-          <td>Person Name</td>
+         
           <td>{{ w.pages_crawled }}</td>
           <td>06/20/2015</td>
           <td>
@@ -163,7 +185,7 @@
       <table id="statuses" class="table table-condensed table-striped table-gray">
         <tr>
           <th>Dataset Name</th>
-          <th>Added By</th>
+         
           <th>Date Created</th>
           <th>Status</th>
           <th>Actions</th>
@@ -175,7 +197,7 @@
                 &nbsp{{ w.name }}
             </a>
           </td>
-          <td>Person Name</td>
+          
           <td>06/20/2015</td>
           <td>
             <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
@@ -244,7 +266,6 @@
         <p>No Crawl Models Registered.</p>
         {% endif %}
 
-        {% include "crawl_space/add_crawl_form.html" %}
 
       </div>
     </div>
