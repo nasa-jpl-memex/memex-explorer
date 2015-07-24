@@ -7,6 +7,10 @@
 {% block extrafooter %}
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/project.js' %}"></script>
+    <script src="{% static 'base/js/form_ajax.js' %}"></script>
+    <script src="{% static 'base/js/crawl_form.js' %}"></script>
+    <script src="{% static 'base/js/forms/crawl_submit.js' %}"></script>
+    <script src="{% static 'base/js/forms/crispy_form_errors.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -59,7 +63,7 @@
     <div class="row">
             <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
 
-            <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
+            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
 
             <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}"><i class="fa-fa-plus"></i>&nbsp; &nbsp;Add a new Crawl Model</a>
     </div>
@@ -106,7 +110,7 @@
           <td>
             {{ w.status}}
           </td>
-          <td> 
+          <td>
             <i class="fa fa-pencil"></i>&nbsp; <i class="fa fa-trash"> </i>&nbsp; <i class="fa fa-pie-chart"> &nbsp; </i>
           </td>
           <td>
@@ -132,7 +136,7 @@
         </a>
 
         <!--
-        <a id="gotoKibana"  
+        <a id="gotoKibana"
             class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
             Visualize
         </a>
@@ -177,8 +181,8 @@
             <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
           </td>
           <td>
-            <i class="fa fa-pencil"></i>&nbsp; 
-            <i class="fa fa-trash"> </i>&nbsp; 
+            <i class="fa fa-pencil"></i>&nbsp;
+            <i class="fa fa-trash"> </i>&nbsp;
             <a id="gotoKibana" href="{{ kibana }}">
               <i class="fa fa-pie-chart"> &nbsp; </i>
             </a>
@@ -215,7 +219,6 @@
         {% endif %}
 -->
 
-
         {% if project.crawlmodel_set.all %}
         <table class="table table-striped table-condensed table-gray">
           <tr>
@@ -240,8 +243,10 @@
         {% else %}
         <p>No Crawl Models Registered.</p>
         {% endif %}
+
+        {% include "crawl_space/add_crawl_form.html" %}
+
       </div>
     </div>
-
   </div>
 {% endblock %}
