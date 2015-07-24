@@ -19,7 +19,7 @@
         }
       }
 
-      var seeds_list = addCrawlForm.seeds_list.files[0];
+      var seeds_list = addCrawlForm.seeds_list.files[0]? addCrawlForm.seeds_list.files[0] : "";
       var name = addCrawlForm.name.value;
       var csrfmiddlewaretoken = addCrawlForm.csrfmiddlewaretoken.value;
       var description = addCrawlForm.description.value;
@@ -40,6 +40,17 @@
       formData.append("seeds_list", seeds_list, seeds_list.name);
       formData.append("crawler", crawler);
       formData.append("submit", submit);
+
+      crispyFormErrors.clearErrors([
+        "csrfmiddlewaretoken",
+        "name",
+        "description",
+        "crawl_model",
+        "rounds_left",
+        "seeds_list",
+        "crawler",
+        "submit",
+      ]);
 
       xhr.send(formData);
     }

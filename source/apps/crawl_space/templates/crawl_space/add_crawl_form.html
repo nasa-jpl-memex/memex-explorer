@@ -1,5 +1,5 @@
-  <h1>Add Crawl</h1>
   <form method="post" enctype="multipart/form-data" id="addCrawlForm">
+    <h1>Add Crawl</h1>
     {% csrf_token %}
     <fieldset>
       <div id="div_id_name" class="form-group">
@@ -27,6 +27,9 @@
         </label>
         <div class="controls">
           <input class="clearablefileinput" id="id_seeds_list" name="seeds_list" type="file" />
+          <span class="help-block">
+            <strong id="error_id_seeds_list" hidden></strong>
+          </span>
         </div>
       </div>
       <div id="div_id_textseeds" class="form-group">
@@ -72,7 +75,7 @@
           <select class="select form-control" id="id_crawl_model" name="crawl_model">
             <option value="" selected="selected">---------</option>
             {% for w in project.crawlmodel_set.all %}
-              <option value="{{ w }}">{{ w }}</option>
+            <option value="{{ w.id }}">{{ w.name }}</option>
             {% endfor %}
           </select>
           <span class="help-block">

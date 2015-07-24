@@ -18,4 +18,10 @@
     })
   }
 
+  exports.clearErrors = function(inputs){
+    _.each(inputs, function(field){
+      removeError(field);
+    })
+  }
+
 })(this.crispyFormErrors = {});
