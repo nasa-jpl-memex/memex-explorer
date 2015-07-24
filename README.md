@@ -10,25 +10,39 @@ To setup your machine, you will need Anaconda or Miniconds installed. Miniconda 
 
 Clone the repository and `cd memex-explorer/source`. Run the following commands:
 ```
-$ ./app_setup.sh && source activate memex && supervisord
+$ ./app_setup.sh
+$ source activate memex
+$ supervisord
 ```
-These commands will set up your memex environment, prepare the application by creating the database, and run all of the necessary services for the application. If there are any problems with any of these commands, please report them as a github issue.
-
-
-To stop running the services, simply press `Ctrl-c`.
+These commands will set up your memex environment, prepare the application by creating the database, and run all of the necessary services for the application. If there are any problems with any of these commands, please report them as a [GitHub issue](https://github.com/memex-explorer/memex-explorer/issues).
 
 If you have already run the install script, simply run `supervisord` from the `memex-explorer/source` directory to restart all of the services.
 
-<!---
-The current recommended method for developing Memex Explorer locally is to run it in a [Vagrant](https://www.vagrantup.com/) environment using [VirtualBox](http://docs.vagrantup.com/v2/virtualbox).  After you have installed Vagrant and VirtualBox, run the following commands.
+The supervisord will start supervisord in the foreground, which will
+in turn ensure that all services associated with the core Memex
+Explorer environment are running.  To stop supervisord and the
+associated services, send an interrupt to the process with `Ctrl-c`.
+
+# Testing
+
+To run memex-explorer tests, use the following command from within an active environment:
+```
+$ py.test
+```
+
+# Building the Documentation
+The project documentation is written in [reStructuredText](http://docutils.sf.net/rst.html) and can be built using the popular [Sphinx](http://sphinx-doc.org/) tool.
 
 ```
-$ git clone https://github.com/memex-explorer/memex-explorer
-$ cd memex-explorer
-$ vagrant up
+$ cd docs
+$ make html
 ```
 
-The installation process for the virtual machine can take about an hour, depending on the speed of your Internet connection, as it builds and provisions the Memex Explorer system.  Once it is running, you should receive a message stating that Memex Explorer is running locally on port 8000, which you will then be able to access from your web browser.
+The documentation is then available within `build/html/index.html`
+
+# Administration
+
+To access the administration panel, navigate to http://localhost:8000/admin (or the equivalent deployed URL) after starting Memex Explorer. Here you will be able to view and make manual changes to the database.
 
 # Deploying
 
@@ -70,24 +84,3 @@ To connect to a instance given an IP address of 54.167.11.71, log in with the co
     ssh -i keys/ec2-54.167.11.71.pem vagrant@54.167.11.71
 
 After the setup script is done running, you will be able to access the application by entering the IP address into your browser.
--->
-# Testing
-
-To run memex-explorer tests, use the following command from within an active environment:
-```
-$ py.test
-```
-
-# Building the Documentation
-The project documentation is written in [reStructuredText](http://docutils.sf.net/rst.html) and can be built using the popular [Sphinx](http://sphinx-doc.org/) tool.
-
-```
-$ cd docs
-$ make html
-```
-
-The documentation is then available within `build/html/index.html`
-
-# Administration
-
-To access the administration panel, navigate to http://localhost:8000/admin (or the equivalent deployed URL) after starting Memex Explorer. Here you will be able to view and make manual changes to the database.
