@@ -15,7 +15,7 @@
           "crawler",
           "submit",
         ],
-        "addCrawlForm",
+        "addCrawlForm"
       );
     }
 
