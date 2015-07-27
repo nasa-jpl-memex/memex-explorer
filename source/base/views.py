@@ -75,7 +75,7 @@ class AddProjectView(SuccessMessageMixin, CreateView):
                     content_type="application/json",
                 )
         else:
-            return super(AddProjectForm, self).post(request, *args, **kwargs)
+            return super(AddProjectView, self).post(request, *args, **kwargs)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
