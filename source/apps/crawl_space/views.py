@@ -305,6 +305,23 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     template_name = "crawl_space/add_crawl_model.html"
     success_message = "Crawl model %(name)s was added successfully."
 
+    def post(self, request, *args, **kwargs):
+        form = AddCrawlModelForm(request.POST, request.FILES)
+        # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            if form.is_valid():
+                return super(AddCrawlModelView, self).post(request, *args, **kwargs)
+            else:
+                return HttpResponse(
+                    json.dumps({
+                        "form_errors": form.errors,
+                    }),
+                    status=500,
+                    content_type="application/json",
+                )
+        else:
+            return super(AddCrawlModelView, self).post(request, *args, **kwargs)
+
     def form_valid(self, form):
         form.instance.project = self.get_project()
         return super(AddCrawlModelView, self).form_valid(form)

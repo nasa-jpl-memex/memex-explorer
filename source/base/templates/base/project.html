@@ -7,9 +7,10 @@
 {% block extrafooter %}
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/project.js' %}"></script>
-    <script src="{% static 'base/js/form_ajax.js' %}"></script>
+    <script src="{% static 'base/js/forms/form_ajax.js' %}"></script>
     <script src="{% static 'base/js/crawl_form.js' %}"></script>
     <script src="{% static 'base/js/forms/crawl_submit.js' %}"></script>
+    <script src="{% static 'base/js/forms/model_submit.js' %}"></script>
     <script src="{% static 'base/js/forms/crispy_form_errors.js' %}"></script>
 {% endblock %}
 
@@ -245,6 +246,7 @@
         {% endif %}
 
         {% include "crawl_space/add_crawl_form.html" %}
+        {% include "crawl_space/add_crawl_model_form.html" %}
 
       </div>
     </div>
