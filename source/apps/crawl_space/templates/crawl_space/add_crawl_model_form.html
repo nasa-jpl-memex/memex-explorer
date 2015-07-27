@@ -1,0 +1,43 @@
+<form id="addCrawlModelForm" method="post" enctype="multipart/form-data">
+<h1>Add Crawl Model</h1>
+    <input type='hidden' name='csrfmiddlewaretoken' value='ZTHcCrWDuqpE9gXoyDK4cSJ5fWKhjc6c' />
+    <div id="div_id_name" class="form-group">
+        <label for="id_name" class="control-label requiredField">
+            Name<span class="asteriskField">*</span>
+        </label>
+        <div class="controls ">
+            <input class="textinput textInput form-control" id="id_name" maxlength="64" name="name" type="text" />
+            <span class="help-block">
+                <strong id="error_id_name" hidden></strong>
+            </span>
+        </div>
+    </div>
+    <div id="div_id_model" class="form-group">
+        <label for="id_model" class="control-label requiredField">
+            Model<span class="asteriskField">*</span>
+        </label>
+        <div class="controls ">
+            <input class="clearablefileinput" id="id_model" name="model" type="file" />
+            <span class="help-block">
+                <strong id="error_id_model" hidden></strong>
+            </span>
+        </div>
+    </div>
+    <div id="div_id_features" class="form-group">
+        <label for="id_features" class="control-label  requiredField">
+            Features<span class="asteriskField">*</span>
+        </label>
+        <div class="controls ">
+            <input class="clearablefileinput" id="id_features" name="features" type="file" />
+            <span class="help-block">
+                <strong id="error_id_features" hidden></strong>
+            </span>
+        </div>
+    </div>
+    <div class="form-actions">
+        <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit"/>
+    </div>
+    <a class="add_index btn btn-primary link-button" id="cancelSubmit" target="_blank" href="#">
+        Cancel
+    </a>
+</form>

@@ -1,26 +1,26 @@
 (function(exports){
 
-  function displayError(inputDiv, error){
-    $("#div_id_" + inputDiv).addClass("has-error");
-    $("#error_id_" + inputDiv).attr("hidden", false).html(error);
+  function displayError(inputDiv, error, formId){
+    $("#" + formId).find("#div_id_" + inputDiv).addClass("has-error");
+    $("#" + formId).find("#error_id_" + inputDiv).attr("hidden", false).html(error);
   }
 
-  function removeError(inputDiv){
-    $("#div_id_" + inputDiv).removeClass("has-error");
-    $("#error_id_" + inputDiv).attr("hidden", true).html("");
+  function removeError(inputDiv, formId){
+    $("#" + formId).find("#div_id_" + inputDiv).removeClass("has-error");
+    $("#" + formId).find("#error_id_" + inputDiv).attr("hidden", true).html("");
   }
 
-  exports.showFormErrors = function(errorResponse){
+  exports.showFormErrors = function(errorResponse, formId){
     var errorsObject = JSON.parse(errorResponse).form_errors;
     var errorsArray = Object.keys(errorsObject);
     _.each(errorsArray, function(field){
-      displayError(field, errorsObject[field])
+      displayError(field, errorsObject[field], formId)
     })
   }
 
-  exports.clearErrors = function(inputs){
+  exports.clearErrors = function(inputs, formId){
     _.each(inputs, function(field){
-      removeError(field);
+      removeError(field, formId);
     })
   }
 
