@@ -93,7 +93,7 @@ def create_index(self, index, *args, **kwargs):
             for kw, val in features.items():
                 parsed["has_" + re.sub(' ', '_', kw)] = val
             #parsed["authors"] = process_authors(parsed["X-TIKA:content"])
-            es.index(index="%s_%s" % (self.index.slug, self.index.project.slug),
+            es.index(index="%s" % self.index.index_name,
                      doc_type="autonomy",
                      body = parsed,
                      )
