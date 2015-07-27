@@ -1,6 +1,15 @@
 {% extends "base/base.html" %}
 {% load crispy_forms_tags %}
 
+{% load static %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/forms/form_ajax.js' %}"></script>
+    <script src="{% static 'base/js/forms/crispy_form_errors.js' %}"></script>
+    <script src="{% static 'base/js/forms/project_submit.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <div class='inner'>
     <div class="row">
