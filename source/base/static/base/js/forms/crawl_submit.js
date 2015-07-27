@@ -14,7 +14,7 @@
         if ((xhr.status === 200) || (xhr.status === 302)){
           success = true;
         } else {
-          crispyFormErrors.showFormErrors(xhr.response);
+          crispyFormErrors.showFormErrors(xhr.response, "addCrawlForm");
           success = false;
         }
       }

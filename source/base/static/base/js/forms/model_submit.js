@@ -5,7 +5,7 @@
 
     addCrawlModelForm.submit(function(event){
       event.preventDefault();
-      var xhr = ajaxForms.xhrFactory(window.location.href + "add_crawl_model/");
+      var xhr = ajaxForms.xhrFactory(window.location.href + "add_crawl_model/", "addCrawlModelForm");
       var formData = ajaxForms.toFormData(addCrawlModelForm);
 
       var model = $("#id_model")[0].files[0];
