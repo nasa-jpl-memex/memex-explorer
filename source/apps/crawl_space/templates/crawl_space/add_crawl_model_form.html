@@ -1,6 +1,6 @@
 <form id="addCrawlModelForm" method="post" enctype="multipart/form-data">
 <h1>Add Crawl Model</h1>
-    <input type='hidden' name='csrfmiddlewaretoken' value='ZTHcCrWDuqpE9gXoyDK4cSJ5fWKhjc6c' />
+    {% csrf_token %}
     <div id="div_id_name" class="form-group">
         <label for="id_name" class="control-label requiredField">
             Name<span class="asteriskField">*</span>

@@ -4,16 +4,19 @@
     var addCrawlForm = document.getElementById("addCrawlForm")
 
     function cleanErrors(){
-      crispyFormErrors.clearErrors([
-        "csrfmiddlewaretoken",
-        "name",
-        "description",
-        "crawl_model",
-        "rounds_left",
-        "seeds_list",
-        "crawler",
-        "submit",
-      ]);
+      crispyFormErrors.clearErrors(
+        [
+          "csrfmiddlewaretoken",
+          "name",
+          "description",
+          "crawl_model",
+          "rounds_left",
+          "seeds_list",
+          "crawler",
+          "submit",
+        ],
+        "addCrawlForm",
+      );
     }
 
     addCrawlForm.onsubmit = function(event){

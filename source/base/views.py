@@ -60,6 +60,23 @@ class AddProjectView(SuccessMessageMixin, CreateView):
     template_name = "base/add_project.html"
     success_message = "Project %(name)s was added successfully."
 
+    def post(self, request, *args, **kwargs):
+        form = AddProjectForm(request.POST)
+        # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            if form.is_valid():
+                return super(AddProjectView, self).post(request, *args, **kwargs)
+            else:
+                return HttpResponse(
+                    json.dumps({
+                        "form_errors": form.errors,
+                    }),
+                    status=500,
+                    content_type="application/json",
+                )
+        else:
+            return super(AddProjectForm, self).post(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.object.get_absolute_url()
 
