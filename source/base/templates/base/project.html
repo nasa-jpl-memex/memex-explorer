@@ -154,7 +154,13 @@
             {{ w.status}}
           </td>
           <td>
-            <i class="fa fa-pencil"></i>&nbsp; <i class="fa fa-trash"> </i>&nbsp; <i class="fa fa-pie-chart"> &nbsp; </i>
+            <a href="{% url 'base:crawl_space:crawl_settings' project_slug=project.slug crawl_slug=w.slug %}">
+              <i class="fa fa-pencil"></i>&nbsp; 
+            </a>
+            <a href="#">
+              <i class="fa fa-trash deleteCrawlButton" data-delete-url="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}"> </i>&nbsp; 
+            </a>
+            <i class="fa fa-pie-chart"> &nbsp; </i>
           </td>
           <td>
             {% if w.status == "NOT STARTED"%}
@@ -291,4 +297,29 @@
       </div>
     </div>
   </div>
+  <script>
+$(document).ready(function() {
+    $('.deleteCrawlButton').click(function(){
+        var deleteButton = $(this);
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this crawl.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: "No, cancel!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+        function(isConfirm){
+            if (isConfirm){
+                $("<form action='" + deleteButton.data("delete-url") + "' method='post'>{% csrf_token %}</form>").submit();
+            } else {
+                swal("Cancelled", "You cancelled the delete process", "error");
+            }
+        })
+    });
+});
+</script>
 {% endblock %}
