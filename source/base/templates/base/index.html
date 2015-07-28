@@ -24,10 +24,10 @@
             </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="projectList">
         <div class="col-lg-3 col-md-4">
             <div class="panel panel-project">
-                <a href="{% url 'base:add_project' %}">
+                <a>
                 <div class="panel-heading">
                     <div class="row color-set">
                         <div class="col-xs-3">
@@ -67,9 +67,6 @@
         {% endfor %}
     </div>
 
-    <!--
-    modal for upload project
-
     <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -78,13 +75,11 @@
                     <h4 class="modal-title" id="myModalLabel">Add Project</h4>
                 </div>
                 <div class="modal-body">
-                    {% crispy form %}
+                    {% include "base/add_project_form.html" %}
                 </div>
             </div>
         </div>
     </div>
-
-    -->
 </div>
 <script type="text/javascript">
 /* simple project name search implementation */
@@ -105,4 +100,5 @@
         return false;
     });
 </script>
+{% include "base/underscore_templates.html" %}
 {% endblock %}

@@ -3,13 +3,18 @@
 
     var addCrawlModelForm = $("#addCrawlModelForm");
 
+    function updateModelFields(jsonResponse){
+      var template = _.template($("#crawlFormModel").html())
+      $("#id_crawl_model").append(template(JSON.parse(jsonResponse)))
+    }
+
     addCrawlModelForm.submit(function(event){
       event.preventDefault();
 
       var xhr = ajaxForms.xhrFactory(window.location.href + "add_crawl_model/", "addCrawlModelForm");
       xhr.onreadystatechange = function(){
-        if (xhr.readyState == 4){
-          console.log(xhr.response);
+        if ((xhr.readyState == 4) && (xhr.status == 200)){
+          updateModelFields(xhr.response);
         }
       }
 

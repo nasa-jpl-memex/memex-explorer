@@ -3,9 +3,21 @@
 
     var addProjectForm = $("#addProjectForm");
 
+    function updateProjectList(jsonResponse){
+      var template = _.template($("#indexProjectItem").html());
+      $("#projectList").append(template(JSON.parse(jsonResponse)));
+    }
+
     addProjectForm.submit(function(event){
       event.preventDefault();
       var xhr = ajaxForms.xhrFactory(window.location.href + "add_project/", "addProjectForm");
+      xhr.onreadystatechange = function(){
+        if ((xhr.readyState == 4) && (xhr.status == 200)){
+          console.log(xhr.response);
+          updateProjectList(xhr.response);
+        }
+      }
+
       var formData = ajaxForms.toFormData(addProjectForm);
 
       crispyFormErrors.clearErrors(

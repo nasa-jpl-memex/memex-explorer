@@ -68,9 +68,13 @@ class AddProjectView(SuccessMessageMixin, CreateView):
             if form.is_valid():
                 self.object = form.save()
                 return HttpResponse(
-                    json.dumps(
-                        serializers.serialize('json', [self.object])
-                    ),
+                    json.dumps({
+                        "url": self.object.get_absolute_url(),
+                        "id": self.object.id,
+                        "name": self.object.name,
+                        "slug": self.object.slug,
+                        "description": self.object.description,
+                    }),
                     status=200,
                     content_type="application/json"
                 )
