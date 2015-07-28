@@ -155,7 +155,7 @@
           </td>
           <td>
             <a href="{% url 'base:crawl_space:crawl_settings' project_slug=project.slug crawl_slug=w.slug %}">
-              <i class="fa fa-pencil"></i>&nbsp; 
+              <i class="fa fa-pencil"></i>&nbsp;
             </a>
             <a href="#">
               <i class="fa fa-trash deleteCrawlButton" data-delete-url="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}"> </i>&nbsp;
@@ -275,7 +275,7 @@
             <th>Actions</th>
           </tr>
           {% for x in project.crawlmodel_set.all %}
-            <tr>
+            <tr id="modelRows">
               <td>
                 {{ x.name }}
               </td>
@@ -322,4 +322,5 @@ $(document).ready(function() {
     });
 });
 </script>
+{% include "base/underscore_templates.html" %}
 {% endblock %}

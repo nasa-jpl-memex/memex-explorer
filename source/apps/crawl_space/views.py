@@ -60,6 +60,7 @@ class ProjectObjectMixin(ContextMixin):
                 json.dumps({
                     "url": self.object.get_absolute_url(),
                     "id": self.object.id,
+                    "name": self.object.name,
                     "slug": self.object.slug,
                     "project_id": self.object.project.id,
                 }),
