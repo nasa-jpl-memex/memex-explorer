@@ -58,7 +58,7 @@ class ProjectObjectMixin(ContextMixin):
             json_response = serializers.serialize(
                 'json',
                 [self.object],
-                fields=("name", "slug", "project", "id")
+                fields=("name", "slug", "project", "status")
             )
             return HttpResponse(
                 json.dumps({
