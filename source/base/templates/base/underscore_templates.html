@@ -1,8 +1,8 @@
 <script type="text/template" id="crawlTableItem">
     <tr>
-      <td><a href="<%= abs_url %>"><%= name %></a></td>
+      <td><a href="<%= url %>"><%= name %></a></td>
       <td>0</td>
-      <td><%= status %></td>
+      <td>NOT STARTED</td>
       <td>
         <i class="fa fa-pencil"></i>&nbsp;
         <i class="fa fa-trash"></i>&nbsp;
@@ -12,4 +12,8 @@
           <button class="btn btn-success btn-xs">Launch</button>
       </td>
     </tr>
+</script>
+
+<script type="text/template" id="crawlFormModel">
+    <option value="<%= id %>"><%= name %></option>
 </script>

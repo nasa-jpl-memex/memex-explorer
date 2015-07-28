@@ -55,17 +55,12 @@ class ProjectObjectMixin(ContextMixin):
         if form.is_valid():
             form.instance.project = self.get_project()
             self.object = form.save()
-            json_response = serializers.serialize(
-                'json',
-                [self.object],
-                fields=("name", "slug", "project", "status")
-            )
             return HttpResponse(
                 json.dumps({
-                    "object": {
-                        "fields": json.loads(json_response),
-                        "url": self.object.get_absolute_url()
-                    }
+                    "url": self.object.get_absolute_url(),
+                    "id": self.object.id,
+                    "slug": self.object.slug,
+                    "project_id": self.object.project.id,
                 }),
                 status=200,
                 content_type="application/json"
