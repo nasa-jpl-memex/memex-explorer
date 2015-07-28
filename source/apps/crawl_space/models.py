@@ -216,4 +216,4 @@ class Crawl(models.Model):
 
     @property
     def index_name(self):
-        return "%s_%s" % (self.slug, self.project.slug)
+        return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)

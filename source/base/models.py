@@ -119,7 +119,7 @@ class Index(models.Model):
 
     @property
     def index_name(self):
-        return "%s_%s" % (self.slug, self.project.slug)
+        return "%s_%s_%s" % (self.slug, self.project.slug, "dataset")
 
     def __unicode__(self):
         return self.name
