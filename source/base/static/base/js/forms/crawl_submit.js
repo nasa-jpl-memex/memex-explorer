@@ -3,6 +3,8 @@
 
     var addCrawlForm = $("#addCrawlForm")
 
+
+
     function cleanErrors(){
       crispyFormErrors.clearErrors(
         [
@@ -34,6 +36,12 @@
       cleanErrors();
 
       xhr.send(formData);
+      xhr.onreadystatechange = function(){
+        if (xhr.readyState==4){
+          console.log(xhr.response);
+        }
+      }
+
     })
 
     $("#cancelSubmit").click(function(){

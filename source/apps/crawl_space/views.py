@@ -51,6 +51,34 @@ class ProjectObjectMixin(ContextMixin):
         """
         return self.get_project().get_absolute_url()
 
+    def handle_form_submit(self, request, form):
+        if form.is_valid():
+            form.instance.project = self.get_project()
+            self.object = form.save()
+            json_response = serializers.serialize(
+                'json',
+                [self.object],
+                fields=("name", "slug", "project", "id")
+            )
+            return HttpResponse(
+                json.dumps({
+                    "object": {
+                        "fields": json.loads(json_response),
+                        "url": self.object.get_absolute_url()
+                    }
+                }),
+                status=200,
+                content_type="application/json"
+            )
+        else:
+            return HttpResponse(
+                json.dumps({
+                    "form_errors": form.errors,
+                }),
+                status=500,
+                content_type="application/json",
+            )
+
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     model = Crawl
@@ -75,24 +103,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         form = AddCrawlForm(request.POST, request.FILES)
         # Let add crawl work normally if it is not dealing with an xmlhttprequest.
         if request.is_ajax():
-            if form.is_valid():
-                form.instance.project = self.get_project()
-                self.object = form.save()
-                return HttpResponse(
-                    json.dumps(
-                        serializers.serialize('json', [self.object])
-                    ),
-                    status=200,
-                    content_type="application/json"
-                )
-            else:
-                return HttpResponse(
-                    json.dumps({
-                        "form_errors": form.errors,
-                    }),
-                    status=500,
-                    content_type="application/json",
-                )
+            return self.handle_form_submit(request, form)
         else:
             return super(AddCrawlView, self).post(request, *args, **kwargs)
 
@@ -314,24 +325,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         form = AddCrawlModelForm(request.POST, request.FILES)
         # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
         if request.is_ajax():
-            if form.is_valid():
-                form.instance.project = self.get_project()
-                self.object = form.save()
-                return HttpResponse(
-                    json.dumps(
-                        serializers.serialize('json', [self.object])
-                    ),
-                    status=200,
-                    content_type="application/json"
-                )
-            else:
-                return HttpResponse(
-                    json.dumps({
-                        "form_errors": form.errors,
-                    }),
-                    status=500,
-                    content_type="application/json",
-                )
+            return self.handle_form_submit(request, form)
         else:
             return super(AddCrawlModelView, self).post(request, *args, **kwargs)
 
