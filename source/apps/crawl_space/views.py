@@ -15,6 +15,7 @@ from django.apps import apps
 from django.http import HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
+from django.core import serializers
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -75,6 +76,7 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         # Let add crawl work normally if it is not dealing with an xmlhttprequest.
         if request.is_ajax():
             if form.is_valid():
+                form.instance.project = self.get_project()
                 self.object = form.save()
                 return HttpResponse(
                     json.dumps(
@@ -93,11 +95,6 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 )
         else:
             return super(AddCrawlView, self).post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.project = self.get_project()
-        self.object = form.save()
-        return super(AddCrawlView, self).form_valid(form)
 
 
 class ListCrawlsView(ProjectObjectMixin, ListView):
@@ -318,6 +315,7 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
         # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
         if request.is_ajax():
             if form.is_valid():
+                form.instance.project = self.get_project()
                 self.object = form.save()
                 return HttpResponse(
                     json.dumps(
@@ -336,10 +334,6 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 )
         else:
             return super(AddCrawlModelView, self).post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.project = self.get_project()
-        return super(AddCrawlModelView, self).form_valid(form)
 
 
 class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
