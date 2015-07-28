@@ -29,6 +29,9 @@
       xhr.onload = function(){
         if ((xhr.status === 200) || (xhr.status === 302)){
           success = true;
+          
+          //temporarily reloading page
+          location.reload();
         } else {
           crispyFormErrors.showFormErrors(xhr.response, "addCrawlForm");
           success = false;

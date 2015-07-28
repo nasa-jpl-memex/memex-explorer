@@ -86,9 +86,29 @@
               </div>
             </div>
 
-            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add a new Dataset</a>
-
+            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add a new Dataset</a>
+            <!--
             <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}"><i class="fa-fa-plus"></i>&nbsp; &nbsp;Add a new Crawl Model</a>
+            -->
+            <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#crawlModelModal">
+             ADD CRAWL MODEL
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="crawlModelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Crawl Model</h4>
+                  </div>
+                  <div class="modal-body">
+                     {% include "crawl_space/add_crawl_model_form.html" %}
+                  </div>
+
+                </div>
+              </div>
+            </div>
     </div>
 
     <div class="row">
