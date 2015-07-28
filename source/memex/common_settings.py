@@ -142,8 +142,8 @@ MEDIA_ROOT = None
 PROJECT_PATH = None
 EXTERNAL_APP_LOCATIONS = {}
 
-# Update this list if you add an external application
-EXTERNAL_APPS = ['celery',
+# Update this set if you add an external application
+EXTERNAL_APPS = {'celery',
                  'ddt',
                  'elasticsearch',
                  'kibana',
@@ -151,9 +151,11 @@ EXTERNAL_APPS = ['celery',
                  'logio-server',
                  'redis',
                  'tad',
-                 'tika']
+                 'tika'}
 
 sys.stderr.write("[%d]: Querying supervisor for state of external applications\n" % (os.getpid()))
-READY_EXTERNAL_APPS = [app for app in EXTERNAL_APPS if check_process_state(app)]
-sys.stderr.write("[%d]: The following applications are ready %s\n" % (os.getpid(), str(READY_EXTERNAL_APPS)))
-
+READY_EXTERNAL_APPS = {app for app in EXTERNAL_APPS if check_process_state(app)}
+if READY_EXTERNAL_APPS:
+    sys.stderr.write("[%d]: The following applications are ready %s\n" % (os.getpid(), str(READY_EXTERNAL_APPS)))
+else:
+    sys.stderr.write("[%d]: Supervisord not running or no applications are running\n" % (os.getpid()))
