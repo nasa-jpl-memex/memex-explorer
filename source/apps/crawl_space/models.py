@@ -213,3 +213,7 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
+
+    @property
+    def index_name(self):
+        return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)

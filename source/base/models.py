@@ -117,5 +117,9 @@ class Index(models.Model):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
 
+    @property
+    def index_name(self):
+        return "%s_%s_%s" % (self.slug, self.project.slug, "dataset")
+
     def __unicode__(self):
         return self.name
