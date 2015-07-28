@@ -48,6 +48,10 @@
             <a class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add Dataset</a>
 
             <a class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl_model' project_slug=project.slug %}">Add Crawl Model</a>
+
+              {% if "ddt" in settings.READY_EXTERNAL_APPS %}
+              <a class="btn btn-default btn-duo center link-button" href={{settings.EXTERNAL_APP_LOCATIONS.ddt}}>Domain Discovery </a>
+              {% endif %}
           </div>
 
     </div>
