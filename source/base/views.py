@@ -10,6 +10,7 @@ from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.http import HttpResponse
@@ -65,7 +66,14 @@ class AddProjectView(SuccessMessageMixin, CreateView):
         # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
         if request.is_ajax():
             if form.is_valid():
-                return super(AddProjectView, self).post(request, *args, **kwargs)
+                self.object = form.save()
+                return HttpResponse(
+                    json.dumps(
+                        serializers.serialize('json', [self.object])
+                    ),
+                    status=200,
+                    content_type="application/json"
+                )
             else:
                 return HttpResponse(
                     json.dumps({
