@@ -1,5 +1,4 @@
 <form method="post" id="addProjectForm">
-    <h1>Add Project</h1>
     {% csrf_token %}
     <div id="div_id_name" class="form-group">
         <label for="id_name" class="control-label  requiredField">
@@ -8,6 +7,9 @@
         <div class="controls ">
             <input class="textinput textInput form-control" id="id_name" maxlength="64" name="name" type="text" />
         </div>
+        <span class="help-block">
+            <strong id="error_id_name" hidden></strong>
+        </span>
     </div>
     <div id="div_id_description" class="form-group">
         <label for="id_description" class="control-label ">
@@ -17,7 +19,14 @@
             <textarea class="textarea form-control" cols="40" id="id_description" name="description" rows="10"></textarea>
         </div>
     </div>
+    <hr>
     <div class="form-actions">
-        <input type="submit" name="submit" value="Submit" class="btn btn-primary" id="submit-id-submit"/>
-    </div>
+      <div class="col-md-2">
+          <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
+      </div>
+
+      <div class="col-md-2">
+       <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
+      </div>
+   </div>
 </form>

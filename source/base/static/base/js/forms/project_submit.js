@@ -15,6 +15,7 @@
         if ((xhr.readyState == 4) && (xhr.status == 200)){
           console.log(xhr.response);
           updateProjectList(xhr.response);
+          $("#newProjectModal").modal('hide');
         }
       }
 
