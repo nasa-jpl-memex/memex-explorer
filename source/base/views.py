@@ -33,6 +33,7 @@ from task_manager.file_tasks import upload_zip
 def project_context_processor(request):
     additional_context = {
         'projects': Project.objects.all(),
+        'settings': settings,
         'deployment': settings.DEPLOYMENT,
         'logio': settings.EXTERNAL_APP_LOCATIONS["logio"],
         'kibana': settings.EXTERNAL_APP_LOCATIONS["kibana"],

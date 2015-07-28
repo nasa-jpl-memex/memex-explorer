@@ -24,6 +24,7 @@ PROJECT_PATH = os.path.join(MEDIA_ROOT, "projects")
 DEPLOYMENT = False
 
 EXTERNAL_APP_LOCATIONS = {
+    'ddt': 'http://localhost:8084',
     'kibana': 'http://localhost:5601',
     'logio': 'http://localhost:28778',
 }

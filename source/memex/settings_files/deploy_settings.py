@@ -29,6 +29,7 @@ DEBUG = True
 
 #Must match the urls given in deploy/nginx.conf
 EXTERNAL_APP_LOCATIONS = {
+    'ddt': 'http://explorer.continuum.io:8084',
     'kibana': '/kibana/',
     'logio': '/logio/',
 }
