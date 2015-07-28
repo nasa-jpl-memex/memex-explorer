@@ -36,6 +36,7 @@ import celery
 from redis.connection import ConnectionError
 
 class ProjectObjectMixin(ContextMixin):
+
     def get_project(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
 
@@ -101,6 +102,10 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
             return self.handle_form_submit(request, form)
         else:
             return super(AddCrawlView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.get_project()
+        return super(AddCrawlView, self).form_valid(form)
 
 
 class ListCrawlsView(ProjectObjectMixin, ListView):
@@ -323,6 +328,10 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
             return self.handle_form_submit(request, form)
         else:
             return super(AddCrawlModelView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.get_project()
+        return super(AddCrawlModelView, self).form_valid(form)
 
 
 class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
