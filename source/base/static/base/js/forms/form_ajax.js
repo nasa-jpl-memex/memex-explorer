@@ -26,6 +26,7 @@
     xhr.onload = function(){
       if ((xhr.status === 200) || (xhr.status === 302)){
         success = true;
+        console.log(xhr.response);
       } else {
         crispyFormErrors.showFormErrors(xhr.response, formId);
         success = false;
