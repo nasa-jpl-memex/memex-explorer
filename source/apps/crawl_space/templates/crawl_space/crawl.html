@@ -262,7 +262,7 @@
 </div>
 
 {% if crawl.crawler == "nutch" %}
-<div class='row'>
+<!-- <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
         <div role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
@@ -278,6 +278,11 @@
                 <iframe src="{{ kibana }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
             </div>
         </div>
+    </div>
+</div> -->
+<div class='row'>
+    <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
+        <iframe src="{{ logio }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
     </div>
 </div>
 {% endif %}
