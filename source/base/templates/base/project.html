@@ -133,14 +133,14 @@
             <a href="{% url 'base:crawl_space:crawl_settings' project_slug=project.slug crawl_slug=w.slug %}">
               <i class="fa fa-pencil"></i>&nbsp;
             </a>
-            <form action="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}"
+            <form style="display:inline" action="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}"
             method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
                 {% csrf_token %}
             <button class="fa fa-trash-o" type="submit"></button>
             </form>            <i class="fa fa-pie-chart"> &nbsp; </i>
           </td>
           <td>
-              <button class="btn btn-success btn-xs">View</button>
+              <a href="{{ w.get_absolute_url }}"><button class="btn btn-success btn-xs">View</button></a>
           </td>
         </tr>
         {% endfor %}
