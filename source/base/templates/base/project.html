@@ -23,13 +23,6 @@
 </script>
 
 <style>
-.table-gray{
-  border: 4px solid #eee !important;
-}
-
-.table-gray th{
-  background: #eee !important;
-}
 </style>
 <!--
 {% include "base/sidebar.html" %}
@@ -42,8 +35,7 @@
       <li> <a href="/"> / My Projects / </a></li> {{ project.name }}
     </ol>
   </div>
-  <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 main">
-    <div class="row">
+  <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
       <h1>{{ project.name }}
       <a href="{% url 'base:project_settings' project_slug=project.slug %}">
         <button id="editButton" title="Edit Project" type="button" class="btn btn-control"
@@ -52,8 +44,7 @@
         <i class="fa fa-pencil" style="font-size:24px;"></i>
         </button></a>
       </h1>
-      <p>{{ project.description }}</p>
-    </div>
+      <p>{{ project.description }}</p>  
   </div>
 
 </div>
