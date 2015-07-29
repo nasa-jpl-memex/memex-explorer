@@ -112,7 +112,7 @@
       </h4>
 
       {% if project.crawl_set.all %}
-      <table id="crawlTable" class="table table-condensed table-striped table-gray ">
+      <table id="crawlTable" class="table table-condensed table-gray ">
         <tr>
           <th>Crawl Name</th>
 
@@ -137,7 +137,8 @@
             method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
                 {% csrf_token %}
             <button class="fa fa-trash-o" type="submit"></button>
-            </form>            <i class="fa fa-pie-chart"> &nbsp; </i>
+            </form>    
+            <a href="{{ kibana }}">    <i class="fa fa-pie-chart"> &nbsp; </i></a>
           </td>
           <td>
               <a href="{{ w.get_absolute_url }}"><button class="btn btn-success btn-xs">View</button></a>
