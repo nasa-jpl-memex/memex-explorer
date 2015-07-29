@@ -4,8 +4,14 @@
     var addCrawlForm = $("#addCrawlForm")
 
     function updateCrawlTable(jsonResponse){
-      var template = _.template($("#crawlTableItem").html());
-      $("#crawlTable > tbody:last-child").append(template(JSON.parse(jsonResponse)));
+      if (!$("#crawlTable").length){
+        var tableTemplate = _.template($("#crawlTableBody").html());
+        $("#crawlTableDiv").append(tableTemplate(JSON.parse(jsonResponse)));
+        $("#noCrawls").attr("hidden", true);
+      } else {
+        var template = _.template($("#crawlTableItem").html());
+        $("#crawlTable > tbody:last-child").append(template(JSON.parse(jsonResponse)));
+      }
     }
 
     function cleanErrors(){
