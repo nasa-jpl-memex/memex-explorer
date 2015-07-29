@@ -9,8 +9,14 @@
     }
 
     function updateModelTable(jsonResponse){
-      var template = _.template($("#crawlModelTableItem").html())
-      $("#modelRows > tbody:last-child").append(template(JSON.parse(jsonResponse)))
+      if (!$("#modelTable").length){
+        var tableTemplate = _.template($("#modelTableBody").html());
+        $("#modelTableDiv").append(tableTemplate(JSON.parse(jsonResponse)));
+        $("#noModels").attr("hidden", true);
+      } else {
+        var template = _.template($("#modelTableItem").html());
+        $("#modelTable > tbody:last-child").append(template(JSON.parse(jsonResponse)));
+      }
     }
 
     addCrawlModelForm.submit(function(event){

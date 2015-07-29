@@ -226,7 +226,7 @@
     </div>
     <hr/>
 
-    <div class="row">
+    <div id="modelTableDiv" class="row">
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
       </h4>
@@ -250,7 +250,7 @@
 -->
 
         {% if project.crawlmodel_set.all %}
-        <table id="modelRows" class="table table-striped table-condensed table-gray">
+        <table id="modelTable" class="table table-striped table-condensed table-gray">
           <tr>
             <th>Name</th>
             <th>Actions</th>
@@ -271,7 +271,7 @@
           {% endfor %}
         </table>
         {% else %}
-        <p>No Crawl Models Registered.</p>
+        <p id="noModels">No Crawl Models Registered.</p>
         {% endif %}
 
 
