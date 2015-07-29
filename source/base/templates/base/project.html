@@ -203,7 +203,7 @@
             <div id={{ w.slug }}>{{ w.status }}</div>
           </td>
           <td>
-            <a href={% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}>
+            <a href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
               <i class="fa fa-pencil"></i>&nbsp;
             </a>
              <form style="display:inline" action="{% url 'base:delete_index' project_slug=project.slug index_slug=w.slug %}"
