@@ -8,12 +8,23 @@
 {% include "base/sidebar.html" %}
 
 <div class='row'>
+	<div class="col-md-offset-2 col-md-4">
+                <ol class="breadcrumb">
+                  <li> <a href="/"> / My Projects / </a></li> <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">{{ project.name }}  </a> / Add Crawl Model
+                </ol>
+            </div>
     <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
         <div class="center">
             <h1>Add Crawl Model</h1>
             {% crispy form %}
         </div>
+        {% if "ddt" in settings.READY_EXTERNAL_APPS %}
+        <a id="DDT"
+           style="float:right;" class="btn btn-default btn-duo center link-button" href={{settings.EXTERNAL_APP_LOCATIONS.ddt}}> Domain Discovery
+        </a>
+        {% endif %}
     </div>
 </div>
+
 {% endblock %}
 

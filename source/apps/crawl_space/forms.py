@@ -19,6 +19,7 @@ class AddCrawlForm(CrispyModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AddCrawlForm, self).__init__(*args, **kwargs)
+        self.fields["rounds_left"].label = "Rounds"
         self.set_layout()
 
     def set_layout(self):
@@ -27,8 +28,6 @@ class AddCrawlForm(CrispyModelForm):
             Fieldset(None,
                 'name',
                 'description',
-                InlineRadios('crawler'),
-                'crawl_model',
                 'seeds_list',
                 HTML(
                 '''
@@ -48,7 +47,20 @@ class AddCrawlForm(CrispyModelForm):
                     <br>
                 '''
                 ),
-                FormActions(Submit('submit', "Submit"))
+                InlineRadios('crawler'),
+                "rounds_left",
+                'crawl_model',
+                FormActions(Submit('submit', "Create")),
+                HTML(
+                """
+                    <a class="add_index btn btn-primary link-button"
+                        id="cancelSubmit"
+                        target="_blank"
+                        href="#">
+                        Cancel
+                    </a>
+                """
+                ),
             )
         )
 
@@ -73,7 +85,7 @@ class AddCrawlForm(CrispyModelForm):
     class Meta:
         model = Crawl
         fields = ['name', 'description', 'crawler',
-                  'crawl_model', 'seeds_list']
+                  'crawl_model', 'seeds_list', 'rounds_left']
         widgets = {'crawl_model': Select}
 
 

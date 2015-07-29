@@ -1,0 +1,74 @@
+package:
+  name: elasticsearch-py
+  version: "1.6.0"
+
+source:
+  fn: elasticsearch-1.6.0.tar.gz
+  url: https://pypi.python.org/packages/source/e/elasticsearch/elasticsearch-1.6.0.tar.gz
+  md5: 15f518950131aa403bb95024a5456409
+#  patches:
+   # List any patch files here
+   # - fix.patch
+
+# build:
+  # noarch_python: True
+  # preserve_egg_dir: True
+  # entry_points:
+    # Put any entry points (scripts to be generated automatically) here. The
+    # syntax is module:function.  For example
+    #
+    # - elasticsearch = elasticsearch:main
+    #
+    # Would create an entry point called elasticsearch that calls elasticsearch.main()
+
+
+  # If this is a new build for the same version, increment the build
+  # number. If you do not include this key, it defaults to 0.
+  # number: 1
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - urllib3 >=1.8,<2.0
+
+  run:
+    - python
+    - urllib3 >=1.8,<2.0
+
+test:
+  # Python imports
+  imports:
+    - elasticsearch
+    - elasticsearch.client
+    - elasticsearch.connection
+    - elasticsearch.connection.esthrift
+    - elasticsearch.helpers
+
+  # commands:
+    # You can put test commands to be run here.  Use this to test that the
+    # entry points work.
+
+
+  # You can also put a file called run_test.py in the recipe that will be run
+  # at test time.
+
+  requires:
+    - coverage
+    - mock
+    - nose
+    - nosexcover
+    - pyaml
+    - pylibmc ==1.4.1
+    - requests >=1.0.0,<3.0.0
+    # Put any additional test requirements here.  For example
+    # - nose
+
+about:
+  home: https://github.com/elastic/elasticsearch-py
+  license: Apache Software License
+  summary: 'Python client for Elasticsearch'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

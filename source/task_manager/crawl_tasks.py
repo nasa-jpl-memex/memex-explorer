@@ -87,7 +87,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         crawl_path,
         "--index",
         "-D",
-        "elastic.index=%s" % self.crawl.slug,
+        "elastic.index=%s" % self.crawl.index_name,
         self.crawl.seeds_list.path,
         self.crawl.get_crawl_path(),
         "1",
@@ -139,11 +139,16 @@ def ache(self, crawl, *args, **kwargs):
     call = [
         ache_path,
         "startCrawl",
+        "-o",
         self.crawl.get_crawl_path(),
+        "-c",
         self.crawl.get_config_path(),
+        "-s",
         self.crawl.seeds_list.path,
+        "-m",
         self.crawl.crawl_model.get_model_path(),
-        LANG_DETECT_PATH,
+        "-e",
+        self.crawl.index_name,
     ]
     with open(os.path.join(self.crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
         proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,

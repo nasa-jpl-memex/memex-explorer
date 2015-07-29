@@ -38,16 +38,22 @@ import requests
 def project_context_processor(request):
     additional_context = {
         'projects': Project.objects.all(),
+        'settings': settings,
         'deployment': settings.DEPLOYMENT,
+        'logio': settings.EXTERNAL_APP_LOCATIONS["logio"],
+        'kibana': settings.EXTERNAL_APP_LOCATIONS["kibana"],
     }
-    for app, location in settings.EXTERNAL_APP_LOCATIONS.items():
-        additional_context["{}_link".format(app)] = location
     return additional_context
 
 
-class IndexView(ListView):
+class IndexView(CreateView):
     model = Project
+    form_class = AddProjectForm
     template_name = "base/index.html"
+    success_message = "Project %(name)s was added successfully."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
 
 class AboutView(TemplateView):

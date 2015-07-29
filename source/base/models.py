@@ -63,224 +63,6 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
-class App(models.Model):
-    """
-    Represents information about starting an application in a container.
-    """
-    name = models.CharField(max_length=64, unique=True,
-        validators=[alphanumeric_validator()])
-    index_url = models.URLField()
-
-    #Only one of the following can be non-blank. This is not enforced yet.
-    image = models.TextField(max_length=256, blank=True, null=True)
-    build = models.TextField(max_length=265, blank=True, null=True)
-    command = models.TextField(max_length=256)
-
-
-    def create_container_entry(self, project):
-        container = Container.objects.create(
-            app = self,
-            project = project,
-            high_port = None,
-            running = True
-        )
-        return container
-
-    def __unicode__(self):
-        return "{} running {}".format(self.name, self.image or self.build)
-
-class AppLink(models.Model):
-    from_app = models.ForeignKey(App, related_name='links')
-    to_app = models.ForeignKey(App)
-    alias = models.TextField(max_length=64, null=True, blank=True)
-    external = models.BooleanField(default=False)
-
-class AppPort(models.Model):
-    expose_publicly = models.BooleanField(default=False)
-    app = models.ForeignKey(App, related_name='ports')
-    internal_port = models.IntegerField(null=False, blank=False)
-    service_name = models.TextField(max_length=64, null=True, blank=True)
-
-    def clean(self, *args, **kwargs):
-        if AppPort.objects.filter(app = self.app).filter(expose_publicly = True).exists():
-            raise ValidationError("An application can only expose one port publicly. {} already exposes port {}".filter(
-              self.app.name, AppPort.objects.filter(app = self.app).filter(expose_publicly = True).get().internal_port
-              ))
-
-    def __unicode__(self):
-        return "{} is running on port {}".format(self.app.name, self.internal_port)
-
-    class Meta:
-        unique_together = ('app', 'internal_port')
-
-class VolumeMount(models.Model):
-    """
-    When creating this app, where to mount it in the container.
-
-    TODO: More thinking required
-    """
-    app = models.ForeignKey(App)
-    mounted_at = models.TextField(max_length=254)
-    """Where within the container is it mounted?"""
-    located_at = models.TextField(max_length=254)
-    """Where on the host is the directory?"""
-    read_only = models.BooleanField(default=False)
-
-class EnvVar(models.Model):
-    app = models.ForeignKey(App, related_name='environment_variables')
-    name = models.TextField(max_length=64)
-    value = models.TextField(max_length=256, default='')
-
-# We are no longer having memex-explorer spin up additional containers dynamically.
-#Much of this is now dead code that can be removed. -- @amfarrell
-class Container(models.Model):
-    """
-    """
-    NGINX_CONFIG_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/nginx-reverse-proxy.conf.jinja2')
-    DOCKER_COMPOSE_TEMPLATE_PATH = os.path.join(settings.BASE_DIR, 'base/deploy_templates/docker-compose.yml.jinja2')
-    NGINX_CONFIG_DESTINATION_PATH =  os.path.join(settings.BASE_DIR, 'base/nginx-reverse-proxy.conf')
-    NGINX_CONFIG_COPY_PATH = '/etc/nginx/sites-enabled/default'
-    DOCKER_COMPOSE_DESTINATION_PATH = os.path.join(settings.BASE_DIR, 'base/docker-compose.yml')
-
-    app = models.ForeignKey(App)
-    project = models.ForeignKey(Project)
-    "What type of app should the container be running?"
-    high_port = models.IntegerField(null=True, blank=True)
-    "If the app exposes a port, what high port does it end up exposing it on?"
-    public_path_base = models.TextField(null=True, blank=True)
-    "If the app is supposed to be served to the outside world and has a base url different than /project.name/app.name, what is it?"
-    running = models.BooleanField(default=False)
-    "Should the container be running?"
-
-    def slug(self):
-        return Container.__slug(self.project, self.app)
-
-    def public_urlbase(self):
-        if self.public_path_base:
-            return self.public_path_base
-        return "/{}/{}".format(self.project.name, self.app.name)
-
-    def docker_name(self):
-        composefile_dir_name = os.path.basename(os.path.dirname(Container.DOCKER_COMPOSE_DESTINATION_PATH))
-        return "{}_{}_1".format(composefile_dir_name, self.slug())
-
-    def context_dict(self):
-        #TODO: This can be dramatically sped up by actually thinking about db queries and a judicious prefectch_related
-        result = {
-            'slug':self.slug(),
-            'command': self.app.command or '',
-            'volumes' : list(VolumeMount.objects.filter(app = self.app).values('located_at', 'mounted_at')),
-            'ports': [port[0] for port in AppPort.objects.filter(app=self.app).values_list('internal_port')],
-            'links': [{'name': Container.__slug(self.project, link.to_app), 'alias': link.alias or ''} for link in
-                        AppLink.objects.filter(from_app = self.app)],
-            'environment_variables': list(EnvVar.objects.filter(app=self.app).values('name', 'value')),
-        }
-        if self.app.image:
-            result['image'] = self.app.image
-        elif self.app.build:
-            result['build'] = self.app.build
-        else:
-            raise ValueError("container {} has neither an image not a build.".format(self.slug()))
-        return result
-
-    @staticmethod
-    def __slug(project, app):
-        return "{}{}".format(project.name, app.name)
-
-    @staticmethod
-    def fill_template(source, destination, context_dict):
-        template = Template(open(source, 'r').read(), trim_blocks = True, lstrip_blocks = True)
-        result = template.render(context_dict)
-        with open(destination, 'w') as f:
-            f.write(result)
-            f.flush()
-
-    @staticmethod
-    def generate_container_context():
-        containers = Container.objects.filter(running = True).select_related('app', 'project').all()
-        return {'containers': [container.context_dict() for container in containers]} #this is going to make about 50 queries when it could make 2 or 5.
-    @staticmethod
-    def docker_compose_path():
-        if os.path.exists(os.path.expanduser('~/miniconda/')):
-            DOCKER_COMPOSE_PATH=os.path.expanduser('~/miniconda/bin/docker-compose')
-        elif os.path.exists(os.path.expanduser('~/anaconda/')):
-            DOCKER_COMPOSE_PATH=os.path.expanduser('~/anaconda/bin/docker-compose')
-        elif os.path.exists('/miniconda/'):
-            DOCKER_COMPOSE_PATH='/miniconda/bin/docker-compose'
-        elif os.path.exists('/anaconda/'):
-            DOCKER_COMPOSE_PATH='/anaconda/bin/docker-compose'
-        else:
-            DOCKER_COMPOSE_PATH='docker-compose'
-        return DOCKER_COMPOSE_PATH
-
-    @staticmethod
-    def create_containers():
-        """
-        Create a new docker compose file with an entry for every container that is supposed to be running.
-        """
-        Container.fill_template(Container.DOCKER_COMPOSE_TEMPLATE_PATH, Container.DOCKER_COMPOSE_DESTINATION_PATH, Container.generate_container_context())
-        command = ["sudo",Container.docker_compose_path(),"-f",Container.DOCKER_COMPOSE_DESTINATION_PATH,"up","-d","--no-recreate"]
-        print(command)
-        out = subprocess.check_output(command)
-
-        app_ids = AppPort.objects.filter(expose_publicly = True).values_list('app_id', flat=True)
-        return out
-
-    @staticmethod
-    def get_port_mappings():
-        app_ports = dict(AppPort.objects.filter(expose_publicly = True).values_list('app_id', 'internal_port'))
-        port_mappings = set()
-        for container in Container.objects.filter(app_id__in = app_ports.keys()).filter(running = True).all():
-            docker_port_output = subprocess.check_output(['sudo', 'docker', 'port', container.docker_name()])
-            for raw_mapping in docker_port_output.split('\n'):
-                print(raw_mapping)
-                if '/tcp -> 0.0.0.0:' in raw_mapping:
-                    if app_ports[container.app_id] in app_ports.values():
-                        internal, external = raw_mapping.split('/tcp -> 0.0.0.0:')
-                        container.high_port = int(external)
-                        container.save()
-                        port_mappings.add((container.public_urlbase(), container.high_port))
-        return port_mappings
-
-    @staticmethod
-    def generate_nginx_context(port_mappings=[]):
-        if port_mappings is None:
-            port_mappings = Container.get_port_mappings()
-        root_port = os.environ.get('ROOT_PORT', '8000')
-        hostname = os.environ.get('HOST_NAME', settings.HOSTNAME)
-        ip_addr = os.environ.get('IP_ADDR', settings.IP_ADDR)
-        return {
-            'static_root': settings.STATIC_ROOT,
-            'portmaps': [{'port': mapping[1], 'urlbase': mapping[0]}
-                                    for mapping in port_mappings]
-                , 'root_port': root_port, 'hostname': hostname, 'ip_addr': ip_addr}
-
-    @staticmethod
-    def map_public_ports(port_mappings=None):
-        """
-        Create a new nginx config with an entry for every container that is supposed to be running and has a public path base.
-        Then, restart nginx.
-        """
-        Container.fill_template(Container.NGINX_CONFIG_TEMPLATE_PATH,
-            Container.NGINX_CONFIG_DESTINATION_PATH, Container.generate_nginx_context(port_mappings))
-        command = ["sudo","cp",Container.NGINX_CONFIG_DESTINATION_PATH, Container.NGINX_CONFIG_COPY_PATH]
-        print(command)
-        subprocess.check_output(command)
-        return subprocess.check_output(["sudo","service","nginx","restart"])
-
-
-from task_manager.docker_tasks import start_containers
-
-
-def start_container_celery(sender, instance, **kwargs):
-    start_containers.delay(instance)
-
-
-# TODO: Remove this conditional entirely.
-if settings.DEPLOYMENT:
-    pass
-    #post_save.connect(start_container_celery, sender = Project)
-
 
 def get_zipped_data_path(instance, filename):
     """
@@ -324,6 +106,7 @@ class Index(models.Model):
     data_folder = models.TextField(blank=True)
     project = models.ForeignKey(Project)
     status = models.CharField(max_length=64, default="")
+    num_files = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
@@ -333,6 +116,10 @@ class Index(models.Model):
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
+
+    @property
+    def index_name(self):
+        return "%s_%s_%s" % (self.slug, self.project.slug, "dataset")
 
     def __unicode__(self):
         return self.name

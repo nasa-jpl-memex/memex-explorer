@@ -165,7 +165,7 @@ class Crawl(models.Model):
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
         default=None)
     location = models.CharField(max_length=64, default="location")
-    rounds_left = models.IntegerField(default=0)
+    rounds_left = models.IntegerField(default=1, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -213,3 +213,7 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
+
+    @property
+    def index_name(self):
+        return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)

@@ -1,15 +1,20 @@
 #!/bin/bash
-pushd ../
-conda update conda;
+pushd ../;
+conda update conda -y;
 conda install conda-env -y;
 conda env update --file local-environment.yml;
-popd
+popd;
+
+pushd memex;
+cp settings_files/dev_settings.py settings.py;
+popd;
 
 source activate memex;
+npm install -g log.io
 python manage.py migrate;
 
-pushd memex
-cp settings_files/dev_settings.py settings.py;
-popd
+pushd ../deploy;
+python logio_settings.py;
+popd;
 
-source deactivate
+source deactivate;

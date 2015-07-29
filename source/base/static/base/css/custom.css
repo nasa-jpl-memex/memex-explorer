@@ -13,24 +13,35 @@
 }
 
 .panel-project {
-    background-color:#1D4971;
+    background-color:#f5f5f5;
+    border: none;
+    margin-top: 20px;
+    box-shadow: 3px 3px 15px #888888;
 }
 
-.panel-project>.panel-heading {
-color: #fff;
+.panel-project>.panel-heading{
+color: black !important;
 background-color: #1D4971;
 border-color: #1D4971;
 }
 
+.color-set {
+  color:white;
+}
 .panel-project>a>.panel-heading {
-color: #fff;
 background-color: #1D4971;
-border-color: #1D4971;
+/*border-color: #1D4971; */
 }
 
-.panel-project>.panel-footer.p {
-color: black;
+.panel-footer{
+  background-color:#f5f5f5 !important;
 }
+
+.search-bar {
+  margin-top:20px;
+  margin-bottom: 10px;
+}
+
 
 /* Index page - app icons style */
 

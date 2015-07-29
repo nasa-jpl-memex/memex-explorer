@@ -561,7 +561,7 @@ button.projects {
 
 /* line 411, ../scss/dashboard.scss */
 .project-tab {
-  min-height: 330px;
+  min-height: 200px;
 }
 
 @media (max-width: 769px) {

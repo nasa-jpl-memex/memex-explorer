@@ -46,6 +46,7 @@ class Harvest(object):
         df = pd.read_csv(StringIO(stdout), delimiter='\t',
             names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
 
         source = into(ColumnDataSource, df)
         return source
@@ -53,7 +54,7 @@ class Harvest(object):
     def create(self):
         self.source = self.update_source()
 
-        p = figure(plot_width=500, plot_height=250,
+        p = figure(plot_width=400, plot_height=400,
                    title="Harvest Plot", x_axis_type='datetime',
                    tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
@@ -79,4 +80,3 @@ class Harvest(object):
         script, div = components(p, INLINE)
 
         return (script, div)
-
