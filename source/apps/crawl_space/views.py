@@ -15,6 +15,7 @@ from django.apps import apps
 from django.http import HttpResponse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
+from django.core import serializers
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -35,6 +36,7 @@ import celery
 from redis.connection import ConnectionError
 
 class ProjectObjectMixin(ContextMixin):
+
     def get_project(self):
         return Project.objects.get(slug=self.kwargs['project_slug'])
 
@@ -48,15 +50,41 @@ class ProjectObjectMixin(ContextMixin):
         """
         Prepend the hostname and the port to the path for an object.
         """
-        return "{}/{}".format(
-            self.request.META.get('HTTP_ORIGIN', '').rstrip('/'),
-            self.object.get_absolute_url().lstrip('/'))
+        return self.get_project().get_absolute_url()
+
+    def handle_form_submit(self, request, form):
+        if form.is_valid():
+            form.instance.project = self.get_project()
+            self.object = form.save()
+            return HttpResponse(
+                json.dumps({
+                    "url": self.object.get_absolute_url(),
+                    "id": self.object.id,
+                    "name": self.object.name,
+                    "slug": self.object.slug,
+                    "project_id": self.object.project.id,
+                }),
+                status=200,
+                content_type="application/json"
+            )
+        else:
+            return HttpResponse(
+                json.dumps({
+                    "form_errors": form.errors,
+                }),
+                status=500,
+                content_type="application/json",
+            )
 
 
 class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
+    model = Crawl
     form_class = AddCrawlForm
     template_name = "crawl_space/add_crawl.html"
     success_message = "Crawl %(name)s was saved successfully."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 
     def post(self, request, *args, **kwargs):
         """
@@ -69,7 +97,12 @@ class AddCrawlView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
                 bytes(request.POST["textseeds"]),
                 'utf-8'
             )
-        return super(AddCrawlView, self).post(request, *args, **kwargs)
+        form = AddCrawlForm(request.POST, request.FILES)
+        # Let add crawl work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            return self.handle_form_submit(request, form)
+        else:
+            return super(AddCrawlView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.project = self.get_project()
@@ -288,6 +321,14 @@ class AddCrawlModelView(SuccessMessageMixin, ProjectObjectMixin, CreateView):
     form_class = AddCrawlModelForm
     template_name = "crawl_space/add_crawl_model.html"
     success_message = "Crawl model %(name)s was added successfully."
+
+    def post(self, request, *args, **kwargs):
+        form = AddCrawlModelForm(request.POST, request.FILES)
+        # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            return self.handle_form_submit(request, form)
+        else:
+            return super(AddCrawlModelView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         form.instance.project = self.get_project()

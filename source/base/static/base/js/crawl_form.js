@@ -10,6 +10,8 @@ $(document).ready(function(){
         if (nutch[0].checked){
             crawl_model.prop("disabled", true);
             rounds.prop("disabled", false);
+            model_div.prop("hidden", true);
+            rounds_div.prop("hidden", false);
             model_div.addClass("input-greyed-out");
             model_div.removeClass("input-available");
             rounds_div.addClass("input-available");
@@ -17,6 +19,8 @@ $(document).ready(function(){
         } else {
             crawl_model.prop("disabled", false);
             rounds.prop("disabled", true);
+            model_div.prop("hidden", false);
+            rounds_div.prop("hidden", true);
             model_div.addClass("input-available");
             model_div.removeClass("input-greyed-out");
             rounds_div.addClass("input-greyed-out");
@@ -28,4 +32,5 @@ $(document).ready(function(){
     on_crawler_change();
 
     crawler.change(on_crawler_change);
+
 });

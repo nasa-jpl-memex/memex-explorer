@@ -349,7 +349,7 @@ div.data-sample {
   display: inline-block;
   float: none;
   margin: 0 auto;
-  margin: 0px 10px 0px 10px;
+  margin: 0px 10px 0px 0px;
 }
 /* line 280, ../scss/dashboard.scss */
 .btn-default:hover a, .btn-primary:hover a, .btn-danger:hover a {
@@ -374,7 +374,7 @@ div.data-sample {
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$topColor', endColorstr='$bottomColor',GradientType=0 );
   /* IE6-9 */
-  color: #fff;
+  color: #fff !important;
   display: inline;
   margin-left: 20px;
 }

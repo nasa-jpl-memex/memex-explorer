@@ -10,6 +10,7 @@ from django.views import generic
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.http import HttpResponse
@@ -61,6 +62,34 @@ class AddProjectView(SuccessMessageMixin, CreateView):
     template_name = "base/add_project.html"
     success_message = "Project %(name)s was added successfully."
 
+    def post(self, request, *args, **kwargs):
+        form = AddProjectForm(request.POST)
+        # Let add crawl model work normally if it is not dealing with an xmlhttprequest.
+        if request.is_ajax():
+            if form.is_valid():
+                self.object = form.save()
+                return HttpResponse(
+                    json.dumps({
+                        "url": self.object.get_absolute_url(),
+                        "id": self.object.id,
+                        "name": self.object.name,
+                        "slug": self.object.slug,
+                        "description": self.object.description,
+                    }),
+                    status=200,
+                    content_type="application/json"
+                )
+            else:
+                return HttpResponse(
+                    json.dumps({
+                        "form_errors": form.errors,
+                    }),
+                    status=500,
+                    content_type="application/json",
+                )
+        else:
+            return super(AddProjectView, self).post(request, *args, **kwargs)
+
     def get_success_url(self):
         return self.object.get_absolute_url()
 
@@ -71,7 +100,7 @@ class ProjectView(DetailView):
     template_name = "base/project.html"
 
     def post(self, request, *args, **kwargs):
-        if request.POST['action'] == "index_status":
+        if request.POST["action"] == "index_status":
             statuses = {}
             for x in self.get_object().index_set.all():
                 x.status = x.celerytask.task.status

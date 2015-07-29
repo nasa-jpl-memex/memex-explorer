@@ -1,8 +1,17 @@
 {% extends "base/base.html" %}
 {% load crispy_forms_tags %}
 
+{% load static %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/forms/form_ajax.js' %}"></script>
+    <script src="{% static 'base/js/forms/crispy_form_errors.js' %}"></script>
+    <script src="{% static 'base/js/forms/project_submit.js' %}"></script>
+{% endblock %}
+
 {% block content %}
-<div class='inner'>
+<div class='col-md-offset-1 col-md-10'>
     <div class="row">
         <div class="col-md-8">
             <h3>MY PROJECTS</h3>
@@ -15,16 +24,16 @@
             </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-3 col-md-4">
+    <div class="row" id="projectList">
+        <div class="col-lg-3 col-md-4 pointer-hand"  data-toggle="modal" data-target="#newProjectModal">
             <div class="panel panel-project">
-                <a href="{% url 'base:add_project' %}">
+                <a>
                 <div class="panel-heading">
                     <div class="row color-set">
                         <div class="col-xs-3">
                             <i class="fa fa-plus fa-3x"></i>
                         </div>
-                        <div class="col-xs-9 text-right" data-toggle="modal" data-target="#newProjectModal">
+                        <div class="col-xs-9 text-right ">
                             <p>New Project</p>
                         </div>
                     </div>
@@ -58,9 +67,6 @@
         {% endfor %}
     </div>
 
-    <!--
-    modal for upload project
-
     <div class="modal fade" id="newProjectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -69,13 +75,11 @@
                     <h4 class="modal-title" id="myModalLabel">Add Project</h4>
                 </div>
                 <div class="modal-body">
-                    {% crispy form %}
+                    {% include "base/add_project_form.html" %}
                 </div>
             </div>
         </div>
     </div>
-
-    -->
 </div>
 <script type="text/javascript">
 /* simple project name search implementation */
@@ -96,4 +100,5 @@
         return false;
     });
 </script>
+{% include "base/underscore_templates.html" %}
 {% endblock %}
