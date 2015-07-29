@@ -1,15 +1,28 @@
+<script type="text/template" id="crawlTableBody">
+  <table id="crawlRows" class="table table-condensed table-striped table-gray ">
+    <tbody>
+    <tr>
+      <th>Crawl Name</th>
+      <th>Pages Crawled</th>
+      <th>Status</th>
+      <th>Actions</th>
+      <th></th>
+    </tr>
+    </tbody>
+  </table>
+</script>
+
 <script type="text/template" id="crawlTableItem">
   <tr>
     <td><a href="<%= url %>"><%= name %></a></td>
     <td>0</td>
-    <td>06/20/2015</td>
     <td><%= status %></td>
     <td>
       <a href="<%= url + 'settings/' %>">
         <i class="fa fa-pencil"></i>&nbsp;
       </a>
       <form action="<%= url + 'settings/delete/' %>"
-      method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+      method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
           {% csrf_token %}
       <button class="fa fa-trash-o" type="submit"></button>
       </form>

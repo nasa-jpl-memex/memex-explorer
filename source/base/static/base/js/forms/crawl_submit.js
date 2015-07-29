@@ -5,7 +5,7 @@
 
     function updateCrawlTable(jsonResponse){
       var template = _.template($("#crawlTableItem").html());
-      $("#crawlRows > tbody:last-child").append(template(JSON.parse(jsonResponse)));
+      $("#crawlTable > tbody:last-child").append(template(JSON.parse(jsonResponse)));
     }
 
     function cleanErrors(){
