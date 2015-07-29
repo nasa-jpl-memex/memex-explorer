@@ -1,25 +1,42 @@
 <script type="text/template" id="crawlTableItem">
-    <tr>
-      <td><a href="<%= url %>"><%= name %></a></td>
-      <td>0</td>
-      <td>NOT STARTED</td>
-      <td>
+  <tr>
+    <td><a href="<%= url %>"><%= name %></a></td>
+    <td>0</td>
+    <td>06/20/2015</td>
+    <td><%= status %></td>
+    <td>
+      <a href="<%= url + 'settings/' %>">
         <i class="fa fa-pencil"></i>&nbsp;
-        <i class="fa fa-trash"></i>&nbsp;
-        <i class="fa fa-pie-chart">&nbsp;</i>
-      </td>
-      <td>
-          <button class="btn btn-success btn-xs">Launch</button>
-      </td>
-    </tr>
+      </a>
+      <form action="<%= url + 'settings/delete/' %>"
+      method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+          {% csrf_token %}
+      <button class="fa fa-trash-o" type="submit"></button>
+      </form>
+      <i class="fa fa-pie-chart"> &nbsp; </i>
+    </td>
+    <td>
+      <button class="btn btn-success btn-xs">Launch</button>
+    </td>
+  </tr>
 </script>
 
 <script type="text/template" id="crawlFormModel">
     <option value="<%= id %>"><%= name %></option>
 </script>
 
+
 <script type="text/template" id="crawlModelTableItem">
-    <td><%= name %></td>
+  <tr>
+      <td><%= name %></td>
+      <td>
+        <form action="<%= url + slug + '/' + 'delete/' %>"
+        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+            {% csrf_token %}
+        <button class="fa fa-trash-o" type="submit"></button>
+        </form>
+      </td>
+  </tr>
 </script>
 
 <script type="text/template" id="indexProjectItem">

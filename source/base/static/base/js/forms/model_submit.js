@@ -8,6 +8,11 @@
       $("#id_crawl_model").append(template(JSON.parse(jsonResponse)))
     }
 
+    function updateModelTable(jsonResponse){
+      var template = _.template($("#crawlModelTableItem").html())
+      $("#modelRows > tbody:last-child").append(template(JSON.parse(jsonResponse)))
+    }
+
     addCrawlModelForm.submit(function(event){
       event.preventDefault();
 
@@ -15,6 +20,8 @@
       xhr.onreadystatechange = function(){
         if ((xhr.readyState == 4) && (xhr.status == 200)){
           updateModelFields(xhr.response);
+          updateModelTable(xhr.response);
+          $("#crawlModelModal").modal('hide');
         }
       }
 

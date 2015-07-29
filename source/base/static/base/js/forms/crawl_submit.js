@@ -3,7 +3,10 @@
 
     var addCrawlForm = $("#addCrawlForm")
 
-
+    function updateCrawlTable(jsonResponse){
+      var template = _.template($("#crawlTableItem").html());
+      $("#crawlRows > tbody:last-child").append(template(JSON.parse(jsonResponse)));
+    }
 
     function cleanErrors(){
       crispyFormErrors.clearErrors(
@@ -38,7 +41,8 @@
       xhr.send(formData);
       xhr.onreadystatechange = function(){
         if (xhr.readyState==4){
-          console.log(xhr.response);
+          updateCrawlTable(xhr.response);
+          $("#crawlModal").modal('hide');
         }
       }
 
