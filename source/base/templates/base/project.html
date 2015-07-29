@@ -104,9 +104,7 @@
 
     <div id="crawlTableDiv" class="row">
       <h4 style="line-height:2em;">
-        <!-- <a id="link-crawls" href="{% url 'base:crawl_space:crawls' project_slug=project.slug %}"> -->
           <i class="fa fa-search"> &nbsp; </i>Crawls
-        <!-- </a> -->
 
 
       </h4>
@@ -153,33 +151,9 @@
 
     <div class="row">
       <h4 style="line-height:2em;">
-        <!--<a href="{% url 'base:indices' project_slug=project.slug %}"> -->
           <i class="fa fa-archive"> &nbsp; </i>Datasets
         </a>
-
-        <!--
-        <a id="gotoKibana"
-            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
-            Visualize
-        </a>
-        -->
       </h4>
-<!--
-      {% if project.index_set.all %}
-      <ul id="statuses" class="list-group">
-        {%  for w in project.index_set.all %}
-        <li class="list-group-item">
-            <a target="_blank" href={% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}>
-                &nbsp{{ w.name }}
-            </a>
-            <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p>No Datasets Registered.</p>
-      {% endif %}
--->
 
       {% if project.index_set.all %}
       <table id="statuses" class="table table-condensed table-gray table-bordered">
@@ -202,7 +176,7 @@
             <div id={{ w.slug }}>{{ w.status }}</div>
           </td>
           <td>
-            <a href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
+            <a target="_blank" href="{% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}">
               <i class="fa fa-pencil"></i>
             </a>
             &nbsp;&nbsp;
@@ -229,25 +203,6 @@
       <h4 style="line-height:2em;">
           <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
       </h4>
-<!--
-        {% if project.crawlmodel_set.all %}
-        <ul class="list-group">
-          {% for x in project.crawlmodel_set.all %}
-          <li class="list-group-item">
-                {{ x.name }}
-                <form action="{% url 'base:crawl_space:delete_crawl_model' project_slug=project.slug model_slug=x.slug %}"
-                method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
-                    {% csrf_token %}
-                <button class="fa fa-trash-o" type="submit"></button>
-                </form>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p>No Crawl Models Registered.</p>
-        {% endif %}
--->
-
         {% if project.crawlmodel_set.all %}
         <table id="modelTable" class="table table-condensed table-gray table-bordered">
           <tr>
@@ -277,30 +232,5 @@
       </div>
     </div>
   </div>
-  <script>
-$(document).ready(function() {
-    $('.deleteCrawlButton').click(function(){
-        var deleteButton = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "You will not be able to recover this crawl.",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#DD6B55',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        },
-        function(isConfirm){
-            if (isConfirm){
-                $("<form action='" + deleteButton.data("delete-url") + "' method='post'>{% csrf_token %}</form>").submit();
-            } else {
-                swal("Cancelled", "You cancelled the delete process", "error");
-            }
-        })
-    });
-});
-</script>
 {% include "base/underscore_templates.html" %}
 {% endblock %}

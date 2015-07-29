@@ -1,5 +1,5 @@
 <script type="text/template" id="crawlTableBody">
-  <table id="crawlTable" class="table table-condensed table-striped table-gray ">
+  <table id="crawlTable" class="table table-condensed table-gray table-bordered">
     <tbody>
     <tr>
       <th>Crawl Name</th>
@@ -11,20 +11,20 @@
     <tr>
       <td><a href="<%= url %>"><%= name %></a></td>
       <td>0</td>
-      <td><%= status %></td>
+      <td>NOT STARTED</td>
       <td>
         <a href="<%= url + 'settings/' %>">
-          <i class="fa fa-pencil"></i>&nbsp;
+          <i class="fa fa-pencil"></i>
         </a>
-        <form action="<%= url + 'settings/delete/' %>"
+        <form style="display:inline" action="<%= url + 'settings/delete/' %>"
         method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
             {% csrf_token %}
-        <button class="fa fa-trash-o" type="submit"></button>
+        <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
         </form>
-        <i class="fa fa-pie-chart"> &nbsp; </i>
+        <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
       </td>
       <td>
-        <button class="btn btn-success btn-xs">Launch</button>
+        <button class="btn btn-success btn-xs">View</button>
       </td>
     </tr>
   </tbody>
@@ -35,17 +35,17 @@
   <tr>
     <td><a href="<%= url %>"><%= name %></a></td>
     <td>0</td>
-    <td><%= status %></td>
+    <td>NOT STARTED</td>
     <td>
       <a href="<%= url + 'settings/' %>">
-        <i class="fa fa-pencil"></i>&nbsp;
+        <i class="fa fa-pencil"></i>
       </a>
-      <form action="<%= url + 'settings/delete/' %>"
+      <form style="display:inline" action="<%= url + 'settings/delete/' %>"
       method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
           {% csrf_token %}
-      <button class="fa fa-trash-o" type="submit"></button>
+      <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
       </form>
-      <i class="fa fa-pie-chart"> &nbsp; </i>
+      <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
     </td>
     <td>
       <button class="btn btn-success btn-xs">View</button>
@@ -58,7 +58,7 @@
 </script>
 
 <script type="text/template" id="modelTableBody">
-  <table id="modelTable" class="table table-striped table-condensed table-gray">
+  <table id="modelTable" class="table table-condensed table-gray table-bordered">
     <tbody>
     <tr>
       <th>Name</th>
@@ -70,7 +70,7 @@
         <form action="<%= url + slug + '/' + 'delete/' %>"
         method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
             {% csrf_token %}
-        <button class="fa fa-trash-o" type="submit"></button>
+                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
         </form>
       </
     </tbody>
@@ -84,7 +84,7 @@
         <form action="<%= url + slug + '/' + 'delete/' %>"
         method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
             {% csrf_token %}
-        <button class="fa fa-trash-o" type="submit"></button>
+                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
         </form>
       </td>
   </tr>
