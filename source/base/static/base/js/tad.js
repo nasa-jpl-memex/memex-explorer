@@ -14,7 +14,8 @@ var tad = tad || {};
         "constant-baseline"     : $("#constant-baseline").is(":checked"),
         "scale-baseline"        : $("#scale-baseline").is(":checked"),
         "index"                 : $("#index").val(),
-        "time-field"            : $("#time-field").val()
+        "time-field"            : $("#time-field").val(),
+        "csrfmiddlewaretoken"   : $("input[name=csrfmiddlewaretoken]").val()
       },
       success: function(response){
         $("#raw-response").text(JSON.stringify(response, null, 2));
@@ -46,7 +47,8 @@ var tad = tad || {};
       type: "POST",
       data: {
         "action": "progress",
-        "task-id": $("#task-id").text()
+        "task-id": $("#task-id").text(),
+        "csrfmiddlewaretoken"   : $("input[name=csrfmiddlewaretoken]").val()
       },
       success: function(response) {
         $("#raw-response").text(JSON.stringify(response['result'], null, 2));
