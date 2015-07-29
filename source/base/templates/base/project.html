@@ -138,7 +138,7 @@
                 {% csrf_token %}
             <button class="fa fa-trash" type="submit"></button>
             </form>
-            <a href="{{ kibana }}">    <i class="fa fa-pie-chart"> &nbsp; </i></a>
+            <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"> &nbsp; </i></a>
           </td>
           <td>
               <a href="{{ w.get_absolute_url }}"><button class="btn btn-success btn-xs">View</button></a>
@@ -212,7 +212,7 @@
             <button class="fa fa-trash" type="submit"></button>
             </form>
 
-            <a id="gotoKibana" href="{{ kibana }}">
+            <a id="gotoKibana" target="_blank" href="{{ kibana }}">
               <i class="fa fa-pie-chart"> &nbsp; </i>
             </a>
           </td>
