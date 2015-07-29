@@ -112,7 +112,7 @@
       </h4>
 
       {% if project.crawl_set.all %}
-      <table id="crawlTable" class="table table-condensed table-gray ">
+      <table id="crawlTable" class="table table-condensed table-gray table-bordered">
         <tr>
           <th>Crawl Name</th>
 
@@ -136,7 +136,7 @@
             <form style="display:inline" action="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=w.slug %}"
             method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
                 {% csrf_token %}
-            <button class="fa fa-trash-o" type="submit"></button>
+            <button class="fa fa-trash" type="submit"></button>
             </form>    
             <a href="{{ kibana }}">    <i class="fa fa-pie-chart"> &nbsp; </i></a>
           </td>
@@ -183,10 +183,10 @@
 -->
 
       {% if project.index_set.all %}
-      <table id="statuses" class="table table-condensed table-striped table-gray">
+      <table id="statuses" class="table table-condensed table-gray table-bordered">
         <tr>
           <th>Dataset Name</th>
-          <th>Date Created</th>
+         
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -198,13 +198,20 @@
             </a>
           </td>
 
-          <td>06/20/2015</td>
+        
           <td>
             <p id={{ w.slug }} style="float:right;">{{ w.status }}</p>
           </td>
           <td>
-            <i class="fa fa-pencil"></i>&nbsp;
-            <i class="fa fa-trash"> </i>&nbsp;
+            <a href={% url 'base:index_settings' project_slug=project.slug index_slug=w.slug %}>
+              <i class="fa fa-pencil"></i>&nbsp;
+            </a>
+             <form style="display:inline" action="{% url 'base:delete_index' project_slug=project.slug index_slug=w.slug %}"
+            method="post" onSubmit="return confirm('Are you sure you want to delete this dataset?')">
+                {% csrf_token %}
+            <button class="fa fa-trash" type="submit"></button>
+            </form>
+          
             <a id="gotoKibana" href="{{ kibana }}">
               <i class="fa fa-pie-chart"> &nbsp; </i>
             </a>
@@ -242,7 +249,7 @@
 -->
 
         {% if project.crawlmodel_set.all %}
-        <table id="modelTable" class="table table-striped table-condensed table-gray">
+        <table id="modelTable" class="table table-condensed table-gray table-bordered">
           <tr>
             <th>Name</th>
             <th>Actions</th>
@@ -256,7 +263,7 @@
                 <form action="{% url 'base:crawl_space:delete_crawl_model' project_slug=project.slug model_slug=x.slug %}"
                 method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
                     {% csrf_token %}
-                <button class="fa fa-trash-o" type="submit"></button>
+                <button class="fa fa-trash" type="submit"></button>
                 </form>
               </td>
           </tr>
