@@ -93,7 +93,7 @@ def create_index(self, index, *args, **kwargs):
             for kw, val in features.items():
                 parsed["has_" + re.sub(' ', '_', kw)] = val
             #parsed["authors"] = process_authors(parsed["X-TIKA:content"])
-            es.index(index=self.index.slug,
+            es.index(index="%s" % self.index.index_name,
                      doc_type="autonomy",
                      body = parsed,
                      )
@@ -102,4 +102,3 @@ def create_index(self, index, *args, **kwargs):
             #Just move on to the next document
             print e
             pass
-

@@ -18,7 +18,13 @@
             <h1>Add Crawl Model</h1>
             {% crispy form %}
         </div>
+        {% if "ddt" in settings.READY_EXTERNAL_APPS %}
+        <a id="DDT"
+           style="float:right;" class="btn btn-default btn-duo center link-button" href={{settings.EXTERNAL_APP_LOCATIONS.ddt}}> Domain Discovery
+        </a>
+        {% endif %}
     </div>
 </div>
+
 {% endblock %}
 
