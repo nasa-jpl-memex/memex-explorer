@@ -10,14 +10,27 @@
 <div class='row'>
     <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
         <div class="col-sm-6">
-            <h1>Edit Crawl</h1> 
+            <h1>Edit Crawl</h1>
         </div>
         <div class="col-sm-6">
-            <button id="deleteCrawlButton" title="Delete Crawl" type="button" 
-            class="btn btn-control" data-container="body" data-toggle="tooltip"
-            data-placement="bottom" style="float:right;margin-top:20px;">
-                <i class="fa fa-trash-o" style="font-size:28px;"></i>
-            </button>
+          <form style="
+              display:inline;
+              float:right;
+              margin-top:20px;
+              margin-bottom:10px;
+              background:none;
+            "
+            action="{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=crawl.slug %}"
+            method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
+            {% csrf_token %}
+        <button
+            class="fa fa-trash-o btn btn-control"
+            style="
+                font-size:32px;
+            "
+            type="submit">
+        </button>
+        </form>
         </div>
     </div>
     <div class="col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3 main">
@@ -26,30 +39,6 @@
         </div>
     </div>
 </div>
-<script>
-$(document).ready(function() {
-    $('#deleteCrawlButton').click(function(){
-        swal({
-            title: "Are you sure?",
-            text: "You will not be able to recover this crawl.",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: '#DD6B55',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        },
-        function(isConfirm){
-            if (isConfirm){
-                $("<form action='{% url 'base:crawl_space:delete_crawl' project_slug=project.slug crawl_slug=crawl.slug %}' method='post'>{% csrf_token %}</form>").submit();
-            } else {
-                swal("Cancelled", "You cancelled the delete process", "error");
-            }
-        })
-    });
-});
-</script>
 {% endblock %}
 
 {% load staticfiles %}

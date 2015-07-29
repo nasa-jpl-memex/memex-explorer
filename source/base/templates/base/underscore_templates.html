@@ -1,0 +1,116 @@
+<script type="text/template" id="crawlTableBody">
+  <table id="crawlTable" class="table table-condensed table-gray table-bordered">
+    <tbody>
+    <tr>
+      <th>Crawl Name</th>
+      <th>Pages Crawled</th>
+      <th>Status</th>
+      <th>Actions</th>
+      <th></th>
+    </tr>
+    <tr>
+      <td><a href="<%= url %>"><%= name %></a></td>
+      <td>0</td>
+      <td>NOT STARTED</td>
+      <td>
+        <a href="<%= url + 'settings/' %>">
+          <i class="fa fa-pencil"></i>
+        </a>
+        <form style="display:inline" action="<%= url + 'settings/delete/' %>"
+        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
+            {% csrf_token %}
+        <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
+        </form>
+        <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
+      </td>
+      <td>
+        <button class="btn btn-success btn-xs">View</button>
+      </td>
+    </tr>
+  </tbody>
+  </table>
+</script>
+
+<script type="text/template" id="crawlTableItem">
+  <tr>
+    <td><a href="<%= url %>"><%= name %></a></td>
+    <td>0</td>
+    <td>NOT STARTED</td>
+    <td>
+      <a href="<%= url + 'settings/' %>">
+        <i class="fa fa-pencil"></i>
+      </a>
+      <form style="display:inline" action="<%= url + 'settings/delete/' %>"
+      method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
+          {% csrf_token %}
+      <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
+      </form>
+      <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
+    </td>
+    <td>
+      <button class="btn btn-success btn-xs">View</button>
+    </td>
+  </tr>
+</script>
+
+<script type="text/template" id="crawlFormModel">
+    <option value="<%= id %>"><%= name %></option>
+</script>
+
+<script type="text/template" id="modelTableBody">
+  <table id="modelTable" class="table table-condensed table-gray table-bordered">
+    <tbody>
+    <tr>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+    <tr>
+      <td><%= name %></td>
+      <td>
+        <form action="<%= url + slug + '/' + 'delete/' %>"
+        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+            {% csrf_token %}
+                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
+        </form>
+      </
+    </tbody>
+  </table>
+</script>
+
+<script type="text/template" id="modelTableItem">
+  <tr>
+      <td><%= name %></td>
+      <td>
+        <form action="<%= url + slug + '/' + 'delete/' %>"
+        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+            {% csrf_token %}
+                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
+        </form>
+      </td>
+  </tr>
+</script>
+
+<script type="text/template" id="indexProjectItem">
+    <div class="col-lg-3 col-md-4 project-tab">
+        <div class="panel panel-project">
+            <div class="panel-heading">
+            <a href="<%= url %>" style="text-decoration:none;">
+                <div class="row">
+                    <div class="col-md-12 color-set">
+                        <p><%= name %></p>
+                    </div>
+                    <!--div class="col-xs-9 text-right">
+                        <i class="fa {{project.icon}} fa-3x"></i>
+                    </div-->
+                </div>
+            </div>
+                <div class="panel-footer">
+                    <p><%= description %></p>
+
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+</script>

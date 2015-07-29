@@ -7,11 +7,11 @@
 {% endblock %}
 
 {% block extrafooter %}
+    <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'base/js/bokeh.min.js' %}"></script>
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/crawl_statuses.js' %}"></script>
     <script src="{% static 'base/js/crawl.js' %}"></script>
-    <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +25,7 @@
 
   <!-- Crawl Header -->
 <div class='row'>
-  <div class="col-md-offset-2 col-md-4">
+  <div class="col-md-offset-2 col-md-10">
           <ol class="breadcrumb">
             <li> <a href="/"> / My Projects / </a></li> <a href="{% url 'base:project' project_slug=project.slug %}" style="text-decoration:none;">{{ project.name }} </a> / {{ crawl.name }}
           </ol>
@@ -227,7 +227,7 @@
         </h4>
         <div class="col-md-2 pull-right">
           <a id="gotoKibana"
-            class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
+            class="btn btn-default btn-duo center link-button" target="_blank" href="{{ kibana }}">
             Visualize
               </a>
         </div>
@@ -262,7 +262,7 @@
 </div>
 
 {% if crawl.crawler == "nutch" %}
-<div class='row'>
+<!-- <div class='row'>
     <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
         <div role="tabpanel">
             <ul class="nav nav-tabs" role="tablist">
@@ -278,6 +278,11 @@
                 <iframe src="{{ kibana }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
             </div>
         </div>
+    </div>
+</div> -->
+<div class='row'>
+    <div class="col-sm-7 col-sm-offset-3 col-md-7 col-md-offset-2 main">
+        <iframe src="{{ logio }}" style="width:100%;height:600px;border:1px solid #EEEEEE;"></iframe>
     </div>
 </div>
 {% endif %}
