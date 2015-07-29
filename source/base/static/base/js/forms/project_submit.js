@@ -16,6 +16,7 @@
           console.log(xhr.response);
           updateProjectList(xhr.response);
           $("#newProjectModal").modal('hide');
+          $("#addProjectForm")[0].reset();
         }
       }
 

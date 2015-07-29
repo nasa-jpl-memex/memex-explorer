@@ -28,6 +28,7 @@
           updateModelFields(xhr.response);
           updateModelTable(xhr.response);
           $("#crawlModelModal").modal('hide');
+          $("#addCrawlModelForm")[0].reset();
         }
       }
 

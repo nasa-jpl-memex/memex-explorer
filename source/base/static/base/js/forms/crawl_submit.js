@@ -49,6 +49,7 @@
         if (xhr.readyState==4){
           updateCrawlTable(xhr.response);
           $("#crawlModal").modal('hide');
+          $("#addCrawlForm")[0].reset();
         }
       }
 
