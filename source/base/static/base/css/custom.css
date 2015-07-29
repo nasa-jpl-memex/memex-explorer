@@ -131,6 +131,7 @@ background-color: #1D4971;
     font-size: 24px;
 }
 
+/*Project page changes */
 .table-gray{
   border: 4px solid #eee !important;
 }
@@ -143,4 +144,12 @@ background-color: #1D4971;
 }
 .pointer-hand{
   cursor: pointer;
+}
+a:hover .fa {
+    text-decoration: none !important;
+}
+
+.no-style-btn{
+  border:0;
+  background:transparent;
 }
