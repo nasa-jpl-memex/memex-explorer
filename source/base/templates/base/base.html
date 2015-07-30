@@ -40,9 +40,9 @@
           <a class="navbar-brand" href="/">MEMEX-EXPLORER</a>
             <ul class="nav navbar-nav">
                       <li class="active dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-left:60px">Projects <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Projects <span class="caret"></span></a>
                         {% if projects %}
-                          <ul class="dropdown-menu dropdown-menu-right">
+                          <ul class="dropdown-menu">
                           {% for x in projects %}
                           <li> <a href="{% url 'base:project' project_slug=x.slug %}">{{ x.name }}</a></li>
                             {% endfor %}

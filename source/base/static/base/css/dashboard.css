@@ -547,6 +547,10 @@ button.projects {
   float: right;
 }
 
+.dropdown-menu{
+  max-width:none;
+}
+
 /* line 405, ../scss/dashboard.scss */
 .dropdown-menu li {
   margin-left: 5px;
