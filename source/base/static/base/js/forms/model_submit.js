@@ -33,6 +33,22 @@
       }
     }
 
+    function disableForm(formId, disableBool){
+      $("#" + formId).find(":input").attr("disabled", disableBool);
+      if (disableBool == true){
+        $("#" + formId).css({
+          "background-color": "#f5f5f5",
+          "border-radius": "8px",
+        });
+      } else {
+        $("#" + formId).css({
+          "background-color": "inherit",
+          "border-radius": "0px",
+        });
+      }
+      $("#addCrawlModelForm :input[name='cancel']").attr("disabled", false);
+    }
+
     addCrawlModelForm.submit(function(event){
       event.preventDefault();
 
@@ -47,6 +63,12 @@
           progressBar.attr("hidden", true);
           $("#addCrawlModelForm :input[name='submit']").attr("disabled", false);
           $("#addCrawlModelForm :input[name='cancel']").attr("value", "Cancel");
+          disableForm("addCrawlModelForm", false);
+        } else if ((xhr.readyState == 4) && (xhr.status == 500)){
+          progressBar.attr("hidden", true);
+          $("#addCrawlModelForm :input[name='submit']").attr("disabled", false);
+          $("#addCrawlModelForm :input[name='cancel']").attr("value", "Cancel");
+          disableForm("addCrawlModelForm", false);
         }
       }
 
@@ -60,17 +82,33 @@
         formData.append("features", features, features.name)
       }
 
-      crispyFormErrors.clearErrors([
-        "name",
-        "features",
-        "model",
-      ]);
+      crispyFormErrors.clearErrors(
+        [
+          "name",
+          "features",
+          "model",
+        ],
+        "addCrawlModelForm"
+      );
 
       xhr.send(formData);
       progressBar.attr("hidden", false);
+
+      disableForm("addCrawlModelForm", true);
       $("#addCrawlModelForm :input[name='submit']").attr("disabled", true);
       $("#addCrawlModelForm :input[name='cancel']").attr("value", "Hide");
     });
+
+    $("#addCrawlModelForm :input[id='cancelSubmit']").click(function(){
+      crispyFormErrors.clearErrors(
+        [
+          "name",
+          "features",
+          "model",
+        ],
+        "addCrawlModelForm"
+      );
+    })
 
   });
 })();

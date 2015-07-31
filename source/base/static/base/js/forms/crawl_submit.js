@@ -55,7 +55,7 @@
 
     })
 
-    $("#cancelSubmit").click(function(){
+    $("#addCrawlForm :input[id='cancelSubmit']").click(function(){
       cleanErrors();
     })
 
