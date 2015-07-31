@@ -56,8 +56,27 @@ WORKDIR /home/explorer/memex-explorer/deploy
 RUN python logio_settings.py
 
 # Need a special supervisord.conf that knows how to bind to 0.0.0.0
-ADD supervisord.conf /home/explorer/memex-explorer/source/supervisord.conf
+COPY supervisord.conf /home/explorer/memex-explorer/source/supervisord.conf
 
+# Now bring over elasticsearch index data
+COPY elasticdump.json /home/explorer/elasticdump.json
+
+# Install elasticdump
+RUN npm install -g elasticdump
+
+# Load data
+# Elasticsearch data
+COPY populate_elasticsearch.sh /home/explorer/populate_elasticsearch.sh
+WORKDIR /home/explorer
+RUN /bin/bash ./populate_elasticsearch.sh
+# Crawl data 
+COPY resources /home/explorer/memex-explorer/source/resources/
+# SQLite (Django)
+COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
+
+# Permissions clean-up
+USER root
+RUN chown -R explorer /home/explorer/memex-explorer/source
 
 ##################### INSTALLATION END #####################
 
