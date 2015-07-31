@@ -2,6 +2,20 @@
   $(document).ready(function(){
 
     var addCrawlModelForm = $("#addCrawlModelForm");
+    var progressBar = $("#progress");
+    var uploadProgress = $("#upload_progress");
+    var percentage = $("#upload_percentage");
+
+    function updateProgress(event){
+      var percentComplete = parseInt((event.loaded / event.total) * 100);
+      uploadProgress.attr("aria-valuenow", percentComplete);
+      uploadProgress.css("width", percentComplete + "%");
+      if (percentComplete == 100){
+        percentage.html("Completed");
+      } else {
+        percentage.html(percentComplete + "%");
+      }
+    }
 
     function updateModelFields(jsonResponse){
       var template = _.template($("#crawlFormModel").html())
@@ -23,12 +37,16 @@
       event.preventDefault();
 
       var xhr = ajaxForms.xhrFactory(window.location.href + "add_crawl_model/", "addCrawlModelForm");
+      xhr.upload.addEventListener("progress", updateProgress, false);
       xhr.onreadystatechange = function(){
         if ((xhr.readyState == 4) && (xhr.status == 200)){
           updateModelFields(xhr.response);
           updateModelTable(xhr.response);
           $("#crawlModelModal").modal('hide');
           $("#addCrawlModelForm")[0].reset();
+          progressBar.attr("hidden", true);
+          $("#addCrawlModelForm :input[name='submit']").attr("disabled", false);
+          $("#addCrawlModelForm :input[name='cancel']").attr("value", "Cancel");
         }
       }
 
@@ -49,6 +67,9 @@
       ]);
 
       xhr.send(formData);
+      progressBar.attr("hidden", false);
+      $("#addCrawlModelForm :input[name='submit']").attr("disabled", true);
+      $("#addCrawlModelForm :input[name='cancel']").attr("value", "Hide");
     });
 
   });
