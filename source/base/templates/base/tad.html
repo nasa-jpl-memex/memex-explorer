@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+
+{% block title %}TAD{% endblock %}
+
+{% load static %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/tad.js' %}"></script>
+    <script src="{% static 'base/js/bokeh.min.js' %}"></script>
+    <script src="{% static 'base/js/jquery-1.10.2.js' %}"></script>
+    <script src="{% static 'base/js/jquery-ui.min.js' %}"></script>
+    <link href="{% static 'base/css/bokeh.min.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/jquery-ui.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% include "base/sidebar.html" %}
+<div class='row'>
+  <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-2 main">
+    <h1>Temporal Anomaly Detector</h1>
+    {% csrf_token %}
+    <div style="padding: 4px; border: solid 1px black;">
+      <table style="border: none; width: 100%" cellpadding="10">
+        <tr><td width="150">Analysis start date:</td><td><input style="width: 100%" type="text" id="analysis-start-date" /></td></tr>
+        <tr><td>Analysis end date:</td><td><input style="width: 100%" type="text" id="analysis-end-date" /></td></tr>
+        <tr><td>Target filters:</td><td><input style="width: 100%" type="text" id="target-filters" /></td></tr>
+        <tr><td>Baseline filters:</td><td><input style="width: 100%" type="text" id="baseline-filters" /></td></tr>
+        <tr><td>Constant baseline:</td><td><input type="checkbox" id="constant-baseline" /></td></tr>
+        <tr style="display: none"><td>Scale baseline:</td><td><input type="checkbox" id="scale-baseline" /></td></tr>
+        <tr><td>Index:</td><td><input style="width: 100%" type="text" id="index" /></td></tr>
+        <tr><td>Time Field:</td><td><input style="width: 100%" type="text" id="time-field" /></td></tr>
+        <tr><td colspan="2" style="align: center"><button class="btn btn-default btn-duo center link-button" id="run-detector" style="float:right;">Run Detector</button></td></tr>
+      </table>
+    </div>
+    <div id="response" style="padding:4px; border: solid 1px black;">No query run.</div>
+    <div id="raw-response" style="padding:4px; border: solid 1px black; overflow: scroll; font-family: monospace; font-size: small; height: 150px;"></div>
+    <div id="task-id" style="display: none;"></div>
+  </div>
+</div>
+{% endblock %}

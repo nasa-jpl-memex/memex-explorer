@@ -30,6 +30,11 @@ from apps.crawl_space.views import ProjectObjectMixin
 
 from task_manager.file_tasks import upload_zip
 
+import datetime as dt
+import time
+
+import numpy as np
+import requests
 
 def project_context_processor(request):
     additional_context = {
@@ -275,3 +280,79 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
+
+class TadView(ProjectObjectMixin, TemplateView):
+    template_name = "base/tad.html"
+
+    def post(self, request, *args, **kwargs):
+        if request.POST['action'] == 'post':
+            query = {
+                "target-filters"        : json.loads(request.POST['target-filters']),
+                "baseline-filters"      : json.loads(request.POST['baseline-filters']),
+                "analysis-start-date"   : request.POST['analysis-start-date'],
+                "analysis-end-date"     : request.POST['analysis-end-date'],
+                "constant-baseline"     : request.POST['constant-baseline'] == 'true',
+                "index"                 : request.POST['index'],
+                "time-field"            : request.POST['time-field']
+            }
+            r = requests.post("http://127.0.0.1:5000/event-report", json=query)
+            return HttpResponse(
+                json.dumps({'result': json.loads(r.text)}),
+                content_type="application/json"
+            )
+
+        elif request.POST['action'] == 'progress':
+            r = requests.get('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
+            try: result = json.loads(r.text)
+            except: result = {'result': r.text, 'error': 'Could not parse response.'}
+            if result['error']  != None:
+                return HttpResponse({'result': result, 'plot': ''}, content_type='application/json')
+            elif result['result'] != None:
+                dates = [[dt.datetime.strptime(r[0], '%Y/%m/%d')] for r in result['result']]
+                pvalues_lower = [-np.log10(r[-3] + 1e-300) for r in result['result']]
+                pvalues_upper = [-np.log10(r[-1] + 1e-300) for r in result['result']]
+                baseline_counts = np.array([r[3] for r in result['result']])
+                target_counts = np.array([r[4] for r in result['result']])
+                return HttpResponse(
+                        json.dumps({
+                            'result': result,
+                            'pvalue_plot': pvalue_plot(dates, pvalues_lower, pvalues_upper),
+                            'count_plot' : counts_plot(dates, baseline_counts, target_counts)}),
+                        content_type='application/json')
+            else: return HttpResponse(json.dumps({'result': r.text}), content_type='application/json')
+
+        return HttpResponse(
+            json.dumps("Nope!"),
+            content_type="application/json",
+        )
+
+from bokeh.plotting import figure
+from bokeh.resources import CDN, INLINE
+from bokeh.embed import components
+
+def pvalue_plot( date, pvalues_lower, pvalues_upper ):
+    plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
+    plot.line(date, pvalues_lower, legend='Lower', line_color='green')
+    plot.line(date, pvalues_upper, legend='Upper', line_color='red')
+    plot.legend.orientation = "top_left"
+    plot.title = '-log(P Values)'
+
+    script, div = components(plot, CDN)
+    return { 'script': script, 'div': div }
+
+def counts_plot( date, baseline_counts, target_counts ):
+    counts_t = np.sum(target_counts)
+    counts_b = np.sum(baseline_counts)
+    scale_baseline = counts_b >= 10*counts_t
+    if scale_baseline:
+        baseline_counts *= np.sum(target_counts)/np.sum(baseline_counts)
+
+    plot = figure(x_axis_type = "datetime", plot_height=250, plot_width=600)
+    plot.line(date, baseline_counts, legend='Scaled Baseline' if scale_baseline else 'Baseline')
+    plot.line(date, target_counts, line_color='orange', legend='Target')
+    plot.legend.orientation = "top_left"
+    plot.title = 'Counts'
+
+    script, div = components(plot, CDN)
+    return { 'script': script, 'div': div }
