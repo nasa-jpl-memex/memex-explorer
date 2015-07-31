@@ -81,6 +81,10 @@
             {% if "ddt" in settings.READY_EXTERNAL_APPS %}
             <a class="btn btn-default btn-duo center link-button" href={{settings.EXTERNAL_APP_LOCATIONS.ddt}}>Domain Discovery </a>
             {% endif %}
+            {% if "tad" in settings.READY_EXTERNAL_APPS %}
+            <a class="btn btn-default btn-duo center link-button"
+            href="tad">Temporal Anomalies </a>
+            {% endif %}
             <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#crawlModelModal">
              ADD CRAWL MODEL
             </button>
