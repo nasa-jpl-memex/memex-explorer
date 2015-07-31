@@ -83,6 +83,8 @@ RUN ln -s /service/build/tad/service /service/tad
 # also this knows to run TAD
 USER explorer
 COPY supervisord.conf /home/explorer/memex-explorer/source/supervisord.conf
+# Need dev_settings that point to right locations
+COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
 
 # Now bring over elasticsearch index data
 COPY elasticdump.json /home/explorer/elasticdump.json

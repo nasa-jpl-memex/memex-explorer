@@ -296,14 +296,14 @@ class TadView(ProjectObjectMixin, TemplateView):
                 "index"                 : request.POST['index'],
                 "time-field"            : request.POST['time-field']
             }
-            r = requests.post("http://127.0.0.1:5000/event-report", json=query)
+            r = requests.post(settings.EXTERNAL_APP_LOCATIONS['tad'] + "/event-report", json=query)
             return HttpResponse(
                 json.dumps({'result': json.loads(r.text)}),
                 content_type="application/json"
             )
 
         elif request.POST['action'] == 'progress':
-            r = requests.get('http://127.0.0.1:5000/event-report/{}'.format(request.POST['task-id']))
+            r = requests.get(settings.EXTERNAL_APP_LOCATIONS['tad'] + '/event-report/{}'.format(request.POST['task-id']))
             try: result = json.loads(r.text)
             except: result = {'result': r.text, 'error': 'Could not parse response.'}
             if result['error']  != None:
