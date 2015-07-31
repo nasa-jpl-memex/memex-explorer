@@ -123,7 +123,7 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER explorer
 WORKDIR /home/explorer/memex-explorer/
-RUN git fetch && checkout origin/ahmadia/tad_integration_master
+RUN git fetch && git checkout origin/ahmadia/tad_integration_master
 
 ##################### INSTALLATION END #####################
 

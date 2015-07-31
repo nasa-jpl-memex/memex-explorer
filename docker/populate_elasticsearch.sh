@@ -3,6 +3,7 @@
 source activate memex
 echo "memex activated"
 elasticsearch &
+sleep 2
 ES_PID=$!
 echo "elasticsearch launched with pid: $ES_PID"
 elasticdump --bulk=true --input=elasticdump.json --output=http://localhost:9200/
