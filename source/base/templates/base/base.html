@@ -40,7 +40,7 @@
           <a class="navbar-brand" href="/">MEMEX-EXPLORER</a>
             <ul class="nav navbar-nav">
                       <li class="active dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-left:60px">Projects <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Projects <span class="caret"></span></a>
                         {% if projects %}
                           <ul class="dropdown-menu">
                           {% for x in projects %}
@@ -49,14 +49,14 @@
                           </ul>
                             {% endif %}
                       </li>
-               
+
                   <li>
                       <a href ="http://memex-explorer.readthedocs.org/en/latest/" target="_blank" style="color: white; margin-left:60px"> Docs </a>
                   </li>
                   <li>
                       <a href ="/about" target="_blank" style="color: white; margin-left:60px"> About </a>
                   </li>
-               
+
             </ul>
         </div>
         <!-- <div class="navbar-collapse collapse">
@@ -69,14 +69,14 @@
             <input type="text" class="form-control" placeholder="Search...">
           </form>
         </div> -->
-      
+
         {# <a class="navbar-brand projects link-button" href="http://explorer.continuum.io:8022" style="float:right;margin-top:10px;margin-bottom:0px;text-decoration:none;color:#eaeaea">IMAGE SPACE</a> #}
       </div>
     </div>
 
     <div class="container-fluid">
       <div class="row">
-        {% if messages %}      
+        {% if messages %}
           <div class="col-sm-12 main">
             <div class="container">
               <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
