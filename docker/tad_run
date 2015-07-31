@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export C_FORCE_ROOT="true"
+sudo rabbitmq-server -detached
+sleep 2
+cd /service/tad
+./start_worker &
+./start_service
