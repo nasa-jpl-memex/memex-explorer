@@ -12,7 +12,7 @@ Clone the repository, then:
 
 ```bash
 cd memex-explorer/source
-```bash
+```
 
 Run the following commands:
 
