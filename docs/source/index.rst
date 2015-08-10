@@ -23,6 +23,4 @@ Contents:
    crawler_guide
    dev_guide
    manual_testing_guide
-   docker_guide
-   vagrant_guide
    glossary

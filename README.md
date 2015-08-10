@@ -31,6 +31,8 @@ in turn ensure that all services associated with the core Memex
 Explorer environment are running.  To stop supervisord and the
 associated services, send an interrupt to the process with `Ctrl-c`.
 
+**Memex Explorer will now be running locally at http://localhost:8000**
+
 # Testing
 
 To run memex-explorer tests, use the following command from within an active environment:
