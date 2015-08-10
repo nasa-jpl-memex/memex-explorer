@@ -6,39 +6,33 @@ Developer's Guide to Memex Explorer
 Setting up Memex Explorer
 *************************
 
-Environment
-===========
-    To setup the environment, do the following:
+To setup your machine, you will need Anaconda or Miniconda
+installed. Miniconda is a minimal Anaconda installation that
+bootstraps conda and Python on any operating system. Install `Anaconda
+<http://continuum.io/downloads>`_ or `Miniconda
+<http://conda.pydata.org/miniconda.html>`_ from their respective sites.
 
-    .. code-block:: html
-
-        $ http://bit.ly/miniconda
-        $ bash miniconda
-        $ conda env create -n memex -f environment.yml
-        $ source activate memex
+Memex Explorer requires conda, either from Miniconda or Anaconda.  
 
 Application Setup
 =================
-    To setup the application, in an environment with Django 1.7 and Python <2.6 installed, run these commands in the source folder. This will create the database for the application using the migration scripts provided in the source code:
+    To set up a developer's environment, clone the repository, then
+    run the app_setup.sh script:
 
     .. code-block:: html
 
-        $ cd source
-        $ python manage.py migrate
+	$ git clone https://github.com/memex-explorer/memex-explorer.git
+	$ cd memex-explorer/source
+	$ ./app_setup.sh
 
-    Then, in the same folder run this command to launch the application as a local server:
-
+   You can then start the application from this directory:
+	
     .. code-block:: html
+	
+	$ source activate memex
+	$ supervisord
 
-        $ python manage.py runserver
-
-    To set up superuser access to the administrative panel, run this command and provide a username, email, and password:
-
-    .. code-block:: html
-
-        $ python manage.py createsuperuser
-
-    To access the administration panel navigate to http://localhost:8000/admin after running python manage.py runserver. Here you will be able to view and make manual changes to the database.
+   Memex Explorer will now be running locally at `http://localhost:8000 <http://localhost:8000/>`_.
 
 Tests
 =====
