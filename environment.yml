@@ -6,7 +6,7 @@ channels:
     - brittainhard
 dependencies:
     - bokeh=0.7.0
-    - blaze=0.7.0
+    - blaze=0.8.2
     - python=2.7.8
     - elasticnutch
     - ache=0.3.0
