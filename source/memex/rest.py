@@ -4,10 +4,48 @@ from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class SlugModelSerializer(serializers.ModelSerializer):
+    slug = serializers.SlugField(required=False, read_only=True)
+
+
+class ProjectSerializer(SlugModelSerializer):
     class Meta:
         model = Project
-        fields = ("name", "description")
+
+
+class CrawlSerializer(SlugModelSerializer):
+    seeds_list = serializers.FileField()
+    crawler = serializers.CharField(read_only=True)
+    status = serializers.CharField(read_only=True)
+    config = serializers.CharField(read_only=True)
+    index_name = serializers.CharField(read_only=True)
+    pages_crawled = serializers.IntegerField(read_only=True)
+    harvest_rate = serializers.FloatField(read_only=True)
+    rounds_left = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Crawl
+        fields = (
+            "name",
+            "description",
+            "seeds_list",
+            "slug",
+            "crawler",
+            "status",
+            "config",
+            "pages_crawled",
+            "harvest_rate",
+            "rounds_left",
+            "index_name"
+        )
+
+
+class CrawlModelSerializer(SlugModelSerializer):
+    model = serializers.FileField()
+    features = serializers.FileField()
+
+    class Meta:
+        model = CrawlModel
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -15,35 +53,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
 
 
-class CrawlSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Crawl
-        fields = (
-            "name",
-            "description",
-            "crawler",
-            "seeds_list",
-            "project",
-            "crawl_model",
-            "rounds_left"
-        )
-
-
 class CrawlViewSet(viewsets.ModelViewSet):
     parser_classes = (parsers.FileUploadParser,)
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
-
-
-class CrawlModelSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = CrawlModel
-        fields = (
-            "name",
-            "model",
-            "features",
-            "project"
-        )
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
