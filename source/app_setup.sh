@@ -2,7 +2,7 @@
 pushd ../;
 conda update conda -y;
 conda install conda-env -y;
-conda env update --file environment.yaml;
+conda env update --file environment.yml;
 popd;
 
 pushd memex;
