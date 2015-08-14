@@ -176,7 +176,7 @@ class Crawl(models.Model):
         if self.pk is None:
             self.slug = slugify(unicode(self.name))
             self.location = os.path.join(resources_dir, "crawls", self.slug)
-            # TODO
+            # TODO:
             # Fix this function and its weird side effect. Without this line the
             # save method wont work.
             crawl_path = self.ensure_crawl_path()
@@ -189,6 +189,8 @@ class Crawl(models.Model):
                 self.config = self.get_config_path()
         return super(Crawl, self).save(*args, **kwargs)
 
+    # TODO:
+    # This is redundant. URL property is better.
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))

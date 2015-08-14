@@ -20,7 +20,6 @@ class CrawlSerializer(SlugModelSerializer):
     # Fix error with JSON Serializability
     # crawl_model = serializers.ReadOnlyField()
     seeds_list = serializers.FileField()
-    crawler = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
     config = serializers.CharField(read_only=True)
     index_name = serializers.CharField(read_only=True)
