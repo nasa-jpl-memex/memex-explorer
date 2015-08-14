@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(unique=True, max_length=64, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z0-9-_ ]+$', b'Only numbers, letters, underscores, dashes and spaces are allowed.')])),
                 ('slug', models.SlugField(unique=True, max_length=64)),
                 ('description', models.TextField(blank=True)),
-                ('crawler', models.CharField(default=b'nutch', max_length=64, choices=[(b'nutch', b'Nutch'), (b'ache', b'ACHE')])),
+                ('crawler', models.CharField(max_length=64, choices=[(b'nutch', b'Nutch'), (b'ache', b'ACHE')])),
                 ('status', models.CharField(default=b'NOT STARTED', max_length=64)),
                 ('config', models.CharField(default=b'config_default', max_length=64)),
                 ('seeds_list', models.FileField(upload_to=apps.crawl_space.models.get_seeds_upload_path)),

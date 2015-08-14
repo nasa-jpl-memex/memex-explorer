@@ -149,9 +149,7 @@ class Crawl(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    crawler = models.CharField(max_length=64,
-        choices=CRAWLER_CHOICES,
-        default='nutch')
+    crawler = models.CharField(max_length=64, choices=CRAWLER_CHOICES)
     status = models.CharField(max_length=64,
         default="NOT STARTED")
     config = models.CharField(max_length=64,
