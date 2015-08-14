@@ -11,13 +11,14 @@ from django.core.exceptions import ValidationError
 from base.models import Project, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
 
+from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
+    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
+
 
 def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
-    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
@@ -68,7 +69,6 @@ class CrawlModel(models.Model):
     def get_absolute_url(self):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
-
 
     def save(self, *args, **kwargs):
 
@@ -213,6 +213,10 @@ class Crawl(models.Model):
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
 
     @property
     def index_name(self):
