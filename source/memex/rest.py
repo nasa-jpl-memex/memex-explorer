@@ -26,8 +26,11 @@ class CrawlSerializer(SlugModelSerializer):
     class Meta:
         model = Crawl
         fields = (
+            "id",
+            "project",
             "name",
             "description",
+            "project",
             "seeds_list",
             "slug",
             "crawler",
