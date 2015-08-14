@@ -32,7 +32,7 @@ def get_model_upload_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return join(MODELS_TMP_DIR, instance.name, filename)
+    return os.path.join(MODEL_PATH, instance.name, filename)
 
 
 class CrawlModel(models.Model):
@@ -51,7 +51,7 @@ class CrawlModel(models.Model):
     """
 
     def get_model_path(self):
-        return join(MODEL_PATH, str(self.pk))
+        return join(MODEL_PATH, self.name)
 
     def ensure_model_path(self):
         model_path = self.get_model_path()
@@ -71,21 +71,14 @@ class CrawlModel(models.Model):
             kwargs=dict(project_slug=self.project.slug))
 
     def save(self, *args, **kwargs):
-
         if self.pk is None:
-            super(CrawlModel, self).save(*args, **kwargs)
-
+            self.slug = slugify(self.name)
+            # TODO:
+            # Another weird call with a side effect that has to be fixed.
             model_path = self.ensure_model_path()
-            model_dst = join(model_path, 'pageclassifier.model')
-            features_dst = join(model_path, 'pageclassifier.features')
+            return super(CrawlModel, self).save(*args, **kwargs)
 
-            shutil.move(self.model.path, model_dst)
-            self.model.name = model_dst
-            shutil.move(self.features.path, features_dst)
-            self.features.name = features_dst
-
-        self.slug = slugify(self.name)
-        super(CrawlModel, self).save(*args, **kwargs)
+        return super(CrawlModel, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.name
