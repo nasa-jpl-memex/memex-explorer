@@ -269,13 +269,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
             return ''.join(crawl_log)
 
     def get_seeds_path(self):
-        if self.get_object().crawler == "nutch":
-            seeds_path = os.path.join(self.get_object().seeds_list.path, "seeds")
-        elif self.get_object().crawler == "ache":
-            seeds_path = self.get_object().seeds_list.path
-        else:
-            seeds_path = ""
-        return seeds_path
+        return self.get_object().seeds_list.path
 
     def get_seeds_list(self, lines=None):
         with open(self.get_seeds_path()) as f:

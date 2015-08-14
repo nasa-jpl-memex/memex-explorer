@@ -16,7 +16,9 @@ class ProjectSerializer(SlugModelSerializer):
 class CrawlSerializer(SlugModelSerializer):
     # Expose these fields, but only as read only.
     id = serializers.ReadOnlyField()
-    crawl_model = serializers.ReadOnlyField()
+    # TODO:
+    # Fix error with JSON Serializability
+    # crawl_model = serializers.ReadOnlyField()
     seeds_list = serializers.FileField()
     crawler = serializers.CharField(read_only=True)
     status = serializers.CharField(read_only=True)
@@ -25,7 +27,6 @@ class CrawlSerializer(SlugModelSerializer):
     url = serializers.CharField(read_only=True)
     pages_crawled = serializers.IntegerField(read_only=True)
     harvest_rate = serializers.FloatField(read_only=True)
-    rounds_left = serializers.IntegerField(read_only=True)
     location = serializers.CharField(read_only=True)
 
     class Meta:

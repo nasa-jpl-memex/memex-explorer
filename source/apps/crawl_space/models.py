@@ -98,7 +98,12 @@ def get_seeds_upload_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return join(SEEDS_TMP_DIR, instance.name, filename)
+    seeds_list_path = ""
+    if instance.crawler == "nutch":
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds", "seeds")
+    elif instance.crawler == "ache":
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds")
+    return seeds_list_path
 
 
 class Crawl(models.Model):
@@ -167,48 +172,22 @@ class Crawl(models.Model):
     location = models.CharField(max_length=64, default="location")
     rounds_left = models.IntegerField(default=1, null=True, blank=True)
 
-    def __unicode__(self):
-        return self.name
-
     def save(self, *args, **kwargs):
-        # If this is the first time the model is saved, then the seeds
-        #    file needs to be moved from SEEDS_TMP_DIR/filename to the
-        #    crawl directory.
         if self.pk is None:
-            # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
             self.location = os.path.join(resources_dir, "crawls", self.slug)
-            super(Crawl, self).save(*args, **kwargs)
-
-            # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
+            # TODO
+            # Fix this function and its weird side effect. Without this line the
+            # save method wont work.
             crawl_path = self.ensure_crawl_path()
-
-            # Move the file from temporary directory to crawl directory,
-            #   and update the FileField accordingly:
-            #   https://code.djangoproject.com/ticket/15590#comment:10
-
-            # Nutch requires a seed directory, not a seed file
-            if self.crawler == 'nutch':
-                seed_dir = join(crawl_path, 'seeds')
-                ensure_exists(seed_dir)
-                dst = join(crawl_path, 'seeds/seeds')
-                shutil.move(self.seeds_list.path, dst)
-                self.seeds_list.name = seed_dir
-            else:
-                dst = join(crawl_path, 'seeds')
-                shutil.move(self.seeds_list.path, dst)
-                self.seeds_list.name = dst
-                # Create unique configs for every ache crawl.
+            # If the crawler is ache, copy the config. If config already exists,
+            # delete it.
+            if self.crawler == 'ache':
                 if os.path.exists(self.get_config_path()):
                     shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
-
-
-            # Continue saving as normal
-
-        self.slug = slugify(unicode(self.name))
-        super(Crawl, self).save(*args, **kwargs)
+        return super(Crawl, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
@@ -221,3 +200,6 @@ class Crawl(models.Model):
     @property
     def index_name(self):
         return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)
+
+    def __unicode__(self):
+        return self.name
