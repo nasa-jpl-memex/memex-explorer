@@ -31,9 +31,17 @@ class TestRestProject(APITestCase):
         cls.test_project.save()
 
     def test_add_project(self):
-        response = self.client.post("/api/projects/", {"name":"Potatoresttest"}, format="json")
-        assert response.data["slug"] == "potatoresttest"
-        assert response.data["name"] == "Potatoresttest"
+        response = self.client.post("/api/projects/", {"name":"Postresttest"}, format="json")
+        assert response.data["slug"] == "postresttest"
+        assert response.data["name"] == "Postresttest"
+
+    def test_add_project_no_name(self):
+        response = self.client.post("/api/projects/", {}, format="json")
+        assert response.data["name"][0] == "This field is required."
+
+    def test_add_project_no_name(self):
+        response = self.client.post("/api/projects/", {"name":"potatorest!"}, format="json")
+        assert response.data["name"][0] == "Only numbers, letters, underscores, dashes and spaces are allowed."
 
     def test_get_all_projects(self):
         response = self.client.get("/api/projects/")
@@ -49,7 +57,6 @@ class TestRestProject(APITestCase):
 
     def test_get_project_by_slug(self):
         response = self.client.get("/api/projects/?slug=%s" % self.test_project.slug)
-        import pdb; pdb.set_trace()
         assert response.data
 
     def test_no_project_exists(self):
