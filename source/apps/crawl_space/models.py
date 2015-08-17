@@ -150,10 +150,8 @@ class Crawl(models.Model):
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
     crawler = models.CharField(max_length=64, choices=CRAWLER_CHOICES)
-    status = models.CharField(max_length=64,
-        default="NOT STARTED")
-    config = models.CharField(max_length=64,
-        default="config_default")
+    status = models.CharField(max_length=64, default="NOT STARTED")
+    config = models.CharField(max_length=64, default="config_default")
     seeds_list = models.FileField(upload_to=get_seeds_upload_path)
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
