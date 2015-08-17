@@ -152,7 +152,6 @@ class TestViews(UnitTestSkeleton):
             **self.slugs)
         assert 'crawl_space/crawl.html' in response.template_name
 
-    @pytest.mark.xfail
     def test_crawl_page(self):
         # Get the test crawl page, and assert that the
         # crawl slug is generated properly and the project
@@ -182,7 +181,6 @@ class TestViews(UnitTestSkeleton):
         crawl = get_object(response)
         assert crawl.description == "A crawl for information about cats."
 
-    @pytest.mark.xfail
     def test_crawl_delete(self):
         response = self.post('base:crawl_space:delete_crawl',
             **self.crawl_slugs)
