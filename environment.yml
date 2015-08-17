@@ -38,3 +38,4 @@ dependencies:
         - elasticsearch
         - supervisor
         - djangorestframework
+        - django-filter

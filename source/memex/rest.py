@@ -1,4 +1,4 @@
-from rest_framework import routers, serializers, viewsets, parsers
+from rest_framework import routers, serializers, viewsets, parsers, filters
 
 from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
@@ -37,9 +37,22 @@ class CrawlModelSerializer(SlugModelSerializer):
         model = CrawlModel
 
 
+"""
+Viewset Classes.
+
+Filtering is provided by django-filter.
+
+Backend settings are in common_settings.py under REST_FRAMEWORK. Setting is:
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+
+This backend is supplied to every viewset by default.
+"""
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    # Filtering provided by django-filter.
+    # Set by REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS'] in common_settings.py
+    filter_fields = ('id', 'slug', 'name',)
 
 
 class CrawlViewSet(viewsets.ModelViewSet):
