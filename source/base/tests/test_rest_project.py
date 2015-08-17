@@ -7,18 +7,16 @@ import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-
-from memex.test_utils.unit_test_utils import UnitTestSkeleton, get_object
 from django.test import TestCase
 from django.db import IntegrityError
 
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APITestCase
 from rest_framework import status
 
 from base.models import Project
 
 
-class TestRestProject(APITestCase):
+class TestProjectREST(APITestCase):
     """
     Testing for adding Projects through the REST framework.
     """
@@ -73,3 +71,11 @@ class TestRestProject(APITestCase):
         response = self.client.patch(self.url + "%d/" % self.test_project.id,
             {'description':'New Description'}, format="json")
         assert response.data["description"] == "New Description"
+
+    def test_change_slug_fails(self):
+        """
+        Slug is read-only and cannot be changed. Assert the slug is unchanged.
+        """
+        response = self.client.patch(self.url + "%d/" % self.test_project.id,
+            {'slug':'Bad Slug'}, format="json")
+        assert response.data["slug"] == "resttest"
