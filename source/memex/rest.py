@@ -45,13 +45,12 @@ Filtering is provided by django-filter.
 Backend settings are in common_settings.py under REST_FRAMEWORK. Setting is:
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
 
-This backend is supplied to every viewset by default.
+This backend is supplied to every viewset by default. Alter query fields by adding
+or removing items from filter_fields
 """
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    # Filtering provided by django-filter.
-    # Set by REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS'] in common_settings.py
     filter_fields = ('id', 'slug', 'name',)
 
 
