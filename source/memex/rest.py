@@ -60,7 +60,8 @@ class CrawlViewSet(viewsets.ModelViewSet):
     parser_classes = (parsers.FileUploadParser,)
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
-    filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project', 'crawl_model')
+    filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
+        'crawl_model', 'crawler')
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
