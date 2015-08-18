@@ -55,7 +55,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class CrawlViewSet(viewsets.ModelViewSet):
-    parser_classes = (parsers.FileUploadParser,)
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
@@ -63,7 +62,6 @@ class CrawlViewSet(viewsets.ModelViewSet):
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
-    parser_classes = (parsers.FileUploadParser,)
     queryset = CrawlModel.objects.all()
     serializer_class = CrawlModelSerializer
 

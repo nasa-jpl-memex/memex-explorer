@@ -4,6 +4,7 @@ import os
 import pytest
 import requests
 import json
+import shutil
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -61,6 +62,12 @@ class TestCrawlREST(APITestCase):
         cls.url = "/api/crawls/"
 
     @classmethod
+    def tearDownClass(cls):
+        super(TestCrawlREST, cls).tearDownClass()
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, "crawls"))
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, "models"))
+
+    @classmethod
     def get_model_file(self):
         return SimpleUploadedFile('pageclassifier.model', bytes('This is a model file.\n'), 'utf-8')
 
@@ -107,7 +114,24 @@ class TestCrawlREST(APITestCase):
         response = self.client.get(self.url + "?crawler=%s" % self.test_nutch_crawl.crawler)
         assert self.parse_response(response)["crawler"] == self.test_nutch_crawl.crawler
 
-    def test_add_crawl_rest(self):
-        data = {"name": "Nutch POST REST", "crawler": "nutch", "seeds_list": self.get_seeds(), "project": self.test_project.id}
+    def test_add_crawl_rest_nutch(self):
+        data = {"name": "Nutch POST REST", "crawler": "nutch", "seeds_list": self.get_seeds(),
+            "project": self.test_project.id}
         response = self.client.post(self.url, data, format="multipart")
         assert json.loads(response.content)["name"] == "Nutch POST REST"
+
+    def test_add_crawl_rest_ache(self):
+        data = {"name": "Ache POST REST", "crawler": "ache", "seeds_list": self.get_seeds(),
+            "project": self.test_project.id, "crawl_model": self.test_crawlmodel.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"] == "Ache POST REST"
+
+    def test_crawl_change_name(self):
+        response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
+            {'name':'new name'}, format="json")
+        assert json.loads(response.content)["name"] == "new name"
+
+    def test_crawl_change_description(self):
+        response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
+            {'description':'this is a new description'}, format="json")
+        assert json.loads(response.content)["description"] == "this is a new description"
