@@ -16,8 +16,6 @@ class ProjectSerializer(SlugModelSerializer):
 class CrawlSerializer(SlugModelSerializer):
     # Expose these fields, but only as read only.
     id = serializers.ReadOnlyField()
-    project = serializers.ReadOnlyField(source="project.id")
-    crawl_model = serializers.ReadOnlyField(source="crawl_model.id")
     seeds_list = serializers.FileField(use_url=False)
     status = serializers.CharField(read_only=True)
     config = serializers.CharField(read_only=True)

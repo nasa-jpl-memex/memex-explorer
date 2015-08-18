@@ -70,9 +70,10 @@ class TestCrawlREST(APITestCase):
 
     @classmethod
     def get_seeds(self):
-        """Return a new instance of SimpleUploadedFile. This file can only
-        be used once."""
-        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'), 'utf-8')
+        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'))
+
+    def parse_response(self, response):
+        return json.loads(response.content)[0]
 
     def test_crawls_endpoint(self):
         response = self.client.get(self.url)
@@ -80,28 +81,33 @@ class TestCrawlREST(APITestCase):
 
     def test_crawl_query_name(self):
         response = self.client.get(self.url + "?name=%s" % self.test_nutch_crawl.name)
-        assert json.loads(response.content)[0]["name"] == "Test Nutch REST"
+        assert self.parse_response(response)["name"] == "Test Nutch REST"
 
     def test_crawl_query_slug(self):
         response = self.client.get(self.url + "?slug=%s" % self.test_nutch_crawl.slug)
-        assert json.loads(response.content)[0]["slug"] == "test-nutch-rest"
+        assert self.parse_response(response)["slug"] == "test-nutch-rest"
 
     def test_crawl_query_description(self):
         response = self.client.get(self.url + "?description=%s" % self.test_nutch_crawl.description)
-        assert json.loads(response.content)[0]["description"] == "Test Crawl Description"
+        assert self.parse_response(response)["description"] == "Test Crawl Description"
 
     def test_crawl_query_status(self):
         response = self.client.get(self.url + "?status=%s" % self.test_nutch_crawl.status)
-        assert json.loads(response.content)[0]["status"] == "NOT STARTED"
+        assert self.parse_response(response)["status"] == "NOT STARTED"
 
     def test_crawl_query_project(self):
         response = self.client.get(self.url + "?project=%d" % self.test_nutch_crawl.project.id)
-        assert json.loads(response.content)[0]["project"] == self.test_project.id
+        assert self.parse_response(response)["project"] == self.test_project.id
 
     def test_crawl_query_crawl_model(self):
         response = self.client.get(self.url + "?crawl_model=%d" % self.test_ache_crawl.crawl_model.id)
-        assert json.loads(response.content)[0]["crawl_model"] == self.test_crawlmodel.id
+        assert self.parse_response(response)["crawl_model"] == self.test_crawlmodel.id
 
     def test_crawl_query_crawler(self):
         response = self.client.get(self.url + "?crawler=%s" % self.test_nutch_crawl.crawler)
-        assert json.loads(response.content)[0]["crawler"] == self.test_nutch_crawl.crawler
+        assert self.parse_response(response)["crawler"] == self.test_nutch_crawl.crawler
+
+    def test_add_crawl_rest(self):
+        data = {"name": "Nutch POST REST", "crawler": "nutch", "seeds_list": self.get_seeds(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"] == "Nutch POST REST"
