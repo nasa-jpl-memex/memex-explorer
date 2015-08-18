@@ -84,33 +84,33 @@ class TestCrawlREST(APITestCase):
 
     def test_crawls_endpoint(self):
         response = self.client.get(self.url)
-        assert response
+        assert self.parse_response(response)
 
-    def test_crawl_query_name(self):
+    def test_get_crawl_by_name(self):
         response = self.client.get(self.url + "?name=%s" % self.test_nutch_crawl.name)
         assert self.parse_response(response)["name"] == "Test Nutch REST"
 
-    def test_crawl_query_slug(self):
+    def test_get_crawl_by_slug(self):
         response = self.client.get(self.url + "?slug=%s" % self.test_nutch_crawl.slug)
         assert self.parse_response(response)["slug"] == "test-nutch-rest"
 
-    def test_crawl_query_description(self):
+    def test_get_crawl_by_description(self):
         response = self.client.get(self.url + "?description=%s" % self.test_nutch_crawl.description)
         assert self.parse_response(response)["description"] == "Test Crawl Description"
 
-    def test_crawl_query_status(self):
+    def test_get_crawl_by_status(self):
         response = self.client.get(self.url + "?status=%s" % self.test_nutch_crawl.status)
         assert self.parse_response(response)["status"] == "NOT STARTED"
 
-    def test_crawl_query_project(self):
+    def test_get_crawl_by_project(self):
         response = self.client.get(self.url + "?project=%d" % self.test_nutch_crawl.project.id)
         assert self.parse_response(response)["project"] == self.test_project.id
 
-    def test_crawl_query_crawl_model(self):
+    def test_get_crawl_by_crawl_model(self):
         response = self.client.get(self.url + "?crawl_model=%d" % self.test_ache_crawl.crawl_model.id)
         assert self.parse_response(response)["crawl_model"] == self.test_crawlmodel.id
 
-    def test_crawl_query_crawler(self):
+    def test_get_crawl_by_crawler(self):
         response = self.client.get(self.url + "?crawler=%s" % self.test_nutch_crawl.crawler)
         assert self.parse_response(response)["crawler"] == self.test_nutch_crawl.crawler
 
@@ -135,3 +135,11 @@ class TestCrawlREST(APITestCase):
         response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
             {'description':'this is a new description'}, format="json")
         assert json.loads(response.content)["description"] == "this is a new description"
+
+    def test_change_slug_fails(self):
+        """
+        Slug is read-only and cannot be changed. Assert the slug is unchanged.
+        """
+        response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
+            {'slug':'Bad Slug'}, format="json")
+        assert json.loads(response.content)["slug"] == "test-nutch-rest"

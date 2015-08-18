@@ -64,6 +64,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
 class CrawlModelViewSet(viewsets.ModelViewSet):
     queryset = CrawlModel.objects.all()
     serializer_class = CrawlModelSerializer
+    filter_fields = ('id', 'slug', 'name', 'project')
 
 
 router = routers.DefaultRouter()
