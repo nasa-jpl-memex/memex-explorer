@@ -38,11 +38,11 @@
       window.newProject = newProject;
       this.collection.add(newProject);
       newProject.save({}, {
-        success: function(){
-          console.log("success");
+        success: function(data){
+          console.log(data);
         },
-        failure: function(){
-          console.log("failure");
+        error: function(data){
+          console.log(data);
         },
       });
     },
