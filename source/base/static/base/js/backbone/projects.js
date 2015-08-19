@@ -32,10 +32,11 @@
   });
 
 
-  var AddProjectView = Backbone.View.extend({
+  var AddProjectView = baseViews.FormView.extend({
     el: "#addProjectContainer",
     modal: "#newProjectModal",
     form: "#addProjectForm",
+    formFields: ["name"],
     template: _.template($("#addProjectTemplate").html()),
     initialize: function(collection){
       this.collection = collection;
@@ -44,27 +45,6 @@
     },
     render: function(){
       this.$el.html(this.template());
-    },
-    clearErrors: function(){
-      var that = this;
-      fields = ["name"];
-      _.each(fields, function(field){
-        $(that.form).find("#div_id_" + field).removeClass("has-error");
-        $(that.form).find("#error_id_" + field).attr("hidden", true).html("")
-      });
-    },
-    showFormErrors: function(errors){
-      // This code is particular to the JSON response given by the REST api.
-      var errorsArray = Object.keys(errors);
-      var that = this;
-      _.each(errorsArray, function(field){
-        $(that.form).find("#div_id_" + field).addClass("has-error");
-        $(that.form).find("#error_id_" + field).attr("hidden", false).html(errors[field][0]);
-      });
-    },
-    formSuccess: function(){
-      $(this.modal).modal('hide');
-      $(this.form)[0].reset();
     },
     addProject: function(event){
       var that = this;
@@ -87,14 +67,13 @@
     },
     events: {
       "submit #addProjectForm": "addProject",
-    }
+    },
   });
 
 
   var ProjectCollectionView = Backbone.View.extend({
     initialize: function(collection){
       this.collection = collection;
-      window.collection = collection;
       _.bindAll(this, 'render');
       var that = this;
       this.collection.fetch({
@@ -107,7 +86,7 @@
       this.collection.each(function(project){
         var projectView = new ProjectView(project);
       });
-    }
+    },
   });
 
 
@@ -118,8 +97,8 @@
     index: function(){
       var projectCollection = new ProjectCollection();
       var collectionView = new ProjectCollectionView(projectCollection);
-      var addProjectView = new AddProjectView(collection);
-    }
+      var addProjectView = new AddProjectView(projectCollection);
+    },
   });
 
 
