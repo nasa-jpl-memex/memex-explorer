@@ -37,3 +37,5 @@ dependencies:
         - celery
         - elasticsearch
         - supervisor
+        - djangorestframework
+        - django-filter

@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'base',
     'task_manager',
+    'rest_framework',
 )
 
 EXPLORER_APPS = (
@@ -159,3 +160,10 @@ if READY_EXTERNAL_APPS:
     sys.stderr.write("[%d]: The following applications are ready %s\n" % (os.getpid(), str(READY_EXTERNAL_APPS)))
 else:
     sys.stderr.write("[%d]: Supervisord not running or no applications are running\n" % (os.getpid()))
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+}

@@ -10,7 +10,7 @@ from yaml import Loader, SafeLoader
 from django.conf import settings
 
 def construct_yaml_str(self, node):
-    # Override the default string handling function 
+    # Override the default string handling function
     # to always return unicode objects
     return self.construct_scalar(node)
 Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
@@ -33,8 +33,9 @@ class TestViews(UnitTestSkeleton):
         super(TestViews, cls).setUpClass()
 
         cls.test_project = Project(
-            name = "Project Test",
-            description = "Test Project Description")
+            name="Test REST Project",
+            description="Test Project Description",
+        )
         cls.test_project.save()
 
     def test_front_page(self):
@@ -74,7 +75,7 @@ class TestViews(UnitTestSkeleton):
         assert 'base/project.html' in response.template_name
 
     def test_project_settings_page(self):
-        response = self.get('base:project_settings', 
+        response = self.get('base:project_settings',
             slugs={'project_slug': self.test_project.slug})
         assert 'base/project_update_form.html' in response.template_name
 
@@ -137,5 +138,3 @@ class TestProjectQueries(TestCase):
 
     def test_get_by_slug(self):
         assert 'bicycles-for-sale' == self.project.slug
-
-

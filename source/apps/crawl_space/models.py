@@ -11,13 +11,14 @@ from django.core.exceptions import ValidationError
 from base.models import Project, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
 
+from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
+    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
+
 
 def validate_model_file(value):
     if value != 'pageclassifier.model':
         raise ValidationError("Model file must be named 'pageclassifier.model'.")
 
-from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
-    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
 
 def validate_features_file(value):
     if value != 'pageclassifier.features':
@@ -31,7 +32,7 @@ def get_model_upload_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return join(MODELS_TMP_DIR, instance.name, filename)
+    return os.path.join(MODEL_PATH, instance.name, filename)
 
 
 class CrawlModel(models.Model):
@@ -50,7 +51,7 @@ class CrawlModel(models.Model):
     """
 
     def get_model_path(self):
-        return join(MODEL_PATH, str(self.pk))
+        return join(MODEL_PATH, self.name)
 
     def ensure_model_path(self):
         model_path = self.get_model_path()
@@ -69,23 +70,15 @@ class CrawlModel(models.Model):
         return reverse('base:project',
             kwargs=dict(project_slug=self.project.slug))
 
-
     def save(self, *args, **kwargs):
-
         if self.pk is None:
-            super(CrawlModel, self).save(*args, **kwargs)
-
+            self.slug = slugify(self.name)
+            # TODO:
+            # Another weird call with a side effect that has to be fixed.
             model_path = self.ensure_model_path()
-            model_dst = join(model_path, 'pageclassifier.model')
-            features_dst = join(model_path, 'pageclassifier.features')
+            return super(CrawlModel, self).save(*args, **kwargs)
 
-            shutil.move(self.model.path, model_dst)
-            self.model.name = model_dst
-            shutil.move(self.features.path, features_dst)
-            self.features.name = features_dst
-
-        self.slug = slugify(self.name)
-        super(CrawlModel, self).save(*args, **kwargs)
+        return super(CrawlModel, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.name
@@ -98,7 +91,12 @@ def get_seeds_upload_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    return join(SEEDS_TMP_DIR, instance.name, filename)
+    seeds_list_path = ""
+    if instance.crawler == "nutch":
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds", "seeds")
+    elif instance.crawler == "ache":
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds")
+    return seeds_list_path
 
 
 class Crawl(models.Model):
@@ -151,13 +149,9 @@ class Crawl(models.Model):
         validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     description = models.TextField(blank=True)
-    crawler = models.CharField(max_length=64,
-        choices=CRAWLER_CHOICES,
-        default='nutch')
-    status = models.CharField(max_length=64,
-        default="NOT STARTED")
-    config = models.CharField(max_length=64,
-        default="config_default")
+    crawler = models.CharField(max_length=64, choices=CRAWLER_CHOICES)
+    status = models.CharField(max_length=64, default="NOT STARTED")
+    config = models.CharField(max_length=64, default="config_default")
     seeds_list = models.FileField(upload_to=get_seeds_upload_path)
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
@@ -167,53 +161,36 @@ class Crawl(models.Model):
     location = models.CharField(max_length=64, default="location")
     rounds_left = models.IntegerField(default=1, null=True, blank=True)
 
-    def __unicode__(self):
-        return self.name
-
     def save(self, *args, **kwargs):
-        # If this is the first time the model is saved, then the seeds
-        #    file needs to be moved from SEEDS_TMP_DIR/filename to the
-        #    crawl directory.
         if self.pk is None:
-            # Need to save first to obtain the pk attribute.
             self.slug = slugify(unicode(self.name))
             self.location = os.path.join(resources_dir, "crawls", self.slug)
-            super(Crawl, self).save(*args, **kwargs)
-
-            # Ensure that the crawl path `resources/crawls/<crawl.pk>` exists
+            # TODO:
+            # Fix this function and its weird side effect. Without this line the
+            # save method wont work.
             crawl_path = self.ensure_crawl_path()
-
-            # Move the file from temporary directory to crawl directory,
-            #   and update the FileField accordingly:
-            #   https://code.djangoproject.com/ticket/15590#comment:10
-
-            # Nutch requires a seed directory, not a seed file
-            if self.crawler == 'nutch':
-                seed_dir = join(crawl_path, 'seeds')
-                ensure_exists(seed_dir)
-                dst = join(crawl_path, 'seeds/seeds')
-                shutil.move(self.seeds_list.path, dst)
-                self.seeds_list.name = seed_dir
-            else:
-                dst = join(crawl_path, 'seeds')
-                shutil.move(self.seeds_list.path, dst)
-                self.seeds_list.name = dst
-                # Create unique configs for every ache crawl.
+            # If the crawler is ache, copy the config. If config already exists,
+            # delete it.
+            if self.crawler == 'ache':
                 if os.path.exists(self.get_config_path()):
                     shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
+        return super(Crawl, self).save(*args, **kwargs)
 
-
-            # Continue saving as normal
-
-        self.slug = slugify(unicode(self.name))
-        super(Crawl, self).save(*args, **kwargs)
-
+    # TODO:
+    # This is redundant. URL property is better.
     def get_absolute_url(self):
         return reverse('base:crawl_space:crawl',
             kwargs=dict(project_slug=self.project.slug, crawl_slug=self.slug))
 
     @property
+    def url(self):
+        return self.get_absolute_url()
+
+    @property
     def index_name(self):
         return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)
+
+    def __unicode__(self):
+        return self.name
