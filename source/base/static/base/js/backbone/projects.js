@@ -34,7 +34,17 @@
       console.log("Submitting");
       event.preventDefault();
       var formObjects = ajaxForms.toJson($("#addProjectForm"));
-      this.collection.add(formObjects);
+      var newProject = new Project(formObjects);
+      window.newProject = newProject;
+      this.collection.add(newProject);
+      newProject.save({}, {
+        success: function(){
+          console.log("success");
+        },
+        failure: function(){
+          console.log("failure");
+        },
+      });
     },
     events: {
       "submit #addProjectForm": "addProject",
