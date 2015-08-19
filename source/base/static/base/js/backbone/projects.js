@@ -17,41 +17,6 @@
   });
 
 
-  var AddProjectView = Backbone.View.extend({
-    el: "#addProjectContainer",
-    template: _.template($("#addProjectTemplate").html()),
-    initialize: function(collection){
-      this.collection = collection;
-      _.bindAll(this, 'render');
-      console.log("Initialized.");
-      this.render()
-    },
-    render: function(){
-      console.log("Rendering.");
-      this.$el.html(this.template());
-    },
-    addProject: function(event){
-      console.log("Submitting");
-      event.preventDefault();
-      var formObjects = ajaxForms.toJson($("#addProjectForm"));
-      var newProject = new Project(formObjects);
-      window.newProject = newProject;
-      this.collection.add(newProject);
-      newProject.save({}, {
-        success: function(data){
-          console.log(data);
-        },
-        error: function(data){
-          console.log(data);
-        },
-      });
-    },
-    events: {
-      "submit #addProjectForm": "addProject",
-    }
-  });
-
-
   var ProjectView = Backbone.View.extend({
     el: "#projects",
     template: _.template($("#indexProjectItem").html()),
@@ -64,6 +29,50 @@
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
     },
+  });
+
+
+  var AddProjectView = Backbone.View.extend({
+    el: "#addProjectContainer",
+    modal: "#newProjectModal",
+    form: "#addProjectForm",
+    template: _.template($("#addProjectTemplate").html()),
+    initialize: function(collection){
+      this.collection = collection;
+      _.bindAll(this, 'render');
+      this.render();
+    },
+    render: function(){
+      this.$el.html(this.template());
+    },
+    formSuccess: function(){
+      $(this.modal).modal('hide');
+      $(this.form)[0].reset();
+    },
+    formFailure: function(){
+
+    },
+    addProject: function(event){
+      var that = this;
+      event.preventDefault();
+      var formObjects = ajaxForms.toJson($("#addProjectForm"));
+      var newProject = new Project(formObjects);
+      this.collection.add(newProject);
+      newProject.save({}, {
+        success: function(data){
+          var newProject = new ProjectView(
+            that.collection.models[that.collection.models.length - 1]
+          );
+          that.formSuccess();
+        },
+        error: function(data){
+          console.log(data);
+        },
+      });
+    },
+    events: {
+      "submit #addProjectForm": "addProject",
+    }
   });
 
 
@@ -83,7 +92,7 @@
       this.collection.each(function(project){
         var projectView = new ProjectView(project);
       });
-    },
+    }
   });
 
 
@@ -95,7 +104,7 @@
       var projectCollection = new ProjectCollection();
       var collectionView = new ProjectCollectionView(projectCollection);
       var addProjectView = new AddProjectView(collection);
-    },
+    }
   });
 
 
