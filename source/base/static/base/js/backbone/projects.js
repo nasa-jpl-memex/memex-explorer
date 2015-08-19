@@ -10,10 +10,37 @@
     },
   });
 
+
   var ProjectCollection = Backbone.Collection.extend({
     url: "/api/projects/",
     model: Project,
   });
+
+
+  var AddProjectView = Backbone.View.extend({
+    el: "#addProjectContainer",
+    template: _.template($("#addProjectTemplate").html()),
+    initialize: function(collection){
+      this.collection = collection;
+      _.bindAll(this, 'render');
+      console.log("Initialized.");
+      this.render()
+    },
+    render: function(){
+      console.log("Rendering.");
+      this.$el.html(this.template());
+    },
+    addProject: function(event){
+      console.log("Submitting");
+      event.preventDefault();
+      var formObjects = ajaxForms.toJson($("#addProjectForm"));
+      this.collection.add(formObjects);
+    },
+    events: {
+      "submit #addProjectForm": "addProject",
+    }
+  });
+
 
   var ProjectView = Backbone.View.extend({
     el: "#projects",
@@ -28,6 +55,7 @@
       this.$el.append(this.template(this.model.toJSON()));
     },
   });
+
 
   var ProjectCollectionView = Backbone.View.extend({
     initialize: function(collection){
@@ -48,6 +76,7 @@
     },
   });
 
+
   var ProjectRouter = Backbone.Router.extend({
     routes: {
       "": "index",
@@ -55,8 +84,10 @@
     index: function(){
       var projectCollection = new ProjectCollection();
       var collectionView = new ProjectCollectionView(projectCollection);
+      var addProjectView = new AddProjectView(collection);
     },
   });
+
 
   $(document).ready(function(){
     var appRouter = new ProjectRouter();
