@@ -45,12 +45,26 @@
     render: function(){
       this.$el.html(this.template());
     },
+    clearErrors: function(){
+      var that = this;
+      fields = ["name"];
+      _.each(fields, function(field){
+        $(that.form).find("#div_id_" + field).removeClass("has-error");
+        $(that.form).find("#error_id_" + field).attr("hidden", true).html("")
+      });
+    },
+    showFormErrors: function(errors){
+      // This code is particular to the JSON response given by the REST api.
+      var errorsArray = Object.keys(errors);
+      var that = this;
+      _.each(errorsArray, function(field){
+        $(that.form).find("#div_id_" + field).addClass("has-error");
+        $(that.form).find("#error_id_" + field).attr("hidden", false).html(errors[field][0]);
+      });
+    },
     formSuccess: function(){
       $(this.modal).modal('hide');
       $(this.form)[0].reset();
-    },
-    formFailure: function(){
-
     },
     addProject: function(event){
       var that = this;
@@ -59,14 +73,15 @@
       var newProject = new Project(formObjects);
       this.collection.add(newProject);
       newProject.save({}, {
-        success: function(data){
+        success: function(response){
           var newProject = new ProjectView(
             that.collection.models[that.collection.models.length - 1]
           );
           that.formSuccess();
+          that.clearErrors();
         },
-        error: function(data){
-          console.log(data);
+        error: function(model, xhr, thrownError){
+          that.showFormErrors(xhr.responseJSON);
         },
       });
     },
