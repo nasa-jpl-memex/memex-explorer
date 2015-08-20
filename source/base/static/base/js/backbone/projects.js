@@ -32,7 +32,7 @@
   });
 
 
-  var AddProjectView = baseViews.FormView.extend({
+  var AddProjectView = BaseViews.FormView.extend({
     el: "#addProjectContainer",
     modal: "#newProjectModal",
     form: "#addProjectForm",
@@ -49,19 +49,22 @@
     addProject: function(event){
       var that = this;
       event.preventDefault();
-      var formObjects = ajaxForms.toJson($("#addProjectForm"));
+      var formObjects = this.toJson(this.form);
       var newProject = new Project(formObjects);
       this.collection.add(newProject);
+      // If model.save() is successful, clear the errors and the form, and hide
+      // the modal. If model.save() had errors, show each error on form field,
+      // along with the content of the error.
       newProject.save({}, {
         success: function(response){
           var newProject = new ProjectView(
             that.collection.models[that.collection.models.length - 1]
           );
-          that.formSuccess();
-          that.clearErrors();
+          that.formSuccess(that.modal, that.form);
+          that.clearErrors(that.formFields, that.form);
         },
         error: function(model, xhr, thrownError){
-          that.showFormErrors(xhr.responseJSON);
+          that.showFormErrors(xhr.responseJSON, that.form);
         },
       });
     },
@@ -83,6 +86,8 @@
       });
     },
     render: function(){
+      // Render each model in ProjectCollection into a separate backbone view,
+      // with one model per view.
       this.collection.each(function(project){
         var projectView = new ProjectView(project);
       });
