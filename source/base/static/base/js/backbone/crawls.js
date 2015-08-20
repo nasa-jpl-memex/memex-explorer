@@ -54,6 +54,7 @@
       var that = this;
       this.collection = collection;
       this.collection.fetch({
+        url: that.collection.url += "?project=" + $("#project_id").val(),
         success: function(){
           that.render();
         },
