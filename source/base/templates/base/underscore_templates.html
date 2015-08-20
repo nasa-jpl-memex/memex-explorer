@@ -33,34 +33,18 @@
   </form>
 </script>
 
-<script type="text/template" id="crawlTableBody">
-  <table id="crawlTable" class="table table-condensed table-gray table-bordered">
-    <tbody>
+<script type="text/template" id="crawlTableHeader">
+  <h4 style="line-height:2em;">
+    <i class="fa fa-search"> &nbsp; </i>Crawls
+  </h4>
+  <table class="table table-condensed table-gray table-bordered">
+    <tbody id="crawlTable">
     <tr>
       <th>Crawl Name</th>
       <th>Pages Crawled</th>
       <th>Status</th>
       <th>Actions</th>
       <th></th>
-    </tr>
-    <tr>
-      <td><a href="<%= url %>"><%= name %></a></td>
-      <td>0</td>
-      <td>NOT STARTED</td>
-      <td>
-        <a href="<%= url + 'settings/' %>">
-          <i class="fa fa-pencil"></i>
-        </a>
-        <form style="display:inline" action="<%= url + 'settings/delete/' %>"
-        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl?')">
-            {% csrf_token %}
-        <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
-        </form>
-        <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
-      </td>
-      <td>
-        <button class="btn btn-success btn-xs">View</button>
-      </td>
     </tr>
   </tbody>
   </table>
@@ -80,10 +64,10 @@
           {% csrf_token %}
       <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a
       </form>
-      <a href="{{ kibana }}" target="_blank">    <i class="fa fa-pie-chart"></i></a>
+      <a href="{{ kibana }}" target="_blank"><i class="fa fa-pie-chart"></i></a>
     </td>
     <td>
-      <button class="btn btn-success btn-xs">View</button>
+      <a href="<%= url %>"><button class="btn btn-success btn-xs">View</button></a>
     </td>
   </tr>
 </script>

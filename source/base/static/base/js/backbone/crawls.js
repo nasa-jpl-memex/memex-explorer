@@ -25,18 +25,49 @@
 
   exports.CrawlCollection = Backbone.Collection.extend({
     url: "/api/crawls/",
-    model: Crawl,
+    model: exports.Crawl,
   });
 
 
-  exports.CrawlView = Backbone.View.extend({});
+  exports.CrawlView = Backbone.View.extend({
+    el: "#crawlTable",
+    template: _.template($("#crawlTableItem").html()),
+    initialize: function(model){
+      var that = this;
+      this.model = model;
+      this.render();
+    },
+    render: function(){
+      this.$el.append(this.template(this.model.toJSON()));
+    },
+  });
 
 
   exports.AddCrawlView = BaseViews.FormView.extend({});
 
 
-  exports.CrawlCollectionView = BaseViews.CollectionView.extend({
+  exports.CrawlCollectionView = Backbone.View.extend({
+    el: "#crawlTableDiv",
+    template: _.template($("#crawlTableHeader").html()),
     modelView: exports.CrawlView,
+    initialize: function(collection){
+      var that = this;
+      this.collection = collection;
+      this.collection.fetch({
+        success: function(){
+          that.render();
+        },
+      });
+    },
+    render: function(){
+      // Render each model in ProjectCollection into a separate backbone view,
+      // with one model per view.
+      var that = this;
+      this.$el.append(this.template());
+      this.collection.each(function(model){
+        var singleView = new that.modelView(model);
+      });
+    },
   });
 
-})(this.crawls = crawls);
+})(this.Crawls = {});

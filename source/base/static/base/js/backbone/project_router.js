@@ -6,8 +6,8 @@
     },
     index: function(){
       var collection = new Crawls.CrawlCollection();
-      var collectionView = new Crawls.CrawlCollectionView();
-      var formView = new Crawls.CrawlFormView()
+      var collectionView = new Crawls.CrawlCollectionView(collection);
+      // var formView = new Crawls.CrawlFormView(collection)
     },
   });
 
