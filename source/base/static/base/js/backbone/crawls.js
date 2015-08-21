@@ -44,9 +44,9 @@
 
 
   exports.AddCrawlView = BaseViews.FormView.extend({
-    el: "#addProjectContainer",
-    modal: "#newProjectModal",
-    form: "#addProjectForm",
+    el: "#addCrawlContainer",
+    modal: "#newCrawlModal",
+    form: "#addCrawlForm",
     formFields: [
       "name",
       "crawl_model",
@@ -54,7 +54,7 @@
       "seeds_list",
       "crawler",
     ],
-    template: _.template($("#addProjectTemplate").html()),
+    template: _.template($("#addCrawlTemplate").html()),
     initialize: function(crawlCollection, modelCollection){
       var that = this;
       this.crawlCollection = crawlCollection;
@@ -75,15 +75,10 @@
       var that = this;
       this.project = $("#project_id").val();
       this.collection = collection;
-      this.collection.fetch({
-        url: that.collection.url += "?project=" + that.project,
-        success: function(){
-          that.render();
-        },
-      });
+      this.render();
     },
     render: function(){
-      // Render each model in ProjectCollection into a separate backbone view,
+      // Render each model in CrawlCollection into a separate Backbone view,
       // with one model per view.
       var that = this;
       if (this.collection.models.length){
