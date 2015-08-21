@@ -5,9 +5,12 @@
       "": "index",
     },
     index: function(){
-      var collection = new Crawls.CrawlCollection();
-      var collectionView = new Crawls.CrawlCollectionView(collection);
-      // var formView = new Crawls.CrawlFormView(collection)
+      var modelCollection = new CrawlModels.CrawlModelCollection();
+      var crawlCollection = new Crawls.CrawlCollection();
+      modelCollection.fetch();
+      window.modelCollection = modelCollection;
+      var crawlCollectionView = new Crawls.CrawlCollectionView(crawlCollection);
+      var crawlFormView = new Crawls.AddCrawlView(crawlCollection, modelCollection);
     },
   });
 

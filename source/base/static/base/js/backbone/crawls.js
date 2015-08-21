@@ -43,7 +43,27 @@
   });
 
 
-  exports.AddCrawlView = BaseViews.FormView.extend({});
+  exports.AddCrawlView = BaseViews.FormView.extend({
+    el: "#addProjectContainer",
+    modal: "#newProjectModal",
+    form: "#addProjectForm",
+    formFields: [
+      "name",
+      "crawl_model",
+      "rounds_left",
+      "seeds_list",
+      "crawler",
+    ],
+    template: _.template($("#addProjectTemplate").html()),
+    initialize: function(crawlCollection, modelCollection){
+      var that = this;
+      this.crawlCollection = crawlCollection;
+      this.modelCollection = modelCollection;
+    },
+    render: function(){
+
+    },
+  });
 
 
   exports.CrawlCollectionView = Backbone.View.extend({
