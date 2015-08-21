@@ -45,7 +45,7 @@
 
   exports.AddCrawlView = BaseViews.FormView.extend({
     el: "#addCrawlContainer",
-    modal: "#newCrawlModal",
+    modal: "#addCrawlModal",
     form: "#addCrawlForm",
     formFields: [
       "name",
@@ -59,9 +59,10 @@
       var that = this;
       this.crawlCollection = crawlCollection;
       this.modelCollection = modelCollection;
+      this.render();
     },
     render: function(){
-
+      this.$el.html(this.template({crawlModels: this.modelCollection.toJSON()}));
     },
   });
 

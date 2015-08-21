@@ -8,8 +8,8 @@
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/project.js' %}"></script>
     <script src="{% static 'base/js/forms/form_ajax.js' %}"></script>
-    <script src="{% static 'base/js/crawl_form.js' %}"></script>
-    <script src="{% static 'base/js/forms/crawl_submit.js' %}"></script>
+    <!-- <script src="{% static 'base/js/crawl_form.js' %}"></script> -->
+    <!-- <script src="{% static 'base/js/forms/crawl_submit.js' %}"></script> -->
     <script src="{% static 'base/js/forms/model_submit.js' %}"></script>
     <script src="{% static 'base/js/forms/crispy_form_errors.js' %}"></script>
     <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
@@ -61,22 +61,20 @@
            <!-- <a id="link-add-crawl" class="btn btn-default btn-duo center link-button" href="{% url 'base:crawl_space:add_crawl' project_slug=project.slug %}"><i class="fa fa-plus"></i>&nbsp;&nbsp;Start a new Crawl</a>
 
             -->
-            <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#crawlModal">
+            <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#addCrawlModal">
              START A NEW CRAWL
             </button>
 
 
             <!-- Modal -->
-            <div class="modal fade" id="crawlModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal fade" id="addCrawlModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">Add Crawl</h4>
                   </div>
-                  <div class="modal-body">
-                     {% include "crawl_space/add_crawl_form.html" %}
-                  </div>
+                  <div class="modal-body" id="addCrawlContainer"></div>
 
                 </div>
               </div>
