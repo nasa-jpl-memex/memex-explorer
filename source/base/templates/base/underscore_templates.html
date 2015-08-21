@@ -103,7 +103,7 @@
         <form action="<%= url + slug + '/' + 'delete/' %>"
         method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
             {% csrf_token %}
-                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
+            <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
         </form>
       </td>
   </tr>
@@ -132,4 +132,11 @@
             </a>
         </div>
     </div>
+</script>
+
+<script type="text/template" id="emptyTable">
+  <h4 style="line-height:2em;">
+    <i class="fa fa-search"> &nbsp; </i>Crawls
+  </h4>
+  <p id="noCrawls">No Crawls Registered.</p>
 </script>

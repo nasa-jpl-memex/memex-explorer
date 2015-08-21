@@ -48,13 +48,15 @@
 
   exports.CrawlCollectionView = Backbone.View.extend({
     el: "#crawlTableDiv",
-    template: _.template($("#crawlTableHeader").html()),
+    tableTemplate: _.template($("#crawlTableHeader").html()),
+    noCrawlsTemplate: _.template($("#emptyTable").html()),
     modelView: exports.CrawlView,
     initialize: function(collection){
       var that = this;
+      this.project = $("#project_id").val();
       this.collection = collection;
       this.collection.fetch({
-        url: that.collection.url += "?project=" + $("#project_id").val(),
+        url: that.collection.url += "?project=" + that.project,
         success: function(){
           that.render();
         },
@@ -64,10 +66,14 @@
       // Render each model in ProjectCollection into a separate backbone view,
       // with one model per view.
       var that = this;
-      this.$el.append(this.template());
-      this.collection.each(function(model){
-        var singleView = new that.modelView(model);
-      });
+      if (this.collection.models.length){
+        this.$el.append(this.tableTemplate());
+        this.collection.each(function(model){
+          var singleView = new that.modelView(model);
+        });
+      } else {
+        this.$el.append(this.noCrawlsTemplate());
+      }
     },
   });
 
