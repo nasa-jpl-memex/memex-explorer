@@ -3,7 +3,6 @@
   var Project = Backbone.Model.extend({
     urlRoot: "/api/projects/",
     defaults: {
-      id: 0,
       name: "",
       description: "",
       url: "",

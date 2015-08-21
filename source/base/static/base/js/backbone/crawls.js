@@ -3,7 +3,6 @@
   exports.Crawl = Backbone.Model.extend({
     urlRoot: "/api/crawls/",
     defaults: {
-      id: 1,
       slug: "",
       seeds_list: "",
       status: "",
@@ -61,6 +60,8 @@
     el: "#addCrawlContainer",
     modal: "#addCrawlModal",
     form: "#addCrawlForm",
+    project: $("#project_id").val(),
+    filesField: "#id_seeds_list",
     formFields: [
       "name",
       "crawl_model",
@@ -83,17 +84,47 @@
         var newModelOption = new that.modelView(model);
       });
     },
+    addCrawl: function(event){
+      var that = this;
+      event.preventDefault();
+      var formObjects = this.toFormData(this.form);
+      formObjects["project"] = this.project;
+      var file = $(this.filesField)[0].files[0];
+      if (typeof file != 'undefined'){
+        formObjects.append("seeds_list", file, file.name);
+      }
+      var newCrawl = new exports.Crawl(formObjects);
+      this.crawlCollection.add(newCrawl);
+      // If model.save() is successful, clear the errors and the form, and hide
+      // the modal. If model.save() had errors, show each error on form field,
+      // along with the content of the error.
+      newCrawl.save({}, {
+        success: function(response){
+          var newCrawlView = new exports.CrawlView(
+            that.collection.models[that.collection.models.length - 1]
+          );
+          that.formSuccess(that.modal, that.form);
+          that.clearErrors(that.formFields, that.form);
+        },
+        error: function(model, xhr, thrownError){
+          that.showFormErrors(xhr.responseJSON, that.form);
+        },
+      });
+    },
+    events: {
+      "submit #addCrawlForm": "addCrawl",
+    },
   });
 
 
   exports.CrawlCollectionView = Backbone.View.extend({
     el: "#crawlTableDiv",
+    project: $("#project_id").val(),
     tableTemplate: _.template($("#crawlTableHeader").html()),
     noCrawlsTemplate: _.template($("#emptyTable").html()),
     modelView: exports.CrawlView,
     initialize: function(collection){
       var that = this;
-      this.project = $("#project_id").val();
       this.collection = collection;
       this.render();
     },
