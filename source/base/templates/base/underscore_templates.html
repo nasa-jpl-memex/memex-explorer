@@ -218,9 +218,6 @@
         <div class="controls ">
           <select class="select form-control" id="id_crawl_model" name="crawl_model">
             <option value="" selected="selected">---------</option>
-            <% _.each(crawlModels, function(model){ %>
-              <option value="<%= model.id %>"><%= model.name %></option>
-            <% }) %>
           </select>
           <span class="help-block">
             <strong id="error_id_crawl_model" hidden></strong>

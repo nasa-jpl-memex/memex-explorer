@@ -43,6 +43,20 @@
   });
 
 
+  exports.AddCrawlFormModel = Backbone.View.extend({
+    el: "#id_crawl_model",
+    template: _.template($("#crawlFormModel").html()),
+    initialize: function(model){
+      var that = this;
+      this.model = model;
+      this.render();
+    },
+    render: function(){
+      this.$el.append(this.template(this.model.toJSON()));
+    },
+  });
+
+
   exports.AddCrawlView = BaseViews.FormView.extend({
     el: "#addCrawlContainer",
     modal: "#addCrawlModal",
@@ -54,6 +68,7 @@
       "seeds_list",
       "crawler",
     ],
+    modelView: exports.AddCrawlFormModel,
     template: _.template($("#addCrawlTemplate").html()),
     initialize: function(crawlCollection, modelCollection){
       var that = this;
@@ -62,7 +77,11 @@
       this.render();
     },
     render: function(){
-      this.$el.html(this.template({crawlModels: this.modelCollection.toJSON()}));
+      var that = this;
+      this.$el.html(this.template());
+      this.modelCollection.each(function(model){
+        var newModelOption = new that.modelView(model);
+      });
     },
   });
 
