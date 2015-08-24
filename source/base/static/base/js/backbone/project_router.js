@@ -16,7 +16,7 @@
         url: crawlCollection.url += "?project=" + project,
         success: function(){
           var crawlCollectionView = new Crawls.CrawlCollectionView(crawlCollection);
-          var crawlFormView = new Crawls.AddCrawlView(crawlCollection, modelCollection);
+          var crawlFormView = new Crawls.AddCrawlView(crawlCollection, modelCollection, crawlCollectionView);
         },
       });
     },

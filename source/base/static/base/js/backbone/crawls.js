@@ -71,10 +71,11 @@
     ],
     modelView: exports.AddCrawlFormModel,
     template: _.template($("#addCrawlTemplate").html()),
-    initialize: function(crawlCollection, modelCollection){
+    initialize: function(crawlCollection, modelCollection, collectionView){
       var that = this;
       this.crawlCollection = crawlCollection;
       this.modelCollection = modelCollection;
+      this.collectionView = collectionView;
       this.render();
     },
     render: function(){
@@ -88,6 +89,7 @@
       var that = this;
       event.preventDefault();
       var formObjects = this.toFormData(this.form);
+      // Attach the contents of the file to the FormData object.
       var file = $(this.filesField)[0].files[0];
       if (typeof file != 'undefined'){
         formObjects.append("seeds_list", file, file.name);
@@ -101,9 +103,15 @@
         data: formObjects,
         contentType: false,
         success: function(response){
-          var newCrawlView = new exports.CrawlView(
-            that.collection.models[that.collection.models.length - 1]
-          );
+          // After success, if the size of the collection is 1, re-render the
+          // collection view.
+          if (that.crawlCollection.models.length == 1){
+            that.collectionView.render();
+          } else {
+            var newCrawlView = new exports.CrawlView(
+              that.crawlCollection.models[that.crawlCollection.models.length - 1]
+            );
+          }
           that.formSuccess(that.modal, that.form);
           that.clearErrors(that.formFields, that.form);
         },
@@ -134,7 +142,7 @@
       // with one model per view.
       var that = this;
       if (this.collection.models.length){
-        this.$el.append(this.tableTemplate());
+        this.$el.html(this.tableTemplate());
         this.collection.each(function(model){
           var singleView = new that.modelView(model);
         });

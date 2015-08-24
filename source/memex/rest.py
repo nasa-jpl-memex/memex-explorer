@@ -1,5 +1,8 @@
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
+
 from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
 
@@ -61,6 +64,15 @@ class CrawlViewSet(viewsets.ModelViewSet):
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
         'crawl_model', 'crawler')
+
+    def create(self, request):
+        if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
+            request.data["seeds_list"] = SimpleUploadedFile(
+                'seeds',
+                bytes(request.data.get("textseeds")),
+                'application/octet-stream'
+            )
+        return super(CrawlViewSet, self).create(request)
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
