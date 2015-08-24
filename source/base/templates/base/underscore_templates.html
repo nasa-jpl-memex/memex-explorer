@@ -144,6 +144,7 @@
 <script type="text/template" id="addCrawlTemplate">
   <form method="post" enctype="multipart/form-data" id="addCrawlForm">
     {% csrf_token %}
+    <input type="hidden" id="id_crawl_project" name="project" value="{{ project.id }}">
     <fieldset>
       <div id="div_id_name" class="form-group">
         <label for="id_name" class="control-label requiredField">

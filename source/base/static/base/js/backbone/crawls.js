@@ -88,7 +88,6 @@
       var that = this;
       event.preventDefault();
       var formObjects = this.toFormData(this.form);
-      formObjects["project"] = this.project;
       var file = $(this.filesField)[0].files[0];
       if (typeof file != 'undefined'){
         formObjects.append("seeds_list", file, file.name);
@@ -99,6 +98,8 @@
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
       newCrawl.save({}, {
+        data: formObjects,
+        contentType: false,
         success: function(response){
           var newCrawlView = new exports.CrawlView(
             that.collection.models[that.collection.models.length - 1]
