@@ -76,6 +76,7 @@
       this.crawlCollection = crawlCollection;
       this.modelCollection = modelCollection;
       this.collectionView = collectionView;
+      this.on("renderCrawlForm", this.afterRender);
       this.render();
     },
     render: function(){
@@ -84,6 +85,38 @@
       this.modelCollection.each(function(model){
         var newModelOption = new that.modelView(model);
       });
+      this.trigger("renderCrawlForm");
+    },
+    afterRender: function(){
+      this.onCrawlerChange();
+    },
+    // Hide Crawl Model when Nutch is selected, hide Rounds when Ache is selected.
+    onCrawlerChange: function(){
+      var crawler = $("#addCrawlForm :input[id='cancelSubmit']");
+      var nutch = $('#id_crawler_1');
+      var crawl_model = $('#id_crawl_model');
+      var model_div = $('#div_id_crawl_model');
+      var rounds_div = $('#div_id_rounds_left');
+      var rounds = $('#id_rounds_left')
+      if (nutch[0].checked){
+        crawl_model.prop("disabled", true);
+        rounds.prop("disabled", false);
+        model_div.prop("hidden", true);
+        rounds_div.prop("hidden", false);
+        model_div.addClass("input-greyed-out");
+        model_div.removeClass("input-available");
+        rounds_div.addClass("input-available");
+        rounds_div.removeClass("input-greyed-out");
+      } else {
+        crawl_model.prop("disabled", false);
+        rounds.prop("disabled", true);
+        model_div.prop("hidden", false);
+        rounds_div.prop("hidden", true);
+        model_div.addClass("input-available");
+        model_div.removeClass("input-greyed-out");
+        rounds_div.addClass("input-greyed-out");
+        rounds_div.removeClass("input-available");
+      }
     },
     addCrawl: function(event){
       var that = this;
@@ -122,6 +155,7 @@
     },
     events: {
       "submit #addCrawlForm": "addCrawl",
+      "change #addCrawlForm :input[name='crawler']": "onCrawlerChange",
     },
   });
 
