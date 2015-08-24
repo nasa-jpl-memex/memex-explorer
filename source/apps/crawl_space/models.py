@@ -6,7 +6,7 @@ from os.path import join
 from django.db import models
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
 from base.models import Project, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
