@@ -152,3 +152,9 @@ class TestCrawlREST(APITestCase):
         response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
             {'slug':'Bad Slug'}, format="json")
         assert json.loads(response.content)["slug"] == "test-nutch-rest"
+
+    def test_add_crawl_no_model(self):
+        data = {"name": "Ache POST No Model", "crawler": "ache", "textseeds": "http://www.google.com",
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["crawler"][0] == "Ache crawls require a Crawl Model"
