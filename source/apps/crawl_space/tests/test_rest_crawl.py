@@ -157,19 +157,19 @@ class TestCrawlREST(APITestCase):
         data = {"name": "", "crawler": "nutch", "textseeds": "http://www.google.com",
             "project": self.test_project.id}
         response = self.client.post(self.url, data, format="multipart")
-        assert json.loads(response.content)["name"][0] == "This field is required."
+        assert json.loads(response.content)["name"][0]
 
     def test_add_crawl_no_crawler(self):
         data = {"name": "nocrawler", "crawler": "", "textseeds": "http://www.google.com",
             "project": self.test_project.id}
         response = self.client.post(self.url, data, format="multipart")
-        assert json.loads(response.content)["crawler"][0] == "This field is required."
+        assert json.loads(response.content)["crawler"][0]
 
     def test_add_crawl_no_project(self):
         data = {"name": "noproject", "crawler": "nutch", "textseeds": "http://www.google.com",
             "project": ""}
         response = self.client.post(self.url, data, format="multipart")
-        assert json.loads(response.content)["project"][0] == "This field is required."
+        assert json.loads(response.content)["project"][0]
 
     def test_add_crawl_no_model(self):
         data = {"name": "Ache POST No Model", "crawler": "ache", "textseeds": "http://www.google.com",
