@@ -32,7 +32,7 @@ class CrawlSerializer(SlugModelSerializer):
 
     def validate_crawler(self, value):
         if value == "ache" and not self.initial_data.get("crawl_model"):
-            raise serializers.ValidationError("Ache crawls require a Crawl Model")
+            raise serializers.ValidationError("Ache crawls require a Crawl Model.")
         return value
 
     class Meta:

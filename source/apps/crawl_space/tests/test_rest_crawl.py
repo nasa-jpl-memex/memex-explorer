@@ -153,8 +153,32 @@ class TestCrawlREST(APITestCase):
             {'slug':'Bad Slug'}, format="json")
         assert json.loads(response.content)["slug"] == "test-nutch-rest"
 
+    def test_add_crawl_no_name(self):
+        data = {"name": "", "crawler": "nutch", "textseeds": "http://www.google.com",
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"][0] == "This field is required."
+
+    def test_add_crawl_no_crawler(self):
+        data = {"name": "nocrawler", "crawler": "", "textseeds": "http://www.google.com",
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["crawler"][0] == "This field is required."
+
+    def test_add_crawl_no_project(self):
+        data = {"name": "noproject", "crawler": "nutch", "textseeds": "http://www.google.com",
+            "project": ""}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["project"][0] == "This field is required."
+
     def test_add_crawl_no_model(self):
         data = {"name": "Ache POST No Model", "crawler": "ache", "textseeds": "http://www.google.com",
             "project": self.test_project.id}
         response = self.client.post(self.url, data, format="multipart")
-        assert json.loads(response.content)["crawler"][0] == "Ache crawls require a Crawl Model"
+        assert json.loads(response.content)["crawler"][0] == "Ache crawls require a Crawl Model."
+
+    def test_add_crawl_no_name(self):
+        data = {"name": "badname!", "crawler": "nutch", "textseeds": "http://www.google.com",
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"][0] == "Only numbers, letters, underscores, dashes and spaces are allowed."
