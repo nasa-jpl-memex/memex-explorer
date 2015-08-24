@@ -30,6 +30,11 @@ class CrawlSerializer(SlugModelSerializer):
     harvest_rate = serializers.FloatField(read_only=True)
     location = serializers.CharField(read_only=True)
 
+    def validate_crawler(self, value):
+        if value == "ache" and not self.initial_data.get("crawl_model"):
+            raise serializers.ValidationError("Ache crawls require a Crawl Model")
+        return value
+
     class Meta:
         model = Crawl
 
