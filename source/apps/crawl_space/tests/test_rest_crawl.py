@@ -126,6 +126,15 @@ class TestCrawlREST(APITestCase):
         response = self.client.post(self.url, data, format="multipart")
         assert json.loads(response.content)["name"] == "Ache POST REST"
 
+    def test_add_crawl_textseeds(self):
+        """
+        Test if the application can create a seeds list from text.
+        """
+        data = {"name": "Nutch POST Textseeds", "crawler": "nutch", "textseeds": "http://www.google.com",
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"] == "Nutch POST Textseeds"
+
     def test_crawl_change_name(self):
         response = self.client.patch(self.url + "%d/" % self.test_nutch_crawl.id,
             {'name':'new name'}, format="json")

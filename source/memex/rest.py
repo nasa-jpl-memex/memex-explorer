@@ -70,7 +70,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
             request.data["seeds_list"] = SimpleUploadedFile(
                 'seeds',
                 bytes(request.data.get("textseeds")),
-                'application/octet-stream'
+                'utf-8'
             )
         return super(CrawlViewSet, self).create(request)
 
