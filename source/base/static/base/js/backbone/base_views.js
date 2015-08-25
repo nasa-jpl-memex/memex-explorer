@@ -15,8 +15,8 @@
     showFormErrors: function(errors, form){
       // Take the JSON response from the server containing the errors, parse them,
       // and show them on the form.
-      var errorsArray = Object.keys(errors);
       var that = this;
+      var errorsArray = Object.keys(errors);
       _.each(errorsArray, function(field){
         $(form).find("#div_id_" + field).addClass("has-error");
         $(form).find("#error_id_" + field).attr("hidden", false).html(errors[field][0]);
@@ -46,6 +46,30 @@
         objects[formObject.name] = formObject.value;
       });
       return objects;
+    },
+  });
+
+
+  // View for rendering each item in a collection to a new view. Must define
+  // which modelView to use to render.
+  exports.CollectionView = Backbone.View.extend({
+    modelView: "",
+    initialize: function(collection){
+      this.collection = collection;
+      var that = this;
+      this.collection.fetch({
+        success: function(){
+          that.render();
+        },
+      });
+    },
+    render: function(){
+      // Render each model in ProjectCollection into a separate backbone view,
+      // with one model per view.
+      var that = this;
+      this.collection.each(function(model){
+        var singleView = new that.modelView(model);
+      });
     },
   });
 

@@ -40,7 +40,6 @@
     template: _.template($("#addProjectTemplate").html()),
     initialize: function(collection){
       this.collection = collection;
-      _.bindAll(this, 'render');
       this.render();
     },
     render: function(){
@@ -74,28 +73,12 @@
   });
 
 
-  var ProjectCollectionView = Backbone.View.extend({
-    initialize: function(collection){
-      this.collection = collection;
-      _.bindAll(this, 'render');
-      var that = this;
-      this.collection.fetch({
-        success: function(){
-          that.render();
-        }
-      });
-    },
-    render: function(){
-      // Render each model in ProjectCollection into a separate backbone view,
-      // with one model per view.
-      this.collection.each(function(project){
-        var projectView = new ProjectView(project);
-      });
-    },
+  var ProjectCollectionView = BaseViews.CollectionView.extend({
+    modelView: ProjectView,
   });
 
 
-  var ProjectRouter = Backbone.Router.extend({
+  var IndexRouter = Backbone.Router.extend({
     routes: {
       "": "index",
     },
@@ -108,7 +91,7 @@
 
 
   $(document).ready(function(){
-    var appRouter = new ProjectRouter();
+    var appRouter = new IndexRouter();
     Backbone.history.start();
   });
 

@@ -1,5 +1,8 @@
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
+
 from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
 
@@ -26,6 +29,11 @@ class CrawlSerializer(SlugModelSerializer):
     pages_crawled = serializers.IntegerField(read_only=True)
     harvest_rate = serializers.FloatField(read_only=True)
     location = serializers.CharField(read_only=True)
+
+    def validate_crawler(self, value):
+        if value == "ache" and not self.initial_data.get("crawl_model"):
+            raise serializers.ValidationError("Ache crawls require a Crawl Model.")
+        return value
 
     class Meta:
         model = Crawl
@@ -61,6 +69,15 @@ class CrawlViewSet(viewsets.ModelViewSet):
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
         'crawl_model', 'crawler')
+
+    def create(self, request):
+        if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
+            request.data["seeds_list"] = SimpleUploadedFile(
+                'seeds',
+                bytes(request.data.get("textseeds")),
+                'utf-8'
+            )
+        return super(CrawlViewSet, self).create(request)
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
