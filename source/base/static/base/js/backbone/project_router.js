@@ -10,6 +10,9 @@
       var crawlCollection = new Crawls.CrawlCollection();
       modelCollection.fetch({
         url: modelCollection.url += "?project=" + project,
+        success: function(){
+          var modelCollectionView = new CrawlModels.CrawlModelCollectionView(modelCollection);
+        },
       });
       // Create the views only if the crawls were successfully fetched.
       crawlCollection.fetch({
