@@ -35,6 +35,9 @@
 
   exports.AddCrawlModelView = BaseViews.FormView.extend({
     el: "#addCrawlModelContainer",
+    progressBar: "#progress",
+    uploadProgress: "#upload_progress",
+    percentage: "#upload_percentage",
     modal: "#crawlModelModal",
     form: "#addCrawlModelForm",
     project: $("#project_id").val(),
@@ -56,9 +59,40 @@
       var that = this;
       this.$el.html(this.template());
     },
+    updateProgress: function(event){
+      var percentComplete = parseInt((event.loaded / event.total) * 100);
+      $(this.uploadProgress).attr("aria-valuenow", percentComplete);
+      $(this.uploadProgress)css("width", percentComplete + "%");
+      if (percentComplete == 100){
+        $(this.percentage.)html("Completed");
+      } else {
+        $(this.percentage).html(percentComplete + "%");
+      }
+    },
+    uploadStatus: function(uploading){
+      $(this.form).find(":input").attr("disabled", uploading);
+      if (uploading == true){
+        $(this.progressBar).attr("hidden", false);
+        $(this.form).css({
+          "background-color": "#f5f5f5",
+          "border-radius": "8px",
+        });
+        $("#addCrawlModelForm :input[name='submit']").attr("disabled", true);
+        $("#addCrawlModelForm :input[name='cancel']").attr("value", "Hide");
+      } else if (uploading == false){
+        $(this.progressBar).attr("hidden", true);
+        $(this.form).css({
+          "background-color": "inherit",
+          "border-radius": "0px",
+        });
+        $("#addCrawlModelForm :input[name='submit']").attr("disabled", false);
+        $("#addCrawlModelForm :input[name='cancel']").attr("value", "Cancel")
+      }
+    },
     addCrawlModel: function(event){
       var that = this;
       event.preventDefault();
+      this.uploadStatus(true);
       var formObjects = this.toFormData(this.form);
       // Attach the contents of the file to the FormData object.
       var features = $(this.featuresField)[0].files[0];
@@ -77,6 +111,12 @@
       newModel.save({}, {
         data: formObjects,
         contentType: false,
+        xhr: function(){
+          var myXhr = $.ajaxSettings.xhr();
+          if (myXhr.upload){
+            myXhr.upload.addEventListener("progress", updateProgress, false);
+          }
+        },
         success: function(response){
           // After success, if the size of the collection is 1, re-render the
           // collection view.
@@ -97,6 +137,7 @@
           that.showFormErrors(xhr.responseJSON, that.form);
         },
       });
+      this.uploadStatus(false);
     },
     events: {
       "submit #addCrawlModelForm": "addCrawlModel",
