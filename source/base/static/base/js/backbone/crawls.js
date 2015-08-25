@@ -164,7 +164,7 @@
     el: "#crawlTableDiv",
     project: $("#project_id").val(),
     tableTemplate: _.template($("#crawlTableHeader").html()),
-    noCrawlsTemplate: _.template($("#emptyTable").html()),
+    noCrawlsTemplate: _.template($("#emptyCrawlTable").html()),
     modelView: exports.CrawlView,
     initialize: function(collection){
       var that = this;

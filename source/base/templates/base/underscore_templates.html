@@ -78,37 +78,34 @@
     <option value="<%= id %>"><%= name %></option>
 </script>
 
-<script type="text/template" id="modelTableBody">
-  <table id="modelTable" class="table table-condensed table-gray table-bordered">
-    <tbody>
-    <tr>
-      <th>Name</th>
-      <th>Actions</th>
-    </tr>
-    <tr>
-      <td><%= name %></td>
-      <td>
-        <form action="<%= url + slug + '/' + 'delete/' %>"
-        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
-            {% csrf_token %}
-                <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
-        </form>
-      </
+<script type="text/template" id="modelTableHeader">
+  <table class="table table-condensed table-gray table-bordered">
+    <tbody id="modelTable">
+      <tr>
+        <th>Name</th>
+        <th>Actions</th>
+      </tr>
     </tbody>
   </table>
 </script>
 
 <script type="text/template" id="modelTableItem">
   <tr>
-      <td><%= name %></td>
-      <td>
-        <form action="<%= url + slug + '/' + 'delete/' %>"
-        method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
-            {% csrf_token %}
-            <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
-        </form>
-      </td>
+    <td><%= name %></td>
+    <td>
+      <form action="<%= url + slug + '/' + 'delete/' %>" method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+        {% csrf_token %}
+        <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
+      </form>
+    </td>
   </tr>
+</script>
+
+<script type="text/template" id="emptyModelTable">
+  <h4 style="line-height:2em;">
+    <i class="fa fa-bar-chart"> &nbsp; </i>Models
+  </h4>
+  <p id="noCrawls">No Models Registered.</p>
 </script>
 
 <script type="text/template" id="indexProjectItem">
@@ -136,7 +133,7 @@
     </div>
 </script>
 
-<script type="text/template" id="emptyTable">
+<script type="text/template" id="emptyCrawlTable">
   <h4 style="line-height:2em;">
     <i class="fa fa-search"> &nbsp; </i>Crawls
   </h4>
