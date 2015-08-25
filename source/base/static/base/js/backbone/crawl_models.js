@@ -9,6 +9,7 @@
       project: 0,
       features: "",
       model: "",
+      url: "",
     },
   });
 
@@ -40,11 +41,23 @@
     project: $("#project_id").val(),
     formFields: [
       "name",
-      "crawl_model",
-      "rounds_left",
-      "seeds_list",
-      "crawler",
+      "model",
+      "features",
     ],
+    template: _.template($("#addCrawlModelTemplate").html()),
+    initialize: function(collection, collectionView){
+      var that = this;
+      this.collection = collection;
+      this.collectionView = collectionView;
+      this.render();
+    },
+    render: function(){
+      var that = this;
+      this.$el.html(this.template());
+      this.collection.each(function(model){
+        var newModelOption = new that.modelView(model);
+      });
+    },
   });
 
 
@@ -52,7 +65,7 @@
     el: "#crawlModelTableDiv",
     project: $("#project_id").val(),
     tableTemplate: _.template($("#crawlModelTableHeader").html()),
-    noCrawlsTemplate: _.template($("#emptyCrawlModelTable").html()),
+    noCrawlModelsTemplate: _.template($("#emptyCrawlModelTable").html()),
     modelView: exports.CrawlModelView,
     initialize: function(collection){
       var that = this;

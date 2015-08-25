@@ -252,6 +252,7 @@
 </div>
 <form id="addCrawlModelForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <input type="hidden" id="id_crawl_model_project" name="project" value="{{ project.id }}">
     <div id="div_id_name" class="form-group">
         <label for="id_name" class="control-label requiredField">
             Name<span class="asteriskField">*</span>

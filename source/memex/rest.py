@@ -42,6 +42,7 @@ class CrawlSerializer(SlugModelSerializer):
 class CrawlModelSerializer(SlugModelSerializer):
     model = serializers.FileField(use_url=False)
     features = serializers.FileField(use_url=False)
+    url = serializers.CharField(read_only=True)
 
     class Meta:
         model = CrawlModel

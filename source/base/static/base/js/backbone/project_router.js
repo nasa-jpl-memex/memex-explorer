@@ -12,6 +12,7 @@
         url: modelCollection.url += "?project=" + project,
         success: function(){
           var modelCollectionView = new CrawlModels.CrawlModelCollectionView(modelCollection);
+          var addModelView = new CrawlModels.AddCrawlModelView(modelCollection, modelCollectionView);
         },
       });
       // Create the views only if the crawls were successfully fetched.

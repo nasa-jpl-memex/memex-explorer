@@ -80,6 +80,10 @@ class CrawlModel(models.Model):
 
         return super(CrawlModel, self).save(*args, **kwargs)
 
+    @property
+    def url(self):
+        return self.get_absolute_url()
+
     def __unicode__(self):
         return self.name
 
