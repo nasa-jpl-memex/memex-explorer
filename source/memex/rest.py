@@ -69,7 +69,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
-        'crawl_model', 'crawler')
+        'crawl_model', 'crawler',)
 
     def create(self, request):
         if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
@@ -84,7 +84,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
 class CrawlModelViewSet(viewsets.ModelViewSet):
     queryset = CrawlModel.objects.all()
     serializer_class = CrawlModelSerializer
-    filter_fields = ('id', 'slug', 'name', 'project')
+    filter_fields = ('id', 'slug', 'name', 'project',)
 
 
 router = routers.DefaultRouter()

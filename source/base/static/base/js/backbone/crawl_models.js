@@ -3,7 +3,6 @@
   exports.CrawlModel = Backbone.Model.extend({
     urlRoot: "/api/crawl_models/",
     defaults: {
-      id: 0,
       slug: "",
       name: "",
       project: 0,
@@ -36,7 +35,7 @@
 
   exports.AddCrawlModelView = BaseViews.FormView.extend({
     el: "#addCrawlModelContainer",
-    modal: "#addCrawlModelModal",
+    modal: "#crawlModelModal",
     form: "#addCrawlModelForm",
     project: $("#project_id").val(),
     formFields: [
@@ -44,6 +43,8 @@
       "model",
       "features",
     ],
+    featuresField: "#id_features",
+    modelField: "#id_model",
     template: _.template($("#addCrawlModelTemplate").html()),
     initialize: function(collection, collectionView){
       var that = this;
@@ -58,6 +59,48 @@
         var newModelOption = new that.modelView(model);
       });
     },
+    addCrawlModel: function(event){
+      var that = this;
+      event.preventDefault();
+      var formObjects = this.toFormData(this.form);
+      // Attach the contents of the file to the FormData object.
+      var features = $(this.featuresField)[0].files[0];
+      var model = $(this.modelField)[0].files[0];
+      if (typeof features != 'undefined'){
+        formObjects.append("features", features, features.name);
+      }
+      if (typeof model != 'undefined'){
+        formObjects.append("model", model, model.name);
+      }
+      var newModel = new exports.CrawlModel(formObjects);
+      this.collection.add(newModel);
+      // If model.save() is successful, clear the errors and the form, and hide
+      // the modal. If model.save() had errors, show each error on form field,
+      // along with the content of the error.
+      newModel.save({}, {
+        data: formObjects,
+        contentType: false,
+        success: function(response){
+          // After success, if the size of the collection is 1, re-render the
+          // collection view.
+          if (that.collection.models.length == 1){
+            that.collectionView.render();
+          } else {
+            var newModelView = new exports.CrawlModelView(
+              that.collection.models[that.collection.models.length - 1]
+            );
+          }
+          that.formSuccess(that.modal, that.form);
+          that.clearErrors(that.formFields, that.form);
+        },
+        error: function(model, xhr, thrownError){
+          that.showFormErrors(xhr.responseJSON, that.form);
+        },
+      });
+    },
+    events: {
+      "submit #addCrawlModelForm": "addCrawlModel",
+    }
   });
 
 
