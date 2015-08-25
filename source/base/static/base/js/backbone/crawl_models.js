@@ -55,9 +55,6 @@
     render: function(){
       var that = this;
       this.$el.html(this.template());
-      this.collection.each(function(model){
-        var newModelOption = new that.modelView(model);
-      });
     },
     addCrawlModel: function(event){
       var that = this;
@@ -87,6 +84,9 @@
             that.collectionView.render();
           } else {
             var newModelView = new exports.CrawlModelView(
+              that.collection.models[that.collection.models.length - 1]
+            );
+            var newModelOption = new Crawls.AddCrawlFormModel(
               that.collection.models[that.collection.models.length - 1]
             );
           }
