@@ -110,13 +110,13 @@
       newModel.save({}, {
         data: formObjects,
         contentType: false,
+        xhr: function(){
+          var xhr = $.ajaxSettings.xhr();
+          xhr.upload.addEventListener("progress", that.updateProgress, false);
+          return xhr;
+        },
         beforeSend: function(xhr){
           that.uploadStatus(true);
-          var newXhr = $.ajaxSettings.xhr();
-          if (newXhr.upload){
-            newXhr.upload.addEventListener("progress", this.updateProgress, false);
-          }
-          return newXhr;
         },
         success: function(response, model, xhr){
           // After success, if the size of the collection is 1, re-render the
