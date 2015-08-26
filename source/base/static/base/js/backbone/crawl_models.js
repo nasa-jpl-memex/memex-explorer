@@ -36,8 +36,6 @@
   exports.AddCrawlModelView = BaseViews.FormView.extend({
     el: "#addCrawlModelContainer",
     progressBar: "#progress",
-    uploadProgress: "#upload_progress",
-    percentage: "#upload_percentage",
     modal: "#crawlModelModal",
     form: "#addCrawlModelForm",
     project: $("#project_id").val(),
@@ -61,12 +59,12 @@
     },
     updateProgress: function(event){
       var percentComplete = parseInt((event.loaded / event.total) * 100);
-      $(this.uploadProgress).attr("aria-valuenow", percentComplete);
-      $(this.uploadProgress).css("width", percentComplete + "%");
+      $("#upload_progress").attr("aria-valuenow", percentComplete);
+      $("#upload_progress").css("width", percentComplete + "%");
       if (percentComplete == 100){
-        $(this.percentage).html("Completed");
+        $("#upload_percentage").html("Completed");
       } else {
-        $(this.percentage).html(percentComplete + "%");
+        $("#upload_percentage").html(percentComplete + "%");
       }
     },
     uploadStatus: function(uploading){
@@ -88,6 +86,7 @@
         $("#addCrawlModelForm :input[name='submit']").attr("disabled", false);
         $("#addCrawlModelForm :input[name='cancel']").attr("value", "Cancel")
       }
+      $("#addCrawlModelForm :input[name='cancel']").attr("disabled", false);
     },
     addCrawlModel: function(event){
       var that = this;
