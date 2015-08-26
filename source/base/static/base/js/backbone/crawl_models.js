@@ -62,9 +62,9 @@
     updateProgress: function(event){
       var percentComplete = parseInt((event.loaded / event.total) * 100);
       $(this.uploadProgress).attr("aria-valuenow", percentComplete);
-      $(this.uploadProgress)css("width", percentComplete + "%");
+      $(this.uploadProgress).css("width", percentComplete + "%");
       if (percentComplete == 100){
-        $(this.percentage.)html("Completed");
+        $(this.percentage).html("Completed");
       } else {
         $(this.percentage).html(percentComplete + "%");
       }
@@ -92,7 +92,6 @@
     addCrawlModel: function(event){
       var that = this;
       event.preventDefault();
-      this.uploadStatus(true);
       var formObjects = this.toFormData(this.form);
       // Attach the contents of the file to the FormData object.
       var features = $(this.featuresField)[0].files[0];
@@ -111,13 +110,15 @@
       newModel.save({}, {
         data: formObjects,
         contentType: false,
-        xhr: function(){
-          var myXhr = $.ajaxSettings.xhr();
-          if (myXhr.upload){
-            myXhr.upload.addEventListener("progress", updateProgress, false);
+        beforeSend: function(xhr){
+          that.uploadStatus(true);
+          var newXhr = $.ajaxSettings.xhr();
+          if (newXhr.upload){
+            newXhr.upload.addEventListener("progress", this.updateProgress, false);
           }
+          return newXhr;
         },
-        success: function(response){
+        success: function(response, model, xhr){
           // After success, if the size of the collection is 1, re-render the
           // collection view.
           if (that.collection.models.length == 1){
@@ -132,12 +133,12 @@
           }
           that.formSuccess(that.modal, that.form);
           that.clearErrors(that.formFields, that.form);
+          that.uploadStatus(false);
         },
         error: function(model, xhr, thrownError){
           that.showFormErrors(xhr.responseJSON, that.form);
         },
       });
-      this.uploadStatus(false);
     },
     events: {
       "submit #addCrawlModelForm": "addCrawlModel",
