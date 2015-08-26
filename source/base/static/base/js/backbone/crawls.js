@@ -42,20 +42,6 @@
   });
 
 
-  exports.AddCrawlFormModel = Backbone.View.extend({
-    el: "#id_crawl_model",
-    template: _.template($("#crawlFormModel").html()),
-    initialize: function(model){
-      var that = this;
-      this.model = model;
-      this.render();
-    },
-    render: function(){
-      this.$el.append(this.template(this.model.toJSON()));
-    },
-  });
-
-
   exports.AddCrawlView = BaseViews.FormView.extend({
     el: "#addCrawlContainer",
     modal: "#addCrawlModal",
@@ -71,10 +57,9 @@
     ],
     modelView: exports.AddCrawlFormModel,
     template: _.template($("#addCrawlTemplate").html()),
-    initialize: function(crawlCollection, modelCollection, collectionView){
+    initialize: function(collection, collectionView){
       var that = this;
-      this.crawlCollection = crawlCollection;
-      this.modelCollection = modelCollection;
+      this.collection = collection;
       this.collectionView = collectionView;
       this.on("renderCrawlForm", this.afterRender);
       this.render();
@@ -82,9 +67,6 @@
     render: function(){
       var that = this;
       this.$el.html(this.template());
-      this.modelCollection.each(function(model){
-        var newModelOption = new that.modelView(model);
-      });
       this.trigger("renderCrawlForm");
     },
     afterRender: function(){
@@ -128,7 +110,7 @@
         formObjects.append("seeds_list", file, file.name);
       }
       var newCrawl = new exports.Crawl(formObjects);
-      this.crawlCollection.add(newCrawl);
+      this.collection.add(newCrawl);
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
@@ -138,11 +120,11 @@
         success: function(response){
           // After success, if the size of the collection is 1, re-render the
           // collection view.
-          if (that.crawlCollection.models.length == 1){
+          if (that.collection.models.length == 1){
             that.collectionView.render();
           } else {
             var newCrawlView = new exports.CrawlView(
-              that.crawlCollection.models[that.crawlCollection.models.length - 1]
+              that.collection.models[that.collection.models.length - 1]
             );
           }
           that.formSuccess(that.modal, that.form);

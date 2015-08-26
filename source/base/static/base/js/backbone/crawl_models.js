@@ -19,12 +19,27 @@
   });
 
 
+  exports.AddCrawlFormModel = Backbone.View.extend({
+    el: "#id_crawl_model",
+    template: _.template($("#crawlFormModel").html()),
+    initialize: function(model){
+      var that = this;
+      this.model = model;
+      this.render();
+    },
+    render: function(){
+      this.$el.append(this.template(this.model.toJSON()));
+    },
+  });
+
+
   exports.CrawlModelView = Backbone.View.extend({
     el: "#crawlModelTable",
     template: _.template($("#crawlModelTableItem").html()),
     initialize: function(model){
       var that = this;
       this.model = model;
+      var newModelOption = new exports.AddCrawlFormModel(model);
       this.render();
     },
     render: function(){
@@ -124,9 +139,6 @@
             that.collectionView.render();
           } else {
             var newModelView = new exports.CrawlModelView(
-              that.collection.models[that.collection.models.length - 1]
-            );
-            var newModelOption = new Crawls.AddCrawlFormModel(
               that.collection.models[that.collection.models.length - 1]
             );
           }

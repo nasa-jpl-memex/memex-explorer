@@ -250,6 +250,7 @@
         </div>
     </div>
 </div>
+
 <form id="addCrawlModelForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="hidden" id="id_crawl_model_project" name="project" value="{{ project.id }}">
@@ -294,6 +295,5 @@
             <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
         </div>
     </div>
-    <!--</a>-->
 </form>
 </script>
