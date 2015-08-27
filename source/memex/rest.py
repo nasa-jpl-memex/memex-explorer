@@ -90,7 +90,10 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
         crawls = Crawl.objects.all().filter(crawl_model=pk)
         if crawls:
             message = "The Crawl Model is being used by the following Crawls and cannot be deleted: "
-            raise serializers.ValidationError({message: [x.name for x in crawls]})
+            raise serializers.ValidationError({
+                "message": message,
+                "errors": [x.name for x in crawls],
+            })
         return super(CrawlModelViewSet, self).destroy(request)
 
 

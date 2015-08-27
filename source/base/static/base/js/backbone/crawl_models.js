@@ -44,7 +44,6 @@
       // Reset events each time so backbone doesnt clump events together.
       this.events = {};
       this.events["submit " + this.deleteId] = "deleteModel"
-      console.log(this.events)
       var newModelOption = new exports.AddCrawlFormModel(model);
       this.render();
     },
@@ -53,7 +52,24 @@
     },
     deleteModel: function(event){
       event.preventDefault();
-      console.log("Deleting.")
+      var confirmDelete = confirm("Are you sure you want to delete this crawl model?")
+      if (confirmDelete == true){
+        $.ajax({
+          method: "DELETE",
+          url: "/api/crawl_models/" + this.model.id + "/",
+          success: function(response){
+            window.location.reload();
+          },
+          error: function(response, xhr, thrownError){
+            errorString = "";
+            errors = response.responseJSON;
+            _.each(errors.errors, function(error){
+              errorString += ("\n\t" + error);
+            })
+            alert(errors.message + errorString);
+          },
+        });
+      }
     },
   });
 
