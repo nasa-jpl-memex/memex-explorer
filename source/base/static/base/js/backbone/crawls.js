@@ -110,7 +110,6 @@
         formObjects.append("seeds_list", file, file.name);
       }
       var newCrawl = new exports.Crawl(formObjects);
-      this.collection.add(newCrawl);
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
@@ -120,6 +119,7 @@
         success: function(response){
           // After success, if the size of the collection is 1, re-render the
           // collection view.
+          that.collection.add(newCrawl);
           if (that.collection.models.length == 1){
             that.collectionView.render();
           } else {

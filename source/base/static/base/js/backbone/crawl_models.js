@@ -143,7 +143,6 @@
         formObjects.append("model", model, model.name);
       }
       var newModel = new exports.CrawlModel(formObjects);
-      this.collection.add(newModel);
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
@@ -157,10 +156,12 @@
         },
         beforeSend: function(xhr){
           that.uploadStatus(true);
+          that.clearErrors(that.formFields, that.form);
         },
         success: function(response, model, xhr){
           // After success, if the size of the collection is 1, re-render the
           // collection view.
+          that.collection.add(newModel);
           if (that.collection.models.length == 1){
             that.collectionView.render();
           } else {
