@@ -1,10 +1,37 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+
+$script = <<SCRIPT
+sudo apt-get update
+sudo apt-get install -y make gcc g++ openjdk-7-jre-headless nodejs nodejs-legacy
+wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+bash ./Miniconda-latest-Linux-x86_64.sh -b
+export PATH=/home/vagrant/miniconda/bin:$PATH
+cd /vagrant/source
+bash app_setup.sh
+# reconfigure supervisor to bind django to 0.0.0.0
+sed -i "s#command=python manage.py runserver 127.0.0.1:8000#command=python manage.py runserver 0.0.0.0:8000#g" supervisord.conf
+echo "source /home/vagrant/miniconda/envs/memex/bin/activate memex" >> ~/.bashrc
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "                        MEMEX EXPLORER INSTALLED                           "
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo ""
+echo ""
+echo "Log into your VM: vagrant ssh"
+echo "Launch Memex Explorer: cd /vagrant/source; supervisord"
+echo "Open a browser at http://localhost:8000"
+SCRIPT
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
 Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -21,6 +48,7 @@ Vagrant.configure(2) do |config|
 
   # We bring the memex-explorer main server up on 8000
   config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 8084, host: 8084
   config.vm.network "forwarded_port", guest: 8888, host: 28888
   # And the log.io server on 28778
   config.vm.network "forwarded_port", guest: 28778, host: 28778
@@ -45,7 +73,7 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder "deploy/salt/roots/", "/srv"
+  # config.vm.synced_folder "deploy/salt/roots/", "/srv"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -74,14 +102,6 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-    ## For masterless, mount your salt file root
-
-    ## Use all the defaults:
-  config.vm.provision :salt do |salt|
-    salt.minion_config = "deploy/salt/minion"
-    salt.run_highstate = true
-    salt.verbose = true
-  end
-  
+  config.vm.provision "shell", privileged: false, inline: $script
 end
 
