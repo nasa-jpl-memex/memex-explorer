@@ -39,11 +39,21 @@
     initialize: function(model){
       var that = this;
       this.model = model;
+      this.modelObject = this.model.toJSON()
+      this.deleteId = "#delete_crawl_model_" + this.modelObject.id
+      // Reset events each time so backbone doesnt clump events together.
+      this.events = {};
+      this.events["submit " + this.deleteId] = "deleteModel"
+      console.log(this.events)
       var newModelOption = new exports.AddCrawlFormModel(model);
       this.render();
     },
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
+    },
+    deleteModel: function(event){
+      event.preventDefault();
+      console.log("Deleting.")
     },
   });
 

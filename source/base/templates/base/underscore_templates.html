@@ -96,7 +96,7 @@
   <tr>
     <td><%= name %></td>
     <td>
-      <form action="<%= url + slug + '/' + 'delete/' %>" method="post" onSubmit="return confirm('Are you sure you want to delete this crawl model?')">
+      <form id="delete_crawl_model_<%= id %>" action="" method="post">
         {% csrf_token %}
         <a href="#"><button class="fa fa-trash no-style-btn" type="submit"></button></a>
       </form>
