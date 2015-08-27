@@ -14,15 +14,16 @@
           var crawlCollectionView = new Crawls.CrawlCollectionView(crawlCollection);
           var crawlFormView = new Crawls.AddCrawlView(crawlCollection, crawlCollectionView);
         },
-      });
-      modelCollection.fetch({
-        url: modelCollection.url += "?project=" + project,
-        success: function(){
-          var modelCollectionView = new CrawlModels.CrawlModelCollectionView(modelCollection);
-          var addModelView = new CrawlModels.AddCrawlModelView(modelCollection, modelCollectionView);
+        complete: function(){
+          modelCollection.fetch({
+            url: modelCollection.url += "?project=" + project,
+            success: function(){
+              var modelCollectionView = new CrawlModels.CrawlModelCollectionView(modelCollection);
+              var addModelView = new CrawlModels.AddCrawlModelView(modelCollection, modelCollectionView);
+            },
+          });
         },
       });
-      // Create the views only if the crawls were successfully fetched.
     },
   });
 

@@ -76,7 +76,6 @@ class CrawlModel(models.Model):
             # TODO:
             # Another weird call with a side effect that has to be fixed.
             model_path = self.ensure_model_path()
-            return super(CrawlModel, self).save(*args, **kwargs)
 
         return super(CrawlModel, self).save(*args, **kwargs)
 
