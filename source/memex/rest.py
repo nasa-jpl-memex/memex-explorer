@@ -1,3 +1,5 @@
+import shutil
+
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
 from django.core.exceptions import ValidationError
@@ -97,6 +99,7 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
     filter_fields = ('id', 'slug', 'name', 'project',)
 
     def destroy(self, request, pk=None):
+        model = CrawlModel.objects.get(pk=pk)
         crawls = Crawl.objects.all().filter(crawl_model=pk)
         if crawls:
             message = "The Crawl Model is being used by the following Crawls and cannot be deleted: "
@@ -105,6 +108,7 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
                 "errors": [x.name for x in crawls],
             })
         else:
+            shutil.rmtree(model.get_model_path())
             return super(CrawlModelViewSet, self).destroy(request)
 
 
