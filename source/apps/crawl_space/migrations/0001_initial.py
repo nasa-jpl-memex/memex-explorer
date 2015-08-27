@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import apps.crawl_space.models
+import django.db.models.deletion
 import django.core.validators
 
 
@@ -50,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='crawl',
             name='crawl_model',
-            field=models.ForeignKey(default=None, blank=True, to='crawl_space.CrawlModel', null=True),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, default=None, blank=True, to='crawl_space.CrawlModel', null=True),
             preserve_default=True,
         ),
         migrations.AddField(

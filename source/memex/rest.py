@@ -86,6 +86,12 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
     serializer_class = CrawlModelSerializer
     filter_fields = ('id', 'slug', 'name', 'project',)
 
+    def destroy(self, request, pk=None):
+        crawls = Crawl.objects.all().filter(crawl_model=pk)
+        if crawls:
+            raise serializers.ValidationError("Cannot delete")
+        return super(CrawlModelViewSet, self).destroy(request)
+
 
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)

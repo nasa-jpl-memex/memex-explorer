@@ -161,7 +161,7 @@ class Crawl(models.Model):
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
-        default=None)
+        default=None, on_delete=models.PROTECT)
     location = models.CharField(max_length=64, default="location")
     rounds_left = models.IntegerField(default=1, null=True, blank=True)
 
