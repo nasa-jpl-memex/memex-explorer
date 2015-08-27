@@ -174,6 +174,7 @@
         },
         error: function(model, xhr, thrownError){
           that.showFormErrors(xhr.responseJSON, that.form);
+          that.uploadStatus(false);
         },
       });
     },

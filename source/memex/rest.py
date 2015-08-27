@@ -44,6 +44,16 @@ class CrawlModelSerializer(SlugModelSerializer):
     features = serializers.FileField(use_url=False)
     url = serializers.CharField(read_only=True)
 
+    def validate_model(self, value):
+        if value.name != "pageclassifier.model":
+            raise serializers.ValidationError("File must be named pageclassifier.model")
+        return value
+
+    def validate_features(self, value):
+        if value.name != "pageclassifier.features":
+            raise serializers.ValidationError("File must be named pageclassifier.features")
+        return value
+
     class Meta:
         model = CrawlModel
 
@@ -94,7 +104,8 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
                 "message": message,
                 "errors": [x.name for x in crawls],
             })
-        return super(CrawlModelViewSet, self).destroy(request)
+        else:
+            return super(CrawlModelViewSet, self).destroy(request)
 
 
 router = routers.DefaultRouter()

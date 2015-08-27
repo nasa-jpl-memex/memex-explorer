@@ -82,6 +82,18 @@ class TestCrawlModelREST(APITestCase):
         response = self.client.post(self.url, data, format="multipart")
         assert json.loads(response.content)["name"] == "Crawl Model POST REST"
 
+    def test_add_crawl_model_bad_festures(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_model_file(),
+            "model": self.get_model_file(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["features"]
+
+    def test_add_crawl_model_bad_model(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "model": self.get_features_file(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["model"]
+
     def test_change_slug_fails(self):
         """
         Slug is read-only and cannot be changed. Assert the slug is unchanged.
@@ -134,4 +146,4 @@ class TestCrawlModelREST(APITestCase):
             "project": self.test_project.id, "crawl_model": model["id"]}
         crawl = json.loads(self.client.post("/api/crawls/", data, format="multipart").content)
         error = json.loads(self.client.delete(self.url + str(model["id"]) + "/", format="multipart").content)
-        assert error[error.keys()[0]][0] == crawl["name"]
+        assert error["errors"][0] == crawl["name"]
