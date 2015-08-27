@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             name='CrawlModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=64, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z0-9-_ ]+$', b'Only numbers, letters, underscores, dashes and spaces are allowed.')])),
+                ('name', models.CharField(unique=True, max_length=64, validators=[django.core.validators.RegexValidator(b'^[a-zA-Z0-9-_ ]+$', b'Only numbers, letters, underscores, dashes and spaces are allowed.')])),
                 ('slug', models.SlugField(unique=True, max_length=64)),
                 ('model', models.FileField(upload_to=apps.crawl_space.models.get_model_upload_path, validators=[apps.crawl_space.models.validate_model_file])),
                 ('features', models.FileField(upload_to=apps.crawl_space.models.get_model_upload_path, validators=[apps.crawl_space.models.validate_features_file])),

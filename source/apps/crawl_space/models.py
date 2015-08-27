@@ -58,7 +58,8 @@ class CrawlModel(models.Model):
         ensure_exists(model_path)
         return model_path
 
-    name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     model = models.FileField(upload_to=get_model_upload_path,
         validators=[validate_model_file])
