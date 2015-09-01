@@ -47,10 +47,6 @@ class TestViews(UnitTestSkeleton):
         response = self.get('base:about')
         assert 'base/about.html' in response.template_name
 
-    def test_documentation(self):
-        response = urllib2.urlopen("http://memex-explorer.readthedocs.org/en/latest/")
-        assert response.code == 200
-
     def test_add_project_page(self):
         response = self.get('base:add_project')
         assert 'base/add_project.html' in response.template_name

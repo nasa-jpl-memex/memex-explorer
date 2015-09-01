@@ -1,3 +1,5 @@
+import shutil
+
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
 from django.core.exceptions import ValidationError
@@ -42,6 +44,17 @@ class CrawlSerializer(SlugModelSerializer):
 class CrawlModelSerializer(SlugModelSerializer):
     model = serializers.FileField(use_url=False)
     features = serializers.FileField(use_url=False)
+    url = serializers.CharField(read_only=True)
+
+    def validate_model(self, value):
+        if value.name != "pageclassifier.model":
+            raise serializers.ValidationError("File must be named pageclassifier.model")
+        return value
+
+    def validate_features(self, value):
+        if value.name != "pageclassifier.features":
+            raise serializers.ValidationError("File must be named pageclassifier.features")
+        return value
 
     class Meta:
         model = CrawlModel
@@ -68,7 +81,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
-        'crawl_model', 'crawler')
+        'crawl_model', 'crawler',)
 
     def create(self, request):
         if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
@@ -83,7 +96,20 @@ class CrawlViewSet(viewsets.ModelViewSet):
 class CrawlModelViewSet(viewsets.ModelViewSet):
     queryset = CrawlModel.objects.all()
     serializer_class = CrawlModelSerializer
-    filter_fields = ('id', 'slug', 'name', 'project')
+    filter_fields = ('id', 'slug', 'name', 'project',)
+
+    def destroy(self, request, pk=None):
+        model = CrawlModel.objects.get(pk=pk)
+        crawls = Crawl.objects.all().filter(crawl_model=pk)
+        if crawls:
+            message = "The Crawl Model is being used by the following Crawls and cannot be deleted: "
+            raise serializers.ValidationError({
+                "message": message,
+                "errors": [x.name for x in crawls],
+            })
+        else:
+            shutil.rmtree(model.get_model_path())
+            return super(CrawlModelViewSet, self).destroy(request)
 
 
 router = routers.DefaultRouter()

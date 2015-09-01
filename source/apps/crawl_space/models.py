@@ -58,7 +58,8 @@ class CrawlModel(models.Model):
         ensure_exists(model_path)
         return model_path
 
-    name = models.CharField(max_length=64, validators=[alphanumeric_validator()])
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
     slug = models.SlugField(max_length=64, unique=True)
     model = models.FileField(upload_to=get_model_upload_path,
         validators=[validate_model_file])
@@ -76,9 +77,12 @@ class CrawlModel(models.Model):
             # TODO:
             # Another weird call with a side effect that has to be fixed.
             model_path = self.ensure_model_path()
-            return super(CrawlModel, self).save(*args, **kwargs)
 
         return super(CrawlModel, self).save(*args, **kwargs)
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
 
     def __unicode__(self):
         return self.name
@@ -157,7 +161,7 @@ class Crawl(models.Model):
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
-        default=None)
+        default=None, on_delete=models.PROTECT)
     location = models.CharField(max_length=64, default="location")
     rounds_left = models.IntegerField(default=1, null=True, blank=True)
 

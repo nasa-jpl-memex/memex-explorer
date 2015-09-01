@@ -15,7 +15,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APITestCase
 from rest_framework import status
 
-from apps.crawl_space.models import CrawlModel
+from apps.crawl_space.models import CrawlModel, Crawl
 from base.models import Project
 
 
@@ -49,6 +49,10 @@ class TestCrawlModelREST(APITestCase):
     def get_features_file(self):
         return SimpleUploadedFile('pageclassifier.features', bytes('This is a features file.\n'), 'utf-8')
 
+    @classmethod
+    def get_seeds(self):
+        return SimpleUploadedFile('ht.seeds', bytes('This is some content.\n'))
+
     def parse_response(self, response):
         return json.loads(response.content)[0]
 
@@ -78,6 +82,18 @@ class TestCrawlModelREST(APITestCase):
         response = self.client.post(self.url, data, format="multipart")
         assert json.loads(response.content)["name"] == "Crawl Model POST REST"
 
+    def test_add_crawl_model_bad_festures(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_model_file(),
+            "model": self.get_model_file(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["features"]
+
+    def test_add_crawl_model_bad_model(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "model": self.get_features_file(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["model"]
+
     def test_change_slug_fails(self):
         """
         Slug is read-only and cannot be changed. Assert the slug is unchanged.
@@ -85,3 +101,49 @@ class TestCrawlModelREST(APITestCase):
         response = self.client.patch(self.url + "%d/" % self.test_crawlmodel.id,
             {'slug':'Bad Slug'}, format="json")
         assert json.loads(response.content)["slug"] == "test-crawl-model-rest"
+
+    def test_add_crawl_model_no_project(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "model": self.get_model_file()}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["project"][0]
+
+    def test_add_crawl_model_no_name(self):
+        data = {"features": self.get_features_file(),
+            "model": self.get_model_file(), "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["name"][0]
+
+    def test_add_crawl_model_no_model(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["model"]
+
+    def test_add_crawl_model_no_features(self):
+        data = {"name": "Crawl Model POST REST", "model": self.get_model_file(),
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+        assert json.loads(response.content)["features"]
+
+    def test_add_crawl_model_no_features(self):
+        data = {"name": "Crawl Model POST REST", "model": self.get_model_file(),
+            "project": self.test_project.id}
+        response = self.client.post(self.url, data, format="multipart")
+
+    def test_delete_crawl_model(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "model": self.get_model_file(), "project": self.test_project.id}
+        model = json.loads(self.client.post(self.url, data, format="multipart").content)
+        response = self.client.delete(self.url + str(model["id"]) + "/", format="multipart")
+        assert not response.content
+
+    def test_delete_crawl_integrity_error(self):
+        data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
+            "model": self.get_model_file(), "project": self.test_project.id}
+        model = json.loads(self.client.post(self.url, data, format="multipart").content)
+        data = {"name": "Ache POST REST", "crawler": "ache", "seeds_list": self.get_seeds(),
+            "project": self.test_project.id, "crawl_model": model["id"]}
+        crawl = json.loads(self.client.post("/api/crawls/", data, format="multipart").content)
+        error = json.loads(self.client.delete(self.url + str(model["id"]) + "/", format="multipart").content)
+        assert error["errors"][0] == crawl["name"]
