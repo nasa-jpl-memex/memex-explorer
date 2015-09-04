@@ -92,6 +92,15 @@
       var that = this;
       this.collection = collection;
       this.collectionView = collectionView;
+
+      // If the add crawl modal has been opened at the same time as the add model form,
+      // change focus back to the add crawl modal after the form has been closed
+      // or submitted.
+      $(this.modal).on('hidden.bs.modal', function(event){
+        if ($("#addCrawlModal").attr("aria-hidden") == "false"){
+          $("body").addClass("modal-open");
+        }
+      });
       this.render();
     },
     render: function(){
