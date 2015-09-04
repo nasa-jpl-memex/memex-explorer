@@ -1,4 +1,19 @@
+# 0.3
+
+Released September 2015
+
+* Backbone.js support for crawls, project, and crawl models
+* Django REST API
+* conda Vagrantfile support
+* Bug fixes
+
+# 0.2.1
+
+* Fix environment.yml naming
+
 # 0.2
+
+Released August 2015
 
 * Ache and Nutch crawlers now both dump into an Elasticsearch index.
 * Upload files directly into a Tika parser / Elasticsearch index
