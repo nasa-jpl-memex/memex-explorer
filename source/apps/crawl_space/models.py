@@ -12,7 +12,7 @@ from base.models import Project, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
 
 from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
-    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, MODELS_TMP_DIR)
+    MODEL_PATH, CRAWL_PATH, SEEDS_TMP_DIR, SEEDS_PATH, MODELS_TMP_DIR)
 
 
 def validate_model_file(value):
@@ -195,6 +195,16 @@ class Crawl(models.Model):
     @property
     def index_name(self):
         return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)
+
+    def __unicode__(self):
+        return self.name
+
+
+class SeedsList(models.Model):
+    seeds_list = models.FileField(upload_to=get_seeds_upload_path)
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
+    description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
