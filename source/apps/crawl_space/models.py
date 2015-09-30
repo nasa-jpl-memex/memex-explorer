@@ -201,10 +201,9 @@ class Crawl(models.Model):
 
 
 class SeedsList(models.Model):
-    seeds_list = models.FileField(upload_to=get_seeds_upload_path)
+    seeds = models.TextField()
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
-    description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
