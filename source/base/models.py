@@ -127,3 +127,12 @@ class Index(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class SeedsList(models.Model):
+    name = models.CharField(max_length=64, unique=True,
+        validators=[alphanumeric_validator()])
+    seeds = models.TextField()
+
+    def __unicode__(self):
+        return self.name

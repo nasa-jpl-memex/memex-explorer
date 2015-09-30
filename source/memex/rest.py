@@ -5,8 +5,8 @@ from rest_framework import routers, serializers, viewsets, parsers, filters
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
 
-from base.models import Project
-from apps.crawl_space.models import Crawl, CrawlModel, SeedsList
+from base.models import Project, SeedsList
+from apps.crawl_space.models import Crawl, CrawlModel
 
 
 class SlugModelSerializer(serializers.ModelSerializer):
