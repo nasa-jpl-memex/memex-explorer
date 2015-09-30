@@ -1,11 +1,13 @@
 import shutil
+import json
 
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
+from django.core.validators import URLValidator
 
-from base.models import Project
+from base.models import Project, SeedsList
 from apps.crawl_space.models import Crawl, CrawlModel
 
 
@@ -60,6 +62,27 @@ class CrawlModelSerializer(SlugModelSerializer):
         model = CrawlModel
 
 
+class SeedsListSerializer(SlugModelSerializer):
+
+    def validate_seeds(self, value):
+        try:
+            seeds = json.loads(value)
+        except ValueError:
+            raise serializers.ValidationError("Seeds must be a JSON encoded string.")
+        if type(seeds) != list:
+            raise serializers.ValidationError("Seeds must be an array of URLs.")
+        validator = URLValidator()
+        for x in seeds:
+            try:
+                validator(x)
+            except ValidationError:
+                raise serializers.ValidationError("Seeds must be valid URLs.")
+        return value
+
+    class Meta:
+        model = SeedsList
+
+
 """
 Viewset Classes.
 
@@ -112,7 +135,14 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
             return super(CrawlModelViewSet, self).destroy(request)
 
 
+class SeedsListViewSet(viewsets.ModelViewSet):
+    queryset = SeedsList.objects.all()
+    serializer_class = SeedsListSerializer
+    filter_fields = ('id', 'name', 'seeds', 'slug',)
+
+
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)
 router.register(r"crawls", CrawlViewSet)
 router.register(r"crawl_models", CrawlModelViewSet)
+router.register(r"seeds_list", SeedsListViewSet)

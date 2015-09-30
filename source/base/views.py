@@ -261,6 +261,10 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         return super(IndexSettingsView, self).form_valid(form)
 
 
+class SeedsListView(TemplateView):
+    pass
+
+
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = Index
     success_message = "Index was deleted successfully."
