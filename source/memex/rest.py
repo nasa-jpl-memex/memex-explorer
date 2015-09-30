@@ -5,6 +5,7 @@ from rest_framework import routers, serializers, viewsets, parsers, filters
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
+from django.core.validators import URLValidator
 
 from base.models import Project, SeedsList
 from apps.crawl_space.models import Crawl, CrawlModel
@@ -69,10 +70,13 @@ class SeedsListSerializer(SlugModelSerializer):
         except ValueError:
             raise serializers.ValidationError("Seeds must be a JSON encoded string.")
         if type(seeds) != list:
-            raise serializers.ValidationError("Seeds must be an array.")
+            raise serializers.ValidationError("Seeds must be an array of URLs.")
+        validator = URLValidator()
         for x in seeds:
-            if (type(x) != str) and (type(x) != unicode):
-                raise serializers.ValidationError("Seeds must be strings.")
+            try:
+                validator(x)
+            except ValidationError:
+                raise serializers.ValidationError("Seeds must be valid URLs.")
         return value
 
     class Meta:

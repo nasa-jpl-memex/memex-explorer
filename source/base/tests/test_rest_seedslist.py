@@ -72,3 +72,18 @@ class TestSeedsListREST(APITestCase):
         response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
             {"seeds": json.dumps(["http://www.lolcats.com/", "http://www.reddit.com/r/me_irl/"])}, format="json")
         assert json.loads(json.loads(response.content)["seeds"]) == ["http://www.lolcats.com/", "http://www.reddit.com/r/me_irl/"]
+
+    def test_non_json(self):
+        response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
+            {"seeds": ["http://www.lolcats.com/", "http://www.reddit.com/r/me_irl/"]}, format="json")
+        assert json.loads(response.content)["seeds"][0] == "Seeds must be a JSON encoded string."
+
+    def test_not_array(self):
+        response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
+            {"seeds": json.dumps("http://www.lolcats.com/\nhttp://www.reddit.com/r/me_irl/")}, format="json")
+        assert json.loads(response.content)["seeds"][0] == "Seeds must be an array of URLs."
+
+    def test_not_url(self):
+        response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
+            {"seeds": json.dumps(["a", "b"])}, format="json")
+        assert json.loads(response.content)["seeds"][0] == "Seeds must be valid URLs."
