@@ -1,4 +1,5 @@
 import shutil
+import json
 
 from rest_framework import routers, serializers, viewsets, parsers, filters
 
@@ -61,6 +62,18 @@ class CrawlModelSerializer(SlugModelSerializer):
 
 
 class SeedsListSerializer(SlugModelSerializer):
+
+    def validate_seeds(self, value):
+        try:
+            seeds = json.loads(value)
+        except ValueError:
+            raise serializers.ValidationError("Seeds must be a JSON encoded string.")
+        if type(seeds) != list:
+            raise serializers.ValidationError("Seeds must be an array.")
+        for x in seeds:
+            if (type(x) != str) and (type(x) != unicode):
+                raise serializers.ValidationError("Seeds must be strings.")
+        return value
 
     class Meta:
         model = SeedsList

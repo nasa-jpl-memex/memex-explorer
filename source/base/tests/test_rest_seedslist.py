@@ -17,18 +17,18 @@ class TestSeedsListREST(APITestCase):
     """
     @classmethod
     def setUpClass(cls):
-        cls.seeds="""
-            http://www.reddit.com/r/aww
-            http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964
-            http://en.wikipedia.org/wiki/Cat
-            http://www.catchannel.com/
-            http://mashable.com/category/cats/
-            http://www.huffingtonpost.com/news/cats/
-            http://www.lolcats.com/
-        """
+        cls.seeds=[
+            "http://www.reddit.com/r/aww",
+            "http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964",
+            "http://en.wikipedia.org/wiki/Cat",
+            "http://www.catchannel.com/",
+            "http://mashable.com/category/cats/",
+            "http://www.huffingtonpost.com/news/cats/",
+            "http://www.lolcats.com/"
+        ]
         cls.test_seeds = SeedsList(
             name="RestSeeds",
-            seeds = cls.seeds
+            seeds = json.dumps(cls.seeds),
         )
         cls.test_seeds.save()
         cls.url = "/api/seeds_list/"
@@ -52,7 +52,7 @@ class TestSeedsListREST(APITestCase):
 
     def test_add_seeds_post(self):
         response = self.client.post(self.url, {"name": "test_seeds_post",
-            "seeds": self.seeds}, format="json")
+            "seeds": json.dumps(self.seeds)}, format="json")
         assert json.loads(response.content)["name"] == "test_seeds_post"
 
     def test_add_seeds_no_name(self):
@@ -70,5 +70,5 @@ class TestSeedsListREST(APITestCase):
 
     def test_change_seeds(self):
         response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
-            {"seeds": "http://www.lolcats.com/"}, format="json")
-        assert json.loads(response.content)["seeds"] == "http://www.lolcats.com/"
+            {"seeds": json.dumps(["http://www.lolcats.com/", "http://www.reddit.com/r/me_irl/"])}, format="json")
+        assert json.loads(json.loads(response.content)["seeds"]) == ["http://www.lolcats.com/", "http://www.reddit.com/r/me_irl/"]
