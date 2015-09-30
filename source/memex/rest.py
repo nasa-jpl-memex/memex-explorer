@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
 
 from base.models import Project
-from apps.crawl_space.models import Crawl, CrawlModel
+from apps.crawl_space.models import Crawl, CrawlModel, SeedsList
 
 
 class SlugModelSerializer(serializers.ModelSerializer):
@@ -58,6 +58,12 @@ class CrawlModelSerializer(SlugModelSerializer):
 
     class Meta:
         model = CrawlModel
+
+
+class SeedsListSerializer(SlugModelSerializer):
+
+    class Meta:
+        model = SeedsList
 
 
 """
@@ -112,7 +118,14 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
             return super(CrawlModelViewSet, self).destroy(request)
 
 
+class SeedsListViewSet(viewsets.ModelViewSet):
+    queryset = SeedsList.objects.all()
+    serializer_class = SeedsListSerializer
+    filter_fields = ('id', 'name', 'seeds',)
+
+
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)
 router.register(r"crawls", CrawlViewSet)
 router.register(r"crawl_models", CrawlModelViewSet)
+router.register(r"seeds_list", SeedsListViewSet)

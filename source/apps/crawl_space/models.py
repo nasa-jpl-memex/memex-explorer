@@ -201,9 +201,9 @@ class Crawl(models.Model):
 
 
 class SeedsList(models.Model):
-    seeds = models.TextField()
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
+    seeds = models.TextField()
 
     def __unicode__(self):
         return self.name
