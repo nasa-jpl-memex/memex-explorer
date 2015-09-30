@@ -17,9 +17,7 @@ class TestSeedsListREST(APITestCase):
     """
     @classmethod
     def setUpClass(cls):
-        cls.test_seeds = SeedsList(
-            name="RestSeeds",
-            seeds="""
+        cls.seeds="""
             http://www.reddit.com/r/aww
             http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964
             http://en.wikipedia.org/wiki/Cat
@@ -27,11 +25,50 @@ class TestSeedsListREST(APITestCase):
             http://mashable.com/category/cats/
             http://www.huffingtonpost.com/news/cats/
             http://www.lolcats.com/
-            """
+        """
+        cls.test_seeds = SeedsList(
+            name="RestSeeds",
+            seeds = cls.seeds
         )
         cls.test_seeds.save()
         cls.url = "/api/seeds_list/"
 
-    def test_get_seeds_list(self):
-        response = self.client.get(self.url, {"name": "RestSeeds"}, format="json")
-        assert json.loads(response.content)[0]["name"] == "RestSeeds"
+    def test_get_all_seeds(self):
+        response = self.client.get(self.url, format="json")
+        assert json.loads(response.content)[0]["name"] == self.test_seeds.name
+        assert json.loads(response.content)[0]["seeds"] == self.test_seeds.seeds
+
+    def test_get_seeds_by_id(self):
+        response = self.client.get(self.url + "?id=%s" % self.test_seeds.id)
+        assert json.loads(response.content)[0]["id"] == self.test_seeds.id
+
+    def test_get_seeds_by_slug(self):
+        response = self.client.get(self.url + "?slug=%s" % self.test_seeds.slug)
+        assert json.loads(response.content)[0]["slug"] == self.test_seeds.slug
+
+    def test_get_seeds_by_name(self):
+        response = self.client.get(self.url + "?name=%s" % self.test_seeds.name)
+        assert json.loads(response.content)[0]["name"] == self.test_seeds.name
+
+    def test_add_seeds_post(self):
+        response = self.client.post(self.url, {"name": "test_seeds_post",
+            "seeds": self.seeds}, format="json")
+        assert json.loads(response.content)["name"] == "test_seeds_post"
+
+    def test_add_seeds_no_name(self):
+        response = self.client.post(self.url, {"seeds": self.seeds}, format="json")
+        assert json.loads(response.content)["name"][0] == "This field is required."
+
+    def test_add_seeds_no_seeds(self):
+        response = self.client.post(self.url, {"name": "test_seeds_post"}, format="json")
+        assert json.loads(response.content)["seeds"][0] == "This field is required."
+
+    def test_change_name(self):
+        response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
+            {"name": "cats_seeds"}, format="json")
+        assert json.loads(response.content)["name"] == "cats_seeds"
+
+    def test_change_seeds(self):
+        response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
+            {"seeds": "http://www.lolcats.com/"}, format="json")
+        assert json.loads(response.content)["seeds"] == "http://www.lolcats.com/"

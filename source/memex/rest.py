@@ -121,7 +121,7 @@ class CrawlModelViewSet(viewsets.ModelViewSet):
 class SeedsListViewSet(viewsets.ModelViewSet):
     queryset = SeedsList.objects.all()
     serializer_class = SeedsListSerializer
-    filter_fields = ('id', 'name', 'seeds',)
+    filter_fields = ('id', 'name', 'seeds', 'slug',)
 
 
 router = routers.DefaultRouter()

@@ -132,7 +132,12 @@ class Index(models.Model):
 class SeedsList(models.Model):
     name = models.CharField(max_length=64, unique=True,
         validators=[alphanumeric_validator()])
+    slug = models.SlugField(max_length=64, unique=True)
     seeds = models.TextField()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unicode(self.name))
+        super(SeedsList, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.name
