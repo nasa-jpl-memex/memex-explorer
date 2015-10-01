@@ -141,7 +141,16 @@ class SeedsListViewSet(viewsets.ModelViewSet):
     filter_fields = ('id', 'name', 'seeds', 'slug',)
 
     def create(self, request):
-        return super(CrawlViewSet, self).create(request)
+        # If a seeds file or a textseeds exists, then use those. Otherwise, look
+        # for a string in request.data["seeds"]
+        seeds_list = request.FILES.get("seeds", False)
+        textseeds = request.data.get("textseeds", False)
+        if seeds_list:
+            request.data["seeds"] = json.dumps(seeds_list.read().split("\n"))
+        elif textseeds:
+            # Get rid of carriage return character.
+            request.data["seeds"] = json.dumps(textseeds.replace("\r", "").split("\n"))
+        return super(SeedsListViewSet, self).create(request)
 
 
 router = routers.DefaultRouter()

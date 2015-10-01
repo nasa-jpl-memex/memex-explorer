@@ -40,10 +40,10 @@
     el: "#addSeedsContainer",
     modal: "#newSeedsModal",
     form: "#addSeedsForm",
-    filesField: "#id_seeds_list",
+    filesField: "#id_seeds",
     formFields: [
       "name",
-      "seeds_list",
+      "seeds",
     ],
     template: _.template($("#addSeedsTemplate").html()),
     initialize: function(collection){
@@ -60,7 +60,7 @@
       // Attach the contents of the file to the FormData object.
       var file = $(this.filesField)[0].files[0];
       if (typeof file != 'undefined'){
-        formObjects.append("seeds_list", file, file.name);
+        formObjects.append("seeds", file, file.name);
       }
       var newSeeds = new Seeds(formObjects);
       this.collection.add(newSeeds);
