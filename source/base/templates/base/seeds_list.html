@@ -16,14 +16,14 @@
         </div>
         <div class="col-md-4 search-bar">
             <div class="input-group">
-                  <span class="input-group-addon" id="basic-addon2"><i class="fa fa-search"></i></span>
-                  <input type="text" class="form-control search filterinput" placeholder="Search for seeds here">
-                </div>
+              <span class="input-group-addon" id="basic-addon2"><i class="fa fa-search"></i></span>
+              <input type="text" class="form-control search filterinput" placeholder="Search for seeds here">
             </div>
+        </div>
     </div>
 
     <div class="row" id="seedsList">
-        <div class="col-lg-3 col-md-4 pointer-hand"  data-toggle="modal" data-target="#newSeedsModal">
+        <div class="col-lg-3 col-md-4 pointer-hand" data-toggle="modal" data-target="#newSeedsModal">
             <div class="panel panel-project">
                 <a>
                 <div class="panel-heading">
@@ -59,7 +59,7 @@
     $('.filterinput').keyup(function () {
         var a = $(this).val();
         if (a.length > 0) {
-            children = ($(".project-tab").children());
+            children = ($(".seeds-tab").children());
             children.parent().css("min-height", "200px");
             var containing = children.filter(function () {
                 var regex = new RegExp('\\b' + a, 'i');
@@ -73,5 +73,5 @@
         return false;
     });
 </script>
-{% include "base/underscore_templates.html" %}
+{% include "base/underscore_templates/seeds.html" %}
 {% endblock %}

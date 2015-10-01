@@ -95,4 +95,4 @@
     Backbone.history.start();
   });
 
-})(this.projects = {});
+})(this.Projects = {});

@@ -64,7 +64,7 @@
       });
     },
     render: function(){
-      // Render each model in ProjectCollection into a separate backbone view,
+      // Render each model in collection into a separate backbone view,
       // with one model per view.
       var that = this;
       this.collection.each(function(model){

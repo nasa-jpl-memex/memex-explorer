@@ -1,6 +1,6 @@
 (function(exports){
 
-  exports.Seeds = Backbone.Model.extend({
+  var Seeds = Backbone.Model.extend({
     urlRoot: "/api/seeds_list/",
     defaults: {
       seeds: "",
@@ -10,50 +10,47 @@
   });
 
 
-  exports.SeedsCollection = Backbone.Model.extend({
+  var SeedsCollection = Backbone.Collection.extend({
     url: "/api/seeds_list/",
     model: Seeds,
   });
 
 
-  exports.SeedsCollectionView = Backbone.Model.extend({
-    el: "#addProjectContainer",
-    modal: "#newProjectModal",
-    form: "#addProjectForm",
-    formFields: ["name"],
-    template: _.template($("#addProjectTemplate").html()),
-    initialize: function(collection){
-      this.collection = collection;
+  var SeedsView = Backbone.View.extend({
+    el: "#seeds",
+    template: _.template($("#seedsItem").html()),
+    initialize: function(model){
+      this.model = model;
+      _.bindAll(this, 'render');
+      var that = this;
       this.render();
     },
     render: function(){
-      this.$el.html(this.template());
+      this.$el.append(this.template(this.model.toJSON()));
     },
-    addProject: function(event){
-      var that = this;
-      event.preventDefault();
-      var formObjects = this.toJson(this.form);
-      var newProject = new Project(formObjects);
-      this.collection.add(newProject);
-      // If model.save() is successful, clear the errors and the form, and hide
-      // the modal. If model.save() had errors, show each error on form field,
-      // along with the content of the error.
-      newProject.save({}, {
-        success: function(response){
-          var newProject = new ProjectView(
-            that.collection.models[that.collection.models.length - 1]
-          );
-          that.formSuccess(that.modal, that.form);
-          that.clearErrors(that.formFields, that.form);
-        },
-        error: function(model, xhr, thrownError){
-          that.showFormErrors(xhr.responseJSON, that.form);
-        },
-      });
+  });
+
+
+  var SeedsCollectionView = BaseViews.CollectionView.extend({
+    modelView: SeedsView,
+  });
+
+
+  var SeedsRouter = Backbone.Router.extend({
+    routes: {
+      "": "index",
     },
-    events: {
-      "submit #addProjectForm": "addProject",
+    index: function(){
+      var seedsCollection = new SeedsCollection();
+      var seedsCollectionView = new SeedsCollectionView(seedsCollection);
+      // var addProjectView = new AddProjectView(projectCollection);
     },
+  });
+
+
+  $(document).ready(function(){
+    var appRouter = new SeedsRouter();
+    Backbone.history.start();
   });
 
 })(this.Seeds = {});

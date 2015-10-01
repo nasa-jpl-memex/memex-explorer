@@ -33,6 +33,31 @@
   </form>
 </script>
 
+<script type="text/template" id="indexProjectItem">
+    <div class="col-lg-3 col-md-4 project-tab">
+        <div class="panel panel-project">
+            <div class="panel-heading">
+            <a href="<%= url %>" style="text-decoration:none;">
+                <div class="row">
+                    <div class="col-md-12 color-set">
+                        <p><%= name %></p>
+                    </div>
+                    <!--div class="col-xs-9 text-right">
+                        <i class="fa {{project.icon}} fa-3x"></i>
+                    </div-->
+                </div>
+            </div>
+                <div class="panel-footer">
+                    <p><%= description %></p>
+
+                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                    <div class="clearfix"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+</script>
+
 <script type="text/template" id="crawlTableHeader">
   <h4 style="line-height:2em;">
     <i class="fa fa-search"> &nbsp; </i>Crawls
@@ -109,31 +134,6 @@
     <i class="fa fa-bar-chart"> &nbsp; </i>Crawl Models
   </h4>
   <p id="noCrawlModels">No Crawl Models Registered.</p>
-</script>
-
-<script type="text/template" id="indexProjectItem">
-    <div class="col-lg-3 col-md-4 project-tab">
-        <div class="panel panel-project">
-            <div class="panel-heading">
-            <a href="<%= url %>" style="text-decoration:none;">
-                <div class="row">
-                    <div class="col-md-12 color-set">
-                        <p><%= name %></p>
-                    </div>
-                    <!--div class="col-xs-9 text-right">
-                        <i class="fa {{project.icon}} fa-3x"></i>
-                    </div-->
-                </div>
-            </div>
-                <div class="panel-footer">
-                    <p><%= description %></p>
-
-                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
-        </div>
-    </div>
 </script>
 
 <script type="text/template" id="emptyCrawlTable">
