@@ -1,0 +1,77 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% load static %}
+
+{% block extrafooter %}
+    <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
+    <script src="{% static 'base/js/backbone/seeds.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class='col-md-offset-1 col-md-10'>
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Seeds</h3>
+        </div>
+        <div class="col-md-4 search-bar">
+            <div class="input-group">
+                  <span class="input-group-addon" id="basic-addon2"><i class="fa fa-search"></i></span>
+                  <input type="text" class="form-control search filterinput" placeholder="Search for seeds here">
+                </div>
+            </div>
+    </div>
+
+    <div class="row" id="seedsList">
+        <div class="col-lg-3 col-md-4 pointer-hand"  data-toggle="modal" data-target="#newSeedsModal">
+            <div class="panel panel-project">
+                <a>
+                <div class="panel-heading">
+                    <div class="row color-set">
+                        <div class="col-xs-3">
+                            <i class="fa fa-plus fa-3x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right ">
+                            <p>New Seeds List</p>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div id="seeds"></div>
+    </div>
+
+    <div class="modal fade" id="newSeedsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Seeds</h4>
+                </div>
+                <div class="modal-body" id="addSeedsContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+/* simple project name search implementation */
+    $('.filterinput').keyup(function () {
+        var a = $(this).val();
+        if (a.length > 0) {
+            children = ($(".project-tab").children());
+            children.parent().css("min-height", "200px");
+            var containing = children.filter(function () {
+                var regex = new RegExp('\\b' + a, 'i');
+                return regex.test($('p', this).text());
+            }).slideDown();
+            children.not(containing).slideUp();
+            children.not(containing).parent().css("min-height", "0");
+        } else {
+            children.slideDown();
+        }
+        return false;
+    });
+</script>
+{% include "base/underscore_templates.html" %}
+{% endblock %}
