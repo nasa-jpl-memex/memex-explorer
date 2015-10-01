@@ -40,7 +40,11 @@
     el: "#addSeedsContainer",
     modal: "#newSeedsModal",
     form: "#addSeedsForm",
-    formFields: ["name"],
+    filesField: "#id_seeds_list",
+    formFields: [
+      "name",
+      "seeds_list",
+    ],
     template: _.template($("#addSeedsTemplate").html()),
     initialize: function(collection){
       this.collection = collection;
@@ -64,6 +68,8 @@
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
       newSeeds.save({}, {
+        data: formObjects,
+        contentType: false,
         success: function(response){
           var newSeeds = new SeedsView(
             that.collection.models[that.collection.models.length - 1]

@@ -140,6 +140,9 @@ class SeedsListViewSet(viewsets.ModelViewSet):
     serializer_class = SeedsListSerializer
     filter_fields = ('id', 'name', 'seeds', 'slug',)
 
+    def create(self, request):
+        return super(CrawlViewSet, self).create(request)
+
 
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)
