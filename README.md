@@ -60,11 +60,13 @@ To access the administration panel, navigate to http://localhost:8000/admin (or 
 The current method for deploying to the web is to deploy to ec2 by running a
 fabric script with a few environment variables set.
 
+```
 $ git clone https://github.com/memex-explorer/memex-explorer
 $ cd memex-explorer/deploy
 $ conda env create --file deploy_environment.yml
 $ source activate memex_deploy
 $ cp deploy_ec2.sh nocommit.sh
+```
 
 Now edit the file nocommit.sh. It will contain three environment variables
 which you must set and which you must not commit to the public repository.
