@@ -146,10 +146,13 @@ class SeedsListViewSet(viewsets.ModelViewSet):
         seeds_list = request.FILES.get("seeds", False)
         textseeds = request.data.get("textseeds", False)
         if seeds_list:
-            request.data["seeds"] = json.dumps(seeds_list.read().split("\n"))
+            request.data["seeds"] = json.dumps(map(str.strip, seeds_list.readlines()))
         elif textseeds:
+            if type(textseeds) == unicode:
+                request.data["seeds"] = json.dumps(map(unicode.strip, textseeds.split("\n")))
             # Get rid of carriage return character.
-            request.data["seeds"] = json.dumps(textseeds.replace("\r", "").split("\n"))
+            elif type(textseeds) == str:
+                request.data["seeds"] = json.dumps(map(str.strip, textseeds.split("\n")))
         return super(SeedsListViewSet, self).create(request)
 
 

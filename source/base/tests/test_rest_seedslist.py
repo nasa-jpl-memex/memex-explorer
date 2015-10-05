@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.db import IntegrityError
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class TestSeedsListREST(APITestCase):
@@ -26,6 +27,14 @@ class TestSeedsListREST(APITestCase):
             "http://www.huffingtonpost.com/news/cats/",
             "http://www.lolcats.com/"
         ]
+        cls.seeds_string = """http://www.reddit.com/r/aww
+            http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964
+            http://en.wikipedia.org/wiki/Cat
+            http://www.catchannel.com/
+            http://mashable.com/category/cats/
+            http://www.huffingtonpost.com/news/cats/
+            http://www.lolcats.com/"""
+        cls.seeds_file = SimpleUploadedFile('ht.seeds', bytes("http://www.google.com"), 'utf-8')
         cls.test_seeds = SeedsList(
             name="RestSeeds",
             seeds = json.dumps(cls.seeds),
@@ -54,6 +63,16 @@ class TestSeedsListREST(APITestCase):
         response = self.client.post(self.url, {"name": "test_seeds_post",
             "seeds": json.dumps(self.seeds)}, format="json")
         assert json.loads(response.content)["name"] == "test_seeds_post"
+
+    def test_add_seeds_file(self):
+        response = self.client.post(self.url, {"name": "test_seeds_post1",
+            "seeds": self.seeds_file}, format="multipart")
+        assert json.loads(response.content)["name"] == "test_seeds_post1"
+
+    def test_add_seeds_string(self):
+        response = self.client.post(self.url, {"name": "test_seeds_post2",
+            "textseeds": self.seeds_string}, format="json")
+        assert json.loads(response.content)["name"] == "test_seeds_post2"
 
     def test_add_seeds_no_name(self):
         response = self.client.post(self.url, {"seeds": self.seeds}, format="json")
