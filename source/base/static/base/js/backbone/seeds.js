@@ -23,10 +23,36 @@
       this.model = model;
       _.bindAll(this, 'render');
       var that = this;
+      this.modelObject = this.model.toJSON();
+      this.deleteId = "#delete_seeds_" + this.modelObject.id
+      // Reset events each time so backbone doesnt clump events together.
+      this.events = {};
+      this.events["submit " + this.deleteId] = "deleteSeeds"
       this.render();
     },
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
+    },
+    deleteSeeds: function(event){
+      event.preventDefault();
+      var confirmDelete = confirm("Are you sure you want to delete this crawl model?")
+      if (confirmDelete == true){
+        $.ajax({
+          method: "DELETE",
+          url: "/api/seeds_list/" + this.model.id + "/",
+          success: function(response){
+            window.location.reload();
+          },
+          error: function(response, xhr, thrownError){
+            errorString = "";
+            errors = response.responseJSON;
+            _.each(errors.errors, function(error){
+              errorString += ("\n\t" + error);
+            })
+            alert(errors.message + errorString);
+          },
+        });
+      }
     },
   });
 

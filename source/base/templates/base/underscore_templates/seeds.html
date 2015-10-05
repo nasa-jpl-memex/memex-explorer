@@ -44,12 +44,18 @@
 </script>
 
 <script type="text/template" id="seedsItem">
-    <div class="col-lg-3 col-md-4 seeds-tab">
+    <div class="col-lg-2 col-md-3 seeds-tab">
         <div class="panel panel-project">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-12 color-set">
+                    <div class="col-md-9 color-set seeds-margin">
                         <p><%= name %></p>
+                    </div>
+                    <div class="col-md-3 color-set">
+                        <form id="delete_seeds_<%= id %>" action="" method="post">
+                          {% csrf_token %}
+                          <a href="#"><button class="fa fa-trash no-style-btn" style="float:right;font-size:28px;margin-top:2px;margin-bottom:12px;" type="submit"></button></a>
+                        </form>
                     </div>
                 </div>
             </div>
