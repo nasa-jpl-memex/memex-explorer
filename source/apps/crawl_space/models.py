@@ -8,7 +8,7 @@ from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
-from base.models import Project, alphanumeric_validator
+from base.models import Project, SeedsList, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
 
 from apps.crawl_space.settings import (crawl_resources_dir, resources_dir,
@@ -128,14 +128,11 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
-    def get_crawl_path(self):
-        return join(self.location)
-
     def get_config_path(self):
-        return os.path.join(self.get_crawl_path(), "config")
+        return os.path.join(self.crawl_location, "config")
 
     def ensure_crawl_path(self):
-        crawl_path = self.get_crawl_path()
+        crawl_path = self.crawl_location
         ensure_exists(crawl_path)
         return crawl_path
 
@@ -144,6 +141,13 @@ class Crawl(models.Model):
 
     def get_solr_url(self):
         return SOLR_URL
+
+    def get_seeds_upload_path(self, filename):
+        if self.crawler == "nutch":
+            seeds_list_path = os.path.join(CRAWL_PATH, self.name, "seeds", "seeds")
+        elif self.crawler == "ache":
+            seeds_list_path = os.path.join(CRAWL_PATH, self.name, "seeds")
+        return seeds_list_path
 
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
@@ -156,19 +160,17 @@ class Crawl(models.Model):
     crawler = models.CharField(max_length=64, choices=CRAWLER_CHOICES)
     status = models.CharField(max_length=64, default="NOT STARTED")
     config = models.CharField(max_length=64, default="config_default")
-    seeds_list = models.FileField(upload_to=get_seeds_upload_path)
+    seeds_list = models.ForeignKey(SeedsList, on_delete=models.PROTECT)
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
     crawl_model = models.ForeignKey(CrawlModel, null=True, blank=True,
         default=None, on_delete=models.PROTECT)
-    location = models.CharField(max_length=64, default="location")
     rounds_left = models.IntegerField(default=1, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.slug = slugify(unicode(self.name))
-            self.location = os.path.join(resources_dir, "crawls", self.slug)
             # TODO:
             # Fix this function and its weird side effect. Without this line the
             # save method wont work.
@@ -195,6 +197,10 @@ class Crawl(models.Model):
     @property
     def index_name(self):
         return "%s_%s_%s" % (self.slug, self.project.slug, self.crawler)
+
+    @property
+    def crawl_location(self):
+        return os.path.join(resources_dir, "crawls", self.slug)
 
     def __unicode__(self):
         return self.name
