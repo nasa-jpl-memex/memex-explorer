@@ -35,7 +35,7 @@
     },
     deleteSeeds: function(event){
       event.preventDefault();
-      var confirmDelete = confirm("Are you sure you want to delete this crawl model?")
+      var confirmDelete = confirm("Are you sure you want to delete this seeds list?")
       if (confirmDelete == true){
         $.ajax({
           method: "DELETE",
