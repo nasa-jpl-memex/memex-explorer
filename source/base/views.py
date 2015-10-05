@@ -262,7 +262,7 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
 
 class SeedsListView(TemplateView):
-    pass
+    template_name = "base/seeds_list.html"
 
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):

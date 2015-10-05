@@ -3,6 +3,7 @@
 import os
 import subprocess
 import shutil
+import json
 
 from django.db import models
 from django.utils.text import slugify
@@ -138,6 +139,9 @@ class SeedsList(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unicode(self.name))
         super(SeedsList, self).save(*args, **kwargs)
+
+    def to_file_string(self):
+        return "\n".join(json.loads(self.seeds))
 
     def __unicode__(self):
         return self.name

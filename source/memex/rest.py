@@ -140,6 +140,21 @@ class SeedsListViewSet(viewsets.ModelViewSet):
     serializer_class = SeedsListSerializer
     filter_fields = ('id', 'name', 'seeds', 'slug',)
 
+    def create(self, request):
+        # If a seeds file or a textseeds exists, then use those. Otherwise, look
+        # for a string in request.data["seeds"]
+        seeds_list = request.FILES.get("seeds", False)
+        textseeds = request.data.get("textseeds", False)
+        if seeds_list:
+            request.data["seeds"] = json.dumps(map(str.strip, seeds_list.readlines()))
+        elif textseeds:
+            if type(textseeds) == unicode:
+                request.data["seeds"] = json.dumps(map(unicode.strip, textseeds.split("\n")))
+            # Get rid of carriage return character.
+            elif type(textseeds) == str:
+                request.data["seeds"] = json.dumps(map(str.strip, textseeds.split("\n")))
+        return super(SeedsListViewSet, self).create(request)
+
 
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)
