@@ -1,6 +1,6 @@
 (function(exports){
 
-  var Seeds = Backbone.Model.extend({
+  exports.Seeds = Backbone.Model.extend({
     urlRoot: "/api/seeds_list/",
     defaults: {
       seeds: "",
@@ -10,13 +10,13 @@
   });
 
 
-  var SeedsCollection = Backbone.Collection.extend({
+  exports.SeedsCollection = Backbone.Collection.extend({
     url: "/api/seeds_list/",
-    model: Seeds,
+    model: exports.Seeds,
   });
 
 
-  var SeedsView = Backbone.View.extend({
+  exports.SeedsView = Backbone.View.extend({
     el: "#seeds",
     template: _.template($("#seedsItem").html()),
     initialize: function(model){
@@ -57,12 +57,12 @@
   });
 
 
-  var SeedsCollectionView = BaseViews.CollectionView.extend({
-    modelView: SeedsView,
+  exports.SeedsCollectionView = BaseViews.CollectionView.extend({
+    modelView: exports.SeedsView,
   });
 
 
-  var AddSeedsView = BaseViews.FormView.extend({
+  exports.AddSeedsView = BaseViews.FormView.extend({
     el: "#addSeedsContainer",
     modal: "#newSeedsModal",
     form: "#addSeedsForm",
@@ -88,7 +88,7 @@
       if (typeof file != 'undefined'){
         formObjects.append("seeds", file, file.name);
       }
-      var newSeeds = new Seeds(formObjects);
+      var newSeeds = new exports.Seeds(formObjects);
       this.collection.add(newSeeds);
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
@@ -97,7 +97,7 @@
         data: formObjects,
         contentType: false,
         success: function(response){
-          var newSeeds = new SeedsView(
+          var newSeeds = new exports.SeedsView(
             that.collection.models[that.collection.models.length - 1]
           );
           that.formSuccess(that.modal, that.form);
@@ -111,24 +111,6 @@
     events: {
       "submit #addSeedsForm": "addSeeds",
     },
-  });
-
-
-  var SeedsRouter = Backbone.Router.extend({
-    routes: {
-      "": "index",
-    },
-    index: function(){
-      var seedsCollection = new SeedsCollection();
-      var seedsCollectionView = new SeedsCollectionView(seedsCollection);
-      var addSeedsView = new AddSeedsView(seedsCollection);
-    },
-  });
-
-
-  $(document).ready(function(){
-    var appRouter = new SeedsRouter();
-    Backbone.history.start();
   });
 
 })(this.Seeds = {});
