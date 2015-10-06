@@ -16,7 +16,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 
 from apps.crawl_space.models import CrawlModel, Crawl
-from base.models import Project
+from base.models import Project, SeedsList
 
 
 class TestCrawlModelREST(APITestCase):
@@ -33,6 +33,21 @@ class TestCrawlModelREST(APITestCase):
             features = cls.get_features_file(),
             project = cls.test_project
         )
+
+        cls.test_seeds_list = SeedsList(
+            name = "Test Seeds Models",
+            seeds = json.dumps([
+                "http://www.reddit.com/r/aww",
+                "http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964",
+                "http://en.wikipedia.org/wiki/Cat",
+                "http://www.catchannel.com/",
+                "http://mashable.com/category/cats/",
+                "http://www.huffingtonpost.com/news/cats/",
+                "http://www.lolcats.com/"
+            ]),
+        )
+        cls.test_seeds_list.save()    
+
         cls.test_crawlmodel.save()
         cls.url = "/api/crawl_models/"
 
@@ -142,7 +157,7 @@ class TestCrawlModelREST(APITestCase):
         data = {"name": "Crawl Model POST REST", "features": self.get_features_file(),
             "model": self.get_model_file(), "project": self.test_project.id}
         model = json.loads(self.client.post(self.url, data, format="multipart").content)
-        data = {"name": "Ache POST REST", "crawler": "ache", "seeds_list": self.get_seeds(),
+        data = {"name": "Ache POST REST", "crawler": "ache", "seeds_object": self.test_seeds_list.id,
             "project": self.test_project.id, "crawl_model": model["id"]}
         crawl = json.loads(self.client.post("/api/crawls/", data, format="multipart").content)
         error = json.loads(self.client.delete(self.url + str(model["id"]) + "/", format="multipart").content)

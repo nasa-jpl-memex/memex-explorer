@@ -25,7 +25,7 @@ class ProjectSerializer(SlugModelSerializer):
 class CrawlSerializer(SlugModelSerializer):
     # Expose these fields, but only as read only.
     id = serializers.ReadOnlyField()
-    seeds_list = serializers.FileField(use_url=False)
+    seeds_list = serializers.FileField(read_only=True, use_url=False)
     status = serializers.CharField(read_only=True)
     config = serializers.CharField(read_only=True)
     index_name = serializers.CharField(read_only=True)
@@ -104,16 +104,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
-        'crawl_model', 'crawler',)
-
-    def create(self, request):
-        if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
-            request.data["seeds_list"] = SimpleUploadedFile(
-                'seeds',
-                bytes(request.data.get("textseeds")),
-                'utf-8'
-            )
-        return super(CrawlViewSet, self).create(request)
+        'crawl_model', 'crawler', 'seeds_object')
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):

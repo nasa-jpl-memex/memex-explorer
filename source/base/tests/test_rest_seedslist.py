@@ -44,7 +44,6 @@ class TestSeedsListREST(APITestCase):
 
     def test_get_all_seeds(self):
         response = self.client.get(self.url, format="json")
-        assert json.loads(response.content)[0]["name"] == self.test_seeds.name
         assert json.loads(response.content)[0]["seeds"] == self.test_seeds.seeds
 
     def test_get_seeds_by_id(self):
