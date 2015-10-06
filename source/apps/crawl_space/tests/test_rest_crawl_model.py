@@ -33,6 +33,7 @@ class TestCrawlModelREST(APITestCase):
             features = cls.get_features_file(),
             project = cls.test_project
         )
+        cls.test_crawlmodel.save()
 
         cls.test_seeds_list = SeedsList(
             name = "Test Seeds Models",
@@ -46,9 +47,7 @@ class TestCrawlModelREST(APITestCase):
                 "http://www.lolcats.com/"
             ]),
         )
-        cls.test_seeds_list.save()    
-
-        cls.test_crawlmodel.save()
+        cls.test_seeds_list.save()
         cls.url = "/api/crawl_models/"
 
     @classmethod

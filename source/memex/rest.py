@@ -146,6 +146,18 @@ class SeedsListViewSet(viewsets.ModelViewSet):
                 request.data["seeds"] = json.dumps(map(str.strip, textseeds.split("\n")))
         return super(SeedsListViewSet, self).create(request)
 
+    def destroy(self, request, pk=None):
+        seeds = SeedsList.objects.get(pk=pk)
+        crawls = Crawl.objects.all().filter(seeds_object=pk)
+        if crawls:
+            message = "The Seeds List is being used by the following Crawls and cannot be deleted: "
+            raise serializers.ValidationError({
+                "message": message,
+                "errors": [x.name for x in crawls],
+            })
+        else:
+            return super(CrawlModelViewSet, self).destroy(request)
+
 
 router = routers.DefaultRouter()
 router.register(r"projects", ProjectViewSet)
