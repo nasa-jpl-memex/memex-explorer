@@ -7,7 +7,8 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.core.files import File
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from base.models import Project, SeedsList, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
@@ -96,7 +97,6 @@ def get_seeds_upload_path(instance, filename):
 
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
-    seeds_list_path = ""
     if instance.crawler == "nutch":
         seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds", "seeds")
     elif instance.crawler == "ache":
@@ -162,7 +162,7 @@ class Crawl(models.Model):
     status = models.CharField(max_length=64, default="NOT STARTED")
     config = models.CharField(max_length=64, default="config_default")
     seeds_object = models.ForeignKey(SeedsList, on_delete=models.PROTECT)
-    seeds_list = models.FileField(default=None, null=True, blank=True)
+    seeds_list = models.FileField(default=None, null=True, blank=True, upload_to=get_seeds_upload_path)
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
@@ -184,11 +184,10 @@ class Crawl(models.Model):
                     shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
-                self.seeds_list.save(self.get_seeds_upload_path(),
-                    File(self.seeds_object.to_file_string()))
+                self.seeds_list.save(self.get_seeds_upload_path(), ContentFile(self.seeds_object.to_file_string()), save=False)
             elif self.crawler == "nutch":
-                self.seeds_list.save(self.get_seeds_upload_path(),
-                    File(self.seeds_object.to_file_string()))
+                self.seeds_list = SimpleUploadedFile("seeds", bytes(self.seeds_object.to_file_string()))
+                import ipdb; ipdb.set_trace()
         return super(Crawl, self).save(*args, **kwargs)
 
     # TODO:
