@@ -130,7 +130,7 @@ class Crawl(models.Model):
     """
 
     def get_crawl_path(self):
-        return join(self.location)
+        return join(self.crawl_location)
 
     def get_config_path(self):
         return os.path.join(self.crawl_location, "config")
