@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.files import File
 
 from base.models import Project, SeedsList, alphanumeric_validator
 from apps.crawl_space.utils import ensure_exists
@@ -142,7 +143,7 @@ class Crawl(models.Model):
     def get_solr_url(self):
         return SOLR_URL
 
-    def get_seeds_upload_path(self, filename):
+    def get_seeds_upload_path(self):
         if self.crawler == "nutch":
             seeds_list_path = os.path.join(CRAWL_PATH, self.name, "seeds", "seeds")
         elif self.crawler == "ache":
@@ -160,7 +161,8 @@ class Crawl(models.Model):
     crawler = models.CharField(max_length=64, choices=CRAWLER_CHOICES)
     status = models.CharField(max_length=64, default="NOT STARTED")
     config = models.CharField(max_length=64, default="config_default")
-    seeds_list = models.ForeignKey(SeedsList, on_delete=models.PROTECT)
+    seeds_object = models.ForeignKey(SeedsList, on_delete=models.PROTECT)
+    seeds_list = models.FileField(default=None, null=True, blank=True)
     pages_crawled = models.BigIntegerField(default=0)
     harvest_rate = models.FloatField(default=0)
     project = models.ForeignKey(Project)
@@ -182,6 +184,11 @@ class Crawl(models.Model):
                     shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
+                self.seeds_list.save(self.get_seeds_upload_path(),
+                    File(self.seeds_object.to_file_string()))
+            elif self.crawler == "nutch":
+                self.seeds_list.save(self.get_seeds_upload_path(),
+                    File(self.seeds_object.to_file_string()))
         return super(Crawl, self).save(*args, **kwargs)
 
     # TODO:
