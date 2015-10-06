@@ -129,6 +129,9 @@ class Crawl(models.Model):
     crawl_model : fk to CrawlModel
     """
 
+    def get_crawl_path(self):
+        return join(self.location)
+
     def get_config_path(self):
         return os.path.join(self.crawl_location, "config")
 
@@ -142,13 +145,6 @@ class Crawl(models.Model):
 
     def get_solr_url(self):
         return SOLR_URL
-
-    def get_seeds_upload_path(self):
-        if self.crawler == "nutch":
-            seeds_list_path = os.path.join(CRAWL_PATH, self.name, "seeds", "seeds")
-        elif self.crawler == "ache":
-            seeds_list_path = os.path.join(CRAWL_PATH, self.name, "seeds")
-        return seeds_list_path
 
     CRAWLER_CHOICES = (
         ('nutch', "Nutch"),
@@ -184,10 +180,9 @@ class Crawl(models.Model):
                     shutil.rmtree(self.get_config_path())
                 shutil.copytree(self.get_default_config(), self.get_config_path())
                 self.config = self.get_config_path()
-                self.seeds_list.save(self.get_seeds_upload_path(), ContentFile(self.seeds_object.to_file_string()), save=False)
+                self.seeds_list = SimpleUploadedFile("seeds", bytes(self.seeds_object.to_file_string()))
             elif self.crawler == "nutch":
                 self.seeds_list = SimpleUploadedFile("seeds", bytes(self.seeds_object.to_file_string()))
-                import ipdb; ipdb.set_trace()
         return super(Crawl, self).save(*args, **kwargs)
 
     # TODO:
