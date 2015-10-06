@@ -156,7 +156,7 @@ class SeedsListViewSet(viewsets.ModelViewSet):
                 "errors": [x.name for x in crawls],
             })
         else:
-            return super(CrawlModelViewSet, self).destroy(request)
+            return super(SeedsListViewSet, self).destroy(request)
 
 
 router = routers.DefaultRouter()
