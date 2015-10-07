@@ -23,6 +23,11 @@
           var singleView = new exports.SeedsFormItem(model);
         });
       }
+      $(this.modal).on('hidden.bs.modal', function(event){
+        if ($("#newSeedsModal").attr("aria-hidden") == "false"){
+          $("body").addClass("modal-open");
+        }
+      });
     },
     addSeeds: function(){
       var that = this;
@@ -33,7 +38,7 @@
       if (typeof file != 'undefined'){
         formObjects.append("seeds", file, file.name);
       }
-      var newSeeds = new exports.Seeds(formObjects);
+      var newSeeds = new Seeds.Seeds(formObjects);
       this.collection.add(newSeeds);
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,

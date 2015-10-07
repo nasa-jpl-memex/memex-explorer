@@ -106,7 +106,6 @@
       var formObjects = this.toJson(this.form);
       // Attach the contents of the file to the FormData object.
       var newCrawl = new exports.Crawl(formObjects);
-      debugger;
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
