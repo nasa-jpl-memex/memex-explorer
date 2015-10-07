@@ -24,7 +24,7 @@
         });
       }
       $(this.modal).on('hidden.bs.modal', function(event){
-        if ($("#newSeedsModal").attr("aria-hidden") == "false"){
+        if ($(that.modal).attr("aria-hidden") == "true"){
           $("body").addClass("modal-open");
         }
       });
