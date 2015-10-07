@@ -4,7 +4,7 @@
     urlRoot: "/api/crawls/",
     defaults: {
       slug: "",
-      seeds_list: "",
+      seeds_object: "",
       status: "",
       config: "",
       index_name: "",
@@ -16,8 +16,8 @@
       description: "",
       crawler: "",
       rounds_left: 0,
-      project: 0,
-      crawl_model: 0,
+      project: "",
+      crawl_model: "",
     },
   });
 
@@ -103,19 +103,14 @@
     addCrawl: function(event){
       var that = this;
       event.preventDefault();
-      var formObjects = this.toFormData(this.form);
+      var formObjects = this.toJson(this.form);
       // Attach the contents of the file to the FormData object.
-      var file = $(this.filesField)[0].files[0];
-      if (typeof file != 'undefined'){
-        formObjects.append("seeds_list", file, file.name);
-      }
       var newCrawl = new exports.Crawl(formObjects);
+      debugger;
       // If model.save() is successful, clear the errors and the form, and hide
       // the modal. If model.save() had errors, show each error on form field,
       // along with the content of the error.
       newCrawl.save({}, {
-        data: formObjects,
-        contentType: false,
         success: function(response){
           // After success, if the size of the collection is 1, re-render the
           // collection view.

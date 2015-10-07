@@ -8,6 +8,7 @@
       var project = $("#project_id").val();
       var modelCollection = new CrawlModels.CrawlModelCollection();
       var crawlCollection = new Crawls.CrawlCollection();
+      var seedsCollection = new Seeds.SeedsCollection();
       crawlCollection.fetch({
         url: crawlCollection.url += "?project=" + project,
         success: function(){
@@ -20,6 +21,12 @@
             success: function(){
               var modelCollectionView = new CrawlModels.CrawlModelCollectionView(modelCollection);
               var addModelView = new CrawlModels.AddCrawlModelView(modelCollection, modelCollectionView);
+            },
+          });
+          seedsCollection.fetch({
+            url: seedsCollection.url,
+            success: function(){
+              var addModelView = new AddSeeds.AddSeedsProjectPage(seedsCollection);
             },
           });
         },

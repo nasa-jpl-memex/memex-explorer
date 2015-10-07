@@ -1,12 +1,29 @@
 (function(exports){
 
   exports.SeedsFormItem = Backbone.View.extend({
-    initialize: function(){},
-    render: function(){},
+    el: "#id_seeds_object",
+    template: _.template($("#crawlFormSeeds").html()),
+    initialize: function(model){
+      this.model = model;
+      _.bindAll(this, 'render');
+      this.render();
+    },
+    render: function(){
+      this.$el.append(this.template(this.model.toJSON()));
+    },
   });
 
 
   exports.AddSeedsProjectPage = Seeds.AddSeedsView.extend({
+    render: function(){
+      var that = this;
+      this.$el.html(this.template());
+      if (this.collection.models.length){
+        this.collection.each(function(model){
+          var singleView = new exports.SeedsFormItem(model);
+        });
+      }
+    },
     addSeeds: function(){
       var that = this;
       event.preventDefault();
@@ -38,4 +55,4 @@
     },
   });
 
-})();
+})(this.AddSeeds = {});
