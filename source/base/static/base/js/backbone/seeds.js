@@ -6,6 +6,7 @@
       seeds: "",
       name: "",
       slug: "",
+      url: "",
     }
   });
 

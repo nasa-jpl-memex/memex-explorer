@@ -21,8 +21,8 @@ project_slug = r'^projects/(?P<project_slug>[\w-]+)/'
 
 urlpatterns = patterns('',
     url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^seeds/', views.SeedsListView.as_view(), name='seeds_list'),
-    url(r'^seeds/(?P<seeds_slug>[\w-]+)/', views.EditSeedsView.as_view(), name='edit_seeds'),
+    url(r'^seeds/$', views.SeedsListView.as_view(), name='seeds_list'),
+    url(r'^seeds/(?P<seeds_slug>[\w-]+)/$', views.EditSeedsView.as_view(), name='edit_seeds'),
     url(r'^about/$', views.AboutView.as_view(), name='about'),
     url(r'^add_project/$', views.AddProjectView.as_view(),
         name='add_project'),

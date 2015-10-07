@@ -261,19 +261,6 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
         return super(IndexSettingsView, self).form_valid(form)
 
 
-class SeedsListView(TemplateView):
-    template_name = "base/seeds_list.html"
-
-
-class EditSeedsView(DetailView):
-    model = SeedsList
-    template_name = "base/edit_seeds.html"
-    slug_url_kwarg = 'seeds_slug'
-
-    def get_object(self):
-        return SeedsList.objects.get(slug=self.kwargs['seeds_slug'])
-
-
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
     model = Index
     success_message = "Index was deleted successfully."
@@ -293,6 +280,19 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
         context = super(IndexSettingsView, self).get_context_data(**kwargs)
         context["name"] = self.get_object().name
         return context
+
+
+class SeedsListView(TemplateView):
+    template_name = "base/seeds_list.html"
+
+
+class EditSeedsView(DetailView):
+    model = SeedsList
+    template_name = "base/edit_seeds.html"
+    slug_url_kwarg = 'seeds_slug'
+
+    def get_object(self):
+        return SeedsList.objects.get(slug=self.kwargs['seeds_slug'])
 
 
 class TadView(ProjectObjectMixin, TemplateView):

@@ -5,8 +5,25 @@
 {% load static %}
 
 {% block extrafooter %}
+    <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
+    <script src="{% static 'base/js/backbone/seeds.js' %}"></script>
+    <script src="{% static 'base/js/backbone/edit_seeds_backbone.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-This is the seeds page.
+<div class='row'>
+
+  <div class="col-md-offset-1 col-md-10">
+    <ol class="breadcrumb">
+      <li><a href="/seeds"> / Seeds / </a></li> {{ seedslist.name }}
+    </ol>
+  </div>
+  <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
+    <input id="seeds_pk" type="hidden" value="{{ seedslist.id }}">
+    <h1>{{ seedslist.name }}</h1>
+    <div id="seeds"></div>
+  </div>
+
+</div>
 {% endblock %}
