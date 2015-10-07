@@ -146,17 +146,22 @@ class SeedsListViewSet(viewsets.ModelViewSet):
                 request.data["seeds"] = json.dumps(map(str.strip, textseeds.split("\n")))
         return super(SeedsListViewSet, self).create(request)
 
-    def destroy(self, request, pk=None):
-        seeds = SeedsList.objects.get(pk=pk)
-        crawls = Crawl.objects.all().filter(seeds_object=pk)
-        if crawls:
-            message = "The Seeds List is being used by the following Crawls and cannot be deleted: "
-            raise serializers.ValidationError({
-                "message": message,
-                "errors": [x.name for x in crawls],
-            })
-        else:
-            return super(SeedsListViewSet, self).destroy(request)
+    # TODO: re-integrate this function when we add the Nutch REST api. This function
+    # prevents you from deleting a seeds list if there is a crawl attached, so as
+    # not to break the crawl. All crawls currently have seeds_lists so they will
+    # not break if the seeds_object is deleted.
+    #
+    # def destroy(self, request, pk=None):
+    #     seeds = SeedsList.objects.get(pk=pk)
+    #     crawls = Crawl.objects.all().filter(seeds_object=pk)
+    #     if crawls:
+    #         message = "The Seeds List is being used by the following Crawls and cannot be deleted: "
+    #         raise serializers.ValidationError({
+    #             "message": message,
+    #             "errors": [x.name for x in crawls],
+    #         })
+    #     else:
+    #         return super(SeedsListViewSet, self).destroy(request)
 
 
 router = routers.DefaultRouter()
