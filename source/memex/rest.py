@@ -63,6 +63,7 @@ class CrawlModelSerializer(SlugModelSerializer):
 
 
 class SeedsListSerializer(SlugModelSerializer):
+    url = serializers.CharField(read_only=True)
 
     def validate_seeds(self, value):
         try:

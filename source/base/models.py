@@ -143,5 +143,13 @@ class SeedsList(models.Model):
     def to_file_string(self):
         return "\n".join(json.loads(self.seeds))
 
+    def get_absolute_url(self):
+        return reverse('base:edit_seeds',
+            kwargs=dict(seeds_slug=self.slug))
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
+
     def __unicode__(self):
         return self.name

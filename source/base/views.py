@@ -20,7 +20,7 @@ from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-from base.models import Project, Index
+from base.models import Project, Index, SeedsList
 from base.forms import (AddProjectForm, ProjectSettingsForm, AddIndexForm,
     IndexSettingsForm)
 
@@ -263,6 +263,15 @@ class IndexSettingsView(SuccessMessageMixin, ProjectObjectMixin, UpdateView):
 
 class SeedsListView(TemplateView):
     template_name = "base/seeds_list.html"
+
+
+class EditSeedsView(DetailView):
+    model = SeedsList
+    template_name = "base/edit_seeds.html"
+    slug_url_kwarg = 'seeds_slug'
+
+    def get_object(self):
+        return SeedsList.objects.get(slug=self.kwargs['seeds_slug'])
 
 
 class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
