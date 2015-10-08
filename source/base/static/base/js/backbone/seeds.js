@@ -4,6 +4,7 @@
     urlRoot: "/api/seeds_list/",
     defaults: {
       seeds: "",
+      file_string: "",
       name: "",
       slug: "",
       url: "",

@@ -151,5 +151,9 @@ class SeedsList(models.Model):
     def url(self):
         return self.get_absolute_url()
 
+    @property
+    def file_string(self):
+        return self.to_file_string()
+
     def __unicode__(self):
         return self.name

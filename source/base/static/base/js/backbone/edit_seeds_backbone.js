@@ -9,14 +9,19 @@
       this.model.fetch({
         success: function(){
           that.render();
-          var editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
-            lineNumbers: true
-          });
+          that.setEditor();
         }
       });
     },
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
+    },
+    setEditor: function(){
+      this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
+        lineNumbers: true
+      });
+      this.editor.setValue(this.model.toJSON().file_string);
+      window.editor = this.editor;
     },
   });
 

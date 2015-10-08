@@ -37,9 +37,9 @@
             <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
         </div>
         <div class="col-md-2">
-            <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
+            <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" href="#">
         </div>
-     </div>
+      </div>
   </form>
 </script>
 
@@ -80,24 +80,25 @@
 <script type="text/template" id="editSeedsForm">
   <form id="addSeedsForm" method="post">
       {% csrf_token %}
-      <div id="div_id_textseeds" class="form-group">
-        <label for="id_textseeds" class="control-label">
-        </label>
-        <div class="controls ">
-          <textarea id="id_textseeds" name="textseeds"><% _.each(JSON.parse(seeds), function(seed) { %>
-<%= seed %><% }); %>   
-          </textarea>
-        </div>
-      </div>
-      <hr>
       <div class="form-actions row">
+        <div class="col-md-2">
+          <h1>{{ seedslist.name }}</h1>
+        </div>
         <div class="col-md-2">
             <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
         </div>
         <div class="col-md-2">
             <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" href="#">
         </div>
+      <hr>
      </div>
+      <div id="div_id_textseeds" class="form-group">
+        <label for="id_textseeds" class="control-label">
+        </label>
+        <div class="controls ">
+          <textarea id="id_textseeds" name="textseeds"></textarea>
+        </div>
+      </div>
   </form>
   <div id="potato"></div>
 </script>
