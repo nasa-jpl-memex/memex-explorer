@@ -335,7 +335,7 @@ class DeleteCrawlView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         """ Remove crawl folder """
-        shutil.rmtree(self.get_object().get_crawl_path())
+        shutil.rmtree(self.get_object().crawl_location)
         return super(DeleteCrawlView, self).delete(request, *args, **kwargs)
 
     def get_object(self):

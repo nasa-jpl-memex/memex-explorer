@@ -8,6 +8,8 @@
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/project.js' %}"></script>
     <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
+    <script src="{% static 'base/js/backbone/seeds.js' %}"></script>
+    <script src="{% static 'base/js/backbone/project_seeds.js' %}"></script>
     <script src="{% static 'base/js/backbone/crawl_models.js' %}"></script>
     <script src="{% static 'base/js/backbone/crawls.js' %}"></script>
     <script src="{% static 'base/js/backbone/project_router.js' %}"></script>
@@ -91,6 +93,18 @@
                 </div>
               </div>
             </div>
+
+            <div class="modal fade" id="newSeedsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Add Seeds</h4>
+                        </div>
+                        <div class="modal-body" id="addSeedsContainer"></div>
+                    </div>
+                </div>
+            </div>
     </div>
 
     <div id="crawlTableDiv" class="row"></div>
@@ -150,4 +164,6 @@
     </div>
   </div>
 {% include "base/underscore_templates/underscore_templates.html" %}
+{% include "base/underscore_templates/seeds_underscore.html" %}
+{% include "base/underscore_templates/crawls_underscore.html" %}
 {% endblock %}

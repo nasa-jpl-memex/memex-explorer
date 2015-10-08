@@ -24,10 +24,9 @@ class Migration(migrations.Migration):
                 ('crawler', models.CharField(max_length=64, choices=[(b'nutch', b'Nutch'), (b'ache', b'ACHE')])),
                 ('status', models.CharField(default=b'NOT STARTED', max_length=64)),
                 ('config', models.CharField(default=b'config_default', max_length=64)),
-                ('seeds_list', models.FileField(upload_to=apps.crawl_space.models.get_seeds_upload_path)),
+                ('seeds_list', models.FileField(default=None, null=True, upload_to=apps.crawl_space.models.get_seeds_upload_path, blank=True)),
                 ('pages_crawled', models.BigIntegerField(default=0)),
                 ('harvest_rate', models.FloatField(default=0)),
-                ('location', models.CharField(default=b'location', max_length=64)),
                 ('rounds_left', models.IntegerField(default=1, null=True, blank=True)),
             ],
             options={
@@ -58,6 +57,12 @@ class Migration(migrations.Migration):
             model_name='crawl',
             name='project',
             field=models.ForeignKey(to='base.Project'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='crawl',
+            name='seeds_object',
+            field=models.ForeignKey(to='base.SeedsList', on_delete=django.db.models.deletion.PROTECT),
             preserve_default=True,
         ),
     ]

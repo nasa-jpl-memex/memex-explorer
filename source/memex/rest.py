@@ -25,7 +25,7 @@ class ProjectSerializer(SlugModelSerializer):
 class CrawlSerializer(SlugModelSerializer):
     # Expose these fields, but only as read only.
     id = serializers.ReadOnlyField()
-    seeds_list = serializers.FileField(use_url=False)
+    seeds_list = serializers.FileField(read_only=True, use_url=False)
     status = serializers.CharField(read_only=True)
     config = serializers.CharField(read_only=True)
     index_name = serializers.CharField(read_only=True)
@@ -104,16 +104,7 @@ class CrawlViewSet(viewsets.ModelViewSet):
     queryset = Crawl.objects.all()
     serializer_class = CrawlSerializer
     filter_fields = ('id', 'slug', 'name', 'description', 'status', 'project',
-        'crawl_model', 'crawler',)
-
-    def create(self, request):
-        if request.data.get('textseeds', False) and not request.FILES.get("seeds_list", False):
-            request.data["seeds_list"] = SimpleUploadedFile(
-                'seeds',
-                bytes(request.data.get("textseeds")),
-                'utf-8'
-            )
-        return super(CrawlViewSet, self).create(request)
+        'crawl_model', 'crawler', 'seeds_object')
 
 
 class CrawlModelViewSet(viewsets.ModelViewSet):
@@ -154,6 +145,18 @@ class SeedsListViewSet(viewsets.ModelViewSet):
             elif type(textseeds) == str:
                 request.data["seeds"] = json.dumps(map(str.strip, textseeds.split("\n")))
         return super(SeedsListViewSet, self).create(request)
+
+    def destroy(self, request, pk=None):
+        seeds = SeedsList.objects.get(pk=pk)
+        crawls = Crawl.objects.all().filter(seeds_object=pk)
+        if crawls:
+            message = "The Seeds List is being used by the following Crawls and cannot be deleted: "
+            raise serializers.ValidationError({
+                "message": message,
+                "errors": [x.name for x in crawls],
+            })
+        else:
+            return super(SeedsListViewSet, self).destroy(request)
 
 
 router = routers.DefaultRouter()
