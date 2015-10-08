@@ -50,6 +50,12 @@
   color:#afc2d3;
 }
 
+.save-seeds{
+  margin-top:25px;
+  margin-bottom:10px !important;
+  float:right;
+}
+
 .color-set {
   color:white;
 }

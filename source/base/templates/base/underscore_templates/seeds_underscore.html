@@ -68,29 +68,17 @@
 </script>
 
 
-<script type="text/template" id="editSeeds">
-  <ul>
-    <% _.each(JSON.parse(seeds), function(seed) { %>
-      <li><%= seed %></li>
-    <% }); %> 
-  </ul>
-</script>
-
-
-<script type="text/template" id="editSeedsForm">
-  <form id="addSeedsForm" method="post">
+<script type="text/template" id="editSeedsTemplate">
+  <form id="editSeedsForm" method="post">
       {% csrf_token %}
       <div class="form-actions row">
-        <div class="col-md-2">
+        <div class="col-md-6">
           <h1>{{ seedslist.name }}</h1>
         </div>
-        <div class="col-md-2">
-            <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
+        <div class="col-md-6">
+            <input type="submit" name="submit" value="Save" class="btn btn-primary save-seeds" id="submit-id-submit" />
+            <button type="button" id="reset" class="btn btn-primary save-seeds">Reset</button>
         </div>
-        <div class="col-md-2">
-            <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" href="#">
-        </div>
-      <hr>
      </div>
       <div id="div_id_textseeds" class="form-group">
         <label for="id_textseeds" class="control-label">
@@ -100,5 +88,4 @@
         </div>
       </div>
   </form>
-  <div id="potato"></div>
 </script>

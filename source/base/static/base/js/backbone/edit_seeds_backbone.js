@@ -2,7 +2,7 @@
 
   var EditSeedsView = Backbone.View.extend({
     el: "#seeds",
-    template: _.template($("#editSeedsForm").html()),
+    template: _.template($("#editSeedsTemplate").html()),
     initialize: function(model){
       this.model = model;
       var that = this;
@@ -20,8 +20,18 @@
       this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
         lineNumbers: true
       });
+      this.loadSeeds();
+    },
+    editSeeds: function(event){
+      var that = this;
+      event.preventDefault();
+    },
+    loadSeeds: function(){
       this.editor.setValue(this.model.toJSON().file_string);
-      window.editor = this.editor;
+    },
+    events: {
+      "submit #editSeedsForm": "editSeeds",
+      "click #reset": "loadSeeds",
     },
   });
 
