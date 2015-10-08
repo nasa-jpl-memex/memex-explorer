@@ -190,3 +190,7 @@ a:hover .fa {
   border:0;
   background:transparent;
 }
+
+.line-error{
+  background-color:red;
+}

@@ -22,6 +22,7 @@
         lineNumbers: true
       });
       this.editor.setSize("100%", 1000);
+      window.editor = this.editor;
       this.loadSeeds();
     },
     editSeeds: function(event){
@@ -36,10 +37,14 @@
             console.log("Success!")
           },
           error: function(model, xhr, thrownError){
-            console.log(xhr);
+            // that.displayErrors(xhr.responseJSON);
           },
         });
       }
+    },
+    displayErrors: function(errors){
+      this.editor.doc.eachLine(function(line){
+      });
     },
     loadSeeds: function(){
       this.editor.setValue(this.model.toJSON().file_string);

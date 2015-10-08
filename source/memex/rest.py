@@ -81,7 +81,7 @@ class SeedsListSerializer(SlugModelSerializer):
             except ValidationError:
                 errors.append(x)
         if errors:
-            raise serializers.ValidationError({"The following urls are invalid": errors})
+            raise serializers.ValidationError(errors)
         return value
 
     class Meta:
