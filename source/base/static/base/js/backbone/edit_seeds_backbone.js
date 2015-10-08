@@ -21,18 +21,22 @@
       this.editor = CodeMirror.fromTextArea(document.getElementById("id_seeds"), {
         lineNumbers: true
       });
+      this.editor.setSize("100%", 1000);
       this.loadSeeds();
     },
     editSeeds: function(event){
       var that = this;
       event.preventDefault();
-      var newSeeds = JSON.stringify($("#id_seeds").val().replace("\r", "").split("\n"))
-      this.model.set("seeds", newSeeds);
-      this.model.save({
-        success: function(){
-          alert("Success!")
-        }
-      })
+      var save = confirm("Save this seeds list?");
+      if(save == true){
+        var newSeeds = JSON.stringify($("#id_seeds").val().replace("\r", "").split("\n"))
+        this.model.set("seeds", newSeeds);
+        this.model.save({
+          success: function(){
+            alert("Success!")
+          }
+        });
+      }
     },
     loadSeeds: function(){
       this.editor.setValue(this.model.toJSON().file_string);
