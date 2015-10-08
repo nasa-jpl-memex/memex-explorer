@@ -7,7 +7,7 @@
     initialize: function(model){
       this.model = model;
       var that = this;
-      this.model.fetch({
+      this.model.set({id: $("#seeds_pk").val()}).fetch({
         success: function(){
           that.render();
           that.setEditor();
@@ -28,6 +28,11 @@
       event.preventDefault();
       var newSeeds = JSON.stringify($("#id_seeds").val().replace("\r", "").split("\n"))
       this.model.set("seeds", newSeeds);
+      this.model.save({
+        success: function(){
+          alert("Success!")
+        }
+      })
     },
     loadSeeds: function(){
       this.editor.setValue(this.model.toJSON().file_string);
@@ -45,8 +50,6 @@
     },
     index: function(){
       var seedsList = new Seeds.Seeds();
-      var seedsListPk = $("#seeds_pk").val();
-      seedsList.urlRoot = seedsList.urlRoot + seedsListPk + "/";
       var seedsView = new EditSeedsView(seedsList);
     },
   });
