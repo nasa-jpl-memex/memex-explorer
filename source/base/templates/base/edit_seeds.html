@@ -4,8 +4,13 @@
 
 {% load static %}
 
+{% block extrahead %}
+    <link href="{% static 'base/css/codemirror.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block extrafooter %}
     <script src="{% static 'base/js/ajax.js' %}"></script>
+    <script src="{% static 'base/js/codemirror.js' %}"></script>
     <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
     <script src="{% static 'base/js/backbone/seeds.js' %}"></script>
     <script src="{% static 'base/js/backbone/edit_seeds_backbone.js' %}"></script>
@@ -24,6 +29,9 @@
     <h1>{{ seedslist.name }}</h1>
     <div id="seeds"></div>
   </div>
+<script>
+
+</script>
 
 </div>
 {% include "base/underscore_templates/underscore_templates.html" %}
