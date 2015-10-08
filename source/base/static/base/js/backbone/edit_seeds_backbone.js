@@ -31,10 +31,13 @@
       if(save == true){
         var newSeeds = JSON.stringify($("#id_seeds").val().replace("\r", "").split("\n"))
         this.model.set("seeds", newSeeds);
-        this.model.save({
-          success: function(){
-            alert("Success!")
-          }
+        this.model.save({}, {
+          success: function(response){
+            console.log("Success!")
+          },
+          error: function(model, xhr, thrownError){
+            console.log(xhr);
+          },
         });
       }
     },

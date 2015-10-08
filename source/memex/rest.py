@@ -74,11 +74,14 @@ class SeedsListSerializer(SlugModelSerializer):
         if type(seeds) != list:
             raise serializers.ValidationError("Seeds must be an array of URLs.")
         validator = URLValidator()
+        errors = []
         for x in seeds:
             try:
                 validator(x)
             except ValidationError:
-                raise serializers.ValidationError("Seeds must be valid URLs.")
+                errors.append(x)
+        if errors:
+            raise serializers.ValidationError({"The following urls are invalid": errors})
         return value
 
     class Meta:
