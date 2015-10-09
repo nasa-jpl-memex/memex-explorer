@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import shutil
+import json
 
 # Test
 from memex.test_utils.unit_test_utils import UnitTestSkeleton, form_errors, get_object
@@ -10,7 +11,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 # App
 from apps.crawl_space.models import Crawl, CrawlModel
-from base.models import Project, alphanumeric_validator
+from base.models import Project, SeedsList, alphanumeric_validator
 
 from apps.crawl_space.models import Crawl
 from apps.crawl_space.viz.plot import AcheDashboard
@@ -29,8 +30,23 @@ class TestPlots(UnitTestSkeleton):
 
         cls.test_project = Project(
             name = "Test Project",
-            description = "Test Project Description")
+            description = "Test Project Description"
+        )
         cls.test_project.save()
+
+        cls.test_seeds_list = SeedsList(
+            name = "Test Seeds New",
+            seeds = json.dumps([
+                "http://www.reddit.com/r/aww",
+                "http://gizmodo.com/of-course-japan-has-an-island-where-cats-outnumber-peop-1695365964",
+                "http://en.wikipedia.org/wiki/Cat",
+                "http://www.catchannel.com/",
+                "http://mashable.com/category/cats/",
+                "http://www.huffingtonpost.com/news/cats/",
+                "http://www.lolcats.com/"
+            ]),
+        )
+        cls.test_seeds_list.save()
 
         cls.test_crawlmodel = CrawlModel(
             name = "Test Model",
@@ -45,7 +61,7 @@ class TestPlots(UnitTestSkeleton):
             description = "Test Crawl Description",
             crawler = "ache",
             config = "config_default",
-            seeds_list = cls.get_seeds(),
+            seeds_object = cls.test_seeds_list,
             project = cls.test_project,
             crawl_model = cls.test_crawlmodel,
         )
