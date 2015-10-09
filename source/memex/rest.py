@@ -75,11 +75,13 @@ class SeedsListSerializer(SlugModelSerializer):
             raise serializers.ValidationError("Seeds must be an array of URLs.")
         validator = URLValidator()
         errors = []
-        for x in seeds:
+        for index, x in enumerate(seeds):
             try:
                 validator(x)
             except ValidationError:
-                errors.append(x)
+                # Add index to make it easier for CodeMirror to select the right
+                # line.
+                errors.append({index: x})
         if errors:
             raise serializers.ValidationError(errors)
         return value

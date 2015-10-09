@@ -3,6 +3,7 @@
   var EditSeedsView = Backbone.View.extend({
     el: "#seeds",
     form: "#editSeedsForm",
+    invalidLines: [],
     template: _.template($("#editSeedsTemplate").html()),
     initialize: function(model){
       this.model = model;
@@ -22,7 +23,6 @@
         lineNumbers: true
       });
       this.editor.setSize("100%", 1000);
-      window.editor = this.editor;
       this.loadSeeds();
     },
     editSeeds: function(event){
@@ -33,18 +33,32 @@
         var newSeeds = JSON.stringify($("#id_seeds").val().replace("\r", "").split("\n"))
         this.model.set("seeds", newSeeds);
         this.model.save({}, {
+          beforeSend: function(){
+            that.clearErrors();
+          },
           success: function(response){
             console.log("Success!")
           },
           error: function(model, xhr, thrownError){
-            // that.displayErrors(xhr.responseJSON);
+            that.displayErrors(xhr.responseJSON);
           },
         });
       }
     },
     displayErrors: function(errors){
-      this.editor.doc.eachLine(function(line){
+      var that = this;
+      _.each(errors["seeds"], function(seed){
+        line = that.editor.getLineHandle(Object.keys(seed));
+        that.invalidLines.push(line);
+        that.editor.doc.addLineClass(line, 'background', 'line-error');
       });
+    },
+    clearErrors: function(){
+      var that = this;
+      _.each(this.invalidLines, function(line){
+        that.editor.doc.removeLineClass(line, 'background', 'line-error');
+      });
+      this.invalidLines = []
     },
     loadSeeds: function(){
       this.editor.setValue(this.model.toJSON().file_string);
