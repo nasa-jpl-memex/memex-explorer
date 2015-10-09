@@ -18,7 +18,6 @@ dependencies:
     - gunicorn
     - pytest
     - pip
-    - sphinx
     - jinja2
     - redis-py
     - nodejs
