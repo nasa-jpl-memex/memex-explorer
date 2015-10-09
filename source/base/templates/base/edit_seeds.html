@@ -24,6 +24,18 @@
       <li><a href="/seeds"> / Seeds / </a></li> {{ seedslist.name }}
     </ol>
   </div>
+  <div class="col-sm-5 col-sm-offset-4 col-md-5 col-md-offset-4">
+    <div id="seedsSuccess" class="alert alert-success alert-dismissible" role="alert" hidden>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      Seeds list successfully saved.
+    </div>
+  </div>
+  <div class="col-sm-5 col-sm-offset-4 col-md-5 col-md-offset-4">
+    <div id="seedsFailure" class="alert alert-danger alert-dismissible" role="alert" hidden>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      There were invalid URLs in your seeds list.
+    </div>
+  </div>
   <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1">
     <input id="seeds_pk" type="hidden" value="{{ seedslist.id }}">
     <div id="seeds"></div>

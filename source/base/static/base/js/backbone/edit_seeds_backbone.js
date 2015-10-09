@@ -35,9 +35,11 @@
         this.model.save({}, {
           beforeSend: function(){
             that.clearErrors();
+            $("#seedsSuccess").hide();
+            $("#seedsFailure").hide();
           },
           success: function(response){
-            console.log("Success!")
+            $("#seedsSuccess").show();
           },
           error: function(model, xhr, thrownError){
             that.displayErrors(xhr.responseJSON);
@@ -52,6 +54,7 @@
         that.invalidLines.push(line);
         that.editor.doc.addLineClass(line, 'background', 'line-error');
       });
+      $("#seedsFailure").show()
     },
     clearErrors: function(){
       var that = this;
