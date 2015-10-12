@@ -97,7 +97,7 @@
       // change focus back to the add crawl modal after the form has been closed
       // or submitted.
       $(this.modal).on('hidden.bs.modal', function(event){
-        if ($("#addCrawlModal").attr("aria-hidden") == "false"){
+        if ($("#addCrawlModal").attr("aria-hidden") == "true"){
           $("body").addClass("modal-open");
         }
       });

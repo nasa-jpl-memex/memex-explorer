@@ -70,7 +70,6 @@
               </div>
             </div>
 
-            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add a new Dataset</a>
             {% if "ddt" in settings.READY_EXTERNAL_APPS %}
             <a class="btn btn-default btn-duo center link-button" href={{settings.EXTERNAL_APP_LOCATIONS.ddt}}>Domain Discovery </a>
             {% endif %}
@@ -79,38 +78,14 @@
             href="tad">Temporal Anomalies </a>
             {% endif %}
 
-            <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#crawlModelModal">
-             ADD CRAWL MODEL
-            </button>
-            <div class="modal fade" id="crawlModelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Add Crawl Model</h4>
-                  </div>
-                  <div class="modal-body" id="addCrawlModelContainer"></div>
-                </div>
-              </div>
-            </div>
 
-            <div class="modal fade" id="newSeedsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel">Add Seeds</h4>
-                        </div>
-                        <div class="modal-body" id="addSeedsContainer"></div>
-                    </div>
-                </div>
-            </div>
     </div>
 
     <div id="crawlTableDiv" class="row"></div>
     <hr/>
 
     <div class="row">
+            <a target="_blank" class="add_index btn btn-default btn-duo center link-button" href="{% url 'base:add_index' project_slug=project.slug %}">Add a new Dataset</a>
       <h4 style="line-height:2em;">
           <i class="fa fa-archive"> &nbsp; </i>Datasets
         </a>
@@ -160,8 +135,37 @@
     </div>
     <hr/>
 
-    <div id="crawlModelTableDiv" class="row"></div>
+    <div class="row">
+                  <button type="button" class="btn btn-default btn-duo center link-button" data-toggle="modal" data-target="#crawlModelModal">
+             ADD CRAWL MODEL
+            </button>
+            <div class="modal fade" id="crawlModelModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Add Crawl Model</h4>
+                  </div>
+                  <div class="modal-body" id="addCrawlModelContainer"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal fade" id="newSeedsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Add Seeds</h4>
+                        </div>
+                        <div class="modal-body" id="addSeedsContainer"></div>
+                    </div>
+                </div>
+            </div>
+    <div id="crawlModelTableDiv">
     </div>
+    </div>
+  </div>
   </div>
 {% include "base/underscore_templates/underscore_templates.html" %}
 {% include "base/underscore_templates/seeds_underscore.html" %}
