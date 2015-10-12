@@ -104,4 +104,4 @@ class TestSeedsListREST(APITestCase):
     def test_not_url(self):
         response = self.client.patch(self.url + "%d/" % self.test_seeds.id,
             {"seeds": json.dumps(["a", "b"])}, format="json")
-        assert json.loads(response.content)["seeds"] == [{'0': "a"}, {'1': "b"}]
+        assert json.loads(response.content)["seeds"] == ["The seeds list contains invalid urls.", {'0': "a"}, {'1': "b"}]

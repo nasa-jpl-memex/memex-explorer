@@ -83,6 +83,7 @@ class SeedsListSerializer(SlugModelSerializer):
                 # line.
                 errors.append({index: x})
         if errors:
+            errors.insert(0, "The seeds list contains invalid urls.")
             raise serializers.ValidationError(errors)
         return value
 

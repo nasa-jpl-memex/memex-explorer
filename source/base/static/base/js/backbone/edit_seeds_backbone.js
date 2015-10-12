@@ -48,8 +48,13 @@
       }
     },
     displayErrors: function(errors){
+      this.errors = errors["seeds"];
       var that = this;
-      _.each(errors["seeds"], function(seed){
+      _.each(this.errors, function(seed){
+        // Skip the initial error message.
+        if(that.errors.indexOf(seed) == 0){
+          return;
+        }
         line = that.editor.getLineHandle(Object.keys(seed));
         that.invalidLines.push(line);
         that.editor.doc.addLineClass(line, 'background', 'line-error');
