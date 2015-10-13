@@ -285,6 +285,16 @@ class DeleteIndexView(SuccessMessageMixin, ProjectObjectMixin, DeleteView):
 class SeedsListView(TemplateView):
     template_name = "base/seeds_list.html"
 
+    def get(self, request, *args, **kwargs):
+        if not request.GET:
+            return super(SeedsListView, self).get(request, *args, **kwargs)
+        elif request.GET.get("request", False) == 'seeds':
+            seeds_object = SeedsList.objects.get(pk=request.GET.get("id"))
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=seeds_list.txt'
+            response.write(''.join(seeds_object.file_string))
+            return response
+
 
 class EditSeedsView(DetailView):
     model = SeedsList

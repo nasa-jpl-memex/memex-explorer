@@ -43,25 +43,40 @@
   </form>
 </script>
 
+
 <script type="text/template" id="seedsItem">
     <div class="col-lg-2 col-md-3 seeds-tab">
-        <div class="panel panel-project">
+        <div class="panel panel-seeds">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-md-9 color-set seeds-margin">
+                    <div class="col-md-12 color-set seeds-margin">
                         <a href="<%= url %>" class="create-seeds"><%= name %></a>
                     </div>
-                    <div class="col-md-3 color-set">
-                        <form id="delete_seeds_<%= id %>" action="" method="post">
-                          {% csrf_token %}
-                          <a href="#"><button class="fa fa-trash no-style-btn delete-seeds" type="submit"></button></a>
-                        </form>
-                    </div>
+
                 </div>
+            </div>
+            <div class="panel-footer seeds-buttons">
+                <div class="col-md-6 color-set">
+                    <form method="get" style="display:inline;">
+                        <input type="hidden" name="request" value="seeds">
+                        <input type="hidden" name="id" value="<%= id %>">
+                        <button title="Get Seeds List" id="getInitialSeeds" class="fa fa-download no-style-btn download-seeds"
+                        data-container="body" data-toggle="tooltip" data-placement="bottom">
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6 color-set">
+                    <form id="delete_seeds_<%= id %>" action="" method="post">
+                      {% csrf_token %}
+                      <a href="#"><button class="fa fa-trash no-style-btn delete-seeds" type="submit"></button></a>
+                    </form>
+                </div>
+                <div class="clearfix"></div>
             </div>
         </div>
     </div>
 </script>
+
 
 <script type="text/template" id="crawlFormSeeds">
     <option value="<%= id %>"><%= name %></option>
