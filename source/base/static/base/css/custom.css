@@ -214,3 +214,9 @@ a:hover .fa {
 .line-error{
   background-color:#FF8F8D;
 }
+
+#textseeds_editor {
+  border: 1px solid #ccc;
+  padding: 1px;
+  border-radius: 4px;
+}

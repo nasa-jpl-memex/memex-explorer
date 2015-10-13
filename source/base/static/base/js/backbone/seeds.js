@@ -77,6 +77,10 @@
     initialize: function(collection){
       this.collection = collection;
       this.render();
+      this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
+        lineNumbers: false,
+      });
+      this.editor.setSize("100%", 400);
     },
     render: function(){
       this.$el.html(this.template());
