@@ -39,7 +39,7 @@
         <div class="col-md-2">
             <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
         </div>
-     </div>
+      </div>
   </form>
 </script>
 
@@ -49,7 +49,7 @@
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-md-9 color-set seeds-margin">
-                        <p><%= name %></p>
+                        <a href="<%= url %>" class="create-seeds"><%= name %></a>
                     </div>
                     <div class="col-md-3 color-set">
                         <form id="delete_seeds_<%= id %>" action="" method="post">
@@ -65,4 +65,27 @@
 
 <script type="text/template" id="crawlFormSeeds">
     <option value="<%= id %>"><%= name %></option>
+</script>
+
+
+<script type="text/template" id="editSeedsTemplate">
+  <form id="editSeedsForm" method="post">
+      {% csrf_token %}
+      <div class="form-actions row">
+        <div class="col-md-6">
+          <h1>Edit: {{ seedslist.name }}</h1>
+        </div>
+        <div class="col-md-6">
+            <input type="submit" name="submit" value="Save" class="btn btn-primary save-seeds" id="submit-id-submit" />
+            <button type="button" id="reset" class="btn btn-primary save-seeds">Reset</button>
+        </div>
+     </div>
+      <div id="div_id_textseeds" class="form-group">
+        <label for="id_textseeds" class="control-label">
+        </label>
+        <div class="controls ">
+          <textarea id="id_seeds" name="seeds"></textarea>
+        </div>
+      </div>
+  </form>
 </script>

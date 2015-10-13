@@ -50,6 +50,21 @@
   color:#afc2d3;
 }
 
+.create-seeds {
+  color:#f5f5f5;
+  font-size:20px;
+}
+
+.create-seeds:hover {
+  color:#afc2d3;
+}
+
+.save-seeds{
+  margin-top:25px;
+  margin-bottom:10px !important;
+  float:right;
+}
+
 .color-set {
   color:white;
 }
@@ -183,4 +198,8 @@ a:hover .fa {
 .no-style-btn{
   border:0;
   background:transparent;
+}
+
+.line-error{
+  background-color:#FF8F8D;
 }

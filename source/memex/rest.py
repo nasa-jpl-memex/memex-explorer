@@ -63,6 +63,8 @@ class CrawlModelSerializer(SlugModelSerializer):
 
 
 class SeedsListSerializer(SlugModelSerializer):
+    url = serializers.CharField(read_only=True)
+    file_string = serializers.CharField(read_only=True)
 
     def validate_seeds(self, value):
         try:
@@ -72,11 +74,17 @@ class SeedsListSerializer(SlugModelSerializer):
         if type(seeds) != list:
             raise serializers.ValidationError("Seeds must be an array of URLs.")
         validator = URLValidator()
-        for x in seeds:
+        errors = []
+        for index, x in enumerate(seeds):
             try:
                 validator(x)
             except ValidationError:
-                raise serializers.ValidationError("Seeds must be valid URLs.")
+                # Add index to make it easier for CodeMirror to select the right
+                # line.
+                errors.append({index: x})
+        if errors:
+            errors.insert(0, "The seeds list contains invalid urls.")
+            raise serializers.ValidationError(errors)
         return value
 
     class Meta:

@@ -8,7 +8,6 @@ python:
 branches:
     only:
         - master
-        - dockerize
 
 before_install:
   - "export DISPLAY=:99.0"
