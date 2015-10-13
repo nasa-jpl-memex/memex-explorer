@@ -43,6 +43,7 @@
   </form>
 </script>
 
+
 <script type="text/template" id="seedsItem">
     <div class="col-lg-2 col-md-3 seeds-tab">
         <div class="panel panel-seeds">
@@ -56,7 +57,13 @@
             </div>
             <div class="panel-footer seeds-buttons">
                 <div class="col-md-6 color-set">
-                    <button class="fa fa-download no-style-btn download-seeds"></button>
+                    <form method="get" style="display:inline;">
+                        <input type="hidden" name="request" value="seeds">
+                        <input type="hidden" name="id" value="<%= id %>">
+                        <button title="Get Seeds List" id="getInitialSeeds" class="fa fa-download no-style-btn download-seeds"
+                        data-container="body" data-toggle="tooltip" data-placement="bottom">
+                        </button>
+                    </form>
                 </div>
                 <div class="col-md-6 color-set">
                     <form id="delete_seeds_<%= id %>" action="" method="post">
@@ -69,6 +76,7 @@
         </div>
     </div>
 </script>
+
 
 <script type="text/template" id="crawlFormSeeds">
     <option value="<%= id %>"><%= name %></option>
