@@ -98,9 +98,9 @@ def get_seeds_upload_path(instance, filename):
     https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing
     """
     if instance.crawler == "nutch":
-        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds", "seeds")
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.slug, "seeds", "seeds")
     elif instance.crawler == "ache":
-        seeds_list_path = os.path.join(CRAWL_PATH, instance.name, "seeds")
+        seeds_list_path = os.path.join(CRAWL_PATH, instance.slug, "seeds")
     return seeds_list_path
 
 
