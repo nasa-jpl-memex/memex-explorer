@@ -125,13 +125,14 @@
       var that = this;
       _.each(this.errors, function(seed){
         // Skip the initial error message.
-        if((that.errors.indexOf(seed) == 0) || (that.errors.indexOf(seed) == that.errors[that.errors.length - 1])){
+        if((that.errors.indexOf(seed) == 0) || (that.errors.indexOf(seed) == that.errors.length - 1)){
           return;
         }
         line = that.editor.getLineHandle(Object.keys(seed));
         that.invalidLines.push(line);
         that.editor.doc.addLineClass(line, 'background', 'line-error');
       });
+      this.clearFileInput();
     },
     clearLineErrors: function(){
       var that = this;
@@ -143,6 +144,10 @@
     events: {
       "submit #addSeedsForm": "addSeeds",
     },
+    clearFileInput: function(){
+      var file = $("#id_seeds");
+      file.replaceWith(file = file.clone( true ));
+    }
   });
 
 })(this.Seeds = {});
