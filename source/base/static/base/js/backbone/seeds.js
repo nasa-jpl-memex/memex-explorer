@@ -121,6 +121,7 @@
     },
     showLineErrors: function(errors){
       this.errors = errors["seeds"];
+      $("#textseeds_label").html("");
       this.editor.setValue(this.errors[this.errors.length - 1]["list"]);
       var that = this;
       _.each(this.errors, function(seed){
@@ -136,6 +137,7 @@
     },
     clearLineErrors: function(){
       var that = this;
+      $("#textseeds_label").html("Or, paste urls to crawl.");
       _.each(this.invalidLines, function(line){
         that.editor.doc.removeLineClass(line, 'background', 'line-error');
       });
