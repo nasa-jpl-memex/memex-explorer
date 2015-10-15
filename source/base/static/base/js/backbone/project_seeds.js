@@ -46,15 +46,20 @@
       newSeeds.save({}, {
         data: formObjects,
         contentType: false,
+        beforeSend: function(){
+          that.clearLineErrors();
+        },
         success: function(response){
           var newSeeds = new exports.SeedsFormItem(
             that.collection.models[that.collection.models.length - 1]
           );
           that.formSuccess(that.modal, that.form);
           that.clearErrors(that.formFields, that.form);
+          that.clearLineErrors(xhr.responseJSON, that.form);
         },
         error: function(model, xhr, thrownError){
           that.showFormErrors(xhr.responseJSON, that.form);
+          that.showLineErrors(xhr.responseJSON, that.form);
         },
       });
     },

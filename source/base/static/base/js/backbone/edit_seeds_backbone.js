@@ -42,17 +42,17 @@
             $("#seedsSuccess").show();
           },
           error: function(model, xhr, thrownError){
-            that.displayErrors(xhr.responseJSON);
+            that.showLineErrors(xhr.responseJSON);
           },
         });
       }
     },
-    displayErrors: function(errors){
+    showLineErrors: function(errors){
       this.errors = errors["seeds"];
       var that = this;
       _.each(this.errors, function(seed){
         // Skip the initial error message.
-        if(that.errors.indexOf(seed) == 0){
+        if((that.errors.indexOf(seed) == 0) || (that.errors.indexOf(seed) == that.errors.length - 1)){
           return;
         }
         line = that.editor.getLineHandle(Object.keys(seed));

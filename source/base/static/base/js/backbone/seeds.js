@@ -73,10 +73,15 @@
       "name",
       "seeds",
     ],
+    invalidLines: [],
     template: _.template($("#addSeedsTemplate").html()),
     initialize: function(collection){
       this.collection = collection;
       this.render();
+      this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
+        lineNumbers: false,
+      });
+      this.editor.setSize("100%", 400);
     },
     render: function(){
       this.$el.html(this.template());
@@ -98,6 +103,9 @@
       newSeeds.save({}, {
         data: formObjects,
         contentType: false,
+        beforeSend: function(){
+          that.clearLineErrors();
+        },
         success: function(response){
           var newSeeds = new exports.SeedsView(
             that.collection.models[that.collection.models.length - 1]
@@ -107,12 +115,41 @@
         },
         error: function(model, xhr, thrownError){
           that.showFormErrors(xhr.responseJSON, that.form);
+          that.showLineErrors(xhr.responseJSON, that.form);
         },
       });
+    },
+    showLineErrors: function(errors){
+      this.errors = errors["seeds"];
+      $("#textseeds_label").html("");
+      this.editor.setValue(this.errors[this.errors.length - 1]["list"]);
+      var that = this;
+      _.each(this.errors, function(seed){
+        // Skip the initial error message.
+        if((that.errors.indexOf(seed) == 0) || (that.errors.indexOf(seed) == that.errors.length - 1)){
+          return;
+        }
+        line = that.editor.getLineHandle(Object.keys(seed));
+        that.invalidLines.push(line);
+        that.editor.doc.addLineClass(line, 'background', 'line-error');
+      });
+      this.clearFileInput();
+    },
+    clearLineErrors: function(){
+      var that = this;
+      $("#textseeds_label").html("Or, paste urls to crawl.");
+      _.each(this.invalidLines, function(line){
+        that.editor.doc.removeLineClass(line, 'background', 'line-error');
+      });
+      this.invalidLines = []
     },
     events: {
       "submit #addSeedsForm": "addSeeds",
     },
+    clearFileInput: function(){
+      var file = $("#id_seeds");
+      file.replaceWith(file = file.clone( true ));
+    }
   });
 
 })(this.Seeds = {});
