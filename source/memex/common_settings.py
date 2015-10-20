@@ -148,8 +148,6 @@ EXTERNAL_APPS = {'celery',
                  'ddt',
                  'elasticsearch',
                  'kibana',
-                 'logio-harvester',
-                 'logio-server',
                  'redis',
                  'tad',
                  'tika'}

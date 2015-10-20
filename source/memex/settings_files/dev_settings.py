@@ -27,5 +27,4 @@ EXTERNAL_APP_LOCATIONS = {
     'ddt': 'http://localhost:8084',
     'tad': 'http://localhost:5000',
     'kibana': 'http://localhost:5601',
-    'logio': 'http://localhost:28778',
 }

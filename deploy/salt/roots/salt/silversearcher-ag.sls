@@ -1,3 +1,0 @@
-silversearcher-ag:
-  pkg:
-    - installed

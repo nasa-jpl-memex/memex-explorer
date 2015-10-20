@@ -1,3 +1,0 @@
-tig:
-  pkg:
-    - installed

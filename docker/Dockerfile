@@ -49,7 +49,6 @@ WORKDIR /home/explorer/memex-explorer/source
 ENV PATH /home/explorer/miniconda/envs/memex/bin:$PATH
 ENV CONDA_DEFAULT_ENV memex
 ENV CONDA_ENV_PATH /home/explorer/miniconda
-RUN npm install -g log.io
 RUN python manage.py migrate
 
 WORKDIR /home/explorer/memex-explorer/deploy

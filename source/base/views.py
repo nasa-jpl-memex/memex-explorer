@@ -41,7 +41,6 @@ def project_context_processor(request):
         'projects': Project.objects.all(),
         'settings': settings,
         'deployment': settings.DEPLOYMENT,
-        'logio': settings.EXTERNAL_APP_LOCATIONS["logio"],
         'kibana': settings.EXTERNAL_APP_LOCATIONS["kibana"],
     }
     return additional_context
