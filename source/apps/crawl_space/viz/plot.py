@@ -1,15 +1,9 @@
-import os
 from StringIO import StringIO
 
-from abc import ABCMeta, abstractmethod
-
-from bokeh.models import ColumnDataSource
-from bokeh.plotting import Document, Session
 import pandas as pd
 
 from harvest import Harvest
 from domain import Domain
-from apps.crawl_space.settings import CRAWL_PATH
 
 
 class PlotsNotReadyException(Exception):
@@ -26,6 +20,7 @@ class AcheDashboard(object):
         self.domain = Domain(crawl)
 
     def get_harvest_plot(self):
+        # TODO: Remove Pokemon exception catching
         try:
             script, div = self.harvest.create()
         except:
@@ -33,6 +28,7 @@ class AcheDashboard(object):
         return [script, div]
 
     def get_domain_plot(self):
+        # TODO: Remove Pokemon exception catching
         try:
             script, div = self.domain.create()
         except Exception:

@@ -3,12 +3,12 @@
 {% block title %}Crawl {{ crawl.name }}{% endblock %}
 
 {% block extrahead %}
-  <link href="{% static 'base/css/bokeh.min.css' %}" rel="stylesheet">
+    <link href="{% static 'base/css/bokeh.min.css' %}" rel="stylesheet">
+    <script src="{% static 'base/js/bokeh.min.js' %}"></script>
 {% endblock %}
 
 {% block extrafooter %}
     <script src="{% static 'base/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'base/js/bokeh.min.js' %}"></script>
     <script src="{% static 'base/js/ajax.js' %}"></script>
     <script src="{% static 'base/js/crawl_statuses.js' %}"></script>
     <script src="{% static 'base/js/crawl.js' %}"></script>

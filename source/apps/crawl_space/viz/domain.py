@@ -4,18 +4,17 @@ Generate a bar chart of number of pages crawled in each domain.
 from __future__ import division
 
 import pandas as pd
-from blaze import *
-from bokeh.plotting import *
+import os
+from blaze import into
+from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.resources import INLINE
-from bokeh.models import ColumnDataSource, DataRange1d, FactorRange
+from bokeh.models import ColumnDataSource, Range1d, FactorRange
 from tld import get_tld
 import traceback
 import subprocess
 import shlex
 from StringIO import StringIO
-
-from apps.crawl_space.settings import CRAWL_PATH
 
 
 GREEN = "#47a838"
@@ -80,26 +79,26 @@ class Domain(object):
         return stdout
 
     def create(self):
-
         self.source = self.update_source()
 
-        xdr = DataRange1d(sources=[self.source.columns("crawled")])
+        max_data = max(max(self.source.data['relevant']), max(self.source.data['crawled']))
+        xdr = Range1d(start=0, end=max_data)
 
         p = figure(plot_width=400, plot_height=400,
-            title="Domains Sorted by %s" % self.sort, x_range = xdr,
-            y_range = FactorRange(factors=self.source.data['domain']),
-            tools='reset, resize, save')
+                   title="Domains Sorted by %s" % self.sort, x_range = xdr,
+                   y_range = FactorRange(factors=self.source.data['domain']),
+                   tools='reset, resize, save')
 
-        p.rect(y='domain', x='crawled_half', height=0.75, width='crawled',
-               color=DARK_GRAY, source = self.source, legend="crawled")
-        p.rect(y='domain', x='relevant_half', height=0.75, width='relevant',
-               color=GREEN, source = self.source, legend="relevant")
+        p.rect(y='domain', x='crawled_half', width="crawled", height=0.75,
+               color=DARK_GRAY, source =self.source, legend="crawled")
+        p.rect(y='domain', x='relevant_half', width="relevant", height=0.75,
+               color=GREEN, source =self.source, legend="relevant")
 
         p.ygrid.grid_line_color = None
         p.xgrid.grid_line_color = '#8592A0'
         p.axis.major_label_text_font_size = "8pt"
 
-        script, div = components(p, INLINE)
+        script, div = components(p)
 
         if os.path.exists(self.crawled_data) and os.path.exists(self.relevant_data):
             return (script, div)
