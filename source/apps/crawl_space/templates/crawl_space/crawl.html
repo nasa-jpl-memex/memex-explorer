@@ -15,11 +15,6 @@
 {% endblock %}
 
 {% block content %}
-{% if scripts %}
-    {% for script in scripts %}
-        {{ script | safe }}
-    {% endfor %}
-{% endif %}
 
 {% include "base/sidebar.html" %}
 
@@ -141,7 +136,7 @@
     </div>
   </div>
 </div>
-{% if crawl.crawler == "ache" %}
+{% if crawl.crawler == "ache" or crawl.crawler == "nutch" %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     {% if divs.0 or divs.1 %}
@@ -153,11 +148,18 @@
         </div>
         {% endif %}
         {% endfor %}
-    {% elif crawl.crawler == 'ache' %}
+
+    {% elif crawl.crawler == "ache" %}
       <div class='col-sm-6'>
             <h2>Waiting for plots...</h2>
         </div>
     {% endif %}
+    {% if scripts %}
+        {% for script in scripts %}
+            {{ script | safe }}
+        {% endfor %}
+    {% endif %}
+
   </div>
 </div>
 

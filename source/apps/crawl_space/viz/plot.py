@@ -5,6 +5,7 @@ import pandas as pd
 from harvest import Harvest
 from domain import Domain
 
+from .stream import init_plot
 
 class PlotsNotReadyException(Exception):
     pass
@@ -36,7 +37,7 @@ class AcheDashboard(object):
         return [script, div]
 
     def get_relevant_seeds(self):
-        # Converts stdout to StringIO to allow pandas to read it as a file
+        # Converts string to StringIO to allow pandas to read it as a file
         seeds = pd.read_csv(StringIO(self.domain.get_relevant_data()),
                            delimiter='\t', header=None,
                            names=['url', 'timestamp'])
@@ -50,3 +51,19 @@ class AcheDashboard(object):
             'divs': [domain_plot[1], harvest_plot[1]],
         }
 
+
+class NutchDashboard(object):
+
+    def __init__(self, crawl):
+        self.crawl = crawl
+        if self.crawl.crawler != "nutch":
+            raise ValueError("Crawl must be using the Nutch crawler.")
+
+    # TODO: Replace with real crawl stream monitoring
+    def get_plots(self):
+        # TODO: For simultaneous crawl monitoring need to use unique crawl ids
+        script = init_plot()
+        return {
+            'scripts': [script],
+            'divs': [],
+        }
