@@ -11,7 +11,7 @@ from kombu import Connection
 
 from bokeh.models.glyphs import Segment
 from bokeh.models.markers import Circle
-from bokeh.models import Range1d, FactorRange, ColumnDataSource
+from bokeh.models import Range1d, LinearAxis, ColumnDataSource
 from bokeh.embed import autoload_server
 from bokeh.session import Session
 from bokeh.document import Document
@@ -35,9 +35,12 @@ def init_plot(name='fetcher_log'):
         xdr = Range1d(current, current + 1)
         ydr = ["urls"]
 
+        # styling suggested by Bryan
         plot = figure(title="Crawler Monitor", tools="pan,wheel_zoom,resize,save,hover",
-                      x_axis_type="datetime", x_range=xdr, y_range=ydr,
-                      width=900, height=600)
+                      x_axis_type="datetime", y_axis_location="right", x_range=xdr, y_range=ydr,
+                      width=1200, height=600)
+        plot.toolbar_location = None
+        plot.xgrid.grid_line_color = None
 
     document.add(plot)
     session.store_document(document)
@@ -115,7 +118,7 @@ class NutchUrlTrails:
         """
         print(message.body)
         message = json.loads(message.body)
-        url = NutchUrlTrails.strip_url(message["url"])
+        url = message["url"]
         if message["eventType"] == "START":
             self.open_urls[url] = NutchUrlTrails.jtime_to_datetime(message["timestamp"])
         elif message["eventType"] == "END":
@@ -150,12 +153,14 @@ class NutchUrlTrails:
 
         # For open URLs (not completed fetching), draw a segment from start time to now
         for url, start_t in self.open_urls.items():
+            url = NutchUrlTrails.strip_url(url)
             x0.append(start_t)
             x.append(current_time)
             urls.append(url)
 
         # For closed URLs (completed fetching), draw a segment from start to end time, and a circle as well.
         for url, (start_t, end_t) in self.closed_urls.items():
+            url = NutchUrlTrails.strip_url(url)
             x0.append(start_t)
             x.append(end_t)
             circles.append(end_t)
