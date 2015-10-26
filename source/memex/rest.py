@@ -175,12 +175,17 @@ class SeedsListViewSet(viewsets.ModelViewSet):
 class DataWakeView(APIView):
     index = "datawake"
 
+    def parse_query(self, query):
+        return [x["_source"]["urls"] for x in query["hits"]["hits"]]
+
     def get(self, request, format=None):
         es = Elasticsearch()
+        # TODO: catch all exception. At the very least, deal with 404 not found and
+        # connection refused exceptions.
         try:
-            response = es.search(
-                index=self.index, body={"query": {"match_all": {}}}
-            )["hits"]["hits"]
+            response = self.parse_query(
+                es.search(index=self.index, body={"query": {"match_all": {}}})
+            )
         except Exception:
             response = {}
         return Response(response)
