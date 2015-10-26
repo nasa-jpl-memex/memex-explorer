@@ -12,6 +12,8 @@ from django.core.validators import URLValidator
 from base.models import Project, SeedsList
 from apps.crawl_space.models import Crawl, CrawlModel
 
+from elasticsearch import Elasticsearch
+
 
 class SlugModelSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(required=False, read_only=True)
@@ -171,9 +173,17 @@ class SeedsListViewSet(viewsets.ModelViewSet):
 
 
 class DataWakeView(APIView):
+    index = "datawake"
 
     def get(self, request, format=None):
-        return Response("Potato")
+        es = Elasticsearch()
+        try:
+            response = es.search(
+                index=self.index, body={"query": {"match_all": {}}}
+            )["hits"]["hits"]
+        except Exception:
+            response = {}
+        return Response(response)
 
 
 router = routers.DefaultRouter()
