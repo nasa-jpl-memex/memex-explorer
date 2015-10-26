@@ -2,6 +2,8 @@ import shutil
 import json
 
 from rest_framework import routers, serializers, viewsets, parsers, filters
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
@@ -166,6 +168,12 @@ class SeedsListViewSet(viewsets.ModelViewSet):
             })
         else:
             return super(SeedsListViewSet, self).destroy(request)
+
+
+class DataWakeView(APIView):
+
+    def get(self, request, format=None):
+        return Response("Potato")
 
 
 router = routers.DefaultRouter()
