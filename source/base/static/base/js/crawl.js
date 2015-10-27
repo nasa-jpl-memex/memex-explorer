@@ -30,9 +30,8 @@ $( document ).ready(function() {
   }
 
   function onOffStatus(status){
-  //TODO: @bhard - please help me figure out how to reenable these?
-    //onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
-    //onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+    onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
+    onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
   }
 
   function statusCall(){
