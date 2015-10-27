@@ -12,7 +12,7 @@ dependencies:
     - bokeh=0.10.0
     - blaze=0.8.2
     - python=2.7.8
-    - elasticnutch
+    - elasticnutch>=1.11
     - ache=0.3.0
     - django=1.7.3
     - gunicorn
