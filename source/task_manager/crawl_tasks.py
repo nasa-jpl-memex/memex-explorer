@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import json
 import subprocess
 import os
 import time
@@ -28,9 +29,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     nutch_client = nutch_rest_api.Nutch()
     seed_client = nutch_client.Seeds()
 
-    # TODO: Remove this Shim with Brittain's help
-    seed_urls = open(self.crawl.seeds_list.path).readlines()
-    # END SHIM
+    seed_urls = json.loads(self.crawl.seeds_object.seeds)
     seed = seed_client.create(self.crawl.slug + '_seed', seed_urls)
 
     rest_crawl = nutch_client.Crawl(seed, rounds=self.crawl.rounds_left)
