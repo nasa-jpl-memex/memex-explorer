@@ -17,6 +17,7 @@ from bokeh.session import Session
 from bokeh.document import Document
 
 DEFAULT_NUM_URLS=25
+URL_CHAR_WIDTH=50
 
 
 def init_plot(name='fetcher_log'):
@@ -64,7 +65,7 @@ class NutchUrlTrails:
         :return: The stripped URL
         """
         # TODO: remove protocol-stripping on next Bokeh release
-        return url.replace('https://', '').replace('http://', '').replace(':', '_').replace('-', '_')[:250]
+        return url.replace('https://', '').replace('http://', '').replace(':', '_').replace('-', '_')[:URL_CHAR_WIDTH]
 
     @staticmethod
     def jtime_to_datetime(t):
