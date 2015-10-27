@@ -8,6 +8,8 @@
       seedsCollection = new Seeds.SeedsCollection();
       seedsCollectionView = new Seeds.SeedsCollectionView(seedsCollection);
       addSeedsView = new Seeds.AddSeedsView(seedsCollection);
+      trailsCollection = new Trails.TrailsCollection();
+      trailsCollectionView = new Trails.TrailsCollectionView(trailsCollection);
     },
   });
 

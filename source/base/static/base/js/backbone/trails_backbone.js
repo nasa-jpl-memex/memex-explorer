@@ -1,6 +1,6 @@
-(function(){
+(function(exports){
 
-  var Trail = Backbone.Model.extend({
+  exports.Trail = Backbone.Model.extend({
     urlRoot: "/api/datawake",
     defaults: {
       trail: {},
@@ -11,13 +11,13 @@
   });
 
 
-  var TrailsCollection = Backbone.Collection.extend({
+  exports.TrailsCollection = Backbone.Collection.extend({
     url: "/api/datawake",
-    model: Trail,
+    model: exports.Trail,
   });
 
 
-  var TrailView = Backbone.View.extend({
+  exports.TrailView = Backbone.View.extend({
     initialize: function(){
       null;
     },
@@ -27,8 +27,8 @@
   });
 
 
-  var TrailsCollectionView = BaseViews.CollectionView.extend({
-    modelView: "",
+  exports.TrailsCollectionView = BaseViews.CollectionView.extend({
+    modelView: exports.TrailView,
   });
 
 })(this.Trails = {});
