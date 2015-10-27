@@ -18,11 +18,15 @@
 
 
   exports.TrailView = Backbone.View.extend({
-    initialize: function(){
-      null;
+    el: "trails",
+    template: _.template($("#trailItem").html()),
+    initialize: function(model){
+      var that = this;
+      this.model = model;
+      this.render();
     },
     render: function(){
-      null;
+      this.$el.append(this.template(this.model.toJSON()));
     },
   });
 

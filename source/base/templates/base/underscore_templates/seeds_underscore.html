@@ -3,7 +3,7 @@
       {% csrf_token %}
       <div id="div_id_name" class="form-group">
           <label for="id_name" class="control-label requiredField">
-  			Name<span class="asteriskField">*</span>
+        Name<span class="asteriskField">*</span>
           </label>
           <div class="controls ">
               <input class="textinput textInput form-control" id="id_name" maxlength="64" name="name" type="text" />
@@ -104,4 +104,27 @@
         </div>
       </div>
   </form>
+</script>
+
+
+<script type="text/template" id="trailItem">
+    <div class="col-lg-2 col-md-3 seeds-tab">
+        <div class="panel panel-seeds">
+            <div class="panel-heading">
+                <a href="" class="create-seeds">
+                <div class="row">
+                    <div class="col-md-12 color-set seeds-margin">
+                        <p><%= trail.name %></p>
+                    </div>
+                </div>
+                </a>
+            </div>
+            <div class="panel-footer seeds-buttons">
+                <div class="col-md-6 color-set">
+                  <p>Potato</p>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
 </script>
