@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+
+<configuration>
+
+    <property>
+        <name>http.agent.name</name>
+        <value>Memex Nutch Spider</value>
+    </property>
+
+    <property>
+        <name>plugin.includes</name>
+        <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor)|indexer-elastic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+        <description>Regular expression naming plugin directory names to
+        include.  Any plugin not matching this expression is excluded.
+        In any case you need at least include the nutch-extensionpoints plugin. By
+        default Nutch includes crawling just HTML and plain text via HTTP,
+        and basic indexing and search plugins. In order to use HTTPS please enable
+        protocol-httpclient, but be aware of possible intermittent problems with the
+        underlying commons-httpclient library.
+        </description>
+    </property>
+
+    <property>
+        <name>elastic.host</name>
+        <value>localhost</value>
+        <description>The hostname to send documents to using TransportClient. Either host
+            and port must be defined or cluster.</description>
+    </property>
+
+    <property>
+        <name>elastic.port</name>
+        <value>9300</value>
+        <description>
+        </description>
+    </property>
+
+    <property>
+        <name>elastic.cluster</name>
+        <value>elasticsearch</value>
+        <description>The cluster name to discover. Either host and potr must be defined
+            or cluster.</description>
+    </property>
+
+    <property>
+        <name>elastic.index</name>
+        <value>nutch</value>
+        <description>Default index to send documents to.</description>
+    </property>
+
+    <property>
+        <name>elastic.max.bulk.docs</name>
+        <value>1000</value>
+        <description>Maximum size of the bulk in number of documents.</description>
+    </property>
+
+    <property>
+        <name>elastic.max.bulk.size</name>
+        <value>2500500</value>
+        <description>Maximum size of the bulk in bytes.</description>
+    </property>
+
+    <!-- publisher properties -->
+    <property>
+      <name>publisher.queue.type</name>
+      <value>rabbitmq</value>
+      <description>
+	Choose the type of Queue being used (ex - RabbitMQ, ActiveMq, Kafka, etc). 
+	Currently there exists an implemtation for RabbitMQ producer. 
+      </description>
+    </property>
+
+    <!-- RabbitMQ properties -->
+    <property>
+      <name>rabbitmq.exchange.server</name>
+      <value>fetcher_log</value>
+      <description>
+	Name for the exchange server to use. Default - "fetcher_log"
+      </description>
+    </property>
+    <property>
+      <name>rabbitmq.exchange.type</name>
+      <value>direct</value>
+      <description>
+	There are a few exchange types available: direct, topic, headers and fanout. Default "fanout".
+      </description>
+    </property>
+    <property>
+      <name>rabbitmq.host</name>
+      <value></value>
+      <description>
+	Host on which the RabbitMQ server is running. Default "localhost".
+      </description>
+    </property>
+    <property>
+      <name>rabbitmq.queue.routingkey</name>
+      <value>fetcher_log</value>
+      <description>
+	The routingKey used by publisher to publish messages to specific queues. If the exchange type is "fanout", then this property is ignored. 
+      </description>
+    </property>
+
+    
+</configuration>
