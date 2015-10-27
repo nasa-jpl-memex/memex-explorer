@@ -176,8 +176,12 @@ class DataWakeView(APIView):
     index = "datawake"
 
     def parse_query(self, query):
-        urls = {"urls": [y["url"] for y in [x["_source"]["urls"] for x in query["hits"]["hits"]][0]]}
-        return [query["hits"]["hits"][0], urls]
+        # Iterate over each document.
+        # urls = {"urls": [y["url"] for y in [x["_source"]["urls"] for x in query["hits"]["hits"]][0]]}
+        trails = []
+        for x in query["hits"]["hits"]:
+            trails.append(x)
+        return trails
 
     def get(self, request, format=None):
         es = Elasticsearch()
