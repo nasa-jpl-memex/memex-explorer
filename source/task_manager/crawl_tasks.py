@@ -10,8 +10,12 @@ from django.db import IntegrityError
 
 from task_manager.models import CeleryTask
 import nutch as nutch_rest_api
-
 from apps.crawl_space.viz.stream import NutchUrlTrails
+
+from django.conf import settings
+
+ENABLE_STREAM_VIZ = settings.ENABLE_STREAM_VIZ
+STREAM_UPDATE_PERIOD = 0.1
 
 nutch_path = 'nutch'
 crawl_path = 'crawl'
@@ -34,7 +38,10 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
 
     rest_crawl = nutch_client.Crawl(seed, rounds=self.crawl.rounds_left)
 
-    url_trails = NutchUrlTrails()
+    if ENABLE_STREAM_VIZ:
+        url_trails = NutchUrlTrails()
+    else:
+        url_trails = None
 
     while self.crawl.rounds_left:
         if rest_crawl.currentJob is None:
@@ -42,10 +49,11 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
 
         active_job = rest_crawl.progress(nextRound=False)
         while active_job:
-            time.sleep(0.1)
+            time.sleep(STREAM_UPDATE_PERIOD)
             old_job = active_job
             active_job = rest_crawl.progress(nextRound=False)
-            url_trails.handle_messages()
+            if url_trails:
+                url_trails.handle_messages()
             if active_job and active_job != old_job:
                 self.crawl.status = active_job.info()['type']
                 self.crawl.save()

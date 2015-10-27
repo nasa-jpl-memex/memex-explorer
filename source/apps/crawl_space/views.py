@@ -28,12 +28,14 @@ from apps.crawl_space.utils import touch
 from apps.crawl_space.viz.plot import AcheDashboard, NutchDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 
+
 from task_manager.tika_tasks import create_index
 from task_manager.crawl_tasks import nutch, ache, ache_log_statistics
 
 import celery
 
 from redis.connection import ConnectionError
+
 
 class ProjectObjectMixin(ContextMixin):
 

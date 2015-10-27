@@ -6,6 +6,9 @@ from harvest import Harvest
 from domain import Domain
 
 from .stream import init_plot
+from django.conf import settings
+
+ENABLE_STREAM_VIZ = settings.ENABLE_STREAM_VIZ
 
 class PlotsNotReadyException(Exception):
     pass
@@ -59,10 +62,12 @@ class NutchDashboard(object):
         if self.crawl.crawler != "nutch":
             raise ValueError("Crawl must be using the Nutch crawler.")
 
-    # TODO: Replace with real crawl stream monitoring
     def get_plots(self):
         # TODO: For simultaneous crawl monitoring need to use unique crawl ids
-        script = init_plot()
+        if ENABLE_STREAM_VIZ:
+            script = init_plot()
+        else:
+            script = None
         return {
             'scripts': [script],
             'divs': [],
