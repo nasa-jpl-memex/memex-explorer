@@ -176,11 +176,11 @@ class DataWakeView(APIView):
     index = "datawake"
 
     def parse_query(self, query):
-        # Iterate over each document.
-        # urls = {"urls": [y["url"] for y in [x["_source"]["urls"] for x in query["hits"]["hits"]][0]]}
         trails = []
-        for x in query["hits"]["hits"]:
-            trails.append(x)
+        for index in query["hits"]["hits"]:
+            index = index["_source"]
+            index["urls"] = [x["url"] for x in index["urls"]]
+            trails.append(index)
         return trails
 
     def get(self, request, format=None):
