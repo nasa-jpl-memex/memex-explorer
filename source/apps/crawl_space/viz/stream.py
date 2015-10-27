@@ -36,7 +36,7 @@ def init_plot(name='fetcher_log'):
         ydr = ["urls"]
 
         # styling suggested by Bryan
-        plot = figure(title="Crawler Monitor", tools="pan,wheel_zoom,resize,save,hover",
+        plot = figure(title="Crawler Monitor", tools="hover",
                       x_axis_type="datetime", y_axis_location="right", x_range=xdr, y_range=ydr,
                       width=1200, height=600)
         plot.toolbar_location = None
