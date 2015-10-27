@@ -48,7 +48,7 @@ else
 fi
 
 pushd ${PREFIX}/lib/nutch/
-./bin/nutch \$@
+exec ./bin/nutch \$@
 popd
 EOF
 
@@ -70,7 +70,7 @@ fi
 
 
 pushd ${PREFIX}/lib/nutch/
-./bin/crawl \$@
+exec ./bin/crawl \$@
 popd
 EOF
 
