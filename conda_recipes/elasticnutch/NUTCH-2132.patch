@@ -1,0 +1,438 @@
+diff --git conf/nutch-default.xml conf/nutch-default.xml
+index bf1189a..066c3e3 100644
+--- conf/nutch-default.xml
++++ conf/nutch-default.xml
+@@ -1896,4 +1896,45 @@ CAUTION: Set the parser.timeout to -1 or a bigger value than 30, when using this
+   </description>
+ </property>
+ 
++<!-- publisher properties -->
++<property>
++  <name>publisher.queue.type</name>
++  <value></value>
++  <description>
++    Choose the type of Queue being used (ex - RabbitMQ, ActiveMq, Kafka, etc). 
++    Currently there exists an implemtation for RabbitMQ producer. 
++  </description>
++</property>
++
++<!-- RabbitMQ properties -->
++<property>
++  <name>rabbitmq.exchange.server</name>
++  <value></value>
++  <description>
++    Name for the exchange server to use. Default - "fetcher_log"
++  </description>
++</property>
++<property>
++  <name>rabbitmq.exchange.type</name>
++  <value></value>
++  <description>
++    There are a few exchange types available: direct, topic, headers and fanout. Default "fanout".
++  </description>
++</property>
++<property>
++  <name>rabbitmq.host</name>
++  <value></value>
++  <description>
++    Host on which the RabbitMQ server is running. Default "localhost".
++  </description>
++</property>
++<property>
++  <name>rabbitmq.queue.routingkey</name>
++  <value></value>
++  <description>
++    The routingKey used by publisher to publish messages to specific queues. If the exchange type is "fanout", then this property is ignored. 
++  </description>
++</property>
++
++
+ </configuration>
+diff --git ivy/ivy.xml ivy/ivy.xml
+index 9428fe0..f44c4d4 100644
+--- ivy/ivy.xml
++++ ivy/ivy.xml
+@@ -114,6 +114,9 @@
+     	<dependency org="de.agilecoders.wicket" name="wicket-bootstrap-core" rev="0.9.2" conf="*->default" />
+     	<dependency org="de.agilecoders.wicket" name="wicket-bootstrap-extensions" rev="0.9.2" conf="*->default" />
+ 
++		<!-- Rabbitmq dependencies -->
++		<dependency org="com.rabbitmq" name="amqp-client" rev="3.5.5" conf="*->default" />
++		
+ 		<!--global exclusion -->
+ 		<exclude module="jmxtools" />
+ 		<exclude module="jms" />
+diff --git src/java/org/apache/nutch/fetcher/FetcherThread.java src/java/org/apache/nutch/fetcher/FetcherThread.java
+index 9a482b9..38aa3c1 100644
+--- src/java/org/apache/nutch/fetcher/FetcherThread.java
++++ src/java/org/apache/nutch/fetcher/FetcherThread.java
+@@ -35,6 +35,7 @@ import org.apache.hadoop.util.StringUtils;
+ import org.apache.nutch.crawl.CrawlDatum;
+ import org.apache.nutch.crawl.NutchWritable;
+ import org.apache.nutch.crawl.SignatureFactory;
++import org.apache.nutch.fetcher.FetcherThreadEvent.PublishEventType;
+ import org.apache.nutch.metadata.Metadata;
+ import org.apache.nutch.metadata.Nutch;
+ import org.apache.nutch.net.URLFilterException;
+@@ -128,6 +129,9 @@ public class FetcherThread extends Thread {
+   //Used by the REST service
+   private FetchNode fetchNode;
+   private boolean reportToNutchServer;
++  
++  //Used for publishing events
++  private FetcherThreadPublisher publisher; 
+ 
+   public FetcherThread(Configuration conf, AtomicInteger activeThreads, FetchItemQueues fetchQueues, 
+       QueueFeeder feeder, AtomicInteger spinWaiting, AtomicLong lastRequestStart, Reporter reporter,
+@@ -156,6 +160,7 @@ public class FetcherThread extends Thread {
+     this.storingContent = storingContent;
+     this.pages = pages;
+     this.bytes = bytes;
++    this.publisher = new FetcherThreadPublisher(conf);
+     queueMode = conf.get("fetcher.queue.mode",
+         FetchItemQueues.QUEUE_MODE_HOST);
+     // check that the mode is known
+@@ -239,6 +244,15 @@ public class FetcherThread extends Thread {
+           // fetch the page
+           redirecting = false;
+           redirectCount = 0;
++          
++          //Publisher event
++          FetcherThreadEvent startEvent = new FetcherThreadEvent();
++          startEvent.setEventType(PublishEventType.START);
++          startEvent.setUrl(fit.getUrl().toString());
++          startEvent.setTimestamp(System.currentTimeMillis());
++          publisher.publish(startEvent);
++          
++          
+           do {
+             if (LOG.isInfoEnabled()) {
+               LOG.info("fetching " + fit.url + " (queue crawl delay="
+@@ -303,7 +317,15 @@ public class FetcherThread extends Thread {
+               fetchNode.setFetchTime(System.currentTimeMillis());
+               fetchNode.setUrl(fit.url);
+             }
+-
++            
++            //Publish fetch finish event 
++            FetcherThreadEvent endEvent = new FetcherThreadEvent();
++            endEvent.setEventType(PublishEventType.END);
++            endEvent.setUrl(fit.getUrl().toString());
++            endEvent.setTimestamp(System.currentTimeMillis());
++            endEvent.addEventData("status", status.getName());
++            publisher.publish(endEvent);
++            
+             reporter.incrCounter("FetcherStatus", status.getName(), 1);
+ 
+             switch (status.getCode()) {
+@@ -655,7 +677,21 @@ public class FetcherThread extends Thread {
+             outlinkList.add(links[i]);
+             outlinks.add(toUrl);
+           }
+-
++          
++          //Publish fetch report event 
++          FetcherThreadEvent reportEvent = new FetcherThreadEvent();
++          reportEvent.setEventType(PublishEventType.REPORT);
++          reportEvent.setUrl(url.toString());
++          reportEvent.setTimestamp(System.currentTimeMillis());
++          reportEvent.addOutlinksToEventData(outlinkList);
++          reportEvent.addEventData("title", parseData.getTitle());
++          reportEvent.addEventData("content-type", parseData.getContentMeta().get("content-type"));
++          reportEvent.addEventData("score", datum.getScore());
++          reportEvent.addEventData("fetchTime", datum.getFetchTime());
++          reportEvent.addEventData("content-language", parseData.getContentMeta().get("content-language"));
++          System.out.println(parseData.getContentMeta().names());
++          publisher.publish(reportEvent);
++          
+           // Only process depth N outlinks
+           if (maxOutlinkDepth > 0 && outlinkDepth < maxOutlinkDepth) {
+             reporter.incrCounter("FetcherOutlinks", "outlinks_detected",
+diff --git src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java
+new file mode 100644
+index 0000000..646f6f8
+--- /dev/null
++++ src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java
+@@ -0,0 +1,86 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.fetcher;
++
++import java.io.Serializable;
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.HashMap;
++import java.util.Map;
++
++import org.apache.nutch.parse.Outlink;
++
++/**
++ * This class is used to capture the various events occurring at fetch time. These events are sent to a queue 
++ * implementing the producer
++ * @author Sujen Shah
++ *
++ */
++@SuppressWarnings("serial")
++public class FetcherThreadEvent implements Serializable{
++
++  public static enum PublishEventType {START, END, REPORT}
++
++  private PublishEventType eventType;
++  private Map<String, Object> eventData;
++  private String url; 
++  private Long timestamp; 
++  
++  public PublishEventType getEventType() {
++    return eventType;
++  }
++  public void setEventType(PublishEventType eventType) {
++    this.eventType = eventType;
++  }
++  public Map<String, Object> getEventData() {
++    return eventData;
++  }
++  public void setEventData(Map<String, Object> eventData) {
++    this.eventData = eventData;
++  }
++  public String getUrl() {
++    return url;
++  }
++  public void setUrl(String url) {
++    this.url = url;
++  }
++  
++  public void addEventData(String key, Object value) {
++    if(eventData == null) {
++      eventData = new HashMap<String, Object>();
++    }
++    eventData.put(key, value);
++  }
++  
++  public void addOutlinksToEventData(Collection<Outlink> links) {
++    ArrayList<Map<String, String>> outlinkList = new ArrayList<>();
++    for(Outlink link: links) {
++      Map<String, String> outlink = new HashMap<>();
++      outlink.put("url", link.getToUrl());
++      outlink.put("anchor", link.getAnchor());
++      outlinkList.add(outlink);
++    }
++    this.addEventData("outlinks", outlinkList);
++  }
++  public Long getTimestamp() {
++    return timestamp;
++  }
++  public void setTimestamp(Long timestamp) {
++    this.timestamp = timestamp;
++  }
++
++}
+diff --git src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java
+new file mode 100644
+index 0000000..29d7130
+--- /dev/null
++++ src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java
+@@ -0,0 +1,46 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.fetcher;
++
++import org.apache.hadoop.conf.Configuration;
++import org.apache.nutch.tools.NutchPublisher;
++import org.apache.nutch.tools.RabbitMQPublisher;
++
++/**
++ * This class handles the publishing of the events to the queue implementation. 
++ * @author Sujen Shah
++ *
++ */
++public class FetcherThreadPublisher {
++
++  NutchPublisher publisher;
++  
++  public FetcherThreadPublisher(Configuration conf) { 
++    String publisherImpl = conf.get("publisher.queue.type", "rabbitmq");
++    switch(publisherImpl) {
++    case "rabbitmq":
++      publisher = new RabbitMQPublisher();
++      publisher.setConf(conf);
++      break;
++    }
++  }
++  
++  public void publish(FetcherThreadEvent event) {
++    publisher.publish(event);
++  }
++  
++}
+diff --git src/java/org/apache/nutch/tools/NutchPublisher.java src/java/org/apache/nutch/tools/NutchPublisher.java
+new file mode 100644
+index 0000000..c8a85e5
+--- /dev/null
++++ src/java/org/apache/nutch/tools/NutchPublisher.java
+@@ -0,0 +1,42 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.tools;
++
++import org.apache.hadoop.conf.Configuration;
++
++/**
++ * All publisher subscriber model implementations should implement this interface. 
++ * @author Sujen Shah
++ *
++ */
++public interface NutchPublisher {
++  
++  /**
++   * Use implementation specific configurations
++   * @param conf
++   */
++  public void setConf(Configuration conf);
++  
++  /**
++   * This method publishes the event. Make sure that the event is a Java POJO to avoid 
++   * Jackson JSON conversion errors
++   * @param event
++   */
++  public void publish(Object event);
++  
++
++}
+diff --git src/java/org/apache/nutch/tools/RabbitMQPublisher.java src/java/org/apache/nutch/tools/RabbitMQPublisher.java
+new file mode 100644
+index 0000000..a17d7d7
+--- /dev/null
++++ src/java/org/apache/nutch/tools/RabbitMQPublisher.java
+@@ -0,0 +1,90 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.tools;
++
++import java.io.IOException;
++
++import org.apache.hadoop.conf.Configuration;
++import org.apache.hadoop.util.StringUtils;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import com.fasterxml.jackson.core.JsonProcessingException;
++import com.fasterxml.jackson.databind.ObjectMapper;
++import com.rabbitmq.client.Channel;
++import com.rabbitmq.client.Connection;
++import com.rabbitmq.client.ConnectionFactory;
++
++/**
++ * An implementation of the {@link org.apache.nutch.tools.NutchPublisher} in RabbitMQ
++ * @author Sujen Shah
++ *
++ */
++public class RabbitMQPublisher implements NutchPublisher {
++
++  private static String EXCHANGE_SERVER;
++  private static String EXCHANGE_TYPE;
++  private static String HOST;
++  private static final Logger LOG = LoggerFactory.getLogger(RabbitMQPublisher.class);
++  private static Channel channel;
++  private static String QUEUE_ROUTINGKEY;
++  
++  @Override
++  public void setConf(Configuration conf) {
++    // TODO Auto-generated method stub
++    EXCHANGE_SERVER = conf.get("rabbitmq.exchange.server", "fetcher_log");
++    EXCHANGE_TYPE = conf.get("rabbitmq.exchange.type", "fanout");
++    HOST = conf.get("rabbitmq.host", "localhost");
++    QUEUE_ROUTINGKEY = conf.get("rabbitmq.queue.routingkey", "");
++    
++    ConnectionFactory factory = new ConnectionFactory(); 
++    factory.setHost(HOST);
++    try{
++    Connection connection = factory.newConnection();
++    channel = connection.createChannel();
++    channel.exchangeDeclare(EXCHANGE_SERVER, EXCHANGE_TYPE);
++    }catch(Exception e) {
++      LOG.error("Could not initialize RabbitMQ publisher - {}", StringUtils.stringifyException(e));
++    }
++    LOG.info("Configured RabbitMQ publisher");
++  }
++  
++  @Override
++  public void publish(Object event) {
++    // TODO Auto-generated method stub
++    try {
++      channel.basicPublish(EXCHANGE_SERVER, QUEUE_ROUTINGKEY, null, getJSONString(event).getBytes());
++    } catch (IOException e) {
++      // TODO Auto-generated catch block
++      LOG.error("Error occured while publishing - {}", StringUtils.stringifyException(e));
++    }
++  }
++  
++  private String getJSONString(Object obj) {
++    ObjectMapper mapper = new ObjectMapper();
++    try {
++      return mapper.writeValueAsString(obj);
++    } catch (JsonProcessingException e) {
++      // TODO Auto-generated catch block
++      LOG.error("Error converting event object to JSON String - {}", StringUtils.stringifyException(e));
++    }
++     return null;
++  }
++
++ 
++
++}

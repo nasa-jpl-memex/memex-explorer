@@ -1,0 +1,25 @@
+about: {home: 'http://nutch.apache.org/', license: Apache 2.0 license}
+build:
+  entry_points: []
+  features: []
+  script_env: []
+  string: ''
+  track_features: []
+package: {name: 'elasticnutch', version: '1.11'}
+requirements:
+  build: ['ant']
+  conflicts: []
+  run: []
+source:
+  git_rev: '895ff047d13e4e3fecd99bd62463a67d69545ed9'
+  git_url: https://github.com/apache/nutch.git
+  md5: ''
+  # this doesn't seem to do anything...
+  patches: ['NUTCH-2132.patch']
+  path: ''
+  svn_rev: ''
+test:
+  commands: ['nutch dump -h']
+  files: []
+  imports: []
+  requires: []
