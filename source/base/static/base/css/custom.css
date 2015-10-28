@@ -32,6 +32,19 @@
   border-color: #1D4971;
 }
 
+.panel-trails {
+  background-color:#177134;
+  border: none;
+  margin-top: 20px;
+  box-shadow: 3px 3px 15px #888888;
+}
+
+.panel-trails>.panel-heading{
+  color: black !important;
+  background-color: #1A7E78;
+  border-color: #1A7E78;
+}
+
 .panel-seeds>.panel-footer>.seeds-buttons{
   height: 50px;
 }

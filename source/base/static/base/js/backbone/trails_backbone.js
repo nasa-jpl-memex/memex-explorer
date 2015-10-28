@@ -48,10 +48,12 @@
       // Render each model in collection into a separate backbone view,
       // with one model per view.
       var that = this;
-      this.$el.append(this.template());
-      this.collection.each(function(model){
-        var singleView = new that.modelView(model);
-      });
+      if(this.collection.length){
+        this.$el.append(this.template());
+        this.collection.each(function(model){
+          var singleView = new that.modelView(model);
+        });
+      }
     },
   });
 

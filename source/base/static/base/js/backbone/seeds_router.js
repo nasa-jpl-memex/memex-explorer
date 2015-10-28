@@ -10,7 +10,6 @@
       addSeedsView = new Seeds.AddSeedsView(seedsCollection);
       trailsCollection = new Trails.TrailsCollection();
       trailsCollectionView = new Trails.TrailsCollectionView(trailsCollection);
-      window.trails = trailsCollection;
     },
   });
 

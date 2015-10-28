@@ -197,7 +197,7 @@ class DataWakeView(APIView):
                 es.search(index=self.index, body={"query": {"match_all": {}}})
             )
         except Exception:
-            response = {}
+            response = None
         return Response(response)
 
 
