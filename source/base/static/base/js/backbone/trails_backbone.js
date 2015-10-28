@@ -3,9 +3,9 @@
   exports.Trail = Backbone.Model.extend({
     urlRoot: "/api/datawake",
     defaults: {
-      trail: {},
-      domain: "",
-      user: "",
+      docid: "",
+      trail_id: 0,
+      domain_name: "",
       urls: [],
     },
   });
@@ -18,7 +18,7 @@
 
 
   exports.TrailView = Backbone.View.extend({
-    el: "trails",
+    el: "#trails",
     template: _.template($("#trailItem").html()),
     initialize: function(model){
       var that = this;
@@ -32,7 +32,27 @@
 
 
   exports.TrailsCollectionView = BaseViews.CollectionView.extend({
+    el: "#trailHeader",
+    template: _.template($("#trailHead").html()),
     modelView: exports.TrailView,
+    initialize: function(collection){
+      this.collection = collection;
+      var that = this;
+      this.collection.fetch({
+        success: function(){
+          that.render();
+        },
+      });
+    },
+    render: function(){
+      // Render each model in collection into a separate backbone view,
+      // with one model per view.
+      var that = this;
+      this.$el.append(this.template());
+      this.collection.each(function(model){
+        var singleView = new that.modelView(model);
+      });
+    },
   });
 
 })(this.Trails = {});

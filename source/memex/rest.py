@@ -179,6 +179,10 @@ class DataWakeView(APIView):
         trails = []
         for index in query["hits"]["hits"]:
             index = index["_source"]["crawl_data"]
+            # Correct names with dashes in them.
+            index["domain_name"] = index.pop("domain-name")
+            index["user_email"] = index.pop("user-email")
+            index["full_text"] = index.pop("full-text")
             index["urls"] = index["entities"]["website"]
             del index["entities"]
             trails.append(index)
