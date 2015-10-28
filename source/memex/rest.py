@@ -177,8 +177,9 @@ class DataWakeView(APIView):
 
     def parse_query(self, query):
         trails = []
-        for index in query["hits"]["hits"]:
+        for x, index in enumerate(query["hits"]["hits"]):
             index = index["_source"]["crawl_data"]
+            index["id"] = x + 1
             # Correct names with dashes in them.
             index["domain_name"] = index.pop("domain-name")
             index["user_email"] = index.pop("user-email")
