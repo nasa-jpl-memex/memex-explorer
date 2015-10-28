@@ -20,16 +20,16 @@ DEFAULT_NUM_URLS=25
 URL_CHAR_WIDTH=50
 
 
-def init_plot(name='fetcher_log'):
+def init_plot(crawl_name):
     session = Session()
     document = Document()
-    session.use_doc(name)
+    session.use_doc(crawl_name)
     session.load_document(document)
 
     if document.context.children:
         plot = document.context.children[0]
     else:
-        output_server(name)
+        output_server(crawl_name)
         # TODO: Remove these when Bokeh is upgraded
         # placeholders or Bokeh can't inject properly
         current = np.datetime64(datetime.now())
@@ -76,14 +76,15 @@ class NutchUrlTrails:
         """
         return np.datetime64(datetime.fromtimestamp(t/1000.0))
 
-    def __init__(self, name='fetcher_log', num_urls=DEFAULT_NUM_URLS):
+    def __init__(self, crawl_name, queue_name='fetcher_log', num_urls=DEFAULT_NUM_URLS):
         """
         Create a NutchUrlTrails instance for visualizing a running Nutch crawl in real-time using Bokeh
         :param name: The name of the crawl (as identified by the queue)
         :param num_urls: The number of URLs to display in the visualization
         :return: A NutchUrLTrails instance
         """
-        self.name = name
+        self.crawl_name = crawl_name
+        self.queue_name = queue_name
         self.num_urls = num_urls
         self.open_urls = {}
         self.closed_urls = {}
@@ -91,13 +92,13 @@ class NutchUrlTrails:
         self.old_circles = None
         
         self.session = Session()
-        self.session.use_doc(name)
+        self.session.use_doc(self.crawl_name)
         self.document = Document()
         
         con = Connection()
-        # TODO: consider exposing this
-        self.queue = con.SimpleQueue(name=self.name, exchange_opts={'durable': False})
-        output_server(self.name)
+        # TODO: Explicitly create a queue and bind to correct exchange with crawl_name as routing key
+        self.queue = con.SimpleQueue(name=self.queue_name, exchange_opts={'durable': False})
+        output_server(self.crawl_name)
 
     def handle_messages(self):
         """

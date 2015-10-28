@@ -39,7 +39,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     rest_crawl = nutch_client.Crawl(seed, rounds=self.crawl.rounds_left)
 
     if ENABLE_STREAM_VIZ:
-        url_trails = NutchUrlTrails()
+        url_trails = NutchUrlTrails(self.crawl.name)
     else:
         url_trails = None
 

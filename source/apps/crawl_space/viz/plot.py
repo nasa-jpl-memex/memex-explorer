@@ -65,7 +65,7 @@ class NutchDashboard(object):
     def get_plots(self):
         # TODO: For simultaneous crawl monitoring need to use unique crawl ids
         if ENABLE_STREAM_VIZ:
-            script = init_plot()
+            script = init_plot(self.crawl.name)
         else:
             script = None
         return {
