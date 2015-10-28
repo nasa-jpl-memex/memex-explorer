@@ -123,8 +123,12 @@ class NutchUrlTrails:
         if message["eventType"] == "START":
             self.open_urls[url] = NutchUrlTrails.jtime_to_datetime(message["timestamp"])
         elif message["eventType"] == "END":
-            self.closed_urls[url] = (self.open_urls[url], NutchUrlTrails.jtime_to_datetime(message["timestamp"]))
-            del self.open_urls[url]
+            if url in self.open_urls:
+                self.closed_urls[url] = (self.open_urls[url], NutchUrlTrails.jtime_to_datetime(message["timestamp"]))
+                del self.open_urls[url]
+            else:
+                # TODO: Log mismatched messages instead of just swallowing them
+                pass
         else:
             raise Exception("Unexpected message type")
 
