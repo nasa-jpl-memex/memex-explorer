@@ -173,13 +173,14 @@ class SeedsListViewSet(viewsets.ModelViewSet):
 
 
 class DataWakeView(APIView):
-    index = "datawake"
+    index = "datawake_0"
 
     def parse_query(self, query):
         trails = []
         for index in query["hits"]["hits"]:
-            index = index["_source"]
-            index["urls"] = [x["url"] for x in index["urls"]]
+            index = index["_source"]["crawl_data"]
+            index["urls"] = index["entities"]["website"]
+            del index["entities"]
             trails.append(index)
         return trails
 
