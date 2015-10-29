@@ -8,6 +8,7 @@
       trail_id: 0,
       domain_name: "",
       urls: [],
+      urls_string: "",
     },
   });
 

@@ -121,7 +121,7 @@
 
 <script type="text/template" id="trailItem">
     <div class="col-lg-3 col-md-4" data-toggle="modal" data-target="#trailModal">
-        <div class="panel panel-trails">
+        <div class="panel panel-trails trails-hover">
             <div class="panel-heading">
                 <div class="row">
                 <input type="hidden" value="<%= id %>">
@@ -147,7 +147,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="trailModalLabel">Create Seeds from Trail</h4>
+                    <h4 class="modal-title" id="trailModalLabel">Create Seeds From Trail</h4>
                 </div>
                 <form id="trailForm" method="post">
                     {% csrf_token %}

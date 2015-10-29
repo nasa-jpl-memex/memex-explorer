@@ -45,6 +45,10 @@
   border-color: #1A7E78;
 }
 
+.trails-hover{
+  cursor: pointer;
+}
+
 .panel-seeds>.panel-footer>.seeds-buttons{
   height: 50px;
 }

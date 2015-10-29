@@ -185,6 +185,7 @@ class DataWakeView(APIView):
             index["user_email"] = index.pop("user-email")
             index["full_text"] = index.pop("full-text")
             index["urls"] = index["entities"]["website"]
+            index["urls_string"] = "\n".join(index["entities"]["website"])
             del index["entities"]
             trails.append(index)
         return trails
