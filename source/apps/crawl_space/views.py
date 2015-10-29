@@ -30,7 +30,7 @@ from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 
 
 from task_manager.tika_tasks import create_index
-from task_manager.crawl_tasks import nutch, ache, ache_log_statistics
+from task_manager.crawl_tasks import cca_dump, nutch, ache, ache_log_statistics
 
 import celery
 
@@ -174,8 +174,9 @@ class CrawlView(ProjectObjectMixin, DetailView):
         elif request.POST['action'] == "ccadump":
             crawl_object.status = "DUMPING"
             crawl_object.save()
-            # TODO - Restore cca_dump
-            # cca_dump(self.get_object())
+            cca_dump(self.get_object())
+            crawl_object.status = "SUCCESS"
+            crawl_object.save()
             return HttpResponse("Success")
         # Dump Images
         elif request.POST['action'] == "dump":

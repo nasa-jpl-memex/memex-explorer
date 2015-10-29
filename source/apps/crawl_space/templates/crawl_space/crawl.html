@@ -117,23 +117,21 @@
             Get Crawl Log
             </button>
         </form>
+      {% if crawl.crawler == "nutch" %}
+        <form method="get" style="display:inline;">
+            <button id="common-crawl-dump" title="CCA Export" type="button" class="btn btn-default btn-duo center link-button"
+            data-container="body" data-toggle="tooltip" data-placement="bottom"
+            style="height:40px;width:auto;display:inline;">
+           CCA Export
+        </button>
+        </form>
+      {% endif %}
+
+
+
       </div>
     </div>
 
-    <!--
-    <div class="row">
-      {% if crawl.crawler == "nutch" %}
-        <button id="common-crawl-dump" title="Dump (CCA format)" type="button" class="btn btn-control"
-            data-container="body" data-toggle="tooltip" data-placement="bottom"
-            style="height:40px;width:auto;display:inline;">
-           Dump (CCA format)
-        </button>
-      {% endif %}
-    </div>
-    -->
-    <div class="col-sm-3" style="padding-left:0px;display:inline;">
-
-    </div>
   </div>
 </div>
 {% if crawl.crawler == "ache" or crawl.crawler == "nutch" %}

@@ -21,7 +21,18 @@ nutch_path = 'nutch'
 crawl_path = 'crawl'
 ache_path = 'ache'
 
-# TODO - provide Nutch Common Crawl dump when added to REST API
+
+def cca_dump(crawl):
+    # TODO - check if this is necessary, for now assuming I need same
+    # config to correctly dump a given crawl
+    if ENABLE_STREAM_VIZ:
+        config_name = 'config_streaming_' + self.crawl.name
+        nutch_client = nutch_rest_api.Nutch(confId=config_name)
+    else:
+        nutch_client = nutch_rest_api.Nutch()
+
+    job_client = nutch_client.Jobs(crawl.name)
+    job_client.commoncrawldump()
 
 # TODO - refactor below, these methods are getting a bit big
 
@@ -46,7 +57,6 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
         config_client[config_name] = streaming_overrides
 
         nutch_client = nutch_rest_api.Nutch(confId=config_name)
-
         url_trails = NutchUrlTrails(self.crawl.name)
     else:
         nutch_client = nutch_rest_api.Nutch()
@@ -57,7 +67,9 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     seed_urls = json.loads(self.crawl.seeds_object.seeds)
     seed = seed_client.create(self.crawl.slug + '_seed', seed_urls)
 
-    rest_crawl = nutch_client.Crawl(seed, rounds=self.crawl.rounds_left)
+    job_client = nutch_client.Jobs(self.crawl.name)
+
+    rest_crawl = nutch_client.Crawl(seed, jobClient=job_client, rounds=self.crawl.rounds_left)
 
     while self.crawl.rounds_left:
         if rest_crawl.currentJob is None:
@@ -88,7 +100,7 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
                 # TODO: Log this (Nutch has responded but has not crawled anything yet)
                 pass
         self.crawl.save()
-    self.crawl.status = 'FINISHED'
+    self.crawl.status = 'SUCCESS'
     self.crawl.save()
 
 
