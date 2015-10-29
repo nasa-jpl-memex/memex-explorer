@@ -14,8 +14,8 @@ mkdir -vp ${PREFIX}/lib/nutch/lib;
 mkdir -vp ${PREFIX}/lib/nutch/plugins;
 mkdir -vp ${PREFIX}/lib/nutch/conf;
 
-# apply the patch
-patch -p0 < ${RECIPE_DIR}/NUTCH-2132.patch
+# apply the pub/sub enabling patch
+patch -p0 < ${RECIPE_DIR}/PubSub_routingkey.patch
 
 # build nutch
 ant
