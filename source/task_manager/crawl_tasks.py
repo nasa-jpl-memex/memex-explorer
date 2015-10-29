@@ -23,6 +23,8 @@ ache_path = 'ache'
 
 # TODO - provide Nutch Common Crawl dump when added to REST API
 
+# TODO - refactor below, these methods are getting a bit big
+
 class NutchTask(Task):
     abstract = True
 
@@ -71,8 +73,20 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
             if active_job and active_job != old_job:
                 self.crawl.status = active_job.info()['type']
                 self.crawl.save()
-                # TODO: update pages crawled here from crawldb when appropriate
         self.crawl.rounds_left -= 1
+        try:
+            stats = rest_crawl.jobClient.stats()
+        except nutch_rest_api.NutchException:
+            # TODO: Log this
+            pass
+        else:
+            for ignore, data in stats['status'].items():
+                if data['statusValue'] == 'db_fetched':
+                    self.crawl.pages_crawled = data['count']
+                    break
+            else:
+                # TODO: Log this (Nutch has responded but has not crawled anything yet)
+                pass
         self.crawl.save()
     self.crawl.status = 'FINISHED'
     self.crawl.save()
