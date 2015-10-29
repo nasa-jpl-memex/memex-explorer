@@ -1,0 +1,361 @@
+From ca5bdec89c14148cb11171384a708ce15e61e03a Mon Sep 17 00:00:00 2001
+From: Sujen Shah <sujen1412@gmail.com>
+Date: Tue, 27 Oct 2015 20:15:25 -0700
+Subject: [PATCH] Support for CommonCrawl dump via Service REST endpoint
+
+---
+ src/java/org/apache/nutch/service/NutchServer.java |  2 +
+ .../apache/nutch/service/impl/ServiceWorker.java   | 48 ++++++++++++
+ .../nutch/service/model/request/ServiceConfig.java | 47 ++++++++++++
+ .../nutch/service/model/response/ServiceInfo.java  | 31 ++++++++
+ .../nutch/service/resources/ServicesResource.java  | 85 ++++++++++++++++++++++
+ .../apache/nutch/tools/CommonCrawlDataDumper.java  | 58 ++++++++++++++-
+ 6 files changed, 270 insertions(+), 1 deletion(-)
+ create mode 100644 src/java/org/apache/nutch/service/impl/ServiceWorker.java
+ create mode 100644 src/java/org/apache/nutch/service/model/request/ServiceConfig.java
+ create mode 100644 src/java/org/apache/nutch/service/model/response/ServiceInfo.java
+ create mode 100644 src/java/org/apache/nutch/service/resources/ServicesResource.java
+
+diff --git a/src/java/org/apache/nutch/service/NutchServer.java b/src/java/org/apache/nutch/service/NutchServer.java
+index c50c6a8..aeeb9af 100644
+--- a/src/java/org/apache/nutch/service/NutchServer.java
++++ b/src/java/org/apache/nutch/service/NutchServer.java
+@@ -51,6 +51,7 @@ import org.apache.nutch.service.resources.DbResource;
+ import org.apache.nutch.service.resources.JobResource;
+ import org.apache.nutch.service.resources.ReaderResouce;
+ import org.apache.nutch.service.resources.SeedResource;
++import org.apache.nutch.service.resources.ServicesResource;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
+ 
+@@ -136,6 +137,7 @@ public class NutchServer {
+     resources.add(AdminResource.class);
+     resources.add(SeedResource.class);
+     resources.add(ReaderResouce.class);
++    resources.add(ServicesResource.class);
+     return resources;
+   }
+ 
+diff --git a/src/java/org/apache/nutch/service/impl/ServiceWorker.java b/src/java/org/apache/nutch/service/impl/ServiceWorker.java
+new file mode 100644
+index 0000000..01df5d8
+--- /dev/null
++++ b/src/java/org/apache/nutch/service/impl/ServiceWorker.java
+@@ -0,0 +1,48 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.service.impl;
++
++import org.apache.hadoop.util.StringUtils;
++import org.apache.nutch.service.model.request.ServiceConfig;
++import org.apache.nutch.util.NutchTool;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++public class ServiceWorker implements Runnable{
++
++  private ServiceConfig serviceConfig;
++  private NutchTool tool;
++  private static final Logger LOG = LoggerFactory.getLogger(ServiceWorker.class);
++  
++  public ServiceWorker(ServiceConfig serviceConfig, NutchTool tool) {
++    this.serviceConfig = serviceConfig;
++    this.tool = tool;
++  }
++
++  @Override
++  public void run() {
++    try {
++      tool.run(serviceConfig.getArgs(), serviceConfig.getCrawlId());
++    } catch (Exception e) {
++      // TODO Auto-generated catch block
++      LOG.error("Error running service worker : {}", StringUtils.stringifyException(e));
++    }
++  }
++  
++  
++  
++}
+diff --git a/src/java/org/apache/nutch/service/model/request/ServiceConfig.java b/src/java/org/apache/nutch/service/model/request/ServiceConfig.java
+new file mode 100644
+index 0000000..eb05939
+--- /dev/null
++++ b/src/java/org/apache/nutch/service/model/request/ServiceConfig.java
+@@ -0,0 +1,47 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.service.model.request;
++
++import java.util.Map;
++
++public class ServiceConfig {
++
++  private String crawlId;
++  private String confId;
++  private Map<String, Object> args;
++  
++  public String getCrawlId() {
++    return crawlId;
++  }
++  public void setCrawlId(String crawlId) {
++    this.crawlId = crawlId;
++  }
++  public String getConfId() {
++    return confId;
++  }
++  public void setConfId(String confId) {
++    this.confId = confId;
++  }
++  public Map<String, Object> getArgs() {
++    return args;
++  }
++  public void setArgs(Map<String, Object> args) {
++    this.args = args;
++  }
++  
++  
++}
+diff --git a/src/java/org/apache/nutch/service/model/response/ServiceInfo.java b/src/java/org/apache/nutch/service/model/response/ServiceInfo.java
+new file mode 100644
+index 0000000..7ba734b
+--- /dev/null
++++ b/src/java/org/apache/nutch/service/model/response/ServiceInfo.java
+@@ -0,0 +1,31 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.service.model.response;
++
++import java.util.List;
++public class ServiceInfo {
++
++  private List<String> dumpPaths;
++
++  public List<String> getDumpPaths() {
++    return dumpPaths;
++  }
++
++  public void setDumpPaths(List<String> dumpPaths) {
++    this.dumpPaths = dumpPaths;
++  }
++}
+diff --git a/src/java/org/apache/nutch/service/resources/ServicesResource.java b/src/java/org/apache/nutch/service/resources/ServicesResource.java
+new file mode 100644
+index 0000000..d866d60
+--- /dev/null
++++ b/src/java/org/apache/nutch/service/resources/ServicesResource.java
+@@ -0,0 +1,85 @@
++/**
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.nutch.service.resources;
++
++import java.io.File;
++import java.text.SimpleDateFormat;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Map;
++
++import javax.ws.rs.GET;
++import javax.ws.rs.POST;
++import javax.ws.rs.Path;
++import javax.ws.rs.PathParam;
++import javax.ws.rs.core.MediaType;
++import javax.ws.rs.core.Response;
++import javax.ws.rs.core.Response.Status;
++
++import org.apache.nutch.metadata.Nutch;
++import org.apache.nutch.service.impl.ServiceWorker;
++import org.apache.nutch.service.model.request.ServiceConfig;
++import org.apache.nutch.service.model.response.ServiceInfo;
++import org.apache.nutch.tools.CommonCrawlDataDumper;
++
++/**
++ * The services resource defines an endpoint to enable the user to carry out Nutch jobs like
++ * dump, commoncrawldump, etc. 
++ * @author Sujen Shah
++ *
++ */
++@Path("/services")
++public class ServicesResource {
++
++  private static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
++
++  @GET
++  @Path("/commoncrawldump/{crawlId}")
++  public Response listDumpPaths(@PathParam("crawlId")String crawlId) {
++    File dumpFilePath = new File(crawlId + File.separator + "dump/");
++    File dumpFileList[] = dumpFilePath.listFiles();
++    List<String> fileNames = new ArrayList<>();
++    if(dumpFileList!=null){
++      for(File f : dumpFileList){
++        fileNames.add(f.getPath());
++      }
++    }
++    ServiceInfo info = new ServiceInfo();
++    info.setDumpPaths(fileNames);
++    return Response.ok().entity(info).type(MediaType.APPLICATION_JSON).build();
++  }
++
++  @POST
++  @Path("/commoncrawldump")
++  public Response commoncrawlDump(ServiceConfig serviceConfig){
++    String crawlId = serviceConfig.getCrawlId();
++    String outputDir = crawlId + File.separator + "dump" + File.separator +
++        "commoncrawl-" + sdf.format(System.currentTimeMillis());
++
++    Map<String, Object> args = serviceConfig.getArgs();
++    args.put("outputDir", outputDir);
++    if(!args.containsKey(Nutch.ARG_SEGMENT)) {
++      args.put("segment", crawlId + File.separator + "segments");
++    }
++    serviceConfig.setArgs(args);
++    ServiceWorker worker = new ServiceWorker(serviceConfig, new CommonCrawlDataDumper());
++    worker.run();
++
++    return Response.ok(outputDir).type(MediaType.TEXT_PLAIN).build();
++
++  }
++}
+diff --git a/src/java/org/apache/nutch/tools/CommonCrawlDataDumper.java b/src/java/org/apache/nutch/tools/CommonCrawlDataDumper.java
+index 4663bfe..2349cf8 100644
+--- a/src/java/org/apache/nutch/tools/CommonCrawlDataDumper.java
++++ b/src/java/org/apache/nutch/tools/CommonCrawlDataDumper.java
+@@ -61,10 +61,12 @@ import org.apache.hadoop.util.StringUtils;
+ import org.apache.hadoop.util.Tool;
+ import org.apache.hadoop.util.ToolRunner;
+ import org.apache.nutch.metadata.Metadata;
++import org.apache.nutch.metadata.Nutch;
+ import org.apache.nutch.protocol.Content;
+ import org.apache.nutch.segment.SegmentReader;
+ import org.apache.nutch.util.DumpFileUtil;
+ import org.apache.nutch.util.NutchConfiguration;
++import org.apache.nutch.util.NutchTool;
+ //Tika imports
+ import org.apache.tika.Tika;
+ 
+@@ -170,7 +172,7 @@ import com.ibm.icu.text.SimpleDateFormat;
+  * }
+  * </pre>
+  */
+-public class CommonCrawlDataDumper extends Configured implements Tool {
++public class CommonCrawlDataDumper extends NutchTool implements Tool {
+ 
+   private static final Logger LOG = LoggerFactory
+       .getLogger(CommonCrawlDataDumper.class.getName());
+@@ -687,4 +689,58 @@ public class CommonCrawlDataDumper extends Configured implements Tool {
+ 
+     return 0;
+   }
++
++  /**
++   * Used by the REST service
++   */
++  @Override
++  public Map<String, Object> run(Map<String, Object> args, String crawlId)
++      throws Exception {
++    // TODO Auto-generated method stub
++    String keyPrefix = args.containsKey("keyPrefix")?(String) args.get("keyPrefix"):"";
++    
++    File outputDir = new File((String) args.get("outputDir"));
++    File segmentRootDir = new File((String) args.get(Nutch.ARG_SEGMENT));
++    ArrayList<String> mimeTypesList = args.containsKey("mimetypes")?
++        (ArrayList<String>) args.get("mimetypes"):null;
++    String[] mimeTypes = null;
++    if(mimeTypesList!=null){
++      mimeTypes = new String[mimeTypesList.size()];
++      int i=0;
++      for(String m : mimeTypesList)
++        mimeTypes[i++] = m;
++    }
++    boolean gzip = args.containsKey("gzip")?(boolean) args.get("gzip"):false;
++    boolean epochFilename = args.containsKey("epochFilename")?
++        (boolean) args.get("epochFilename"):false;
++
++    boolean simpleDateFormat = args.containsKey("simpleDateFormat")?
++        (boolean) args.get("simpleDateFormat"):false;
++    boolean jsonArray = args.containsKey("jsonArray")?(boolean) args.get("jsonArray"):false;
++    boolean reverseKey = args.containsKey("reverseKey")?(boolean) args.get("reverseKey"):false;
++    String extension = args.containsKey("extension")?(String) args.get("extension"):"";
++    boolean warc = args.containsKey("warc")?(boolean) args.get("warc"):false;
++    long warcSize = args.containsKey("warcSize")? (Long) args.get("warcSize"):0;
++    
++    CommonCrawlConfig config = new CommonCrawlConfig();
++    config.setKeyPrefix(keyPrefix);
++    config.setSimpleDateFormat(simpleDateFormat);
++    config.setJsonArray(jsonArray);
++    config.setReverseKey(reverseKey);
++    config.setCompressed(gzip);
++    config.setWarcSize(warcSize);
++    config.setOutputDir((String) args.get("outputDir"));
++
++    if (!outputDir.exists()) {
++      if (!outputDir.mkdirs())
++        throw new Exception(
++            "Unable to create: [" + outputDir.getAbsolutePath() + "]");
++    }
++
++    CommonCrawlDataDumper dumper = new CommonCrawlDataDumper(config);
++
++    dumper.dump(outputDir, segmentRootDir, gzip, mimeTypes, epochFilename,
++        extension, warc);
++    return null;
++  }
+ }
+-- 
+2.3.8 (Apple Git-58)
+

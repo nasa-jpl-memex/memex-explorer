@@ -16,6 +16,8 @@ mkdir -vp ${PREFIX}/lib/nutch/conf;
 
 # apply the pub/sub enabling patch
 patch -p0 < ${RECIPE_DIR}/PubSub_routingkey.patch
+# apply the common crawl dump service patch
+patch -p1 < ${RECIPE_DIR}/NUTCH-2152.git.patch
 
 # build nutch
 ant

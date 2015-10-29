@@ -2,7 +2,7 @@ about: {home: 'http://nutch.apache.org/', license: Apache 2.0 license}
 build:
   entry_points: []
   features: []
-  number: 2
+  number: 3
   script_env: []
   string: ''
   track_features: []
