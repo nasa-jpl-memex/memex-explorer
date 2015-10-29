@@ -1,8 +1,21 @@
 diff --git conf/nutch-default.xml conf/nutch-default.xml
-index bf1189a..066c3e3 100644
+index 122b04c..31d4675 100644
 --- conf/nutch-default.xml
 +++ conf/nutch-default.xml
-@@ -1896,4 +1896,45 @@ CAUTION: Set the parser.timeout to -1 or a bigger value than 30, when using this
+@@ -945,6 +945,12 @@
+    fetcher.bandwidth.target. Defaults to 30 and must be at least 1.</description>
+ </property>
+ 
++<property>
++	<name>fetcher.publisher</name>
++	<value>false</value>
++	<description>Set this value to true if you want to use an implementation of the Publisher/Subscriber model. Make sure to set corresponding
++	Publisher implementation specific properties</description>
++</property> 
+ <!-- moreindexingfilter plugin properties -->
+ 
+ <property>
+@@ -1929,4 +1935,45 @@ CAUTION: Set the parser.timeout to -1 or a bigger value than 30, when using this
    </description>
  </property>
  
@@ -63,7 +76,7 @@ index 9428fe0..f44c4d4 100644
  		<exclude module="jmxtools" />
  		<exclude module="jms" />
 diff --git src/java/org/apache/nutch/fetcher/FetcherThread.java src/java/org/apache/nutch/fetcher/FetcherThread.java
-index 9a482b9..38aa3c1 100644
+index 85d0611..8133d3a 100644
 --- src/java/org/apache/nutch/fetcher/FetcherThread.java
 +++ src/java/org/apache/nutch/fetcher/FetcherThread.java
 @@ -35,6 +35,7 @@ import org.apache.hadoop.util.StringUtils;
@@ -74,86 +87,83 @@ index 9a482b9..38aa3c1 100644
  import org.apache.nutch.metadata.Metadata;
  import org.apache.nutch.metadata.Nutch;
  import org.apache.nutch.net.URLFilterException;
-@@ -128,6 +129,9 @@ public class FetcherThread extends Thread {
+@@ -128,6 +129,10 @@ public class FetcherThread extends Thread {
    //Used by the REST service
    private FetchNode fetchNode;
    private boolean reportToNutchServer;
 +  
 +  //Used for publishing events
-+  private FetcherThreadPublisher publisher; 
++  private FetcherThreadPublisher publisher;
++  private boolean activatePublisher;
  
    public FetcherThread(Configuration conf, AtomicInteger activeThreads, FetchItemQueues fetchQueues, 
        QueueFeeder feeder, AtomicInteger spinWaiting, AtomicLong lastRequestStart, Reporter reporter,
-@@ -156,6 +160,7 @@ public class FetcherThread extends Thread {
+@@ -156,6 +161,10 @@ public class FetcherThread extends Thread {
      this.storingContent = storingContent;
      this.pages = pages;
      this.bytes = bytes;
-+    this.publisher = new FetcherThreadPublisher(conf);
++
++    if((activatePublisher=conf.getBoolean("fetcher.publisher", false)))
++      this.publisher = new FetcherThreadPublisher(conf);
++    
      queueMode = conf.get("fetcher.queue.mode",
          FetchItemQueues.QUEUE_MODE_HOST);
      // check that the mode is known
-@@ -239,6 +244,15 @@ public class FetcherThread extends Thread {
+@@ -239,6 +248,13 @@ public class FetcherThread extends Thread {
            // fetch the page
            redirecting = false;
            redirectCount = 0;
 +          
 +          //Publisher event
-+          FetcherThreadEvent startEvent = new FetcherThreadEvent();
-+          startEvent.setEventType(PublishEventType.START);
-+          startEvent.setUrl(fit.getUrl().toString());
-+          startEvent.setTimestamp(System.currentTimeMillis());
-+          publisher.publish(startEvent);
-+          
++          if(activatePublisher) {
++            FetcherThreadEvent startEvent = new FetcherThreadEvent(PublishEventType.START, fit.getUrl().toString());
++            publisher.publish(startEvent, conf);
++          }
 +          
            do {
              if (LOG.isInfoEnabled()) {
                LOG.info("fetching " + fit.url + " (queue crawl delay="
-@@ -303,7 +317,15 @@ public class FetcherThread extends Thread {
+@@ -303,7 +319,13 @@ public class FetcherThread extends Thread {
                fetchNode.setFetchTime(System.currentTimeMillis());
                fetchNode.setUrl(fit.url);
              }
 -
 +            
-+            //Publish fetch finish event 
-+            FetcherThreadEvent endEvent = new FetcherThreadEvent();
-+            endEvent.setEventType(PublishEventType.END);
-+            endEvent.setUrl(fit.getUrl().toString());
-+            endEvent.setTimestamp(System.currentTimeMillis());
-+            endEvent.addEventData("status", status.getName());
-+            publisher.publish(endEvent);
-+            
++            //Publish fetch finish event
++            if(activatePublisher) {
++              FetcherThreadEvent endEvent = new FetcherThreadEvent(PublishEventType.END, fit.getUrl().toString());
++              endEvent.addEventData("status", status.getName());
++              publisher.publish(endEvent, conf);
++            }
              reporter.incrCounter("FetcherStatus", status.getName(), 1);
  
              switch (status.getCode()) {
-@@ -655,7 +677,21 @@ public class FetcherThread extends Thread {
+@@ -656,7 +678,18 @@ public class FetcherThread extends Thread {
              outlinkList.add(links[i]);
              outlinks.add(toUrl);
            }
 -
 +          
 +          //Publish fetch report event 
-+          FetcherThreadEvent reportEvent = new FetcherThreadEvent();
-+          reportEvent.setEventType(PublishEventType.REPORT);
-+          reportEvent.setUrl(url.toString());
-+          reportEvent.setTimestamp(System.currentTimeMillis());
-+          reportEvent.addOutlinksToEventData(outlinkList);
-+          reportEvent.addEventData("title", parseData.getTitle());
-+          reportEvent.addEventData("content-type", parseData.getContentMeta().get("content-type"));
-+          reportEvent.addEventData("score", datum.getScore());
-+          reportEvent.addEventData("fetchTime", datum.getFetchTime());
-+          reportEvent.addEventData("content-language", parseData.getContentMeta().get("content-language"));
-+          System.out.println(parseData.getContentMeta().names());
-+          publisher.publish(reportEvent);
-+          
++          if(activatePublisher) {
++            FetcherThreadEvent reportEvent = new FetcherThreadEvent(PublishEventType.REPORT, url.toString());
++            reportEvent.addOutlinksToEventData(outlinkList);
++            reportEvent.addEventData(Nutch.FETCH_EVENT_TITLE, parseData.getTitle());
++            reportEvent.addEventData(Nutch.FETCH_EVENT_CONTENTTYPE, parseData.getContentMeta().get("content-type"));
++            reportEvent.addEventData(Nutch.FETCH_EVENT_SCORE, datum.getScore());
++            reportEvent.addEventData(Nutch.FETCH_EVENT_FETCHTIME, datum.getFetchTime());
++            reportEvent.addEventData(Nutch.FETCH_EVENT_CONTENTLANG, parseData.getContentMeta().get("content-language"));
++            publisher.publish(reportEvent, conf);
++          }
            // Only process depth N outlinks
            if (maxOutlinkDepth > 0 && outlinkDepth < maxOutlinkDepth) {
              reporter.incrCounter("FetcherOutlinks", "outlinks_detected",
 diff --git src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java
 new file mode 100644
-index 0000000..646f6f8
+index 0000000..add201c
 --- /dev/null
 +++ src/java/org/apache/nutch/fetcher/FetcherThreadEvent.java
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,93 @@
 +/*
 + * Licensed to the Apache Software Foundation (ASF) under one or more
 + * contributor license agreements.  See the NOTICE file distributed with
@@ -190,11 +200,18 @@ index 0000000..646f6f8
 +public class FetcherThreadEvent implements Serializable{
 +
 +  public static enum PublishEventType {START, END, REPORT}
-+
++ 
++  
 +  private PublishEventType eventType;
 +  private Map<String, Object> eventData;
 +  private String url; 
 +  private Long timestamp; 
++  
++  public FetcherThreadEvent(PublishEventType eventType, String url) {
++    this.eventType = eventType;
++    this.url = url;
++    this.timestamp = System.currentTimeMillis();
++  }
 +  
 +  public PublishEventType getEventType() {
 +    return eventType;
@@ -242,10 +259,10 @@ index 0000000..646f6f8
 +}
 diff --git src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java
 new file mode 100644
-index 0000000..29d7130
+index 0000000..85557d3
 --- /dev/null
 +++ src/java/org/apache/nutch/fetcher/FetcherThreadPublisher.java
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,54 @@
 +/*
 + * Licensed to the Apache Software Foundation (ASF) under one or more
 + * contributor license agreements.  See the NOTICE file distributed with
@@ -267,6 +284,8 @@ index 0000000..29d7130
 +import org.apache.hadoop.conf.Configuration;
 +import org.apache.nutch.tools.NutchPublisher;
 +import org.apache.nutch.tools.RabbitMQPublisher;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
 +
 +/**
 + * This class handles the publishing of the events to the queue implementation. 
@@ -275,7 +294,8 @@ index 0000000..29d7130
 + */
 +public class FetcherThreadPublisher {
 +
-+  NutchPublisher publisher;
++  private static NutchPublisher publisher;
++  private static final Logger LOG = LoggerFactory.getLogger(FetcherThreadPublisher.class);
 +  
 +  public FetcherThreadPublisher(Configuration conf) { 
 +    String publisherImpl = conf.get("publisher.queue.type", "rabbitmq");
@@ -287,14 +307,35 @@ index 0000000..29d7130
 +    }
 +  }
 +  
-+  public void publish(FetcherThreadEvent event) {
-+    publisher.publish(event);
++  public void publish(FetcherThreadEvent event, Configuration conf) {
++    if(publisher!=null) {
++      publisher.publish(event, conf);
++    }
++    else {
++      LOG.info("Could not instantiate publisher implementation, continuing without publishing");
++    }
 +  }
 +  
 +}
+diff --git src/java/org/apache/nutch/metadata/Nutch.java src/java/org/apache/nutch/metadata/Nutch.java
+index de80399..92f0766 100644
+--- src/java/org/apache/nutch/metadata/Nutch.java
++++ src/java/org/apache/nutch/metadata/Nutch.java
+@@ -95,4 +95,11 @@ public interface Nutch {
+ 	public static final String ARG_SEGMENTDIR = "segment_dir";
+ 	/** Argument key to specify the location of individual segment for the REST endpoints **/
+ 	public static final String ARG_SEGMENT = "segment";
++	
++	/** Metadata used for the FetcherThreadEvent for publishing to subscribers*/
++	public static final String FETCH_EVENT_TITLE = "title";
++	public static final String FETCH_EVENT_CONTENTTYPE = "content-type";
++	public static final String FETCH_EVENT_SCORE = "score";
++	public static final String FETCH_EVENT_FETCHTIME = "fetchTime";
++	public static final String FETCH_EVENT_CONTENTLANG = "content-language";
+ }
 diff --git src/java/org/apache/nutch/tools/NutchPublisher.java src/java/org/apache/nutch/tools/NutchPublisher.java
 new file mode 100644
-index 0000000..c8a85e5
+index 0000000..1ef9cd7
 --- /dev/null
 +++ src/java/org/apache/nutch/tools/NutchPublisher.java
 @@ -0,0 +1,42 @@
@@ -336,13 +377,13 @@ index 0000000..c8a85e5
 +   * Jackson JSON conversion errors
 +   * @param event
 +   */
-+  public void publish(Object event);
++  public void publish(Object event, Configuration conf);
 +  
 +
 +}
 diff --git src/java/org/apache/nutch/tools/RabbitMQPublisher.java src/java/org/apache/nutch/tools/RabbitMQPublisher.java
 new file mode 100644
-index 0000000..a17d7d7
+index 0000000..fd28ce6
 --- /dev/null
 +++ src/java/org/apache/nutch/tools/RabbitMQPublisher.java
 @@ -0,0 +1,90 @@
@@ -389,7 +430,6 @@ index 0000000..a17d7d7
 +  private static String HOST;
 +  private static final Logger LOG = LoggerFactory.getLogger(RabbitMQPublisher.class);
 +  private static Channel channel;
-+  private static String QUEUE_ROUTINGKEY;
 +  
 +  @Override
 +  public void setConf(Configuration conf) {
@@ -397,7 +437,7 @@ index 0000000..a17d7d7
 +    EXCHANGE_SERVER = conf.get("rabbitmq.exchange.server", "fetcher_log");
 +    EXCHANGE_TYPE = conf.get("rabbitmq.exchange.type", "fanout");
 +    HOST = conf.get("rabbitmq.host", "localhost");
-+    QUEUE_ROUTINGKEY = conf.get("rabbitmq.queue.routingkey", "");
++
 +    
 +    ConnectionFactory factory = new ConnectionFactory(); 
 +    factory.setHost(HOST);
@@ -412,10 +452,11 @@ index 0000000..a17d7d7
 +  }
 +  
 +  @Override
-+  public void publish(Object event) {
++  public void publish(Object event, Configuration conf) {
 +    // TODO Auto-generated method stub
++    String rountingKey = conf.get("rabbitmq.queue.routingkey", "");
 +    try {
-+      channel.basicPublish(EXCHANGE_SERVER, QUEUE_ROUTINGKEY, null, getJSONString(event).getBytes());
++      channel.basicPublish(EXCHANGE_SERVER, rountingKey, null, getJSONString(event).getBytes());
 +    } catch (IOException e) {
 +      // TODO Auto-generated catch block
 +      LOG.error("Error occured while publishing - {}", StringUtils.stringifyException(e));
