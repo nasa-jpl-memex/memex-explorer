@@ -120,13 +120,13 @@
 
 
 <script type="text/template" id="trailItem">
-    <div class="col-lg-3 col-md-4" data-toggle="modal" data-target="#trailModal">
-        <div class="panel panel-trails trails-hover">
+    <div class="col-lg-3 col-md-4">
+        <div class="panel panel-trails trails-hover" data-toggle="modal" data-target="#trailModal">
             <div class="panel-heading">
                 <div class="row">
-                <input type="hidden" value="<%= id %>">
+                <input type="hidden" value="<%= trail_id %>">
                     <div class="col-md-12 color-set seeds-margin">
-                        <p>Trail: <%= id %></p>
+                        <p>Trail: <%= trail_id %></p>
                     </div>
                 </div>
             </div>
@@ -161,6 +161,9 @@
                         <span class="help-block">
                             <strong id="error_id_seedsname" hidden></strong>
                         </span>
+                        <div id="trailseeds_editor">
+                          <textarea id="id_trailseeds" name="trailseeds"></textarea>
+                        </div>
                     </div>
                     <hr>
                     <div class="form-actions row">

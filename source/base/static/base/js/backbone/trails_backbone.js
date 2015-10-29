@@ -3,7 +3,6 @@
   exports.Trail = Backbone.Model.extend({
     urlRoot: "/api/datawake",
     defaults: {
-      id: 0,
       docid: "",
       trail_id: 0,
       domain_name: "",
@@ -44,10 +43,11 @@
     template: _.template($("#trailFormBody").html()),
     initialize: function(collection){
       this.render();
-      // this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
-      //   lineNumbers: false,
-      // });
-      // this.editor.setSize("100%", 400);
+      this.editor = CodeMirror.fromTextArea(document.getElementById("id_trailseeds"), {
+        lineNumbers: false,
+        readOnly: true,
+      });
+      this.editor.setSize("100%", 400);
     },
     render: function(){
       this.$el.html(this.template());
