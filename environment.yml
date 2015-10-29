@@ -10,9 +10,11 @@ dependencies:
     - tika-rest-server=1.9.0
     - kibana
     - bokeh=0.10.0
+    # certifi needed by bokeh server!
+    - certifi
     - blaze=0.8.2
     - python=2.7.8
-    - nutch-python>=1.10.3
+    - nutch-python>=1.11
     - elasticnutch>=1.11
     - ache=0.3.0
     - django=1.7.3

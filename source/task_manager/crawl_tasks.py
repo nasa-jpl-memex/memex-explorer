@@ -30,18 +30,32 @@ class NutchTask(Task):
 def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
     self.crawl_task = None
-    nutch_client = nutch_rest_api.Nutch()
+
+    if ENABLE_STREAM_VIZ:
+        # need to reconfigure nutch
+        config_client = nutch_rest_api.Nutch().Configs()
+
+        streaming_overrides = {'fetcher.publisher':'true',
+                               'publisher.queue.type': 'rabbitmq',
+                               'rabbitmq.exchange.type': 'direct',
+                               'rabbitmq.queue.routingkey': self.crawl.name}
+
+        config_name = 'config_streaming_' + self.crawl.name
+        config_client[config_name] = streaming_overrides
+
+        nutch_client = nutch_rest_api.Nutch(confId=config_name)
+
+        url_trails = NutchUrlTrails(self.crawl.name)
+    else:
+        nutch_client = nutch_rest_api.Nutch()
+        url_trails = None
+
     seed_client = nutch_client.Seeds()
 
     seed_urls = json.loads(self.crawl.seeds_object.seeds)
     seed = seed_client.create(self.crawl.slug + '_seed', seed_urls)
 
     rest_crawl = nutch_client.Crawl(seed, rounds=self.crawl.rounds_left)
-
-    if ENABLE_STREAM_VIZ:
-        url_trails = NutchUrlTrails(self.crawl.name)
-    else:
-        url_trails = None
 
     while self.crawl.rounds_left:
         if rest_crawl.currentJob is None:

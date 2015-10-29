@@ -7,17 +7,18 @@ from Queue import Empty
 
 import numpy as np
 from bokeh.plotting import figure, output_server
-from kombu import Connection
+from kombu import Exchange, Connection, Queue
 
 from bokeh.models.glyphs import Segment
 from bokeh.models.markers import Circle
-from bokeh.models import Range1d, LinearAxis, ColumnDataSource
+from bokeh.models import Range1d, ColumnDataSource
 from bokeh.embed import autoload_server
 from bokeh.session import Session
 from bokeh.document import Document
 
-DEFAULT_NUM_URLS=25
-URL_CHAR_WIDTH=50
+DEFAULT_NUM_URLS = 25
+URL_CHAR_WIDTH = 50
+EXCHANGE_NAME = "fetcher_log"
 
 
 def init_plot(crawl_name):
@@ -76,7 +77,7 @@ class NutchUrlTrails:
         """
         return np.datetime64(datetime.fromtimestamp(t/1000.0))
 
-    def __init__(self, crawl_name, queue_name='fetcher_log', num_urls=DEFAULT_NUM_URLS):
+    def __init__(self, crawl_name, num_urls=DEFAULT_NUM_URLS):
         """
         Create a NutchUrlTrails instance for visualizing a running Nutch crawl in real-time using Bokeh
         :param name: The name of the crawl (as identified by the queue)
@@ -84,7 +85,6 @@ class NutchUrlTrails:
         :return: A NutchUrLTrails instance
         """
         self.crawl_name = crawl_name
-        self.queue_name = queue_name
         self.num_urls = num_urls
         self.open_urls = {}
         self.closed_urls = {}
@@ -94,11 +94,12 @@ class NutchUrlTrails:
         self.session = Session()
         self.session.use_doc(self.crawl_name)
         self.document = Document()
-        
+
         con = Connection()
-        # TODO: Explicitly create a queue and bind to correct exchange with crawl_name as routing key
-        self.queue = con.SimpleQueue(name=self.queue_name, exchange_opts={'durable': False})
-        output_server(self.crawl_name)
+
+        exchange = Exchange(EXCHANGE_NAME, 'direct', durable=False)
+        queue = Queue(crawl_name, exchange=exchange, routing_key=crawl_name)
+        self.queue = con.SimpleQueue(name=queue)
 
     def handle_messages(self):
         """
