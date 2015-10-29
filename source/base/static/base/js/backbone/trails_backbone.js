@@ -29,6 +29,28 @@
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
     },
+    events: {},
+  });
+
+
+  exports.TrailFormView = BaseViews.FormView.extend({
+    el: "#trailSeedsCreation",
+    modal: "#trailModal",
+    form: "#trailForm",
+    formFields: [
+      "seedsname",
+    ],
+    template: _.template($("#trailFormBody").html()),
+    initialize: function(collection){
+      this.render();
+      // this.editor = CodeMirror.fromTextArea(document.getElementById("id_textseeds"), {
+      //   lineNumbers: false,
+      // });
+      // this.editor.setSize("100%", 400);
+    },
+    render: function(){
+      this.$el.html(this.template());
+    },
   });
 
 
