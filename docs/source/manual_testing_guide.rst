@@ -127,14 +127,7 @@ Included with the repository is a test seeds file. You can use this file to test
    a. Refer to step 6 of :ref:`index-creation` on how to access the index from the browser.
    b. Type in the name of the crawl index to see the crawl data. Verify that there are between 200 and 300 "hits", or documents.
 
-8. Verify that log.io is functioning
-
-   a. Below the crawl dashboard you should see a window containing tabs for accessing log.io and kibana
-   b. While a crawl is running, the output of the log.io tab should look like this:
-
-   .. image:: _static/img/testing_guide/logio_running.png
-
-9. Verify that kibana is functioning.
+8. Verify that kibana is functioning.
 
    a. Click on the Kibana tab.
    b. Enter the following information on the "Settings" page.

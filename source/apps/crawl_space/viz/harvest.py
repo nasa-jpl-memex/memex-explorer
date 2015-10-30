@@ -1,24 +1,14 @@
 from __future__ import division
-import csv
 import os
-import sys
-from blaze import *
+from blaze import into
 import pandas as pd
-from bokeh.plotting import *
-from bokeh.embed import components
-from bokeh.resources import INLINE
-from bokeh.objects import HoverTool
-from bokeh.models import ColumnDataSource
+from bokeh.plotting import figure
+from bokeh.models import ColumnDataSource, HoverTool
 from collections import OrderedDict
-import numpy as np
-import datetime as dt
 from bokeh.embed import components
-from bokeh.resources import CDN
 import subprocess
 import shlex
 from StringIO import StringIO
-
-from apps.crawl_space.settings import CRAWL_PATH
 
 
 GREEN = "#47a838"
@@ -30,6 +20,7 @@ class Harvest(object):
     """Create a line plot to compare the growth of crawled and relevant pages in the crawl."""
 
     def __init__(self, crawl):
+        self.source = None
         self.harvest_data = os.path.join(crawl.get_crawl_path(), 'data_monitor/harvestinfo.csv')
 
     def update_source(self):
@@ -44,7 +35,7 @@ class Harvest(object):
         # Converts stdout to StringIO to allow pandas to read it as a file
 
         df = pd.read_csv(StringIO(stdout), delimiter='\t',
-            names=['relevant_pages', 'downloaded_pages', 'timestamp'])
+                         names=['relevant_pages', 'downloaded_pages', 'timestamp'])
         df['harvest_rate'] = df['relevant_pages'] / df['downloaded_pages']
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
 
@@ -58,12 +49,12 @@ class Harvest(object):
                    title="Harvest Plot", x_axis_type='datetime',
                    tools='pan, wheel_zoom, box_zoom, reset, resize, save, hover')
 
-        p.line(x="timestamp", y="relevant_pages", color=GREEN, width=0.2,
+        p.line(x="timestamp", y="relevant_pages", color=GREEN, line_width=0.2,
                legend="relevant", source=self.source)
         p.scatter(x="timestamp", y="relevant_pages", fill_alpha=0.6,
                   color=GREEN, source=self.source)
 
-        p.line(x="timestamp", y="downloaded_pages", color=DARK_GRAY, width=0.2,
+        p.line(x="timestamp", y="downloaded_pages", color=DARK_GRAY, line_width=0.2,
                legend="downloaded", source=self.source)
         p.scatter(x="timestamp", y="downloaded_pages", fill_alpha=0.6,
                  color=DARK_GRAY, source=self.source)
@@ -75,8 +66,5 @@ class Harvest(object):
 
         p.legend.orientation = "top_left"
 
-        # Save ColumnDataSource model id to database model
-
-        script, div = components(p, INLINE)
-
+        script, div = components(p)
         return (script, div)

@@ -25,15 +25,17 @@ from base.models import Project
 from apps.crawl_space.models import Crawl, CrawlModel
 from apps.crawl_space.forms import AddCrawlForm, AddCrawlModelForm, CrawlSettingsForm
 from apps.crawl_space.utils import touch
-from apps.crawl_space.viz.plot import AcheDashboard
+from apps.crawl_space.viz.plot import AcheDashboard, NutchDashboard
 from apps.crawl_space.settings import CRAWL_PATH, IMAGES_PATH, CCA_PATH
 
+
 from task_manager.tika_tasks import create_index
-from task_manager.crawl_tasks import nutch, ache, ache_log_statistics, cca_dump
+from task_manager.crawl_tasks import cca_dump, nutch, ache, ache_log_statistics
 
 import celery
 
 from redis.connection import ConnectionError
+
 
 class ProjectObjectMixin(ContextMixin):
 
@@ -173,10 +175,12 @@ class CrawlView(ProjectObjectMixin, DetailView):
             crawl_object.status = "DUMPING"
             crawl_object.save()
             cca_dump(self.get_object())
+            crawl_object.status = "SUCCESS"
+            crawl_object.save()
             return HttpResponse("Success")
         # Dump Images
         elif request.POST['action'] == "dump":
-            self.dump_images()
+            # TODO - restore dump_images
             return HttpResponse("Success")
 
         # Force Stop Nutch
@@ -203,7 +207,7 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 "STOPPED",
                 "FORCE STOPPED"
             ]
-            if crawl_object.status not in no_go_statuses:
+            if crawl_object.status not in no_go_statuses and crawl_object.crawler != 'nutch':
                 crawl_object.status = crawl_object.celerytask.task.status
                 crawl_object.save()
             if crawl_object.crawler == "ache":
@@ -221,19 +225,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 kwargs=kwargs,
                 post=request.POST)),
             content_type="application/json")
-
-
-    def dump_images(self):
-        self.img_dir = os.path.join(IMAGES_PATH, self.get_object().slug)
-        if os.path.exists(self.img_dir):
-            shutil.rmtree(self.img_dir)
-        else:
-            os.makedirs(self.img_dir)
-
-        img_dump_proc = subprocess.Popen(["nutch", "dump", "-outputDir", self.img_dir, "-segment",
-                                         os.path.join(self.get_object().get_crawl_path(), 'segments'),"-mimetype",
-                                         "image/jpeg", "image/png"]).wait()
-        return "Dumping images"
 
     def get(self, request, *args, **kwargs):
         # Get Relevant Seeds File
@@ -294,6 +285,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
         context['settings'] = settings
         if self.get_object().crawler == "ache":
             plots = AcheDashboard(self.get_object()).get_plots()
+            context['scripts'] = plots['scripts']
+            context['divs'] = plots['divs']
+        elif self.get_object().crawler == "nutch":
+            plots = NutchDashboard(self.get_object()).get_plots()
             context['scripts'] = plots['scripts']
             context['divs'] = plots['divs']
         return context

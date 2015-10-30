@@ -1,3 +1,0 @@
-python-pip:
-  pkg:
-    - installed

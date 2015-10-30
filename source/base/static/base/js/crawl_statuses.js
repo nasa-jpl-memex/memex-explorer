@@ -67,6 +67,81 @@ var statuses = statuses || {};
         "seeds",
       ],
     },
+    "INJECT": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "GENERATE": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "FETCH": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "PARSE": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
+    "UPDATEDB": {
+      "disabled": [
+        "play",
+        "restart",
+        "images",
+        "cca",
+        "rounds",
+      ],
+      "enabled": [
+        "stop",
+        "kill",
+        "log",
+        "seeds",
+      ],
+    },
     "RESTARTING": {
       "disabled": [
         "play",

@@ -1,117 +1,107 @@
 from __future__ import absolute_import
 
+import json
 import subprocess
 import os
-import shlex
 import time
-import shutil
-import sys
 from celery import shared_task, Task
 
 from django.db import IntegrityError
 
 from task_manager.models import CeleryTask
+import nutch as nutch_rest_api
+from apps.crawl_space.viz.stream import NutchUrlTrails
 
-from apps.crawl_space.settings import LANG_DETECT_PATH, CCA_PATH
-from apps.crawl_space.models import Crawl
+from django.conf import settings
 
-# TODO - pull out this hardcode search
-if os.path.exists('/home/vagrant/miniconda/envs/memex/bin/nutch'):
-    nutch_path = '/home/vagrant/miniconda/envs/memex/lib/nutch/bin/nutch'
-    crawl_path = '/home/vagrant/miniconda/envs/memex/lib/nutch/bin/crawl'
-    ache_path = '/home/vagrant/miniconda/envs/memex/bin/ache'
-else:
-    nutch_path = 'nutch'
-    crawl_path = 'crawl'
-    ache_path = 'ache'
-# END TODO
+ENABLE_STREAM_VIZ = settings.ENABLE_STREAM_VIZ
+STREAM_UPDATE_PERIOD = 0.1
 
-
-def nutch_log_statistics(crawl):
-    crawl_db_dir = os.path.join(crawl.get_crawl_path(), 'crawldb')
-    stats_call = nutch_path + " readdb {} -stats".format(crawl_db_dir)
-    proc = subprocess.Popen(shlex.split(stats_call), stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
-    stdout, stderr = proc.communicate()
-    nutch_stats = stdout.decode()
-    for line in stdout.split('\n'):
-        if 'db_fetched' in line:
-            crawl.pages_crawled = int(line.split('\t')[-1])
-            crawl.save()
+nutch_path = 'nutch'
+crawl_path = 'crawl'
+ache_path = 'ache'
 
 
 def cca_dump(crawl):
-    cca_dir = os.path.join(CCA_PATH, crawl.slug)
-    if os.path.exists(cca_dir):
-        shutil.rmtree(cca_dir)
+    # TODO - check if this is necessary, for now assuming I need same
+    # config to correctly dump a given crawl
+    if ENABLE_STREAM_VIZ:
+        config_name = 'config_streaming_' + self.crawl.name
+        nutch_client = nutch_rest_api.Nutch(confId=config_name)
     else:
-        os.makedirs(cca_dir)
+        nutch_client = nutch_rest_api.Nutch()
 
-    sys.stderr.write("CCA DIR "+cca_dir)
-    sys.stderr.write("SEGMENTS DIR "+os.path.join(crawl.get_crawl_path(), 'segments'))
+    job_client = nutch_client.Jobs(crawl.name)
+    job_client.commoncrawldump()
 
-    environ = os.environ.copy()
-    environ['JAVA_HOME'] = '/usr/lib/jvm/java-7-oracle'
-    cca_dump_proc = subprocess.Popen([nutch_path, "commoncrawldump", "-outputDir", cca_dir,
-                                        "-segment", os.path.join(crawl.get_crawl_path(), 'segments')],
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environ)
-    stdout, stderr = cca_dump_proc.communicate()
-    sys.stderr.write(stdout)
-    sys.stderr.write(stderr)
-    crawl.save()
-    return "Dumping CCA data"
-
+# TODO - refactor below, these methods are getting a bit big
 
 class NutchTask(Task):
     abstract = True
 
-    def after_return(self, *args, **kwargs):
-        nutch_log_statistics(self.crawl)
-        self.crawl = Crawl.objects.get(pk=self.crawl.pk)
-        self.crawl.rounds_left -= 1
-        self.crawl.save()
-        if os.path.exists(os.path.join(self.crawl.get_crawl_path(), "stop")):
-            self.crawl.rounds_left = 0
-            self.crawl.save()
-            os.remove(os.path.join(self.crawl.get_crawl_path(), "stop"))
-            return
-        if self.crawl.rounds_left >= 1:
-            time.sleep(10)
-            nutch.delay(self.crawl)
-
-
 @shared_task(bind=True, base=NutchTask)
 def nutch(self, crawl, rounds=1, *args, **kwargs):
     self.crawl = crawl
-    call = [
-        crawl_path,
-        "--index",
-        "-D",
-        "elastic.index=%s" % self.crawl.index_name,
-        self.crawl.seeds_list.path,
-        self.crawl.get_crawl_path(),
-        "1",
-    ]
-    with open(os.path.join(crawl.get_crawl_path(), 'crawl_proc.log'), 'a') as stdout:
-        proc = subprocess.Popen(call, stdout=stdout, stderr=subprocess.PIPE,
-             preexec_fn=os.setsid)
-    # Check whether a CeleryTask already exists. If no, create the new object. If
-    # yes (IntegrityError), update the rows of the already existing object.
-    try:
-        self.crawl_task = CeleryTask(pid=proc.pid, crawl=self.crawl, uuid=self.request.id)
-        self.crawl_task.save()
-    except IntegrityError:
-        self.crawl_task = CeleryTask.objects.get(crawl=self.crawl)
-        self.crawl_task.pid = proc.pid
-        self.crawl_task.uuid = self.request.id
-        self.crawl_task.save()
-    stdout, stderr = proc.communicate()
-    # Because of the difference between the binaries in lib/nutch/bin/nutch and
-    # bin/nutch, the returncode is not always reliable. When nutch is called from
-    # bin/nutch the error codes do not work properly.
-    if proc.returncode > 0:
-        raise RuntimeError("Crawl has failed. Please review the crawl logs.")
-    return "Round Complete"
+    self.crawl_task = None
+
+    if ENABLE_STREAM_VIZ:
+        # need to reconfigure nutch
+        config_client = nutch_rest_api.Nutch().Configs()
+
+        streaming_overrides = {'fetcher.publisher':'true',
+                               'publisher.queue.type': 'rabbitmq',
+                               'rabbitmq.exchange.type': 'direct',
+                               'rabbitmq.queue.routingkey': self.crawl.name}
+
+        config_name = 'config_streaming_' + self.crawl.name
+        config_client[config_name] = streaming_overrides
+
+        nutch_client = nutch_rest_api.Nutch(confId=config_name)
+        url_trails = NutchUrlTrails(self.crawl.name)
+    else:
+        nutch_client = nutch_rest_api.Nutch()
+        url_trails = None
+
+    seed_client = nutch_client.Seeds()
+
+    seed_urls = json.loads(self.crawl.seeds_object.seeds)
+    seed = seed_client.create(self.crawl.slug + '_seed', seed_urls)
+
+    job_client = nutch_client.Jobs(self.crawl.name)
+
+    rest_crawl = nutch_client.Crawl(seed, jobClient=job_client, rounds=self.crawl.rounds_left)
+
+    while self.crawl.rounds_left:
+        if rest_crawl.currentJob is None:
+            rest_crawl.currentJob = rest_crawl.jobClient.create('GENERATE')
+
+        active_job = rest_crawl.progress(nextRound=False)
+        while active_job:
+            time.sleep(STREAM_UPDATE_PERIOD)
+            old_job = active_job
+            active_job = rest_crawl.progress(nextRound=False)
+            if url_trails:
+                url_trails.handle_messages()
+            if active_job and active_job != old_job:
+                self.crawl.status = active_job.info()['type']
+                self.crawl.save()
+        self.crawl.rounds_left -= 1
+        try:
+            stats = rest_crawl.jobClient.stats()
+        except nutch_rest_api.NutchException:
+            # TODO: Log this
+            pass
+        else:
+            for ignore, data in stats['status'].items():
+                if data['statusValue'] == 'db_fetched':
+                    self.crawl.pages_crawled = data['count']
+                    break
+            else:
+                # TODO: Log this (Nutch has responded but has not crawled anything yet)
+                pass
+        self.crawl.save()
+    self.crawl.status = 'SUCCESS'
+    self.crawl.save()
 
 
 def ache_log_statistics(crawl):

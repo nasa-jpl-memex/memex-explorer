@@ -148,8 +148,8 @@ EXTERNAL_APPS = {'celery',
                  'ddt',
                  'elasticsearch',
                  'kibana',
-                 'logio-harvester',
-                 'logio-server',
+                 'rabbitmq',
+                 'bokeh-server',
                  'redis',
                  'tad',
                  'tika'}
@@ -160,6 +160,10 @@ if READY_EXTERNAL_APPS:
     sys.stderr.write("[%d]: The following applications are ready %s\n" % (os.getpid(), str(READY_EXTERNAL_APPS)))
 else:
     sys.stderr.write("[%d]: Supervisord not running or no applications are running\n" % (os.getpid()))
+
+ENABLE_STREAM_VIZ = 'bokeh-server' in READY_EXTERNAL_APPS and 'rabbitmq' in READY_EXTERNAL_APPS
+
+sys.stderr.write("Setting enable stream viz to: {}".format(ENABLE_STREAM_VIZ))
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

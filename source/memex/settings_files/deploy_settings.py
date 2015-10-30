@@ -31,7 +31,6 @@ DEBUG = True
 EXTERNAL_APP_LOCATIONS = {
     'ddt': 'http://explorer.continuum.io:8084',
     'kibana': '/kibana/',
-    'logio': '/logio/',
 }
 
 # A few more checks in deployment that services are running correctly
