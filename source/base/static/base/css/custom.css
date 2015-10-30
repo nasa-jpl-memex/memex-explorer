@@ -32,6 +32,23 @@
   border-color: #1D4971;
 }
 
+.panel-trails {
+  background-color:#177134;
+  border: none;
+  margin-top: 20px;
+  box-shadow: 3px 3px 15px #888888;
+}
+
+.panel-trails>.panel-heading{
+  color: black !important;
+  background-color: #1A7E78;
+  border-color: #1A7E78;
+}
+
+.trails-hover{
+  cursor: pointer;
+}
+
 .panel-seeds>.panel-footer>.seeds-buttons{
   height: 50px;
 }
@@ -219,4 +236,11 @@ a:hover .fa {
   border: 1px solid #ccc;
   padding: 1px;
   border-radius: 4px;
+}
+
+#id_trailseeds {
+  height:400px;
+  background-color: #fff;
+  white-space: nowrap;
+  cursor: default;
 }

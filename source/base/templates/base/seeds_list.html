@@ -10,6 +10,7 @@
 {% block extrafooter %}
     <script src="{% static 'base/js/codemirror-compressed.js' %}"></script>
     <script src="{% static 'base/js/backbone/base_views.js' %}"></script>
+    <script src="{% static 'base/js/backbone/trails_backbone.js' %}"></script>
     <script src="{% static 'base/js/backbone/seeds.js' %}"></script>
     <script src="{% static 'base/js/backbone/seeds_router.js' %}"></script>
 {% endblock %}
@@ -29,7 +30,7 @@
     </div>
 
     <div class="row" id="seedsList">
-        <div class="col-lg-3 col-md-4 pointer-hand" data-toggle="modal" data-target="#newSeedsModal">
+        <div class="col-lg-3 col-md-3 pointer-hand" data-toggle="modal" data-target="#newSeedsModal">
             <div class="panel panel-project">
                 <a>
                 <div class="panel-heading">
@@ -47,6 +48,8 @@
         </div>
         <div id="seeds"></div>
     </div>
+    <div id="trailHeader"></div>
+    <div id="trailSeedsCreation"></div>
 
     <div class="modal fade" id="newSeedsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">

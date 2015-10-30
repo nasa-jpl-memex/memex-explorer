@@ -2,6 +2,9 @@ import shutil
 import json
 
 from rest_framework import routers, serializers, viewsets, parsers, filters
+from rest_framework.views import APIView
+from rest_framework.exceptions import APIException
+from rest_framework.response import Response
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile, InMemoryUploadedFile
@@ -9,6 +12,14 @@ from django.core.validators import URLValidator
 
 from base.models import Project, SeedsList
 from apps.crawl_space.models import Crawl, CrawlModel
+
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ConnectionError, NotFoundError
+
+
+class DataWakeIndexUnavailable(APIException):
+    status_code = 404
+    default_detail = "The server failed to find the DataWake index in elasticsearch."
 
 
 class SlugModelSerializer(serializers.ModelSerializer):
@@ -166,6 +177,42 @@ class SeedsListViewSet(viewsets.ModelViewSet):
             })
         else:
             return super(SeedsListViewSet, self).destroy(request)
+
+
+class DataWakeView(APIView):
+    index = "datawake"
+    es = Elasticsearch()
+
+    def create_trails(self, trail_ids):
+        trails = []
+        for x in trail_ids:
+            url_search = self.es.search(index=self.index, q="trail_id:%d" % x,
+                fields="url", size=1000)["hits"]["hits"]
+            new_trail = {"trail_id": x, "urls": [], "domain_name":url_search[0]["_type"]}
+            for y in url_search:
+                new_trail["urls"].append(y["fields"]["url"][0])
+            new_trail.update({"urls_string": "\n".join(new_trail["urls"])})
+            trails.append(new_trail)
+        return trails
+
+    def get(self, request, format=None):
+        # TODO: catch all exception. At the very least, deal with 404 not found and
+        # connection refused exceptions.
+        # Temporarily remove exceptions for debugging.
+        try:
+            trail_ids = [x["key"] for x in self.es.search(index=self.index, body={
+                "aggs" : {
+                    "trail_id" : {
+                        "terms" : { "field" : "trail_id" }
+                    }
+                }
+            })["aggregations"]["trail_id"]["buckets"]]
+            response = self.create_trails(trail_ids)
+        except ConnectionError as e:
+            raise OSError("Failed to connect to local elasticsearch instance.")
+        except NotFoundError:
+            raise DataWakeIndexUnavailable
+        return Response(response)
 
 
 router = routers.DefaultRouter()
