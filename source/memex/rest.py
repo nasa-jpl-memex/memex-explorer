@@ -173,31 +173,31 @@ class SeedsListViewSet(viewsets.ModelViewSet):
 
 
 class DataWakeView(APIView):
-    index = "datawake_0"
+    index = "datawake"
+    es = Elasticsearch()
 
-    def parse_query(self, query):
+    def create_trails(self, trail_ids):
         trails = []
-        for x, index in enumerate(query["hits"]["hits"]):
-            source = index["_source"]
-            index = index["_source"]["crawl_data"]
-            index["domain_name"] = index.pop("domain-name")
-            index["user_email"] = index.pop("user-email")
-            index["full_text"] = index.pop("full-text")
-            index["url"] = source["url"]
-            del index["entities"]
-            trails.append(index)
+        for x in trail_ids:
+            new_trail = {"trail_id": x, "urls": []}
+            url_search = self.es.search(index="datawake", q="trail_id:%d" % x,
+                fields="url", size=1000)["hits"]["hits"]
+            for y in url_search:
+                new_trail["urls"].append(y["fields"]["url"][0])
+            trails.append(new_trail)
         return trails
 
     def get(self, request, format=None):
-        es = Elasticsearch()
         # TODO: catch all exception. At the very least, deal with 404 not found and
         # connection refused exceptions.
-        try:
-            response = self.parse_query(
-                es.search(index=self.index, body={"query": {"match_all": {}}})
-            )
-        except Exception:
-            response = None
+        trail_ids = [x["key"] for x in self.es.search(index=self.index, body={
+            "aggs" : {
+                "trail_id" : {
+                    "terms" : { "field" : "trail_id" }
+                }
+            }
+        })["aggregations"]["trail_id"]["buckets"]]
+        response = self.create_trails(trail_ids)
         return Response(response)
 
 
