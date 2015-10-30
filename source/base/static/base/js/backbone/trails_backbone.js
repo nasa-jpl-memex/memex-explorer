@@ -1,11 +1,16 @@
 (function(exports){
 
+  // Module-wide variables
+  var module = {};
+
+
   exports.Trail = Backbone.Model.extend({
     urlRoot: "/api/datawake",
     defaults: {
       trail_id: 0,
       domain_name: "",
       urls: [],
+      urls_string: "",
     },
   });
 
@@ -22,12 +27,17 @@
     initialize: function(model){
       var that = this;
       this.model = model;
+      this.trailId = this.model.toJSON()["trail_id"];
       this.render();
+      this.events = {};
+      this.events["click #trail_" + this.trailId] = "setForm"
     },
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
     },
-    events: {},
+    setForm: function(){
+      module.editor.setValue(this.model.toJSON()["urls_string"])
+    }
   });
 
 
@@ -41,11 +51,11 @@
     template: _.template($("#trailFormBody").html()),
     initialize: function(collection){
       this.render();
-      this.editor = CodeMirror.fromTextArea(document.getElementById("id_trailseeds"), {
+      module.editor = CodeMirror.fromTextArea(document.getElementById("id_trailseeds"), {
         lineNumbers: false,
         readOnly: true,
       });
-      this.editor.setSize("100%", 400);
+      module.editor.setSize("100%", 400);
     },
     render: function(){
       this.$el.html(this.template());

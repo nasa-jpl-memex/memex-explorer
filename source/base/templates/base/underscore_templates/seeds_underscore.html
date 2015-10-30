@@ -121,7 +121,7 @@
 
 <script type="text/template" id="trailItem">
     <div class="col-lg-3 col-md-4">
-        <div class="panel panel-trails trails-hover" data-toggle="modal" data-target="#trailModal">
+        <div class="panel panel-trails trails-hover" data-toggle="modal" data-target="#trailModal" id="trail_<%= trail_id %>">
             <div class="panel-heading">
                 <div class="row">
                 <input type="hidden" value="<%= trail_id %>">
@@ -149,32 +149,38 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="trailModalLabel">Create Seeds From Trail</h4>
                 </div>
-                <form id="trailForm" method="post">
-                    {% csrf_token %}
-                    <div id="div_id_seedsname" class="form-group">
-                        <label for="id_seedsname" class="control-label requiredField">
-                            Name<span class="asteriskField">*</span>
-                        </label>
-                        <div class="controls ">
-                            <input class="textinput textInput form-control" id="id_seedsname" maxlength="64" name="seedsname" type="text" />
+                <div class="modal-body">
+                    <form id="trailForm" method="post">
+                        {% csrf_token %}
+                        <div id="div_id_seedsname" class="form-group">
+                            <label for="id_seedsname" class="control-label requiredField">
+                                Name<span class="asteriskField">*</span>
+                            </label>
+                            <div class="controls ">
+                                <input class="textinput textInput form-control" id="id_seedsname" maxlength="64" name="seedsname" type="text" />
+                            </div>
+                            <span class="help-block">
+                                <strong id="error_id_seedsname" hidden></strong>
+                            </span>
+                            <hr />
+                            <label for="id_trailseeds" class="control-label">
+                                Trail Seeds
+                            </label>
+                            <div id="trailseeds_editor">
+                              <textarea id="id_trailseeds" name="trailseeds"></textarea>
+                            </div>
                         </div>
-                        <span class="help-block">
-                            <strong id="error_id_seedsname" hidden></strong>
-                        </span>
-                        <div id="trailseeds_editor">
-                          <textarea id="id_trailseeds" name="trailseeds"></textarea>
+                        <hr>
+                        <div class="form-actions row">
+                          <div class="col-md-2">
+                              <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
+                          </div>
+                          <div class="col-md-2">
+                              <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
+                          </div>
                         </div>
-                    </div>
-                    <hr>
-                    <div class="form-actions row">
-                      <div class="col-md-2">
-                          <input type="submit" name="submit" value="Create" class="btn btn-primary" id="submit-id-submit" />
-                      </div>
-                      <div class="col-md-2">
-                          <input type="button" name="cancel" value="Cancel" class="btn btn-primary link-button" id="cancelSubmit" data-dismiss="modal" href="#">
-                      </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

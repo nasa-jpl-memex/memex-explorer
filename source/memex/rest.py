@@ -184,12 +184,14 @@ class DataWakeView(APIView):
             new_trail = {"trail_id": x, "urls": [], "domain_name":url_search[0]["_type"]}
             for y in url_search:
                 new_trail["urls"].append(y["fields"]["url"][0])
+            new_trail.update({"urls_string": "\n".join(new_trail["urls"])})
             trails.append(new_trail)
         return trails
 
     def get(self, request, format=None):
         # TODO: catch all exception. At the very least, deal with 404 not found and
         # connection refused exceptions.
+        # Temporarily remove exceptions for debugging.
         trail_ids = [x["key"] for x in self.es.search(index=self.index, body={
             "aggs" : {
                 "trail_id" : {
