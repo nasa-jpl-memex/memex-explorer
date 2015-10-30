@@ -238,8 +238,9 @@ a:hover .fa {
   border-radius: 4px;
 }
 
-#trailseeds_editor {
-  border: 1px solid #ccc;
-  padding: 1px;
-  border-radius: 4px;
+#id_trailseeds {
+  height:400px;
+  background-color: #fff;
+  white-space: nowrap;
+  cursor: default;
 }

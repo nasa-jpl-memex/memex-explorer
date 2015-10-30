@@ -30,13 +30,13 @@
       this.trailId = this.model.toJSON()["trail_id"];
       this.render();
       this.events = {};
-      this.events["click #trail_" + this.trailId] = "setForm"
+      this.events["click #trail_" + this.trailId] = "setForm";
     },
     render: function(){
       this.$el.append(this.template(this.model.toJSON()));
     },
     setForm: function(){
-      module.editor.setValue(this.model.toJSON()["urls_string"])
+      $("#id_trailseeds").val(this.model.toJSON()["urls_string"]);
     }
   });
 
@@ -51,14 +51,17 @@
     template: _.template($("#trailFormBody").html()),
     initialize: function(collection){
       this.render();
-      module.editor = CodeMirror.fromTextArea(document.getElementById("id_trailseeds"), {
-        lineNumbers: false,
-        readOnly: true,
-      });
-      module.editor.setSize("100%", 400);
     },
     render: function(){
       this.$el.html(this.template());
+    },
+    createSeeds: function(events){
+      var that = this;
+      event.preventDefault();
+      var formObjects = this.toFormData(this.form);
+    },
+    events: {
+      "submit #trailForm": "createSeeds",
     },
   });
 
