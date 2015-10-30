@@ -61,8 +61,24 @@
       // Convert formdata to fields necessary for creating a seeds list.
       var formObjects = this.toFormData(this.form);
       formObjects["name"] = formObjects["seedsname"];
-      formObjects["seeds"] = $("#id_trailseeds").val();
+      formObjects["textseeds"] = $("#id_trailseeds").val();
       delete formObjects["seedsname"];
+      var newSeeds = new Seeds.Seeds(formObjects);
+      newSeeds.save({}, {
+        success: function(response){
+          that.formSuccess(that.modal, that.form);
+          that.clearErrors(that.formFields, that.form);
+          var newSeedsView = new Seeds.SeedsView(response)
+        },
+        error: function(model, xhr, thrownError){
+          // Convert the name of the error to seedsname, to avoid conflict with
+          // the add seeds form.
+          var response = xhr.responseJSON;
+          response["seedsname"] = response["name"];
+          delete response["name"]
+          that.showFormErrors(response, that.form);
+        },
+      });
     },
     events: {
       "submit #trailForm": "createSeeds",
