@@ -181,7 +181,7 @@ class DataWakeView(APIView):
         for x in trail_ids:
             url_search = self.es.search(index="datawake", q="trail_id:%d" % x,
                 fields="url", size=1000)["hits"]["hits"]
-            new_trail = {"trail_id": x, "urls": [], "domain":url_search[0]["_type"]}
+            new_trail = {"trail_id": x, "urls": [], "domain_name":url_search[0]["_type"]}
             for y in url_search:
                 new_trail["urls"].append(y["fields"]["url"][0])
             trails.append(new_trail)

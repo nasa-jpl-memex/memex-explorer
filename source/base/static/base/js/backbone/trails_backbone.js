@@ -3,11 +3,9 @@
   exports.Trail = Backbone.Model.extend({
     urlRoot: "/api/datawake",
     defaults: {
-      docid: "",
       trail_id: 0,
       domain_name: "",
       urls: [],
-      urls_string: "",
     },
   });
 
