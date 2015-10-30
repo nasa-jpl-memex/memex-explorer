@@ -19,7 +19,7 @@ from elasticsearch.exceptions import ConnectionError, NotFoundError
 
 class DataWakeIndexUnavailable(APIException):
     status_code = 404
-    default_detail = """The server failed to find the DataWake index in elasticsearch."""
+    default_detail = "The server failed to find the DataWake index in elasticsearch."
 
 
 class SlugModelSerializer(serializers.ModelSerializer):
