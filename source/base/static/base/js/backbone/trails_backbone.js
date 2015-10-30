@@ -58,7 +58,11 @@
     createSeeds: function(events){
       var that = this;
       event.preventDefault();
+      // Convert formdata to fields necessary for creating a seeds list.
       var formObjects = this.toFormData(this.form);
+      formObjects["name"] = formObjects["seedsname"];
+      formObjects["seeds"] = $("#id_trailseeds").val();
+      delete formObjects["seedsname"];
     },
     events: {
       "submit #trailForm": "createSeeds",
