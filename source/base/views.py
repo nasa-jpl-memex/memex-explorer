@@ -147,9 +147,9 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         # Remove crawls and folders for crawls.
-        # for crawl in self.get_crawls():
-        #     shutil.rmtree(os.path.join(CRAWL_PATH, str(crawl.pk)))
-        #     crawl.delete()
+        for crawl in self.get_crawls():
+            shutil.rmtree(os.path.join(CRAWL_PATH, crawl.slug))
+            crawl.delete()
         return super(DeleteProjectView, self).delete(request, *args, **kwargs)
 
     def get_object(self):
