@@ -12,6 +12,7 @@ from kombu import Exchange, Connection, Queue
 from bokeh.models.glyphs import Segment
 from bokeh.models.markers import Circle
 from bokeh.models import Range1d, ColumnDataSource
+from bokeh.models.grids import Grid
 from bokeh.embed import autoload_server
 from bokeh.session import Session
 from bokeh.document import Document
@@ -19,7 +20,7 @@ from bokeh.document import Document
 DEFAULT_NUM_URLS = 25
 URL_CHAR_WIDTH = 50
 EXCHANGE_NAME = "fetcher_log"
-
+PLOT_CIRCLES = False
 
 def init_plot(crawl_name):
     session = Session()
@@ -43,6 +44,15 @@ def init_plot(crawl_name):
                       width=1200, height=600)
         plot.toolbar_location = None
         plot.xgrid.grid_line_color = None
+
+        # temporarily turn these off
+        plot.ygrid.grid_line_color = None
+        plot.xaxis.minor_tick_line_color = None
+        plot.xaxis.major_tick_line_color = None
+        plot.xaxis.major_label_text_font_size = '0pt'
+        plot.yaxis.minor_tick_line_color = None
+        plot.yaxis.major_tick_line_color = None
+        plot.yaxis.major_label_text_font_size = '0pt'
 
     document.add(plot)
     session.store_document(document)
@@ -201,6 +211,21 @@ class NutchUrlTrails:
         plot.x_range.end = np.datetime64(datetime.now())
         plot.y_range.factors = active_urls
 
+        # make sure these are turned back on!
+        # turn y axis grid lines back on
+        for r in plot.renderers:
+            if type(r) == Grid:
+                r.grid_line_color = 'black'
+                break
+
+        # turn tickers and their labels back on
+        plot.right[0].minor_tick_line_color = 'black'
+        plot.right[0].major_tick_line_color = 'black'
+        plot.right[0].major_label_text_font_size = '12pt'
+        plot.below[0].minor_tick_line_color = 'black'
+        plot.below[0].major_tick_line_color = 'black'
+        plot.below[0].major_label_text_font_size = '12pt'
+
         # TODO: Find a more correct way to remove old segment/circle glyphs
         if self.old_circles:
             plot.renderers.pop()
@@ -216,7 +241,7 @@ class NutchUrlTrails:
         self.old_segments = Segment(x0="x0", y0="urls", x1="x1", y1="urls", line_color="orange", line_width=10)
         plot.add_glyph(segment_source, self.old_segments)
 
-        if self.closed_urls:
+        if self.closed_urls and PLOT_CIRCLES:
             # filter circles (some of these might not be displayed)
             active_circles = circles[:self.num_urls]
             active_circle_urls = circle_urls[:self.num_urls]
