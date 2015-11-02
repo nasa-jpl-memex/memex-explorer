@@ -6,13 +6,9 @@ Developer's Guide to Memex Explorer
 Setting up Memex Explorer
 *************************
 
-To setup your machine, you will need Anaconda or Miniconda
-installed. Miniconda is a minimal Anaconda installation that
-bootstraps conda and Python on any operating system. Install `Anaconda
-<http://continuum.io/downloads>`_ or `Miniconda
-<http://conda.pydata.org/miniconda.html>`_ from their respective sites.
+To setup your machine, you will need Anaconda or Miniconda installed. Miniconda is a minimal Anaconda installation that bootstraps conda and Python on any operating system. Install `Anaconda <http://continuum.io/downloads>`_ or `Miniconda <http://conda.pydata.org/miniconda.html>`_ from their respective sites.
 
-Memex Explorer requires conda, either from Miniconda or Anaconda.  
+Memex Explorer requires conda, either from Miniconda or Anaconda.
 
 Application Setup
 =================
@@ -25,7 +21,7 @@ Application Setup
        $ cd memex-explorer/source
        $ ./app_setup.sh
 
-   You can then start the application from this directory:
+    You can then start the application from this directory:
 
     .. code-block:: html
 
@@ -33,6 +29,25 @@ Application Setup
        $ supervisord
 
    Memex Explorer will now be running locally at `http://localhost:8000 <http://localhost:8000/>`_.
+
+Enabling Nutch Visualizations
+=============================
+
+   Nutch visualizations are not enabled by default. Nutch visualizations require RabbitMQ, and the method for installing RabbitMQ varies depending on the operating system. RabbitMQ can be installed via Homebrew on Mac, and apt-get on Debian systems. More information on how to install RabbitMQ, read `this page <https://www.rabbitmq.com/download.html>`_.
+
+   To enable Bokeh visualizations for Nutch, change ``autostart=false`` to ``autostart=true`` for both of these directives in source/supervisord.conf, and then kill and restart supervisor.
+
+   .. code-block:: html
+
+      [program:rabbitmq]
+      command=rabbitmq-server
+      priority=1
+      autostart=false
+
+      [program:bokeh-server]
+      command=bokeh-server --backend memory --port 5006
+      priority=1
+      autostart=false
 
 Tests
 =====
