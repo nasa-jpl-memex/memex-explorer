@@ -146,7 +146,8 @@ class DeleteProjectView(SuccessMessageMixin, DeleteView):
     success_url = "/"
 
     def delete(self, request, *args, **kwargs):
-        # Remove crawls and folders for crawls.
+        # Delete all crawls and crawl folders before deleting associated crawl
+        # models, to prevent a ProtectedError.
         for crawl in self.get_crawls():
             shutil.rmtree(os.path.join(CRAWL_PATH, crawl.slug))
             crawl.delete()
