@@ -3,8 +3,10 @@ from __future__ import absolute_import
 import json
 import subprocess
 import os
+import sys
 import time
 from celery import shared_task, Task
+from apps.crawl_space.models import Crawl
 
 from django.db import IntegrityError
 
@@ -70,39 +72,54 @@ def nutch(self, crawl, rounds=1, *args, **kwargs):
     job_client = nutch_client.Jobs(self.crawl.name)
 
     rest_crawl = nutch_client.Crawl(seed, jobClient=job_client, rounds=self.crawl.rounds_left)
+    nutch_crawl(self.crawl, rest_crawl, url_trails)
 
-    while self.crawl.rounds_left:
+
+def nutch_crawl(crawl_model, rest_crawl, url_trails):
+    """
+    Run a Nutch crawl until self.rounds_left is 0 or self.crawl.status is externally set to "STOPPING"
+
+    :param crawl_model: The crawl model
+    :param rest_crawl: A NutchPy Crawl Client
+    :param url_trails: A UrlTrails object for visualizing streaming messages from Nutch
+    """
+
+    while crawl_model.rounds_left:
         if rest_crawl.currentJob is None:
             rest_crawl.currentJob = rest_crawl.jobClient.create('GENERATE')
 
         active_job = rest_crawl.progress(nextRound=False)
         while active_job:
+            crawl_model = Crawl.objects.get(id=crawl_model.id)
+            sys.stderr.write("Crawler Status: {}".format(crawl_model.status))
+            if crawl_model.status == 'STOPPING':
+                crawl_model.status = 'STOPPED'
+                crawl_model.save()
+                return
             time.sleep(STREAM_UPDATE_PERIOD)
             old_job = active_job
             active_job = rest_crawl.progress(nextRound=False)
             if url_trails:
                 url_trails.handle_messages()
             if active_job and active_job != old_job:
-                self.crawl.status = active_job.info()['type']
-                self.crawl.save()
-        self.crawl.rounds_left -= 1
+                crawl_model.status = active_job.info()['type']
+                crawl_model.save()
+        crawl_model.rounds_left -= 1
         try:
             stats = rest_crawl.jobClient.stats()
-        except nutch_rest_api.NutchException:
-            # TODO: Log this
-            pass
+        except nutch_rest_api.NutchException as err:
+            sys.stderr.write(str(err))
         else:
             for ignore, data in stats['status'].items():
                 if data['statusValue'] == 'db_fetched':
-                    self.crawl.pages_crawled = data['count']
+                    crawl_model.pages_crawled = data['count']
                     break
             else:
-                # TODO: Log this (Nutch has responded but has not crawled anything yet)
-                pass
-        self.crawl.save()
-    self.crawl.status = 'SUCCESS'
-    self.crawl.save()
-
+                sys.stderr.write("Warning: Nutch has responded but has not crawled anything yet")
+        crawl_model.save()
+    crawl_model.status = 'SUCCESS'
+    crawl_model.save()
+    
 
 def ache_log_statistics(crawl):
     harvest_path = os.path.join(crawl.get_crawl_path(), 'data_monitor/harvestinfo.csv')

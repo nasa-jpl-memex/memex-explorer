@@ -161,12 +161,10 @@ class CrawlView(ProjectObjectMixin, DetailView):
                 crawl_object.save()
                 os.killpg(crawl_object.celerytask.pid, 9)
             if crawl_object.crawler == "nutch":
-                crawl_object.status = "FINISHING"
-                crawl_object.rounds_left = 1
+                crawl_object.status = "STOPPING"
                 crawl_object.save()
-                touch(join(crawl_path, 'stop'))
             return HttpResponse(json.dumps(dict(
-                    status="STOP SIGNAL SENT")),
+                    status="STOPPING")),
                 content_type="application/json")
 
 
