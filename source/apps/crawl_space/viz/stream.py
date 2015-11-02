@@ -76,7 +76,12 @@ class NutchUrlTrails:
         :return: The stripped URL
         """
         # TODO: remove protocol-stripping on next Bokeh release
-        return url.replace('https://', '').replace('http://', '').replace(':', '_').replace('-', '_')[:URL_CHAR_WIDTH]
+        stripped_url = url.replace('https://', '').replace('http://', '').replace(':', '_').replace('-', '_')
+
+        if len(stripped_url) <= URL_CHAR_WIDTH:
+            return stripped_url
+        else:
+            return stripped_url[:int(URL_CHAR_WIDTH/2)] + '...' + stripped_url[-int(URL_CHAR_WIDTH/2)-3:]
 
     @staticmethod
     def jtime_to_datetime(t):
