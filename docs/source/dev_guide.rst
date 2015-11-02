@@ -2,8 +2,9 @@
 Developer's Guide to Memex Explorer
 ###################################
 
+*************************
 Setting up Memex Explorer
-=========================
+*************************
 
 To setup your machine, you will need Anaconda or Miniconda
 installed. Miniconda is a minimal Anaconda installation that
@@ -20,16 +21,16 @@ Application Setup
 
     .. code-block:: html
 
-   $ git clone https://github.com/memex-explorer/memex-explorer.git
-   $ cd memex-explorer/source
-   $ ./app_setup.sh
+       $ git clone https://github.com/memex-explorer/memex-explorer.git
+       $ cd memex-explorer/source
+       $ ./app_setup.sh
 
    You can then start the application from this directory:
 
     .. code-block:: html
 
-   $ source activate memex
-   $ supervisord
+       $ source activate memex
+       $ supervisord
 
    Memex Explorer will now be running locally at `http://localhost:8000 <http://localhost:8000/>`_.
 
@@ -41,9 +42,9 @@ Tests
 
         $ py.test
 
+******************
 The Database Model
-==================
-
+******************
 The current entity relation diagram:
 
 .. image:: _static/img/DbVisualizer.png
