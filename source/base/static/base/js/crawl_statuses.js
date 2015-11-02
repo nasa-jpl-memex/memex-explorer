@@ -9,7 +9,6 @@ var statuses = statuses || {};
     play: "playButton",
     stop: "stopButton",
     restart: "restartButton",
-    kill: "forceStopButton",
     images: "dumpImages",
     cca: "common-crawl-dump",
     rounds: "rounds",
@@ -26,7 +25,6 @@ var statuses = statuses || {};
       "disabled": [
         "stop",
         "restart",
-        "kill",
         "images",
         "cca",
         "log",
@@ -41,7 +39,6 @@ var statuses = statuses || {};
       "disabled": [
         "stop",
         "restart",
-        "kill",
         "images",
         "cca",
         "play",
@@ -62,7 +59,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -77,7 +73,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -92,7 +87,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -107,7 +101,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -122,7 +115,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -137,7 +129,6 @@ var statuses = statuses || {};
       ],
       "enabled": [
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -150,7 +141,6 @@ var statuses = statuses || {};
         "cca",
         "rounds",
         "stop",
-        "kill",
         "log",
         "seeds",
       ],
@@ -161,7 +151,6 @@ var statuses = statuses || {};
       "disabled": [
         "play",
         "stop",
-        "kill",
       ],
       "enabled": [
         "restart",
@@ -176,7 +165,6 @@ var statuses = statuses || {};
       "disabled": [
         "stop",
         "restart",
-        "kill",
         "images",
         "cca",
         "play",
@@ -191,7 +179,6 @@ var statuses = statuses || {};
       "disabled": [
         "stop",
         "restart",
-        "kill",
         "images",
         "cca",
         "play",
@@ -205,7 +192,6 @@ var statuses = statuses || {};
     "STOPPED": {
       "disabled": [
         "stop",
-        "kill",
         "images",
         "cca",
         "play",
@@ -229,14 +215,12 @@ var statuses = statuses || {};
       "enabled": [
         "log",
         "seeds",
-        "kill",
       ],
     },
     "FORCE STOPPED": {
       "disabled": [
         "stop",
         "restart",
-        "kill",
         "images",
         "cca",
         "play",
@@ -250,7 +234,6 @@ var statuses = statuses || {};
     "REDIS ERROR": {
       "disabled": [
         "stop",
-        "kill",
         "images",
         "cca",
         "play",
@@ -265,7 +248,6 @@ var statuses = statuses || {};
     "CELERY ERROR": {
       "disabled": [
         "stop",
-        "kill",
         "images",
         "cca",
         "play",

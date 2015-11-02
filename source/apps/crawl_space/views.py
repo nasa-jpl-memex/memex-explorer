@@ -181,16 +181,6 @@ class CrawlView(ProjectObjectMixin, DetailView):
             # TODO - restore dump_images
             return HttpResponse("Success")
 
-        # Force Stop Nutch
-        elif request.POST['action'] == "force_stop":
-            touch(join(crawl_object.get_crawl_path(), 'stop'))
-            os.killpg(crawl_object.celerytask.pid, 9)
-            crawl_object.status = "FORCE STOPPED"
-            crawl_object.save()
-            return HttpResponse(json.dumps(dict(
-                    status="FORCE STOPPED")),
-                content_type="application/json")
-
         # Update status, statistics
         elif request.POST['action'] == "status":
             # Do not update the status if the current status is any of

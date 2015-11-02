@@ -86,14 +86,6 @@
       <p style="display:inline;margin-left:5px;">Rounds:
         <input id="rounds" type="number" class="btn btn-control" value="{{ crawl.rounds_left }}" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
       </p>
-      <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "STARTED" %}
-          disabled
-        {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
-      </button>
       {% endif %}
       </div>
       <div class="col-md-4 btn-group" style="margin-top:1%;">
