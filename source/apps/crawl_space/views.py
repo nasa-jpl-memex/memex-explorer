@@ -234,6 +234,19 @@ class CrawlView(ProjectObjectMixin, DetailView):
             response.write(''.join(seeds))
             return response
 
+        elif 'resource' in request.GET and request.GET['resource'] == "crawl_log":
+            crawl_log = self.get_crawl_log()
+            response = HttpResponse(content_type='text/plain')
+            response['Content-Disposition'] = 'attachment; filename=crawl_log.txt'
+            response.write(crawl_log)
+            return response
+
+    def get_crawl_log(self):
+        log_path = os.path.join(self.get_object().get_crawl_path(), "crawl_proc.log")
+        with open(log_path) as f:
+            crawl_log = f.readlines()
+            return ''.join(crawl_log)
+
     def get_seeds_path(self):
         return self.get_object().seeds_list.path
 
