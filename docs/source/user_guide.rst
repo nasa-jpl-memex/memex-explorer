@@ -9,23 +9,16 @@ constantly evolving as a result. For documentation requests, please*
 Application Structure
 =====================
 
-Memex Explorer is a web application that registers *microservices*. Each
-microservice provides a specific functionality—at present, these include:
+The goal of Memex explorer is the bring together the functionalities of several applications in a seamless way, in order to assist the user in searching the deep web for domain specific information. Memex Explorer has integration with several applications, providing a front-end to various crawlers and domain search tools.
 
-Crawl Space
-  A microservice to create, run, and analyze `Nutch <http://nutch.apache.org/>`_
-  and `ACHE <https://github.com/ViDA-NYU/ache>`_ crawls. The crawl operation
-  is heavily abstracted and simplified. Users provide a list of seed URLs to
-  start the crawl, and in the case of ACHE's targeted crawling,
-  a machine learning `model <https://github.com/ViDA-NYU/ache#build-a-model-for-aches-page-classifier>`_ to declare the relevancy of crawled pages.
+Web Crawling
+  A service to create, run, and analyze `Nutch <http://nutch.apache.org/>`_ and `ACHE <https://github.com/ViDA-NYU/ache>`_ crawls. The crawl operation is heavily abstracted and simplified. Users provide a list of seed URLs to start the crawl, and in the case of ACHE's targeted crawling, a machine learning `model <https://github.com/ViDA-NYU/ache#build-a-model-for-aches-page-classifier>`_ to declare the relevancy of crawled pages.
 
-Image Space
-  A microservice for the display and searching of images and their associated
-  metadata. As a basic example of microservice interoperation,
-  users will be able to dump images from Nutch crawls into an Image Space
-  for analysis. Users can also search for images that match on the registered
-  camera serial number, as well as upload their own images into an
-  Image Space for comparison.
+Domain Discovery Tool
+  Through the use of `Domain Discovery Tool <https://github.com/ViDA-NYU/domain_discovery_tool>`_, the user can search for content in the web and build data models based on clustering algorithms. The user can search the web and highlight relevant and irrelevant pages, and DDT will produce data model files, which you can use with Ache crawls in Memex Explorer.
+
+DataWake
+   `DataWake <https://github.com/Sotera/Datawake>`_ is a server and firefox plugin that tracks your search investigations. It keeps track of where you search, so that "trails" can be built out of the information that you gather. These trails can be converted to seeds lists in Memex Explorer, and can be used in both...
 
 Home Page
 =========
@@ -73,6 +66,3 @@ list text file containing newline-delimited URLs.
 
 For ACHE crawls, you will need to provide the same inputs as above, and
 further select a Crawl Model.
-
-
-
