@@ -23,32 +23,31 @@ DataWake
 Home Page
 =========
 
-The landing page lists currently registered projects. All the capabilities of Memex Explorer live under this project abstraction.
+The landing page lists the currently registered projects. All the capabilities of Memex Explorer live under this project abstraction.
 
 .. image:: _static/img/homepage-view.png
+
+Creating a project just requires adding a name and an optional description.
+
+.. image:: _static/img/project-form.png
 
 Project Page
 ============
 
-The project page lists actions provided by registered microservices. Click on the gear icon to change the project name or description.
-
-In the current Memex Explorer, only the Crawl Space microservice has been registered. Therefore, each project page will list the current crawls and crawl models.
+The project page lists the currently available services in Memex Explorer. These services can all be access from the project page.
 
 .. image:: _static/img/project-page.png
 
 Registering a Crawl
 *******************
 
-To register a new crawl, click the "Add Crawl" button above the Crawls table. This will open a popup for adding crawls. If necessary, you can also create seeds list objects 
-
+To register a new crawl, click the "Add Crawl" button above the Crawls table. This will open a popup for adding crawls. If necessary, you can also create seeds list objects and crawl models from the same form.
 
 .. image:: _static/img/add-crawl.png
 
-For Nutch crawls, you will need to provide a name, a description, and a seeds
-list text file containing newline-delimited URLs.
+For Nutch crawls, you will need to provide a name, a description, and a seeds list text file containing newline-delimited URLs.
 
-For ACHE crawls, you will need to provide the same inputs as above, and
-further select a Crawl Model.
+For ACHE crawls, you will need to provide the same inputs as above, and further select a Crawl Model.
 
 Registering a Crawl Model
 *************************
@@ -58,6 +57,17 @@ ACHE crawls require a *Crawl Model* to power the page classifier. The model cons
 To register a new crawl model, click on the "Add Crawl Model button" in the Crawl Models header. This will bring up the crawl model creation popup. Models can also be added from the add crawl form by selecting "ache" as a crawler.
 
 .. image:: _static/img/add-crawl-model.png
+
+Uploading Files and Index Creation
+**********************************
+
+With Memex Explorer you can create indices by uploading zipfiles of important documents. Memex Explorer will analyze these documents with `Tika <https://tika.apache.org/>`_. You can then easily access the documents from the local Elasticsearch Index, and incorporate them into other data analysis tools. You can create the dataset by clicking "Add Dataset" on the project page. 
+
+.. image:: _static/img/upload-files.png
+
+The add dataset page has a progress bar, and  when your dataset has been successfully uploaded, you will get a success message and an alert to close the page. If you attempt to close the page before the files have been successfully uploaded, you will get an alert warning you to wait until the page is done uploading.
+
+.. image:: _static/img/upload-success.png
 
 Seeds List Page
 ===============
