@@ -72,7 +72,7 @@ The add dataset page has a progress bar, and when your dataset has been successf
 Seeds List Page
 ===============
 
-Seeds for crawls are independent of projects. They are created by clicking on the "Seeds" button on the navbar. From the seeds list page you can create seeds lists from files, or from datawake trails. You can also edit the seeds on a separate page. This is the seeds list page:
+Seeds for crawls are independent of projects. They are created by clicking on the "Seeds" button on the navbar. From the seeds list page you can create seeds lists from files, text, or from datawake trails. You can also edit the seeds on a separate page. In addition, you can delete and download any of the seeds objects that you create. This is the seeds list page:
 
 .. image:: _static/img/seeds-page.png
 
