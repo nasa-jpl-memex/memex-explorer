@@ -42,12 +42,14 @@ Enabling Nutch Visualizations
       [program:rabbitmq]
       command=rabbitmq-server
       priority=1
-      autostart=false
+      -autostart=false
+      +autostart=true
 
       [program:bokeh-server]
       command=bokeh-server --backend memory --port 5006
       priority=1
-      autostart=false
+      -autostart=false
+      +autostart=true
 
 Tests
 =====
@@ -55,11 +57,10 @@ Tests
 
     .. code-block:: html
 
-        $ py.test
+       $ py.test
 
-******************
 The Database Model
-******************
+==================
 The current entity relation diagram:
 
 .. image:: _static/img/DbVisualizer.png

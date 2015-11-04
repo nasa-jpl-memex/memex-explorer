@@ -26,10 +26,7 @@ This script will set up a conda environment named memex, prepare the application
 
 If you have already run the install script, simply run `supervisord` from the `memex-explorer/source` directory to restart all of the services.
 
-The supervisord will start supervisord in the foreground, which will
-in turn ensure that all services associated with the core Memex
-Explorer environment are running.  To stop supervisord and the
-associated services, send an interrupt to the process with `Ctrl-c`.
+The supervisord will start supervisord in the foreground, which will in turn ensure that all services associated with the core Memex Explorer environment are running.  To stop supervisord and the associated services, send an interrupt to the process with `Ctrl-c`.
 
 **Memex Explorer will now be running locally at http://localhost:8000**
 
