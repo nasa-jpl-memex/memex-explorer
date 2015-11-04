@@ -504,7 +504,7 @@ ul.inline-icons li {
 }
 
 /* line 362, ../scss/dashboard.scss */
-#forceStopButton, #editButton, #removeButton, #seedButton, #playButton, #stopButton, #restartButton {
+#editButton, #removeButton, #seedButton, #playButton, #stopButton, #restartButton {
   min-height: 40px;
   min-width: 40px;
 }

@@ -49,10 +49,16 @@ class AcheDashboard(object):
     def get_plots(self):
         harvest_plot = self.get_harvest_plot()
         domain_plot = self.get_domain_plot()
-        return {
-            'scripts': [domain_plot[0], harvest_plot[0]],
-            'divs': [domain_plot[1], harvest_plot[1]],
-        }
+        if harvest_plot != [None, None]:
+            return {
+                'scripts': [domain_plot[0], harvest_plot[0]],
+                'divs': [domain_plot[1], harvest_plot[1]],
+            }
+        else:
+            return {
+                'scripts': None,
+                'divs': None,
+            }
 
 
 class NutchDashboard(object):

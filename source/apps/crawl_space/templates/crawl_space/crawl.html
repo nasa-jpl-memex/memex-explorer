@@ -86,14 +86,6 @@
       <p style="display:inline;margin-left:5px;">Rounds:
         <input id="rounds" type="number" class="btn btn-control" value="{{ crawl.rounds_left }}" min="1" max="99" style="font-size:18px;background-color:white;border:2px solid #EEEEEE"></input>
       </p>
-      <button id="forceStopButton" title="Force Stop Crawl" type="button" class="btn btn-control"
-        data-container="body"
-        {% if crawl.status != "STARTED" %}
-          disabled
-        {% endif %}
-        data-toggle="tooltip" data-placement="bottom">
-        <span class="fa fa-exclamation-triangle" style="padding:6px;"></span>
-      </button>
       {% endif %}
       </div>
       <div class="col-md-4 btn-group" style="margin-top:1%;">
@@ -105,6 +97,7 @@
             Get Seeds List
             </button>
         </form>
+      {% if crawl.crawler == "ache" %}
         <form method="get" style="display:inline;">
             <input type="hidden" name="resource" value="crawl_log">
             <button title="Get Crawl Log" id="getCrawlLog" class="btn btn-default btn-duo center link-button"
@@ -116,6 +109,7 @@
             Get Crawl Log
             </button>
         </form>
+      {% endif %}
       {% if crawl.crawler == "nutch" %}
         <form method="get" style="display:inline;">
             <button id="common-crawl-dump" title="CCA Export" type="button" class="btn btn-default btn-duo center link-button"
@@ -159,7 +153,9 @@
 
   </div>
 </div>
+{% endif %}
 
+{% if crawl.crawler == "ache" %}
 <div class='row'>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <form method="get">
@@ -176,27 +172,6 @@
   </div>
 </div>
 {% endif %}
-
-<!--
-{% if crawl.crawler == "nutch" %}
-<div class='row'>
-    <div id="nutchButtons" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-        <br>
-
-        <button id="gotoSolr" type="button" title="Goto Solr" class="btn btn-default btn-duo center">
-            <a>View Results in Solr</a>
-        </button>
-        <button id="dumpImages" type="button" title="Dump crawled images" class="btn btn-default btn-duo center">
-            <a>Dump Images</a>
-        </button>
-        <a id="gotoKibana"
-            style="float:left;" class="btn btn-default btn-duo center link-button" href="{{ kibana }}">
-            Kibana
-        </a>
-    </div>
-</div>
-{% endif %}
--->
 
 {% if crawl.description or crawl.crawler == "ache" %}
 <div class='row'>

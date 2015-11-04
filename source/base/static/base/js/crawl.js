@@ -138,49 +138,6 @@ $( document ).ready(function() {
     });
   });
 
-  function forceStop(){
-    $( '#status' ).text( "STOPPING" );
-    onOffStatus("STOPPING");
-    this.disabled = true;
-
-    $.ajax({
-      type: "POST",
-      data: {
-        "action": "force_stop",
-      },
-      success: function(response) {
-        $( '#status' ).text(response.status);
-        onOffStatus(response.status);
-      },
-      failure: function() {
-        $( '#status' ).text( "Error (could not stop crawl)" );
-      }
-    });
-    return "success"
-  }
-
-  $('#forceStopButton').on('click', function() {
-    swal({
-      title: "Are you sure?",
-      text: "This will corrupt all crawl data, and you will be unable to restart the crawl.",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: '#DD6B55',
-      confirmButtonText: 'Yes, stop it!',
-      cancelButtonText: "No, cancel!",
-      closeOnConfirm: false,
-      closeOnCancel: false
-    },
-    function(isConfirm){
-      if (isConfirm){
-        forceStop();
-        swal("Stopped", "Your crawl has been stopped.", "success");
-      } else {
-        swal("Cancelled", "You cancelled the force-stop process", "error");
-      }
-    })
-  })
-
   $('#restartButton').on('click', function() {
 
     $( '#status' ).text( "RESTARTING" );
