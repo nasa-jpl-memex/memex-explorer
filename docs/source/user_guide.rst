@@ -6,10 +6,10 @@ User's Guide to Memex Explorer
 Application Structure
 =====================
 
-The goal of Memex explorer is the bring together the functionalities of several applications in a seamless way, in order to assist the user in searching the deep web for domain specific information. Memex Explorer has integration with several applications, providing a front-end to various crawlers and domain search tools.
+The goal of Memex explorer is the bring together the functionality of several applications in a seamless way, in order to assist the user in searching the deep web for domain specific information. Memex Explorer has integration with several applications, providing a front-end to various crawlers and domain search tools.
 
 Web Crawling
-  With Memex Explorer you can create, run, and analyze `Nutch <http://nutch.apache.org/>`_ and `ACHE <https://github.com/ViDA-NYU/ache>`_ crawls. The crawl operation is heavily abstracted and simplified. Users provide a list of seed URLs to start the crawl, and in the case of ACHE's targeted crawling, a machine learning `model <https://github.com/ViDA-NYU/ache#build-a-model-for-aches-page-classifier>`_ to declare the relevancy of crawled pages.
+  With Memex Explorer you can create, run, and analyze `Nutch <http://nutch.apache.org/>`_ and `ACHE <https://github.com/ViDA-NYU/ache>`_ crawls. The crawl operation is heavily abstracted and simplified. Users provide a list of seed URLs to start the crawl, and in the case of ACHE's targeted crawling, a `machine learning model <https://github.com/ViDA-NYU/ache#build-a-model-for-aches-page-classifier>`_ to determine the relevancy of crawled pages.
 
 Dataset Analysis
    Memex Explorer allows you to upload a large number of files, which will be analyized by Tika and placed into our Elasticsearch instance. Tika will exctact metadata from these documents, giving you a better overiew of them.
@@ -58,7 +58,7 @@ To register a new crawl model, click on the "Add Crawl Model" button in the Craw
 
 .. image:: _static/img/add-crawl-model.png
 
-Uploading Files and Index Creation
+Uploading Files and Dataset Creation
 **********************************
 
 With Memex Explorer you can create indices by uploading zipfiles of important documents. Memex Explorer will analyze these documents with `Tika <https://tika.apache.org/>`_. You can then easily access the documents from the local Elasticsearch index, and incorporate them into other data analysis tools. You can create the dataset by clicking "Add Dataset" on the project page. 
@@ -83,7 +83,7 @@ Each crawl requires a seeds list object. Ache requires the seed list in a textfi
 
 .. image:: _static/img/create-seeds.png
 
-Seeds require a valid name, and either a file or urls placed in the textarea below. If any of your seeds are invalid, you will get a form error, and all the invalid urls will be highlighted. 
+Seeds require a valid name, and either a file or URLs placed in the textarea below. If any of your seeds are invalid, you will get a form error, and all the invalid urls will be highlighted. 
 
 Creating a Seeds List from a DataWake Trail
 *******************************************
