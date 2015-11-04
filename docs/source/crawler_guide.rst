@@ -28,17 +28,25 @@ Creating a Seeds List
 
     Simply put, the seeds list should contain pages that are relevant to the topics you are searching. Both Nutch and Ache provide insight into the relevance of your seeds list, but in different ways.
 
-    For the purposes of memex-explorer, the extenstion and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler.
+    For the purposes of memex-explorer, the extenstion and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler. 
+
+    Seeds lists are created on the seeds page, and seeds lists can be created from the add crawl page.
 
 Crawler Control Buttons
 =======================
 Here's an overview of the buttons available to each crawler for controlling the crawlers. The buttons behave differently depending on which crawler you are using.
 
-.. image:: _static/img/crawler_control.png
+These are the buttons available for Ache:
+
+.. image:: _static/img/ache-buttons.png
+
+These are the buttons available for Nutch:
+
+.. image:: _static/img/nutch-buttons.png
 
 Options Button
 --------------
-    Symbolized by the "gears" icon. This allows you to change various settings on the crawl. See `Crawl Settings`_.
+    Symbolized by the "pencil" icon. This allows you to change various settings on the crawl. See `Crawl Settings`_.
 
 Start Button
 ------------
@@ -54,19 +62,20 @@ Restart Button
 --------------
     Symbolized by the "refresh" icon. Restarts the current crawl. This button is only available after the crawl has stopped.
 
-    With Ache, it will immediately start a brand new Ache crawl, deleting all of the previous crawl information. With Nutch, it will start a new crawler round, using the  information gathered by the crawl in the previous round.
-
-Get Seeds List
---------------
-    This button will let you download the list of seeds that the crawler is currently using.
+    With Ache, it will immediately start a brand new Ache crawl, deleting all of the previous crawl information. With Nutch, it will start a new crawler round, using the information gathered by the crawl in the previous round.
 
 Get Crawl Log
 -------------
-    This button will let you download the log of the current running crawl. This allows you to see the progress of the crawl and any errors that may be occurring during the crawl.
+    This button will let you download the log of the current running crawl. This allows you to see the progress of the crawl and any errors that may be occurring during the crawl. This is only available for Ache crawls.
+
+CCA Export
+----------
+
+    This button is Nutch only. It allows you to export your crawl data into the CCA format.
 
 Crawl Settings
 ==============
-    The crawl settings page allows you to delete the crawl, as well as change the name or description of the crawl. It is accessed by clicking the "gears" icon next to the name of the crawl.
+    The crawl settings page allows you to delete the crawl, as well as change the name or description of the crawl. It is accessed by clicking the "pencil" icon next to the name of the crawl.
 
     .. image:: _static/img/crawl_settings.png
 
@@ -83,23 +92,19 @@ Nutch
 
     The number of pages left to crawl in a Nutch round increases significantly after each round. With Nutch, you can pass it a seeds list of 100 pages to crawl, and it can find over 1000 pages to crawl for the next round. Because of this, Nutch is a much easier crawler to get running.
 
+    Memex Explorer currently uses the Nutch REST API for running all crawls.
+
 Nutch Dashboard
 =======================
-.. image:: _static/img/nutch_dashboard.png
+    Memex explorer recently added features for monitoring the status of Nutch crawls. You can now get real-time information about which pages Nutch is currently crawling, and information about the duration of the crawl.
+
+.. image:: _static/img/nutch-dashboard.png
 
 Statistics
 ----------
-    memex-explorer will tell you how many pages have been crawled after the current round has finished.
+    Nutch will tell you how many pages have been crawled after the current round has finished.
 
-Nutch Specific Buttons
-----------------------
-    Nutch has two buttons which are unique to its implementation.
-
-    View results in Solr
-        The first button is a link to a Solr instance, which you can use to search the results of the crawls using the standard Solr interface.
-
-    Dump Images
-        This button will download all of the images discovered during the crawl. The images are dumped to a folder on the filesystem. Image Space will use these images as part of its application.
+.. image:: _static/img/nutch_stats.png
 
 .. _ache-section:
 
@@ -110,13 +115,13 @@ Ache
 
 Ache Dashboard
 ======================
-.. image:: _static/img/ache_dashboard1.png
+.. image:: _static/img/ache-dashboard.png
 
 .. image:: _static/img/ache_stats.png
 
 Plots
 -----
-    memex-explorer uses `Bokeh <http://bokeh.pydata.org/en/latest/>`_ for its plots. There are two plots available for analyzing Ache crawls, Domain Relevance and Harvest Rate.
+    Memex Explorer uses `Bokeh <http://bokeh.pydata.org/en/latest/>`_ for its plots. There are two plots available for analyzing Ache crawls, Domain Relevance and Harvest Rate.
 
     The Domain Relevance plot sorts domains by the number of pages crawled, and adds information for relevancy of that domain to your crawl model. This plot helps you understand how well your model fits.
 
@@ -133,7 +138,7 @@ Ache Specific Buttons
     Ache has a "Download Relevant Pages" button, which will allow you download which pages Ache has found to be relevant to your seeds list and your crawl model.
 
 Building a Crawl Model
-======================
+----------------------
     Ache requires a crawl model to run. For information on how to build crawl models, see the `Ache readme <https://github.com/ViDA-NYU/ache/blob/master/README.md>`_.
 
     For more detailed information on Ache, head to the `Ache Wiki <https://github.com/ViDA-NYU/ache/wiki>`_.
