@@ -33,26 +33,24 @@ RUN bash ./Miniconda-latest-Linux-x86_64.sh -b
 RUN git clone https://github.com/memex-explorer/memex-explorer
 
 WORKDIR /home/explorer/memex-explorer/
-RUN git checkout origin/ahmadia/tad_integration_master
 
 WORKDIR /home/explorer/memex-explorer
-ENV PATH /home/explorer/miniconda/bin:$PATH
+ENV PATH /home/explorer/miniconda2/bin:$PATH
 RUN conda update conda -y
 RUN conda install conda-env -y
-RUN conda env update --file local-environment.yml
+RUN conda env update 
 
 WORKDIR /home/explorer/memex-explorer/source/memex
 RUN cp settings_files/dev_settings.py settings.py
 
 WORKDIR /home/explorer/memex-explorer/source
 #replaces source activate... sorta
-ENV PATH /home/explorer/miniconda/envs/memex/bin:$PATH
+ENV PATH /home/explorer/miniconda2/envs/memex/bin:$PATH
 ENV CONDA_DEFAULT_ENV memex
-ENV CONDA_ENV_PATH /home/explorer/miniconda
+ENV CONDA_ENV_PATH /home/explorer/miniconda2
+# move these into another environment.yaml?  Or better, apply them as a patch?
+RUN conda install -c memex ddt
 RUN python manage.py migrate
-
-WORKDIR /home/explorer/memex-explorer/deploy
-RUN python logio_settings.py
 
 ### TAD
 # Move this up eventually
@@ -60,9 +58,9 @@ USER root
 RUN apt-get install -y rabbitmq-server
 
 USER explorer
-ENV PATH /home/explorer/miniconda/envs/memex/bin:$PATH
+ENV PATH /home/explorer/miniconda2/envs/memex/bin:$PATH
 ENV CONDA_DEFAULT_ENV memex
-ENV CONDA_ENV_PATH /home/explorer/miniconda
+ENV CONDA_ENV_PATH /home/explorer/miniconda2
 RUN pip install celery
 RUN pip install fisher elasticsearch
 RUN pip install flask flask_restful
@@ -102,13 +100,13 @@ COPY resources /home/explorer/memex-explorer/source/resources/
 COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
 
 # TAD run script
-COPY tad_run /home/explorer/miniconda/envs/memex/bin/tad
+COPY tad_run /home/explorer/miniconda2/envs/memex/bin/tad
 
 # Permissions clean-up
 USER root
 RUN chown -R explorer /home/explorer/memex-explorer/source
-RUN chmod +x /home/explorer/miniconda/envs/memex/bin/tad
-RUN chown -R explorer /home/explorer/miniconda/envs/memex/bin/tad
+RUN chmod +x /home/explorer/miniconda2/envs/memex/bin/tad
+RUN chown -R explorer /home/explorer/miniconda2/envs/memex/bin/tad
 
 #------------- Service Configuration --------------#
 # Permissions clean-up 
@@ -122,7 +120,6 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER explorer
 WORKDIR /home/explorer/memex-explorer/
-RUN git fetch && checkout origin/ahmadia/tad_integration_master
 
 ##################### INSTALLATION END #####################
 
@@ -138,3 +135,14 @@ EXPOSE 5000
 USER explorer
 WORKDIR /home/explorer/memex-explorer/source
 ENTRYPOINT "supervisord"
+
+### HACKING!
+
+# SQLite (Django)
+COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
+# Permissions clean-up
+USER root
+RUN chown -R explorer /home/explorer/memex-explorer/source
+
+USER explorer
+WORKDIR /home/explorer/memex-explorer/source
