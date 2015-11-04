@@ -117,7 +117,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'memex/logs/debug.log'),
+            'filename': os.path.join(BASE_DIR, 'resources/logs/django-app.log'),
         },
     },
     'loggers': {
