@@ -18,7 +18,7 @@ Domain Discovery Tool
   Through the use of `Domain Discovery Tool <https://github.com/ViDA-NYU/domain_discovery_tool>`_, the user can search for content in the web and build data models based on clustering algorithms. The user can search the web and highlight relevant and irrelevant pages, and DDT will produce data model files, which you can use with Ache crawls in Memex Explorer.
 
 DataWake
-   `DataWake <https://github.com/Sotera/Datawake>`_ is a server and firefox plugin that tracks your search investigations. It keeps track of where you search, so that "trails" can be built out of the information that you gather. These trails can be converted to seeds lists in Memex Explorer, and can be used in both...
+   `DataWake <https://github.com/Sotera/Datawake>`_ is a server and firefox plugin that tracks your search investigations. It keeps track of where you search, so that "trails" can be built out of the information that you gather. These trails can be converted to seeds lists in Memex Explorer, and can be used in both Nutch and Ache crawls.
 
 Home Page
 =========
