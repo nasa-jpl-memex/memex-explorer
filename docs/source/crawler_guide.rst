@@ -28,7 +28,7 @@ Creating a Seeds List
 
     Simply put, the seeds list should contain pages that are relevant to the topics you are searching. Both Nutch and Ache provide insight into the relevance of your seeds list, but in different ways.
 
-    For the purposes of memex-explorer, the extenstion and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler. 
+    For the purposes of memex-explorer, the extension and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler. 
 
     Seeds lists are created on the seeds page, and seeds lists can be created from the add crawl page.
 

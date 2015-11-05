@@ -13,7 +13,7 @@ Project Creation
 
     a. Click the new project button.
     b. Provide a name and a description for the project on the next page, and press submit.
-    c. Veryify that your new project shows up on the project page list.
+    c. Verify that your new project shows up on the project page list.
     d. Click on the new project and go to the project page. Verify that there are no crawls, models, or datasets yet.
 
 Project Settings
