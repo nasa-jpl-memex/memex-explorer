@@ -67,6 +67,6 @@ The current entity relation diagram:
 
 Updating the Database
 ---------------------
-As of version 0.4.0, Memex Explorer will start tracking all database migrations. This means that you will be able to upgrade your databse and preserve the data without any issues.
+As of version 0.4.0, Memex Explorer will start tracking all database migrations. This means that you will be able to upgrade your database and preserve the data without any issues.
 
 If you are using a version that is 0.3.0 or earlier, and you are unable to update your database without server errors, the best course if action is to delete the existing `file at source/db.sqlite3` and start over with a fresh database.

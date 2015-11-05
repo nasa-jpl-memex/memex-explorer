@@ -12,7 +12,7 @@ Web Crawling
   With Memex Explorer you can create, run, and analyze `Nutch <http://nutch.apache.org/>`_ and `ACHE <https://github.com/ViDA-NYU/ache>`_ crawls. The crawl operation is heavily abstracted and simplified. Users provide a list of seed URLs to start the crawl, and in the case of ACHE's targeted crawling, a `machine learning model <https://github.com/ViDA-NYU/ache#build-a-model-for-aches-page-classifier>`_ to determine the relevancy of crawled pages.
 
 Dataset Analysis
-   Memex Explorer allows you to upload a large number of files, which will be analyized by Tika and placed into our Elasticsearch instance. Tika will exctact metadata from these documents, giving you a better overiew of them.
+   Memex Explorer allows you to upload a large number of files, which will be analyzed by Tika and placed into our Elasticsearch instance. Tika will exctact metadata from these documents, giving you a better overview of them.
 
 Domain Discovery Tool
   Through the use of `Domain Discovery Tool <https://github.com/ViDA-NYU/domain_discovery_tool>`_, the user can search for content in the web and build data models based on clustering algorithms. The user can search the web and highlight relevant and irrelevant pages, and DDT will produce data model files, which you can use with Ache crawls in Memex Explorer.
@@ -98,4 +98,3 @@ Editing a Seeds List
 Once you have created your seeds list, you can edit through our built in editor. This editor allow you to change the content of your seeds list, by adding or removing seeds. It will also validate all of the URLs and display the ones which contain errors.
 
 .. image:: _static/img/edit-seeds.png
-
