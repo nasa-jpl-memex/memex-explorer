@@ -33,7 +33,7 @@ Application Setup
 Enabling Nutch Visualizations
 =============================
 
-   Nutch visualizations are not enabled by default. Nutch visualizations require RabbitMQ, and the method for installing RabbitMQ varies depending on the operating system. RabbitMQ can be installed via Homebrew on Mac, and apt-get on Debian systems. More information on how to install RabbitMQ, read `this page <https://www.rabbitmq.com/download.html>`_.
+   Nutch visualizations are not enabled by default. Nutch visualizations require RabbitMQ, and the method for installing RabbitMQ varies depending on the operating system. RabbitMQ can be installed via Homebrew on Mac, and apt-get on Debian systems. More information on how to install RabbitMQ, read `this page <https://www.rabbitmq.com/download.html>`_.  Note: You may also need to change the below command to `sudo rabbitmq-server`, depending on how RabbitMQ is installed on your system and the permissions of the current user.
 
    To enable Bokeh visualizations for Nutch, change ``autostart=false`` to ``autostart=true`` for both of these directives in source/supervisord.conf, and then kill and restart supervisor.
 
