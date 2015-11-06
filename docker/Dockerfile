@@ -144,5 +144,23 @@ COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
 USER root
 RUN chown -R explorer /home/explorer/memex-explorer/source
 
+# Move this up
+RUN service rabbitmq-server stop
+RUN update-rc.d rabbitmq-server disable
+
+USER root
+RUN apt-get install -y nginx
+COPY nginx.conf /etc/nginx/sites-enabled/default
+
+
+EXPOSE 80
+
+# move up
+COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
+RUN chown explorer /home/explorer/memex-explorer/source/memex/settings.py
+
 USER explorer
 WORKDIR /home/explorer/memex-explorer/source
+
+# Dirty dirty hacks
+RUN git checkout ahmadia/docker-v0.4
