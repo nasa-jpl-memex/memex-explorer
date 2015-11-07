@@ -51,6 +51,7 @@ ENV CONDA_ENV_PATH /home/explorer/miniconda2
 # move these into another environment.yaml?  Or better, apply them as a patch?
 RUN conda install -c memex ddt
 RUN python manage.py migrate
+RUN python manage.py collectstatic -v0 --noinput
 
 ### TAD
 # Move this up eventually
@@ -82,22 +83,6 @@ USER explorer
 COPY supervisord.conf /home/explorer/memex-explorer/source/supervisord.conf
 # Need dev_settings that point to right locations
 COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
-
-# Now bring over elasticsearch index data
-COPY elasticdump.json /home/explorer/elasticdump.json
-
-# Install elasticdump
-RUN npm install -g elasticdump
-
-# Load data
-# Elasticsearch data
-COPY populate_elasticsearch.sh /home/explorer/populate_elasticsearch.sh
-WORKDIR /home/explorer
-RUN /bin/bash ./populate_elasticsearch.sh
-# Crawl data 
-COPY resources /home/explorer/memex-explorer/source/resources/
-# SQLite (Django)
-COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
 
 # TAD run script
 COPY tad_run /home/explorer/miniconda2/envs/memex/bin/tad
@@ -138,8 +123,6 @@ ENTRYPOINT "supervisord"
 
 ### HACKING!
 
-# SQLite (Django)
-COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
 # Permissions clean-up
 USER root
 RUN chown -R explorer /home/explorer/memex-explorer/source
@@ -151,9 +134,12 @@ RUN update-rc.d rabbitmq-server disable
 USER root
 RUN apt-get install -y nginx
 COPY nginx.conf /etc/nginx/sites-enabled/default
-
+COPY secrets/nginx.crt /etc/nginx/ssl/nginx.crt
+COPY secrets/nginx.key /etc/nginx/ssl/nginx.key
+COPY secrets/htpasswd /etc/nginx/htpasswd
 
 EXPOSE 80
+EXPOSE 443
 
 # move up
 COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
@@ -163,4 +149,9 @@ USER explorer
 WORKDIR /home/explorer/memex-explorer/source
 
 # Dirty dirty hacks
+# TODO: don't check below line in
+RUN git fetch origin
 RUN git checkout ahmadia/docker-v0.4
+
+# TODO: Move to other environment variables
+ENV VIRTUAL_PROTO https
