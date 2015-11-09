@@ -30,8 +30,12 @@ $( document ).ready(function() {
   }
 
   function onOffStatus(status){
-    onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
-    onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+    try{
+      onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
+      onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+    }catch(err){
+      console.log("ERROR: Crawl dashboard failed to regcognize status \"" + status + "\"");
+    }
   }
 
   function statusCall(){
