@@ -30,8 +30,12 @@ $( document ).ready(function() {
   }
 
   function onOffStatus(status){
-    onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
-    onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+    try{
+      onOffGroup(statuses.states[status]["disabled"], statuses.buttons, true);
+      onOffGroup(statuses.states[status]["enabled"], statuses.buttons, false);
+    }catch(err){
+      console.log("ERROR: Failed to render status " + status + " on crawl dashboard.");
+    }
   }
 
   function statusCall(){
