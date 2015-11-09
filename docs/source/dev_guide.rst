@@ -30,27 +30,6 @@ Application Setup
 
    Memex Explorer will now be running locally at `http://localhost:8000 <http://localhost:8000/>`_.
 
-Enabling Nutch Visualizations
-=============================
-
-   Nutch visualizations are not enabled by default. Nutch visualizations require RabbitMQ, and the method for installing RabbitMQ varies depending on the operating system. RabbitMQ can be installed via Homebrew on Mac, and apt-get on Debian systems. More information on how to install RabbitMQ, read `this page <https://www.rabbitmq.com/download.html>`_.  Note: You may also need to change the below command to `sudo rabbitmq-server`, depending on how RabbitMQ is installed on your system and the permissions of the current user.
-
-   To enable Bokeh visualizations for Nutch, change ``autostart=false`` to ``autostart=true`` for both of these directives in source/supervisord.conf, and then kill and restart supervisor.
-
-   .. code-block:: html
-
-      [program:rabbitmq]
-      command=rabbitmq-server
-      priority=1
-      -autostart=false
-      +autostart=true
-
-      [program:bokeh-server]
-      command=bokeh-server --backend memory --port 5006
-      priority=1
-      -autostart=false
-      +autostart=true
-
 Tests
 =====
     To run the tests, return to the root directory and run:
@@ -70,3 +49,27 @@ Updating the Database
 As of version 0.4.0, Memex Explorer will start tracking all database migrations. This means that you will be able to upgrade your database and preserve the data without any issues.
 
 If you are using a version that is 0.3.0 or earlier, and you are unable to update your database without server errors, the best course if action is to delete the existing `file at source/db.sqlite3` and start over with a fresh database.
+
+Enabling Non-Default Services
+==========================
+
+Nutch Visualizations
+--------------------
+
+   Nutch visualizations are not enabled by default. Nutch visualizations require RabbitMQ, and the method for installing RabbitMQ varies depending on the operating system. RabbitMQ can be installed via Homebrew on Mac, and apt-get on Debian systems. More information on how to install RabbitMQ, read `this page <https://www.rabbitmq.com/download.html>`_.  Note: You may also need to change the below command to `sudo rabbitmq-server`, depending on how RabbitMQ is installed on your system and the permissions of the current user.
+
+   To enable Bokeh visualizations for Nutch, change ``autostart=false`` to ``autostart=true`` for both of these directives in source/supervisord.conf, and then kill and restart supervisor.
+
+   .. code-block:: html
+
+      [program:rabbitmq]
+      command=rabbitmq-server
+      priority=1
+      -autostart=false
+      +autostart=true
+
+      [program:bokeh-server]
+      command=bokeh-server --backend memory --port 5006
+      priority=1
+      -autostart=false
+      +autostart=true
