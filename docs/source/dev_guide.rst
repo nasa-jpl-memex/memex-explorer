@@ -94,7 +94,7 @@ Temporal Anomaly Detection (TAD)
 
    TAD does not currently have a conda package. Like the Nutch visualizations, it also has a RabbitMQ dependency. For instructions on installing TAD, visit the `github repository <https://github.com/autonlab/tad>`_.
 
-   Like DDT and Nutch Visualizations, you also have to change the supervisord directive.
+   Like DDT and Nutch Visualizations, you also have to change the supervisor directive.
 
    .. code-block:: html
 
