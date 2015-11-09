@@ -38,11 +38,11 @@ Crawler Control Buttons
 
    These are the buttons available for Ache:
 
-.. image:: _static/img/ache-buttons.png
+   .. image:: _static/img/ache-buttons.png
 
    These are the buttons available for Nutch:
 
-.. image:: _static/img/nutch-buttons.png
+   .. image:: _static/img/nutch-buttons.png
 
 Options Button
 --------------
@@ -54,9 +54,9 @@ Start Button
 
 Stop Button
 -----------
-    Symbolized by the "stop" button. Stops the crawl.
+   Symbolized by the "stop" button. Stops the crawl.
 
-    In the case of Ache, the crawler stops immediately. In the case of Nutch, the crawler stops after it has finished the current round. This is in order to prevent data corruption that can occur when killing the Nutch process.
+   In the case of Ache, the crawler stops immediately. In the case of Nutch, the crawler stops after it has finished the current round. This is in order to prevent data corruption that can occur when killing the Nutch process.
 
 Restart Button
 --------------
@@ -70,8 +70,11 @@ Get Crawl Log
 
 CCA Export
 ----------
-
     This button is Nutch only. It allows you to export your crawl data into the CCA format.
+
+Rounds Input
+------------
+   Nutch only. This allows you to specify how many rounds you want the crawl to run. You can press the stop button at any time and it will stop when it is done with the current round.
 
 Crawl Settings
 ==============
