@@ -6,9 +6,9 @@ Developer's Guide to Memex Explorer
 Setting up Memex Explorer
 *************************
 
-To setup your machine, you will need Anaconda or Miniconda installed. Miniconda is a minimal Anaconda installation that bootstraps conda and Python on any operating system. Install `Anaconda <http://continuum.io/downloads>`_ or `Miniconda <http://conda.pydata.org/miniconda.html>`_ from their respective sites.
+   To setup your machine, you will need Anaconda or Miniconda installed. Miniconda is a minimal Anaconda installation that bootstraps conda and Python on any operating system. Install `Anaconda <http://continuum.io/downloads>`_ or `Miniconda <http://conda.pydata.org/miniconda.html>`_ from their respective sites.
 
-Memex Explorer requires conda, either from Miniconda or Anaconda.
+   Memex Explorer requires conda, either from Miniconda or Anaconda.
 
 Application Setup
 =================
@@ -40,18 +40,18 @@ Tests
 
 The Database Model
 ==================
-The current entity relation diagram:
+   The current entity relation diagram:
 
 .. image:: _static/img/DbVisualizer.png
 
 Updating the Database
 ---------------------
-As of version 0.4.0, Memex Explorer will start tracking all database migrations. This means that you will be able to upgrade your database and preserve the data without any issues.
+   As of version 0.4.0, Memex Explorer will start tracking all database migrations. This means that you will be able to upgrade your database and preserve the data without any issues.
 
-If you are using a version that is 0.3.0 or earlier, and you are unable to update your database without server errors, the best course if action is to delete the existing `file at source/db.sqlite3` and start over with a fresh database.
+   If you are using a version that is 0.3.0 or earlier, and you are unable to update your database without server errors, the best course if action is to delete the existing `file at source/db.sqlite3` and start over with a fresh database.
 
 Enabling Non-Default Services
-==========================
+=============================
 
 Nutch Visualizations
 --------------------
@@ -73,3 +73,8 @@ Nutch Visualizations
       priority=1
       -autostart=false
       +autostart=true
+
+Domain Discovery Tool
+---------------------
+
+   Domain 

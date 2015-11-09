@@ -34,13 +34,13 @@ Creating a Seeds List
 
 Crawler Control Buttons
 =======================
-Here's an overview of the buttons available to each crawler for controlling the crawlers. The buttons behave differently depending on which crawler you are using.
+   Here's an overview of the buttons available to each crawler for controlling the crawlers. The buttons behave differently depending on which crawler you are using.
 
-These are the buttons available for Ache:
+   These are the buttons available for Ache:
 
 .. image:: _static/img/ache-buttons.png
 
-These are the buttons available for Nutch:
+   These are the buttons available for Nutch:
 
 .. image:: _static/img/nutch-buttons.png
 
