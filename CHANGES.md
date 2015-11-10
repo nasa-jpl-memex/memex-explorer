@@ -1,3 +1,13 @@
+# 0.4
+
+Released November 2015
+
+* Nutch streaming visualizations
+* Nutch REST API support
+* Removed log.io
+* DataWake trail support
+* Bug fixes
+
 # 0.3
 
 Released September 2015
