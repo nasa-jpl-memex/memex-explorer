@@ -28,13 +28,13 @@ Creating a Seeds List
 
     Simply put, the seeds list should contain pages that are relevant to the topics you are searching. Both Nutch and Ache provide insight into the relevance of your seeds list, but in different ways.
 
-    For the purposes of memex-explorer, the extension and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler. 
+    For the purposes of memex-explorer, the extension and name of your seeds list does not matter. It will be automatically renamed and stored according to the specifications of the crawler.
 
     Seeds lists are created on the seeds page, and seeds lists can be created from the add crawl page.
 
 Crawler Control Buttons
 =======================
-   Here's an overview of the buttons available to each crawler for controlling the crawlers. The buttons behave differently depending on which crawler you are using.
+   Here we have an overview of the buttons available to each crawler for controlling the crawlers. The buttons behave differently depending on which one you are using.
 
    These are the buttons available for Ache:
 
@@ -56,7 +56,7 @@ Stop Button
 -----------
    Symbolized by the "stop" button. Stops the crawl.
 
-   In the case of Ache, the crawler stops immediately. In the case of Nutch, the crawler stops after it has finished the current round. This is in order to prevent data corruption that can occur when killing the Nutch process.
+   In the case of Ache, the crawler stops immediately. In the case of Nutch, the crawler stops after it has finished the current process. However, the data on the current round of the crawl will be lost.
 
 Restart Button
 --------------
@@ -89,11 +89,11 @@ Crawl Settings
 *****
 Nutch
 *****
-    `Nutch <http://nutch.apache.org/>`_ is developed by Apache, and has interfaces with both Solr and Elasticsearch, and it allows memex-explorer to offer different crawling functionality from Ache.
+    `Nutch <http://nutch.apache.org/>`_ is developed by Apache, and has an interface with Elasticsearch. All Nutch crawls create Elasticsearch indices by default.
 
-    Nutch runs in uninterruptible rounds of crawling. Nutch will run indefinitely until asked to stop. By viewing the crawl log, it is possible to see how many pages are left to crawl in the current round.
+    With Nutch, you can define how long you want to crawl by setting the number of rounds to crawl. You can keep track of the overall crawl time and the sites currently being crawled by looking at the Nutch crawl visualizations.
 
-    The number of pages left to crawl in a Nutch round increases significantly after each round. With Nutch, you can pass it a seeds list of 100 pages to crawl, and it can find over 1000 pages to crawl for the next round. Because of this, Nutch is a much easier crawler to get running.
+    The number of pages left to crawl in a Nutch round increases significantly after each round. You might pass it a seeds list of 100 pages to crawl, and it can find over 1000 pages to crawl for the next round. Because of this, Nutch is a much easier crawler to get running.
 
     Memex Explorer currently uses the Nutch REST API for running all crawls.
 
