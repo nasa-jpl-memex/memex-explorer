@@ -82,7 +82,6 @@ COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
 
 # TAD configuration
 COPY tad.cfg /service/tad/config/tad.cfg
-RUN chown -R explorer /service
 
 # Now bring over elasticsearch index data
 COPY elasticdump.json /home/explorer/elasticdump.json
@@ -109,6 +108,7 @@ COPY nginx.conf /etc/nginx/sites-enabled/default
 
 # Permissions clean-up
 USER root
+RUN chown -R explorer /service
 RUN chown -R explorer /home/explorer/memex-explorer/source
 RUN chmod +x /home/explorer/miniconda2/envs/memex/bin/tad
 RUN chown -R explorer /home/explorer/miniconda2/envs/memex/bin/tad
