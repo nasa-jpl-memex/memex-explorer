@@ -85,6 +85,7 @@ COPY tad.cfg /service/tad/config/tad.cfg
 
 
 # UNCOMMENT THIS SECTION TO PRELOAD THE ELASTICSEARCH INSTANCE
+# ------------------------------------------------------------- #
 
 # Now bring over elasticsearch index data
 # COPY elasticdump.json /home/explorer/elasticdump.json
@@ -94,11 +95,21 @@ COPY tad.cfg /service/tad/config/tad.cfg
 # COPY populate_elasticsearch.sh /home/explorer/populate_elasticsearch.sh
 # WORKDIR /home/explorer
 # RUN /bin/bash ./populate_elasticsearch.sh
-# Crawl data 
-# uncomment this to copy crawl data (heavy) over
+# ------------------------------------------------------------- #
+
+
+# ------------------------------------------------------------- #
+# UNCOMMENT THIS SECTION TO PRELOAD CRAWL DATA
+# Crawl data
 # COPY resources /home/explorer/memex-explorer/source/resources/
+# ------------------------------------------------------------- #
+
+
+# ------------------------------------------------------------- #
+# UNCOMMENT THIS SECTION TO PRELOAD SQL DATABASE
 # SQLite (Django)
-COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
+# COPY db.sqlite3 /home/explorer/memex-explorer/source/db.sqlite3
+# ------------------------------------------------------------- #
 
 # TAD run script
 COPY tad_run /home/explorer/miniconda2/envs/memex/bin/tad
