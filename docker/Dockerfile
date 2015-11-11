@@ -82,7 +82,7 @@ COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
 # patched in
 WORKDIR /home/explorer/memex-explorer
 RUN conda install markdown
-RUN markdown_py CHANGES.md > source/base/changes.html
+RUN markdown_py CHANGES.md > source/base/static/changes.html
 WORKDIR /home/explorer/memex-explorer/docs
 RUN make html
 RUN mv build/html ../source/base/static/docs
