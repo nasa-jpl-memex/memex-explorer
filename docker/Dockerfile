@@ -83,14 +83,17 @@ COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
 # TAD configuration
 COPY tad.cfg /service/tad/config/tad.cfg
 
+
+# UNCOMMENT THIS SECTION TO PRELOAD THE ELASTICSEARCH INSTANCE
+
 # Now bring over elasticsearch index data
-COPY elasticdump.json /home/explorer/elasticdump.json
+# COPY elasticdump.json /home/explorer/elasticdump.json
 
 # Load data
 # Elasticsearch data
-COPY populate_elasticsearch.sh /home/explorer/populate_elasticsearch.sh
-WORKDIR /home/explorer
-RUN /bin/bash ./populate_elasticsearch.sh
+# COPY populate_elasticsearch.sh /home/explorer/populate_elasticsearch.sh
+# WORKDIR /home/explorer
+# RUN /bin/bash ./populate_elasticsearch.sh
 # Crawl data 
 # uncomment this to copy crawl data (heavy) over
 # COPY resources /home/explorer/memex-explorer/source/resources/
