@@ -11,18 +11,24 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 from common_settings import *
 import os
 
+# SECURITY WARNING: Not setting VIRTUAL_HOST prevents Django from being able to verify headers
+ALLOWED_HOSTS = [os.environ.get('VIRTUAL_HOST', '*')]
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '0#t((zq66&3*87djaltu-pn34%0p!*v_332f2p!$2i)w5y17f8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-PRODUCTION = os.environ.get('PRODUCTION')
+PRODUCTION = os.environ.get('PRODUCTION', False)
+
+# when INLINE is true point to local sources for changes/documentation instead of remote ones
+INLINE = os.environ.get('INLINE', False)
 
 if PRODUCTION:
     DEBUG = False
     TEMPLATE_DEBUG = False
     DEPLOYMENT = True
 else:
-    DEBUG = os.environ.get('DEBUG', )
+    DEBUG = True
     TEMPLATE_DEBUG = True
     INSTALLED_APPS += ('debug_toolbar',)
     DEPLOYMENT = False

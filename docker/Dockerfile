@@ -79,6 +79,13 @@ RUN mkdir /service/tad/config
 USER explorer
 COPY supervisord.conf /home/explorer/memex-explorer/source/supervisord.conf
 COPY docker_settings.py /home/explorer/memex-explorer/source/memex/settings.py
+# patched in
+WORKDIR /home/explorer/memex-explorer
+RUN conda install markdown
+RUN markdown_py CHANGES.md > source/base/changes.html
+WORKDIR /home/explorer/memex-explorer/docs
+RUN make html
+RUN mv build/html ../source/base/static/docs
 
 # TAD configuration
 COPY tad.cfg /service/tad/config/tad.cfg
@@ -138,4 +145,5 @@ USER explorer
 WORKDIR /home/explorer/memex-explorer/source
 ENV HTTP_PROTOCOL http
 ENV WS_PROTOCOL ws
+ENV INLINE 1
 ENTRYPOINT "supervisord"
