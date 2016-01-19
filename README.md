@@ -1,6 +1,10 @@
 [![Build Status](https://travis-ci.org/memex-explorer/memex-explorer.svg?branch=master)](https://travis-ci.org/memex-explorer/memex-explorer)
 [![Coverage Status](https://coveralls.io/repos/ContinuumIO/memex-explorer/badge.svg?branch=master)](https://coveralls.io/r/ContinuumIO/memex-explorer?branch=master)
 
+# *DISCLAIMER*
+
+*Memex explorer has currently been put on hold. Support and development on this project has ceased for the immediate future.*
+
 # memex-explorer
 
 Memex Explorer is a web application that provides easy-to-use interfaces for gathering, analyzing, and graphing web crawl data.
